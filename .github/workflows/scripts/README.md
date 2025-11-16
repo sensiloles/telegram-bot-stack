@@ -1,277 +1,255 @@
-# GitHub Workflows Scripts
+# GitHub Automation Scripts
 
-Automation scripts for GitHub workflows and issue management.
+Modern PyGithub-based scripts for GitHub automation.
 
-## 📋 Scripts Overview
+## 🚀 Quick Start
 
-### Cloud Agent Scripts
+All scripts automatically load `GITHUB_TOKEN` from `.env` or environment.
 
-Scripts for automated issue management via Cloud Agent:
-
-- **`auto_label.py`** - Automatic issue labeling based on content
-- **`generate_subtasks.py`** - Break down issues into subtasks
-- **`add_acceptance_criteria.py`** - Generate acceptance criteria for issues
-- **`analyze_context.py`** - Analyze codebase context for issues
-- **`parse_command.py`** - Parse slash commands in issue comments
-- **`execute_command.py`** - Execute parsed commands
-
-### Issue Management Scripts
-
-#### `read_issues.py` - GitHub Issues Reader
-
-Read and manage GitHub issues from command line or workflows.
-
-**Features:**
-
-- ✅ Read specific issues by number
-- ✅ List issues with filters (state, labels)
-- ✅ JSON export for automation
-- ✅ Works with GitHub CLI or API
-- ✅ Auto-detects repository from git
-
-**Usage:**
+### Read Issues
 
 ```bash
-# Read specific issue
-python .github/workflows/scripts/read_issues.py 1
+# List open issues
+python3 .github/workflows/scripts/read_issues.py --list
 
-# List all open issues
-python .github/workflows/scripts/read_issues.py --list
+# Get specific issue details
+python3 .github/workflows/scripts/read_issues.py 4
 
-# List issues with labels
-python .github/workflows/scripts/read_issues.py --list --labels "refactor"
+# List with filters
+python3 .github/workflows/scripts/read_issues.py --list --state closed
+python3 .github/workflows/scripts/read_issues.py --list --labels bug,priority:high
 
-# Export to JSON
-python .github/workflows/scripts/read_issues.py 1 --json
+# JSON export
+python3 .github/workflows/scripts/read_issues.py 4 --json > issue.json
 ```
 
-**Command Line Options:**
+### Create Issue
 
 ```bash
-usage: read_issues.py [-h] [--list] [--state {open,closed,all}]
-                      [--labels LABELS] [--limit LIMIT] [--repo REPO]
-                      [--json] [--brief]
-                      [issue_number]
+# From markdown file
+python3 .github/workflows/scripts/create_issue.py \
+    --title "Bug: Fix tests" \
+    --file /tmp/issue.md \
+    --labels bug,priority:high
 
-Options:
-  issue_number          Issue number to read
-  --list               List issues instead of reading specific one
-  --state              Filter by state: open, closed, all (default: open)
-  --labels LABELS      Filter by labels (comma-separated)
-  --limit LIMIT        Max issues to list (default: 30)
-  --repo REPO          Repository in format owner/repo (auto-detected)
-  --json               Output raw JSON
-  --brief              Show brief output without full body
+# From stdin
+echo "Issue description" | python3 .github/workflows/scripts/create_issue.py \
+    --title "Feature request"
+
+# Interactive (type description, Ctrl+D when done)
+python3 .github/workflows/scripts/create_issue.py --title "New feature"
+
+# Dry run (preview without creating)
+python3 .github/workflows/scripts/create_issue.py --title "Test" --file issue.md --dry-run
 ```
 
-**Authentication:**
+## 📚 Module: `github_helper.py`
 
-The script supports multiple authentication methods:
+Unified GitHub API helper for all scripts.
 
-1. **GitHub CLI** (recommended):
+```python
+from github_helper import get_repo, get_github_client
 
-   ```bash
-   gh auth login
-   ```
+# Get repository (auto-detected from git)
+repo = get_repo()
 
-2. **Environment Variable**:
+# Or specify explicitly
+repo = get_repo("sensiloles/telegram-bot-stack")
 
-   ```bash
-   export GITHUB_TOKEN="your_token_here"
-   ```
+# Get authenticated client
+gh = get_github_client()
+user = gh.get_user()
+print(f"Authenticated as: {user.login}")
 
-3. **From .env**:
-   ```bash
-   source .env
-   export GITHUB_TOKEN=$GITHUB_TOKEN
-   ```
+# List issues
+for issue in repo.get_issues(state='open'):
+    print(f"#{issue.number}: {issue.title}")
 
-**Examples:**
+# Create issue
+issue = repo.create_issue(
+    title="Bug: Something broke",
+    body="Detailed description...",
+    labels=["bug", "priority:high"]
+)
+print(f"Created: {issue.html_url}")
+```
+
+### Features
+
+- ✅ Automatic token loading from `.env`
+- ✅ Auto-detect repository from git remote
+- ✅ Proper error handling with helpful messages
+- ✅ Type hints for better IDE support
+- ✅ Auto-installs PyGithub if missing
+
+## 🔧 Setup
+
+### 1. Install Dependencies
 
 ```bash
-# Get issue with full details
-python .github/workflows/scripts/read_issues.py 1
-
-# Get brief summary
-python .github/workflows/scripts/read_issues.py 1 --brief
-
-# List all open issues
-python .github/workflows/scripts/read_issues.py --list
-
-# List closed issues
-python .github/workflows/scripts/read_issues.py --list --state closed
-
-# Filter by multiple labels
-python .github/workflows/scripts/read_issues.py --list --labels "bug,priority:high"
-
-# Export to JSON for processing
-python .github/workflows/scripts/read_issues.py 1 --json | jq '.title'
-
-# List issues from specific repo
-python .github/workflows/scripts/read_issues.py --list --repo "owner/repo"
+pip install PyGithub
 ```
 
-**Use in Workflows:**
+Or let the scripts auto-install it.
 
-```yaml
-- name: Read issue
-  env:
-    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  run: |
-    python .github/workflows/scripts/read_issues.py ${{ github.event.issue.number }} --json
-```
+### 2. Configure Token
 
-## 🔧 Development
-
-### Requirements
-
-- Python 3.9+
-- GitHub CLI (`gh`) - optional but recommended
-- Environment variable `GITHUB_TOKEN` for API access
-
-### Adding New Scripts
-
-When adding new scripts:
-
-1. Add shebang: `#!/usr/bin/env python3`
-2. Make executable: `chmod +x script_name.py`
-3. Add comprehensive docstring
-4. Update this README
-5. Follow project code style (ruff)
-
-### Testing Scripts Locally
+Create `.env` in workspace root:
 
 ```bash
-# Install dependencies
-pip install -e .
-
-# Test script help
-python .github/workflows/scripts/read_issues.py --help
-
-# Test with different auth methods
-gh auth status  # Check gh CLI
-echo $GITHUB_TOKEN  # Check token
+GITHUB_TOKEN=your_github_token_here
 ```
 
-## 📚 Script Details
+Or export to environment:
 
-### Cloud Agent Workflow
-
-The Cloud Agent scripts work together in the following flow:
-
-1. **Issue/Comment Event** → Trigger workflow
-2. **`parse_command.py`** → Detect slash commands
-3. **`execute_command.py`** → Route to appropriate handler
-4. **Handler Scripts** → Process request:
-   - `auto_label.py` - Add labels
-   - `generate_subtasks.py` - Create subtasks
-   - `add_acceptance_criteria.py` - Add criteria
-   - `analyze_context.py` - Analyze code context
-
-### Issue Reader Workflow
-
-The `read_issues.py` script can be used:
-
-1. **Standalone** - Command line tool for manual issue management
-2. **In Workflows** - Automated issue processing
-3. **With Other Tools** - JSON export for integration
-
-## 🚀 Usage in Workflows
-
-### Example: Process New Issues
-
-```yaml
-name: Process New Issue
-
-on:
-  issues:
-    types: [opened]
-
-jobs:
-  process:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Read issue details
-        id: issue
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          ISSUE_DATA=$(python .github/workflows/scripts/read_issues.py \
-            ${{ github.event.issue.number }} --json)
-          echo "title=$(echo $ISSUE_DATA | jq -r '.title')" >> $GITHUB_OUTPUT
-
-      - name: Process issue
-        run: |
-          echo "Processing issue: ${{ steps.issue.outputs.title }}"
+```bash
+export GITHUB_TOKEN=your_token
 ```
 
-### Example: Generate Issue Report
+### 3. Token Permissions
 
-```yaml
-name: Weekly Issue Report
+Your token needs:
 
-on:
-  schedule:
-    - cron: "0 9 * * 1" # Every Monday at 9am
+- `repo` scope (full repository access)
+- For public repos: `public_repo` scope is enough
 
-jobs:
-  report:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+## 📖 Script Reference
 
-      - name: Generate report
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          python .github/workflows/scripts/read_issues.py --list \
-            --state all --limit 100 --json > issues_report.json
+### `github_helper.py`
 
-          # Process report...
+Core module with reusable functions:
+
+- `load_token()` - Load token from .env or environment
+- `get_github_client()` - Get authenticated Github client
+- `get_repo()` - Get Repository object
+- `get_repo_from_git()` - Auto-detect repo from git remote
+- `format_issue_list()` - Format issues for display
+- `format_issue_detail()` - Format single issue with details
+
+### `read_issues.py`
+
+Read and list GitHub issues:
+
+- Get specific issue by number
+- List issues with filters (state, labels)
+- JSON export for automation
+- Brief or detailed output
+
+### `create_issue.py`
+
+Create GitHub issues:
+
+- From markdown file or stdin
+- With labels, assignees, milestones
+- Dry-run mode to preview
+- Interactive mode
+
+## 🎯 Common Patterns
+
+### For Cursor Agent
+
+**Check current phase:**
+
+```bash
+python3 .github/workflows/scripts/read_issues.py --list --state open
 ```
+
+**Read active issue:**
+
+```bash
+python3 .github/workflows/scripts/read_issues.py 4
+```
+
+**Create new phase issue:**
+
+```bash
+# 1. Write issue content to file
+cat > /tmp/issue_content.md << 'EOF'
+## Phase Description
+...
+EOF
+
+# 2. Create issue
+python3 .github/workflows/scripts/create_issue.py \
+    --title "[Phase] Phase 1.1: Component Name" \
+    --file /tmp/issue_content.md \
+    --labels "phase-1,enhancement"
+```
+
+### For Automation
+
+**Export all open issues to JSON:**
+
+```bash
+python3 .github/workflows/scripts/read_issues.py --list --json > issues.json
+```
+
+**Create issue from pipeline:**
+
+```bash
+python3 generate_report.py | python3 .github/workflows/scripts/create_issue.py \
+    --title "Weekly Report" \
+    --labels report
+```
+
+## 🔄 Migration from Old Scripts
+
+**Old way (gh CLI):**
+
+```bash
+gh issue list
+gh issue view 4
+gh issue create --title "Bug" --body "..."
+```
+
+**New way (PyGithub):**
+
+```bash
+python3 .github/workflows/scripts/read_issues.py --list
+python3 .github/workflows/scripts/read_issues.py 4
+echo "..." | python3 .github/workflows/scripts/create_issue.py --title "Bug"
+```
+
+**Why PyGithub?**
+
+- ✅ Works reliably with personal access tokens
+- ✅ No GraphQL permission issues
+- ✅ Better error messages
+- ✅ Programmatic API for complex operations
+- ✅ Proven to work (successfully created Issues #1, #2, #3, #4)
+
+## 💡 Tips
+
+1. **Token in .env**: Keep token in `.env` (it's in `.gitignore`)
+2. **Auto-detection**: Scripts auto-detect repo from git remote
+3. **JSON mode**: Use `--json` for automation/parsing
+4. **Dry run**: Test with `--dry-run` before creating issues
+5. **Labels**: Separate labels with commas: `bug,priority:high`
 
 ## 🐛 Troubleshooting
 
-### Common Issues
+**"GITHUB_TOKEN not found"**
+
+- Check `.env` file exists and contains `GITHUB_TOKEN=...`
+- Or export: `export GITHUB_TOKEN=your_token`
+
+**"401 Unauthorized"**
+
+- Token is invalid or expired
+- Token needs `repo` scope
+
+**"404 Not Found"**
+
+- Repository doesn't exist or you don't have access
+- Check repository name format: `owner/repo`
 
 **"Could not detect repository"**
 
-```bash
-# Specify repository explicitly
-python .github/workflows/scripts/read_issues.py --list --repo "owner/repo"
-```
+- Not in git repository
+- Use `--repo owner/repo` explicitly
 
-**"API request failed: 401"**
+## 🔗 Related Files
 
-```bash
-# Authenticate
-gh auth login
-# OR
-export GITHUB_TOKEN="your_token"
-```
-
-**"Issue not found"**
-
-```bash
-# Verify issue exists
-python .github/workflows/scripts/read_issues.py --list
-```
-
-## 🔒 Security
-
-- Never commit `GITHUB_TOKEN` or credentials
-- Use GitHub Secrets in workflows
-- Respect API rate limits (5000 requests/hour authenticated)
-- Use GitHub CLI for better rate limits and caching
-
-## 📖 Documentation
-
-- [GitHub CLI Documentation](https://cli.github.com/manual/)
-- [GitHub REST API](https://docs.github.com/en/rest)
-- [GitHub Actions](https://docs.github.com/en/actions)
-
----
-
-**Note**: All scripts respect `.gitignore` and `.cursorignore` settings. Sensitive data should never be committed.
+- `.github/PROJECT_STATUS.md` - Project status and workflow
+- `.github/HOW_TO_CREATE_ISSUES.md` - Deprecated (use this guide)
+- `.cursorrules` - Agent workflow rules

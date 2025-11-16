@@ -25,15 +25,20 @@ python3 .github/workflows/scripts/read_issues.py <issue_number>
 
 ### 3. Create New Issues (if needed)
 
-```python
-# Use PyGithub (NOT gh CLI)
-from github import Github
-g = Github(os.getenv("GITHUB_TOKEN"))
-repo = g.get_repo("sensiloles/telegram-bot-stack")
+```bash
+# Quick method: Use create_issue.py script
+python3 .github/workflows/scripts/create_issue.py \
+    --title "[Type] Phase X: Description" \
+    --file /tmp/issue.md \
+    --labels label1,label2
+
+# Programmatic: Use github_helper
+from github_helper import get_repo
+repo = get_repo()  # Auto-detects from git
 issue = repo.create_issue(title="...", body="...", labels=[...])
 ```
 
-**See:** `.github/HOW_TO_CREATE_ISSUES.md` for full guide.
+**See:** `.github/workflows/scripts/README.md` for complete guide.
 
 ## 📋 Project Phases
 
@@ -108,7 +113,7 @@ telegram-bot-stack/
 
 **For specific tasks:**
 
-- Creating issues → `.github/HOW_TO_CREATE_ISSUES.md`
+- GitHub automation → `.github/workflows/scripts/README.md`
 - Git workflow → `.cursorrules` (lines 12-89)
 - Testing → `README.md` (lines 80-154)
 - Architecture → `README.md` (lines 155-250)
@@ -137,10 +142,17 @@ python3 .github/workflows/scripts/read_issues.py <issue_number>
 # 1. Read plan for next phase
 # PACKAGE_CONVERSION_PLAN_RU.md
 
-# 2. Create issue content in /tmp/issue_N.md
+# 2. Write issue content to file
+cat > /tmp/issue_content.md << 'EOF'
+## Phase Description
+...
+EOF
 
-# 3. Create issue via PyGithub
-python3 /tmp/create_issue_script.py
+# 3. Create issue with script
+python3 .github/workflows/scripts/create_issue.py \
+    --title "[Phase] Phase X.X: Name" \
+    --file /tmp/issue_content.md \
+    --labels "phase:X,enhancement"
 ```
 
 ### Running Tests
@@ -182,11 +194,12 @@ python3 -m pytest tests/core/test_storage.py -v
 
 ## 💡 Important Notes
 
-1. **Always use PyGithub** for creating issues (not `gh` CLI)
-2. **Read PACKAGE_CONVERSION_PLAN_RU.md** for context on phases
-3. **Check open issues** before starting new work
-4. **Follow Conventional Commits** for all commits
-5. **Update documentation** before committing code changes
+1. **Use modern PyGithub scripts** in `.github/workflows/scripts/` (not `gh` CLI)
+2. **Token auto-loads** from `.env` - no manual setup needed
+3. **Read PACKAGE_CONVERSION_PLAN_RU.md** for context on phases
+4. **Check open issues** before starting new work
+5. **Follow Conventional Commits** for all commits
+6. **Update documentation** before committing code changes
 
 ---
 

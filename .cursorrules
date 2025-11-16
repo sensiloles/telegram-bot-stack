@@ -36,7 +36,7 @@
 | Need | File | Lines |
 |------|------|-------|
 | Project status | `.github/PROJECT_STATUS.md` | All |
-| Create issues | `.github/HOW_TO_CREATE_ISSUES.md` | All |
+| GitHub automation | `.github/workflows/scripts/README.md` | All |
 | Current phase plan | `PACKAGE_CONVERSION_PLAN_RU.md` | 804-847 |
 | Architecture | `README.md` | 155-250 |
 | Testing guide | `README.md` | 80-154 |
@@ -61,20 +61,27 @@
 - `docs(readme): update architecture section`
 - `test(storage): add edge case tests`
 
-### GitHub Issues (Use PyGithub)
-```python
-# ALWAYS use PyGithub (NOT gh CLI)
-from github import Github
-g = Github(os.getenv("GITHUB_TOKEN"))
-repo = g.get_repo("sensiloles/telegram-bot-stack")
-issue = repo.create_issue(
-title="[Type] Phase X.X: Description",
-body=content,
-labels=["label1", "label2"]
-)
+### GitHub Issues (Use Scripts)
+```bash
+# List open issues
+python3 .github/workflows/scripts/read_issues.py --list
+
+# Read specific issue
+python3 .github/workflows/scripts/read_issues.py 4
+
+# Create issue from file
+python3 .github/workflows/scripts/create_issue.py \
+--title "Bug: Fix issue" \
+--file /tmp/issue.md \
+--labels bug,priority:high
+
+# Programmatic (Python)
+from github_helper import get_repo
+repo = get_repo()                                                # Auto-detects from git
+issue = repo.create_issue(title="...", body="...", labels=[...])
 ```
 
-**See:** `.github/HOW_TO_CREATE_ISSUES.md` for full template.
+**See:** `.github/workflows/scripts/README.md` for complete guide.
 
 ### Testing
 ```bash
@@ -101,6 +108,10 @@ python3 -m pytest --cov=src/core --cov-report=term
 - Remove unused imports/code immediately
 
 ### Documentation
+- **UPDATE existing docs**, don't create new ones
+- **NEVER create *.md files** unless critically necessary
+- Describe work in chat, not in documents
+- Keep chat descriptions concise and clear
 - Update docs **BEFORE** committing code
 - Keep examples executable
 - Verify instructions work "out of the box"
