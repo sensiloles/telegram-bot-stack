@@ -266,17 +266,44 @@ If both show no errors → setup is working correctly!
 ## 📁 Project Structure
 
 ```
-quit-smoking-bot/
+telegram-bot-stack/
 ├── venv/                 # Virtual environment (auto-created)
-├── src/                  # Bot source code
-├── scripts/              # Management scripts
-├── docker/               # Docker configuration
-├── .vscode/              # VS Code settings (auto-configured)
-├── dev_setup.py          # Automatic setup script
-├── Makefile              # Build commands
-├── pyproject.toml        # Python dependencies
-└── .env.example          # Environment template
+├── src/
+│   ├── core/            # 🔧 Reusable framework components
+│   │   ├── bot_base.py  # Base bot class
+│   │   ├── storage.py   # Storage abstraction
+│   │   ├── user_manager.py
+│   │   └── admin_manager.py
+│   └── quit_smoking/    # 🎯 Example bot implementation
+│       ├── bot.py       # QuitSmokingBot (inherits from BotBase)
+│       ├── status_manager.py
+│       └── quotes_manager.py
+├── tests/
+│   ├── core/            # Framework tests (81% coverage)
+│   └── integration/     # End-to-end tests
+├── scripts/             # Management scripts
+├── docker/              # Docker configuration
+├── .vscode/             # VS Code settings (auto-configured)
+├── .github/             # GitHub Actions and project docs
+├── Makefile             # Build commands
+├── pyproject.toml       # Python dependencies
+├── ARCHITECTURE.md      # Architecture documentation
+└── .env.example         # Environment template
 ```
+
+### Code Organization
+
+**Framework Layer (`src/core/`):**
+
+- Generic, reusable components
+- 100% test coverage for storage/managers
+- Ready for extraction into PyPI package
+
+**Application Layer (`src/quit_smoking/`):**
+
+- Bot-specific business logic
+- Inherits from framework components
+- Example of framework usage
 
 ## 🎯 First Time Setup Checklist
 
@@ -360,6 +387,59 @@ make code-check
 - All dependencies are managed in `pyproject.toml`
 - VS Code settings are automatically configured
 - Use `make help` to see all available commands
+
+## 🏗️ Working with the Framework
+
+### Understanding the Architecture
+
+See [`ARCHITECTURE.md`](ARCHITECTURE.md) for detailed documentation on:
+
+- Framework design and components
+- Data flow and patterns
+- How to extend BotBase
+- Creating new bots using the framework
+
+### Key Concepts
+
+**Framework Components (`src/core/`):**
+
+- `BotBase`: Base class with common bot patterns
+- `Storage`: JSON storage abstraction
+- `UserManager`: User registration and management
+- `AdminManager`: Admin system with protection
+
+**Extending the Framework:**
+
+```python
+from src.core import BotBase, Storage
+
+class MyBot(BotBase):
+    def __init__(self):
+        storage = Storage("./data")
+        super().__init__(storage=storage, bot_name="My Bot")
+
+    def get_welcome_message(self) -> str:
+        return "Welcome to My Bot!"
+
+    async def get_user_status(self, user_id: int) -> str:
+        return "Custom status here"
+```
+
+### Testing
+
+**Run all tests:**
+
+```bash
+python3 -m pytest
+```
+
+**Run with coverage:**
+
+```bash
+python3 -m pytest --cov=src/core --cov-report=term
+```
+
+**Coverage threshold:** 80% for `src/core/` (currently at 81%)
 
 ---
 

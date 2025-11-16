@@ -197,6 +197,8 @@ See [`.github/workflows/tests.yml`](.github/workflows/tests.yml) for CI/CD confi
 
 ## 🏗️ Architecture Overview
 
+> 📖 **Detailed Architecture Documentation:** See [`ARCHITECTURE.md`](ARCHITECTURE.md) for comprehensive design documentation, data flow diagrams, and extension patterns.
+
 ### Layered Design
 
 The project follows a **layered architecture** separating reusable framework components from bot-specific logic:
@@ -219,15 +221,13 @@ src/
 
 **BotBase** (`src/core/bot_base.py`)
 
-- Common Telegram bot patterns
-- User/admin management integration
+- Common Telegram bot patterns (user/admin management, commands)
 - Command registration and routing
-- Scheduler setup
 - Graceful shutdown handling
 - **Hooks for customization:**
   - `on_user_registered(user_id)` - Called when new user registers
   - `get_user_status(user_id)` - Override to provide custom status
-  - `on_scheduled_notification()` - Override for scheduled messages
+  - `get_welcome_message()` - Override for custom welcome message
 
 **Storage** (`src/core/storage.py`)
 
