@@ -72,8 +72,8 @@ issue = repo.create_issue(title="...", body="...", labels=[...])
 - **Status:** In Progress
 - Extract `src/core/` into standalone `telegram-bot-stack` package
 - Implement Storage Abstraction Layer (JSON + Memory backends)
-- Create example bots (echo_bot, counter_bot, quit_smoking_bot)
-- Comprehensive documentation and testing
+- Create example bots with comprehensive documentation
+- Comprehensive testing and CI/CD
 - Prepare for PyPI publication
 
 ## 📁 Project Structure
@@ -86,10 +86,6 @@ telegram-bot-stack/
 │   │   ├── storage.py     # Storage abstraction (JSON)
 │   │   ├── user_manager.py
 │   │   └── admin_manager.py
-│   ├── quit_smoking/      # ✅ Example bot implementation
-│   │   ├── bot.py         # Inherits from BotBase
-│   │   ├── status_manager.py
-│   │   └── quotes_manager.py
 │   └── config.py
 ├── tests/                 # ✅ 111 tests, 81% coverage
 │   ├── core/              # Framework tests

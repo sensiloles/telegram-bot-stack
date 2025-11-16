@@ -115,8 +115,11 @@ jobs:
           pip install -e ".[dev]"
 
       - name: Run mypy
+        # Note: continue-on-error allows the job to show warnings without failing CI
+        # TODO: Fix type errors and remove this flag
+        continue-on-error: true
         run: |
-          mypy src/core src/quit_smoking --ignore-missing-imports || true
+          mypy src/core --ignore-missing-imports
 
   summary:
     name: Test Summary
@@ -130,20 +133,32 @@ jobs:
           echo "### Test Summary 📊" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
 
+          # Initialize exit code
+          EXIT_CODE=0
+
+          # Check test results
           if [ "${{ needs.test.result }}" == "success" ]; then
             echo "✅ Tests passed on all Python versions" >> $GITHUB_STEP_SUMMARY
           else
             echo "❌ Tests failed" >> $GITHUB_STEP_SUMMARY
+            EXIT_CODE=1
           fi
 
+          # Check linting results
           if [ "${{ needs.lint.result }}" == "success" ]; then
             echo "✅ Linting passed" >> $GITHUB_STEP_SUMMARY
           else
             echo "❌ Linting failed" >> $GITHUB_STEP_SUMMARY
+            EXIT_CODE=1
           fi
 
+          # Check type-check results (warning only, doesn't fail the build)
           if [ "${{ needs.type-check.result }}" == "success" ]; then
             echo "✅ Type checking passed" >> $GITHUB_STEP_SUMMARY
           else
             echo "⚠️  Type checking had issues" >> $GITHUB_STEP_SUMMARY
+            # Type check issues are warnings, not failures
           fi
+
+          # Exit with appropriate code
+          exit $EXIT_CODE
