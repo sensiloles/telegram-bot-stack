@@ -32,11 +32,30 @@ jobs:
           pip install -e ".[dev]"
 
       - name: Run tests with coverage
+        id: pytest
+        continue-on-error: true
         run: |
           pytest --cov=src/core \
                  --cov-report=xml \
                  --cov-report=term-missing \
-                 --cov-report=html
+                 --cov-report=html \
+                 -v \
+                 --tb=short
+
+      - name: Display test summary
+        if: always()
+        run: |
+          echo "### 🧪 Tests on Python ${{ matrix.python-version }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.pytest.outcome }}" == "success" ]; then
+            echo "✅ All tests passed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Some tests failed - check logs above" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Fail job if tests failed
+        if: steps.pytest.outcome != 'success'
+        run: exit 1
 
       - name: Upload coverage to Codecov
         if: matrix.python-version == '3.11'
@@ -130,34 +149,49 @@ jobs:
     steps:
       - name: Check test results
         run: |
-          echo "### Test Summary 📊" >> $GITHUB_STEP_SUMMARY
+          echo "## 📊 Test Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
 
           # Initialize exit code
           EXIT_CODE=0
 
+          echo "| Job | Status | Details |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----|--------|---------|" >> $GITHUB_STEP_SUMMARY
+
           # Check test results
           if [ "${{ needs.test.result }}" == "success" ]; then
-            echo "✅ Tests passed on all Python versions" >> $GITHUB_STEP_SUMMARY
+            echo "| 🧪 **Tests** | ✅ Passed | All Python versions (3.9, 3.10, 3.11, 3.12) |" >> $GITHUB_STEP_SUMMARY
           else
-            echo "❌ Tests failed" >> $GITHUB_STEP_SUMMARY
+            echo "| 🧪 **Tests** | ❌ Failed | Check individual jobs for details |" >> $GITHUB_STEP_SUMMARY
             EXIT_CODE=1
           fi
 
           # Check linting results
           if [ "${{ needs.lint.result }}" == "success" ]; then
-            echo "✅ Linting passed" >> $GITHUB_STEP_SUMMARY
+            echo "| 🎨 **Linting** | ✅ Passed | Ruff linter + formatter |" >> $GITHUB_STEP_SUMMARY
           else
-            echo "❌ Linting failed" >> $GITHUB_STEP_SUMMARY
+            echo "| 🎨 **Linting** | ❌ Failed | Check lint job for details |" >> $GITHUB_STEP_SUMMARY
             EXIT_CODE=1
           fi
 
           # Check type-check results (warning only, doesn't fail the build)
           if [ "${{ needs.type-check.result }}" == "success" ]; then
-            echo "✅ Type checking passed" >> $GITHUB_STEP_SUMMARY
+            echo "| 🔍 **Type Check** | ✅ Passed | mypy type checking |" >> $GITHUB_STEP_SUMMARY
           else
-            echo "⚠️  Type checking had issues" >> $GITHUB_STEP_SUMMARY
-            # Type check issues are warnings, not failures
+            echo "| 🔍 **Type Check** | ⚠️ Warning | Type issues detected (non-blocking) |" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Add helpful note
+          if [ $EXIT_CODE -eq 0 ]; then
+            echo "### ✅ All checks passed!" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Note:** To see detailed test results with individual test names, click on the specific test jobs above (e.g., 'Test Python 3.11')." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "### ❌ Some checks failed" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Please review the failed jobs above for detailed error messages." >> $GITHUB_STEP_SUMMARY
           fi
 
           # Exit with appropriate code
