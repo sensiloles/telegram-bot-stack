@@ -1,7 +1,9 @@
+"""Status management for quit smoking tracking."""
+
 import datetime
 import logging
 
-from .config import (
+from src.config import (
     BOT_TIMEZONE,
     NOTIFICATION_DAY,
     NOTIFICATION_HOUR,
@@ -9,18 +11,33 @@ from .config import (
     START_DATE,
     STATUS_MESSAGE,
 )
-from .quotes import QuotesManager
-from .utils import calculate_period, calculate_prize_fund
+from src.utils import calculate_period, calculate_prize_fund
+
+from .quotes_manager import QuotesManager
 
 logger = logging.getLogger(__name__)
 
 
 class StatusManager:
+    """Manages quit smoking status tracking and prize fund calculations."""
+
     def __init__(self, quotes_manager: QuotesManager):
+        """Initialize status manager with quotes manager.
+
+        Args:
+            quotes_manager: QuotesManager instance for getting motivational quotes
+        """
         self.quotes_manager = quotes_manager
 
     def get_status_info(self, user_id: str = "global") -> str:
-        """Generate status information about the non-smoking period."""
+        """Generate status information about the non-smoking period.
+
+        Args:
+            user_id: User ID (for per-user status in future)
+
+        Returns:
+            Formatted status message with period, prize fund, and quote
+        """
         now = datetime.datetime.now(BOT_TIMEZONE)
         duration = now - START_DATE
 
@@ -83,7 +100,7 @@ class StatusManager:
                 microsecond=0,
             )
 
-        # Get random motivational quote that's different from the last one
+        # Get random motivational quote
         quote = self.quotes_manager.get_random_quote(user_id)
 
         # Format the message using template

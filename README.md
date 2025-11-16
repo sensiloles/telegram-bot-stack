@@ -219,41 +219,71 @@ MAX_PRIZE_FUND = 100000     # maximum prize fund amount
 
 ```
 quit-smoking-bot/
-├── src/                    # Bot implementation
-│   ├── bot.py             # Main bot logic and handlers
-│   ├── config.py          # Configuration settings
-│   ├── quotes.py          # Motivational quotes manager
-│   ├── status.py          # Progress tracking and prize calculation
-│   ├── users.py           # User and admin management
-│   └── utils.py           # Utility functions
-├── docker/                # 🐳 Production Docker configuration
-│   ├── Dockerfile         # Container definition
-│   ├── docker-compose.yml # Production-ready orchestration
-│   ├── entrypoint.py      # 🚀 Production initialization script
-│   └── README.md          # Docker documentation → [see details](docker/README.md)
-├── scripts/               # Advanced management system
-│   ├── actions.py         # Core bot operations
-│   ├── docker_utils.py    # Docker integration
-│   ├── health.py          # Health monitoring
-│   ├── environment.py     # Environment management
-│   ├── service.py         # Service management
-│   ├── errors.py          # Error handling
-│   ├── output.py          # Output formatting
-│   ├── args.py            # Argument parsing
-│   ├── system.py          # System utilities
-│   ├── conflicts.py       # Conflict detection
-│   └── __init__.py        # Package initialization
-├── data/                  # Persistent data (auto-created)
-│   ├── bot_users.json     # Registered users
-│   ├── bot_admins.json    # Administrator list
-│   └── quotes.json        # Motivational quotes
-├── logs/                  # Application logs (auto-created)
-├── manager.py             # 🎯 Primary management interface
-├── src/bot.py            # Bot entry point and main logic
-├── Makefile              # Convenient command shortcuts
-├── pyproject.toml        # Python project configuration and dependencies
-└── README.md            # This file
+├── src/                       # Bot implementation
+│   ├── core/                 # ✨ Reusable framework components
+│   │   ├── __init__.py      # Core module exports
+│   │   ├── bot_base.py      # Base bot class with common patterns
+│   │   ├── user_manager.py  # Generic user management
+│   │   ├── admin_manager.py # Generic admin system
+│   │   └── storage.py       # Storage abstraction layer
+│   ├── quit_smoking/         # 🚭 Quit smoking specific logic
+│   │   ├── __init__.py      # Module exports
+│   │   ├── bot.py           # QuitSmokingBot implementation
+│   │   ├── status_manager.py # Progress tracking and prize calculation
+│   │   └── quotes_manager.py # Motivational quotes manager
+│   ├── bot.py               # Main entry point
+│   ├── config.py            # Configuration settings
+│   └── utils.py             # Utility functions
+├── docker/                   # 🐳 Production Docker configuration
+│   ├── Dockerfile           # Container definition
+│   ├── docker-compose.yml   # Production-ready orchestration
+│   ├── entrypoint.py        # 🚀 Production initialization script
+│   └── README.md            # Docker documentation → [see details](docker/README.md)
+├── scripts/                  # Advanced management system
+│   ├── actions.py           # Core bot operations
+│   ├── docker_utils.py      # Docker integration
+│   ├── health.py            # Health monitoring
+│   ├── environment.py       # Environment management
+│   ├── service.py           # Service management
+│   ├── errors.py            # Error handling
+│   ├── output.py            # Output formatting
+│   ├── args.py              # Argument parsing
+│   ├── system.py            # System utilities
+│   ├── conflicts.py         # Conflict detection
+│   └── __init__.py          # Package initialization
+├── data/                     # Persistent data (auto-created)
+│   ├── bot_users.json       # Registered users
+│   ├── bot_admins.json      # Administrator list
+│   └── quotes.json          # Motivational quotes
+├── logs/                     # Application logs (auto-created)
+├── manager.py               # 🎯 Primary management interface
+├── Makefile                # Convenient command shortcuts
+├── pyproject.toml          # Python project configuration and dependencies
+└── README.md              # This file
 ```
+
+### Architecture Overview
+
+The project now follows a **layered architecture** to support future framework extraction:
+
+- **`src/core/`** - Reusable telegram bot components:
+
+  - `BotBase` - Base class with common bot patterns (user/admin management, command handling, shutdown)
+  - `UserManager` - Generic user registration and tracking
+  - `AdminManager` - Generic admin privilege management
+  - `Storage` - JSON-based storage abstraction
+
+- **`src/quit_smoking/`** - Bot-specific business logic:
+  - `QuitSmokingBot` - Inherits from `BotBase`, adds quit smoking tracking
+  - `StatusManager` - Tracks smoke-free period and calculates prize fund
+  - `QuotesManager` - Manages motivational quotes
+
+This separation makes it easy to:
+
+- Identify reusable vs. bot-specific code
+- Extract `core/` into a framework later
+- Maintain and test components independently
+- Create new bots by inheriting from `BotBase`
 
 ## 📚 Local Usage
 
