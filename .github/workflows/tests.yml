@@ -33,7 +33,7 @@ jobs:
 
       - name: Run tests with coverage
         run: |
-          pytest --cov=src/core --cov=src/quit_smoking \
+          pytest --cov=src/core \
                  --cov-report=xml \
                  --cov-report=term-missing \
                  --cov-report=html
