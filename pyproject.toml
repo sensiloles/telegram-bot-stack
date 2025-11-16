@@ -136,7 +136,6 @@ python_functions = ["test_*"]
 asyncio_mode = "auto"
 addopts = [
 "--cov=src/core",
-"--cov=src/quit_smoking",
 "--cov-report=html",
 "--cov-report=term-missing",
 "--cov-report=xml",
