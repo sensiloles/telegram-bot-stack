@@ -1,292 +1,163 @@
-# Cursor Rules for Quit Smoking Telegram Bot
+# 🤖 Cursor Agent Quick Reference
 
-## 🔐 Security and Best Practices
+## 📍 START HERE - Agent Orientation
 
-### Environment Variables:
-- **NEVER** commit tokens and passwords to git
-- Use .env files (MUST be in .gitignore)
-- Provide .env.example template without real secrets
-- Validate tokens at startup
-- Always run `git rm --cached .env` if accidentally tracked
+### On Every New Context:
+1. **Read:** `.github/PROJECT_STATUS.md` (current phase, open issues)
+2. **Check:** `python3 .github/workflows/scripts/read_issues.py --list --state open`
+3. **Understand:** Read relevant section of `PACKAGE_CONVERSION_PLAN_RU.md`
+4. **Act:** Follow issue checklist or user request
 
-## 🔄 Git and Commit Process
-
-### Commit Creation Procedure:
-When user requests to make a commit, execute these steps in strict order:
-
-1. **Analyze Changes**: Analyze all current git changes
+### When User Says "Continue Work":
 ```bash
-git status
-git diff --name-only
-git diff --stat
+# Auto-workflow:
+1. Check PROJECT_STATUS.md → current phase
+2. List open issues → identify active issue
+3. Read issue details → understand task
+4. Check plan context → understand why
+5. Implement → follow issue acceptance criteria
 ```
 
-2. **Study History**: Look at last 10 commits to understand style
+## 🎯 Project Context (Quick Facts)
+
+**Project:** telegram-bot-stack (reusable Telegram bot framework)
+**Current Phase:** Phase 0.3 - Validation & Documentation
+**Repository:** https://github.com/sensiloles/telegram-bot-stack
+**Master Plan:** `PACKAGE_CONVERSION_PLAN_RU.md` (lines 761-1928)
+
+**Progress:**
+- ✅ Phase 0.1: Extract framework → src/core/
+- ✅ Phase 0.2: Tests (111 tests, 81% coverage)
+- 🔄 Phase 0.3: Validation & docs (current)
+- ⏳ Phase 1: PyPI package release (next)
+
+## 📚 Quick Navigation
+
+| Need | File | Lines |
+|------|------|-------|
+| Project status | `.github/PROJECT_STATUS.md` | All |
+| Create issues | `.github/HOW_TO_CREATE_ISSUES.md` | All |
+| Current phase plan | `PACKAGE_CONVERSION_PLAN_RU.md` | 804-847 |
+| Architecture | `README.md` | 155-250 |
+| Testing guide | `README.md` | 80-154 |
+| Git workflow | This file | 50-80 |
+
+## 🔄 Essential Workflows
+
+### Git Commits (Conventional Commits)
 ```bash
-git log --oneline -10
-git log --pretty=format:"%h - %s (%an, %ar)" -10
+# Always:
+1. git status && git diff --stat
+2. git log --oneline -10                     # Check style
+3. Update docs BEFORE commit
+4. git add .
+5. git commit -m "type(scope): description"
+6. Format: feat/fix/docs/refactor/test/chore
 ```
 
-3. **Check pre-commit**: Study `.pre-commit-config.yaml` file to understand requirements
+**Examples:**
+- `feat(core): add new storage backend`
+- `fix(tests): resolve coverage calculation`
+- `docs(readme): update architecture section`
+- `test(storage): add edge case tests`
 
-4. **Validate Documentation**: BEFORE committing, validate and update all documentation
-```bash
-find . -name "*.md" -not -path "./venv/*" -not -path "./.git/*"
-```
-- Check that documentation matches code changes
-- Update examples, API references, setup instructions
-- Verify all links work and code examples are executable
-- Update dependency versions and file paths if changed
-
-5. **Add Files**: Add all changes
-```bash
-git add .
-```
-
-6. **Create Commit**: Make commit following Conventional Commits standard
-
-### Conventional Commits Format:
-```
-<type>[optional scope]: <description>
-
-[optional body]
-
-[optional footer(s)]
-```
-
-### Commit Types:
-- `feat`: new functionality
-- `fix`: bug fix
-- `docs`: documentation changes
-- `style`: formatting, no logic changes
-- `refactor`: code refactoring
-- `test`: adding tests
-- `chore`: build, CI/CD, dependencies changes
-- `perf`: performance improvements
-- `ci`: CI/CD changes
-- `build`: build system changes
-
-### Examples of Good Commits:
-```bash
-feat(bot): add progressive prize system for quit smoking tracking
-fix(users): resolve JSON serialization error in user data saving
-docs(readme): update setup instructions for Docker deployment
-refactor(config): migrate to environment-based configuration
-chore(deps): update python-telegram-bot to version 20.7
-```
-
-### Pre-commit Checks:
-Project uses:
-- **ruff** - Python code linting and formatting
-- **commitizen** - commit message format validation
-- **pre-commit-hooks** - basic checks (trailing whitespace, YAML, large files)
-
-### Important:
-- Always write commits in English
-- Use imperative mood ("add", "fix", not "added", "fixed")
-- First line no more than 50 characters
-- If explanation needed - add body after empty line
-- Follow conventional commits for automatic changelog generation
-
-## 📚 Documentation Validation and Updates
-
-### Mandatory Check Before Commit:
-Before creating ANY commit **ALWAYS** validate and update documentation:
-
-1. **Scan .md Files**: Find and analyze all documentation files
-```bash
-find . -name "*.md" -not -path "./venv/*" -not -path "./.git/*"
-```
-
-2. **Check Compliance**: Ensure documentation matches changes:
-- `README.md` - general description, installation instructions, API
-- `docker/README.md` - Docker configuration and deployment
-- `docker/ENTRYPOINT.md` - entrypoint documentation
-- Any other .md files in project
-
-3. **Update Content**:
-- Update code examples if APIs or interfaces changed
-- Add descriptions of new functions or parameters
-- Fix outdated instructions
-- Update dependency versions in examples
-- Check file path correctness
-
-4. **Quality Check**:
-- Ensure all links work
-- Check markdown formatting
-- Ensure code examples are executable
-- Verify project structure correspondence
-
-### Examples of Changes Requiring Documentation Updates:
-- Bot API changes → update README.md with new commands
-- New environment variables → update setup instructions
-- Docker changes → update docker/README.md
-- New dependencies → update requirements in documentation
-- File structure changes → update architecture description
-
-### Important:
-- **DON'T SKIP** this step even for "minor" changes
-- **MUST BE DONE BEFORE COMMIT** - not after changes
-- Documentation should be understandable to new developers
-- Use concrete examples, not abstract descriptions
-- Always verify instructions work "out of the box"
-- Include documentation updates in the same commit as code changes
-
-## 🌐 Code Language Standards
-
-### Comments and Documentation Language:
-- **ALL code comments** must be written in English
-- **ALL docstrings** must be written in English
-- **ALL variable names** should use English words
-- **ALL function/class names** should use English words
-- **Configuration files** (pyproject.toml, etc.) should have English comments
-- **README and documentation** should be in English
-
-### Rationale:
-- English is the international standard for programming
-- Ensures code accessibility for global developers
-- Maintains consistency across the codebase
-- Facilitates code reviews and collaboration
-- Improves IDE support and tooling compatibility
-
-### Examples:
+### GitHub Issues (Use PyGithub)
 ```python
-# ✅ Good - English comments
-def calculate_prize_fund(days: int) -> float:
-"""Calculate the prize fund based on smoke-free days."""
-# Apply daily increase to base amount
-return BASE_AMOUNT + (days * DAILY_INCREASE)
-
-# ❌ Bad - Non-English comments
-def calculate_prize_fund(days: int) -> float:
-"""Вычисляет призовой фонд на основе дней без курения."""
-# Применяем ежедневное увеличение к базовой сумме
-return BASE_AMOUNT + (days * DAILY_INCREASE)
-```
-
-Always follow these rules when working with code. Priority: readability, security, performance.
-
-## 🧹 Automatic Cleanup and Artifact Management
-
-### Mandatory Cleanup During Implementation:
-When implementing ANY feature or making changes, **ALWAYS** perform these cleanup steps:
-
-#### 1. **Immediate Cleanup During Development:**
-- Remove unused imports after each change
-- Delete dead/unreachable code immediately
-- Clean up temporary variables and debug statements
-- Remove commented-out code blocks
-- Delete unused function parameters
-
-#### 2. **Function and Class Cleanup:**
-- **Before adding new functions**: Check if similar functionality already exists
-- **After removing functions**: Update all import statements that referenced them
-- **Check dependencies**: Ensure no orphaned functions remain
-- **Update `__all__` exports**: Remove deleted functions from module exports
-- **Clean helper functions**: Remove private functions that are no longer called
-
-#### 3. **File and Module Cleanup:**
-- **Delete empty files**: Remove Python files that contain only imports/comments
-- **Merge duplicate functionality**: Consolidate similar functions into one
-- **Update module imports**: Remove unused modules from `__init__.py`
-- **Clean up test files**: Remove tests for deleted functionality
-
-#### 4. **Post-Implementation Verification:**
-```bash
-# Check for unused imports
-python -m autoflake --check --recursive .
-
-# Verify no undefined references
-python -m flake8 --select=F821 .
-
-# Check for dead code
-python -m vulture .
-```
-
-#### 5. **Documentation Artifact Cleanup:**
-- Remove references to deleted functions from documentation
-- Update command examples that reference removed features
-- Clean up outdated API documentation
-- Remove dead links and broken references
-
-#### 6. **Configuration Cleanup:**
-- Remove unused configuration options
-- Delete obsolete environment variables
-- Clean up unused Docker services/profiles
-- Remove deprecated command line arguments
-
-### Cleanup Checklist Before Committing:
-- [ ] All unused imports removed
-- [ ] No dead/commented code remains
-- [ ] All function references updated
-- [ ] Documentation reflects actual implementation
-- [ ] No orphaned files or directories
-- [ ] Tests updated for removed functionality
-- [ ] Configuration files cleaned up
-- [ ] Linter shows no warnings about unused code
-
-### Tools Integration:
-```bash
-# Use these tools to help with cleanup:
-ruff check --fix .                                             # Auto-fix imports and code issues
-autoflake --remove-all-unused-imports --recursive --in-place .
-isort .                                                        # Sort imports
-vulture .                                                      # Find dead code
-```
-
-### Examples of Good Cleanup:
-
-**✅ Good - Clean Implementation:**
-```python
-# After removing monitor.py functionality:
-# 1. Updated actions.py to include all functionality
-# 2. Removed monitor.py file
-# 3. Updated __init__.py imports
-# 4. Cleaned up Makefile commands
-# 5. Updated README.md documentation
-# 6. Removed unused command line arguments
-```
-
-**❌ Bad - Leaving Artifacts:**
-```python
-# Don't leave these behind:
-# - Unused import statements
-# - Dead functions that are never called
-# - Commented-out code blocks
-# - References to deleted modules
-# - Outdated documentation
-# - Unused configuration options
-```
-
-### Automated Cleanup Rules:
-1. **Every file edit** → Check and remove unused imports
-2. **Every function deletion** → Update all references and imports
-3. **Every feature removal** → Clean documentation and examples
-4. **Every refactoring** → Verify no dead code remains
-5. **Before every commit** → Run full cleanup verification
-
-### Priority Order for Cleanup:
-1. **Critical**: Security artifacts (tokens, secrets, debug info)
-2. **High**: Functional artifacts (unused functions, dead imports)
-3. **Medium**: Documentation artifacts (outdated examples, broken links)
-4. **Low**: Style artifacts (extra whitespace, formatting)
-
-**Remember**: Clean code is maintainable code. Always leave the codebase cleaner than you found it!
-
-
-# 🤖 GitHub Issue Creation
-
-## Use PyGithub Library (NOT gh CLI)
-
-**Working method for creating GitHub issues programmatically:**
-
-```python
+# ALWAYS use PyGithub (NOT gh CLI)
 from github import Github
-g = Github(token)
+g = Github(os.getenv("GITHUB_TOKEN"))
 repo = g.get_repo("sensiloles/telegram-bot-stack")
-issue = repo.create_issue(title="...", body="...", labels=[...])
+issue = repo.create_issue(
+title="[Type] Phase X.X: Description",
+body=content,
+labels=["label1", "label2"]
+)
 ```
 
-**See:** `.github/HOW_TO_CREATE_ISSUES.md` for full guide and template.
+**See:** `.github/HOW_TO_CREATE_ISSUES.md` for full template.
 
-**Note:** `gh` CLI has permission issues with this repository. Always use PyGithub.
+### Testing
+```bash
+# Run tests
+python3 -m pytest
+
+# With coverage (threshold: 80%)
+python3 -m pytest --cov=src/core --cov-report=term
+
+# CI/CD: .github/workflows/tests.yml
+```
+
+## ⚡ Critical Rules
+
+### Security
+- **NEVER** commit tokens/passwords
+- Use `.env` (must be in `.gitignore`)
+- Validate tokens at startup
+
+### Code Quality
+- All comments/docstrings in **English**
+- Use type hints for all new code
+- Follow `ruff` linting rules
+- Remove unused imports/code immediately
+
+### Documentation
+- Update docs **BEFORE** committing code
+- Keep examples executable
+- Verify instructions work "out of the box"
+
+### Testing
+- Maintain ≥80% coverage for `src/core/`
+- Write tests for all new features
+- Use fixtures from `tests/conftest.py`
+
+## 🗂️ Project Structure
+
+```
+src/
+├── core/                # Reusable framework (test coverage 81%)
+│ ├── bot_base.py      # Base class with hooks
+│ ├── storage.py       # JSON storage abstraction
+│ ├── user_manager.py
+│ └── admin_manager.py
+├── quit_smoking/        # Bot-specific logic
+│ ├── bot.py           # Inherits BotBase
+│ └── ...
+tests/
+├── core/                # Unit tests (100% for storage/managers)
+└── integration/         # E2E tests
+```
+
+## 💡 Tips for Token Efficiency
+
+**DON'T read entire files unnecessarily:**
+- Use `codebase_search` for understanding
+- Use `grep` for finding specific code
+- Read specific line ranges: `read_file` with offset/limit
+
+**DO read these on start:**
+- `.github/PROJECT_STATUS.md` (compact status)
+- Current issue via script (structured output)
+- Relevant plan section only (not entire file)
+
+**Prioritize:**
+1. Status file (20 lines) → context
+2. Issue details (50-100 lines) → task
+3. Plan section (50-100 lines) → why
+4. Code only when needed → implementation
+
+## 📋 Detailed Rules (Reference)
+
+**For complete rules, see archived version:**
+- Git workflow details → internal knowledge
+- Cleanup procedures → internal knowledge
+- Documentation validation → internal knowledge
+- Code standards → internal knowledge
+
+**When needed, reference:**
+- Conventional Commits: https://www.conventionalcommits.org/
+- Pre-commit config: `.pre-commit-config.yaml`
+- Test config: `pyproject.toml` [tool.pytest.ini_options]
+
+---
+
+**Remember:** Read `.github/PROJECT_STATUS.md` first on every new context! 🎯

@@ -1,6 +1,36 @@
-# Quit Smoking Telegram Bot
+# Telegram Bot Stack
 
-A specialized Telegram bot to track your smoke-free journey with a progressive prize fund system and motivational support.
+A reusable Python framework for building production-ready Telegram bots with minimal code. Includes user management, admin system, storage abstraction, and comprehensive testing infrastructure.
+
+> 🎯 **Example:** The `src/quit_smoking/` directory contains a complete quit-smoking tracking bot built with this framework.
+
+## 📍 Quick Navigation (For Agents)
+
+**New to this project?**
+
+1. 🎯 **Current Status:** [`.github/PROJECT_STATUS.md`](.github/PROJECT_STATUS.md) - Phase, progress, what to do next
+2. 📖 **Master Plan:** [`PACKAGE_CONVERSION_PLAN_RU.md`](PACKAGE_CONVERSION_PLAN_RU.md) (lines 761-1928) - Complete roadmap
+3. 🔧 **Workflow Rules:** [`.cursorrules`](.cursorrules) - Git, testing, conventions
+
+**Quick Links:**
+
+- [Features](#-features) - What this bot does
+- [Quick Start](#-quick-start) - Setup in 3 steps
+- [Testing](#-testing) - Run tests, coverage
+- [Architecture](#-architecture-overview) - Code structure
+- [Development](#-development) - Dev environment
+
+**Check Status:**
+
+```bash
+# Current phase and open issues
+cat .github/PROJECT_STATUS.md
+
+# List open issues
+python3 .github/workflows/scripts/read_issues.py --list --state open
+```
+
+---
 
 ## 🤖 New: Cloud Agent Issue Automation
 
@@ -14,13 +44,15 @@ A specialized Telegram bot to track your smoke-free journey with a progressive p
 
 ## 🌟 Features
 
-### 🎯 Core Bot Features
+### 🎯 Core Framework Features
 
-- 📊 **Progress Tracking**: Monitor your smoke-free period (years, months, days)
-- 💰 **Prize Fund System**: Growing monthly reward system (starts at 5,000₽, increases by 5,000₽ monthly)
-- 📅 **Monthly Notifications**: Automated motivational messages every 23rd of the month
-- 💭 **Motivational Quotes**: Random inspirational quotes to keep you motivated
-- 👥 **Admin System**: Multi-admin support for bot management
+- 🏗️ **BotBase Class**: Inherit and customize - 70% less boilerplate code
+- 👥 **User Management**: Built-in user registration and tracking
+- 🔐 **Admin System**: Multi-admin support with protection mechanisms
+- 💾 **Storage Abstraction**: JSON storage with unified API (SQL support planned)
+- 📅 **Scheduler Integration**: APScheduler for periodic tasks
+- 🎯 **Hook Pattern**: Override methods for custom behavior
+- 🧪 **Comprehensive Tests**: 111 tests with 81% coverage
 
 ### 🛡️ Production-Grade Infrastructure
 
@@ -36,40 +68,51 @@ A specialized Telegram bot to track your smoke-free journey with a progressive p
 
 ## 🚀 Quick Start
 
-### 1. Clone and Setup
+### Option 1: Use Example Bot (Quit Smoking Tracker)
 
 ```bash
-git clone <your-repo-url>
-cd quit-smoking-bot
+# Clone the repository
+git clone https://github.com/sensiloles/telegram-bot-stack.git
+cd telegram-bot-stack
 
-# Complete setup with bot token
+# Setup and start the example bot
 python3 manager.py setup --token "YOUR_BOT_TOKEN_HERE"
-```
-
-### 2. Start the Bot
-
-```bash
-# Start the bot (recommended)
 python3 manager.py start
 
-# Or start with advanced monitoring
-python3 manager.py start --monitoring
-
-# Or use convenient shortcuts
-make install              # Complete setup and start
-```
-
-### 3. Verify Everything Works
-
-```bash
-# Check bot status
+# Check status
 python3 manager.py status
-
-# View logs
-python3 manager.py logs --follow
 ```
 
-That's it! Your quit smoking bot is now running with comprehensive monitoring and ready to help users track their smoke-free journey.
+### Option 2: Build Your Own Bot
+
+```python
+# my_bot.py
+from src.core.bot_base import BotBase
+from pathlib import Path
+
+class MyBot(BotBase):
+    """Your custom bot - override hooks for custom behavior."""
+
+    async def get_user_status(self, user_id: int) -> str:
+        """Override to provide custom status."""
+        return "Your custom status message!"
+
+    async def on_user_registered(self, user_id: int):
+        """Called when new user registers."""
+        print(f"New user: {user_id}")
+
+if __name__ == "__main__":
+    import asyncio
+    bot = MyBot(
+        storage=Storage(Path("./data")),
+        bot_name="My Bot",
+        user_commands=["/start", "/status"],
+        admin_commands=["/list_users", "/add_admin"]
+    )
+    asyncio.run(bot.run())
+```
+
+**That's it!** 70-80% less code than building from scratch.
 
 ## 👨‍💻 Development
 
@@ -152,39 +195,131 @@ See [`.github/workflows/tests.yml`](.github/workflows/tests.yml) for CI/CD confi
 4. Run tests locally before committing
 5. Ensure coverage remains above 80%
 
-## 📖 How It Works
+## 🏗️ Architecture Overview
 
-### Starting Date Configuration
+### Layered Design
 
-The bot tracks progress from a predefined start date (January 23, 2025 at 21:58 by default).
-Configure this in `src/config.py`:
+The project follows a **layered architecture** separating reusable framework components from bot-specific logic:
+
+```
+src/
+├── core/                    # 🔧 Reusable Framework Layer
+│   ├── bot_base.py         # Base class with common patterns
+│   ├── storage.py          # Storage abstraction (JSON)
+│   ├── user_manager.py     # Generic user management
+│   └── admin_manager.py    # Generic admin system
+│
+└── quit_smoking/            # 🎯 Application Layer
+    ├── bot.py              # QuitSmokingBot (inherits BotBase)
+    ├── status_manager.py   # Quit smoking tracking logic
+    └── quotes_manager.py   # Motivational quotes
+```
+
+### Key Components
+
+**BotBase** (`src/core/bot_base.py`)
+
+- Common Telegram bot patterns
+- User/admin management integration
+- Command registration and routing
+- Scheduler setup
+- Graceful shutdown handling
+- **Hooks for customization:**
+  - `on_user_registered(user_id)` - Called when new user registers
+  - `get_user_status(user_id)` - Override to provide custom status
+  - `on_scheduled_notification()` - Override for scheduled messages
+
+**Storage** (`src/core/storage.py`)
+
+- JSON file operations
+- Type-safe data persistence
+- CRUD operations with error handling
+- **100% test coverage**
+
+**UserManager** (`src/core/user_manager.py`)
+
+- User registration and removal
+- User existence checks
+- Data persistence via Storage
+- **100% test coverage**
+
+**AdminManager** (`src/core/admin_manager.py`)
+
+- Admin assignment and removal
+- Auto-assign first user as admin
+- Last admin protection (can't remove last admin)
+- **100% test coverage**
+
+**QuitSmokingBot** (`src/quit_smoking/bot.py`) - Example Implementation
+
+- Inherits from `BotBase`
+- Overrides hooks for quit smoking logic:
+  - `get_user_status()` → Returns smoke-free status
+  - `on_scheduled_notification()` → Sends motivational quotes
+- **Complete working example** showing framework usage
+
+### Design Principles
+
+1. **Separation of Concerns**: Framework (core) vs Application (quit_smoking example)
+2. **Inheritance over Composition**: BotBase provides foundation
+3. **Dependency Injection**: Managers injected into BotBase
+4. **Hook Pattern**: Subclasses override hooks for customization
+5. **Single Responsibility**: Each component has one clear purpose
+
+### Roadmap: PyPI Package
+
+**Current (Phase 0):** Framework code in `src/core/`
+**Next (Phase 1):** Extract to standalone `telegram-bot-stack` PyPI package
+
+```python
+# Future usage (Phase 1+)
+pip install telegram-bot-stack
+
+from telegram_bot_stack import BotBase, BotConfig
+
+class MyBot(BotBase):
+    async def get_user_status(self, user_id):
+        return "Custom status logic"
+
+# Same simple API, installable from PyPI!
+```
+
+## 📖 Example: Quit Smoking Bot
+
+The `src/quit_smoking/` directory contains a complete example bot built with the framework.
+
+### Features of Example Bot
+
+- 📊 **Progress Tracking**: Monitor smoke-free period (years, months, days)
+- 💰 **Prize Fund System**: Growing monthly reward (5,000₽ → 100,000₽)
+- 📅 **Monthly Notifications**: Automated motivational messages
+- 💭 **Motivational Quotes**: Random inspirational quotes
+- 👥 **Admin System**: Inherited from framework
+
+### Configuration
+
+The example bot tracks progress from a predefined start date. Configure in `src/config.py`:
 
 ```python
 START_YEAR = 2025
 START_MONTH = 1
-NOTIFICATION_DAY = 23  # day of month
-NOTIFICATION_HOUR = 21  # hour (24-hour format)
-NOTIFICATION_MINUTE = 58  # minute
+NOTIFICATION_DAY = 23
+NOTIFICATION_HOUR = 21
+NOTIFICATION_MINUTE = 58
 ```
 
-### Prize Fund System
+### Running the Example
 
-- **Initial Amount**: 5,000₽ per month
-- **Monthly Increase**: +5,000₽ each month
-- **Maximum Cap**: 100,000₽
-- **Calculation**: Based on completed months since start date
+```bash
+# Setup with your bot token
+python3 manager.py setup --token "YOUR_TOKEN"
 
-Example progression:
+# Start the example bot
+python3 manager.py start
 
-- Month 1: 5,000₽
-- Month 2: 10,000₽
-- Month 3: 15,000₽
-- ...
-- Month 20: 100,000₽ (maximum)
-
-### Automated Notifications
-
-The bot sends monthly motivational messages to all users on the 23rd of each month at 21:58 (configurable timezone).
+# Check status
+python3 manager.py status
+```
 
 ## 🤖 Bot Commands
 
