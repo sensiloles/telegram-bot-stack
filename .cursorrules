@@ -272,3 +272,21 @@ vulture .                                                      # Find dead code
 4. **Low**: Style artifacts (extra whitespace, formatting)
 
 **Remember**: Clean code is maintainable code. Always leave the codebase cleaner than you found it!
+
+
+# 🤖 GitHub Issue Creation
+
+## Use PyGithub Library (NOT gh CLI)
+
+**Working method for creating GitHub issues programmatically:**
+
+```python
+from github import Github
+g = Github(token)
+repo = g.get_repo("sensiloles/telegram-bot-stack")
+issue = repo.create_issue(title="...", body="...", labels=[...])
+```
+
+**See:** `.github/HOW_TO_CREATE_ISSUES.md` for full guide and template.
+
+**Note:** `gh` CLI has permission issues with this repository. Always use PyGithub.
