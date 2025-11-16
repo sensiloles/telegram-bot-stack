@@ -2,831 +2,1290 @@
 
 ## 📋 Обзор проекта
 
-Данный документ описывает план преобразования текущего проекта `quit-smoking-bot` в универсальный Python пакет `telegram-bot-stack`, который позволит с легкостью развертывать любые Telegram боты на VPS и вести локальную разработку.
+Данный документ описывает **практический** план преобразования текущего проекта `quit-smoking-bot` в универсальный Python пакет `telegram-bot-stack`, который позволит легко создавать и развертывать Telegram ботов.
 
-### 🎯 Цели
+### 🎯 Основные цели
 
-1. **Универсализация**: Создать фреймворк, который можно использовать для любого Telegram бота
-2. **Простота развертывания**: Одна команда для развертывания на VPS
-3. **Удобство разработки**: Встроенные инструменты для локальной разработки
-4. **Production-ready**: Готовые решения для мониторинга, логирования, масштабирования
+1. **Переиспользование проверенных решений** - выделить общие компоненты из работающего бота
+2. **Простота использования** - сократить код пользовательских ботов на 40-50%
+3. **Production-ready** - встроенные мониторинг, логирование, управление
+4. **Minimal Viable Framework** - начать с простого, расти по мере необходимости
 
-### 🔍 Анализ текущего проекта
+### 🚨 Принцип разработки: Start Simple, Grow Complex
 
-#### Сильные стороны:
+Мы **НЕ будем** создавать сложный универсальный фреймворк с множеством абстракций. Вместо этого:
 
-- ✅ Продвинутая Docker-инфраструктура с compose
-- ✅ Комплексная система управления через `manager.py`
-- ✅ Современные инструменты разработки (pyproject.toml, ruff, mypy)
-- ✅ Система мониторинга и здоровья
-- ✅ Автоматическое управление логами и backup'ами
-- ✅ Поддержка локальной и production разработки
-- ✅ Структурированная система скриптов в папке `scripts/`
-- ✅ Гибкая конфигурация через переменные окружения
+1. ✅ Рефакторим текущий работающий бот
+2. ✅ Выделяем **только проверенные** паттерны
+3. ✅ Создаем минимальный но полезный фреймворк
+4. ✅ Проверяем на миграции существующего бота
+5. ✅ Расширяем по реальным потребностям
 
-#### Элементы для универсализации:
+## 🔍 Анализ текущего проекта
 
-- 🔄 Специфичная бизнес-логика (отказ от курения)
-- 🔄 Жестко прописанные конфигурации
-- 🔄 Отсутствие системы шаблонизации
+### Сильные стороны
 
-### 📊 Анализ рынка разработки Telegram ботов
+**Инфраструктура:**
 
-#### 🏆 Популярность языков программирования
+- ✅ Продвинутая Docker-конфигурация с production entrypoint
+- ✅ Централизованная система управления через `manager.py`
+- ✅ Модульная структура `scripts/` с разделением ответственности
+- ✅ Мониторинг здоровья и автоматическое восстановление
+- ✅ Ротация логов и backup'ы
 
-Для обоснования выбора технологического стека и приоритетов развития важно понимать, на каких языках чаще всего пишут Telegram ботов:
+**Разработка:**
 
-**Статистика по языкам** (на основе GitHub, Stack Overflow и сообществ разработчиков):
+- ✅ Современный `pyproject.toml` вместо `requirements.txt`
+- ✅ Настроенные линтеры (ruff, mypy) и pre-commit hooks
+- ✅ Безопасность (non-root user в Docker)
 
-```
-Python:        ████████████████████████████████████████ 45%
-JavaScript:    ██████████████████████████████ 30%
-PHP:           ████████████ 12%
-Go:            ██████ 6%
-Java/Kotlin:   ████ 4%
-C#:            ██ 2%
-Другие:        █ 1%
-```
+**Архитектура бота:**
 
-#### 🐍 Почему Python доминирует?
+- ✅ Хорошее разделение компонентов (`users.py`, `status.py`, `quotes.py`)
+- ✅ Система администраторов с динамическими командами
+- ✅ Scheduler для периодических уведомлений
+- ✅ Graceful shutdown и обработка сигналов
 
-**1. Простота разработки**
+### Что нужно улучшить
 
-- Минимальный boilerplate код
-- Читаемый синтаксис
-- Быстрое прототипирование
+**Переиспользуемость:**
 
-**2. Богатая экосистема**
+- 🔄 Бизнес-логика смешана с инфраструктурным кодом
+- 🔄 Нет базовых классов для абстракции общих паттернов
+- 🔄 Хранение данных жестко привязано к JSON файлам
 
-```python
-# Легкая интеграция с различными сервисами
-import requests          # HTTP запросы
-import sqlite3          # База данных
-import numpy as np      # Научные вычисления
-import cv2              # Обработка изображений
-import openai           # ИИ интеграция
-```
+**Тестирование:**
 
-**3. Популярные библиотеки для ботов**
+- 🔄 Pytest настроен, но тестов нет
+- 🔄 Критично для фреймворка
 
-- **python-telegram-bot** (PTB): 25k+ звезд на GitHub, самая популярная
-- **aiogram**: 4k+ звезд, современный асинхронный подход
-- **telebot** (pyTelegramBotAPI): простая и легковесная
+**Документация:**
 
-**4. Универсальность применения**
+- 🔄 Нет примеров для разработчиков
+- 🔄 Не описаны архитектурные решения
 
-- Простые уведомители
-- Комплексные бизнес-боты
-- ИИ-ассистенты и чат-боты
-- Игровые и развлекательные боты
+## 🏗️ Целевая архитектура (Упрощенная)
 
-#### 🎯 Выбор языка по типу проекта
-
-| Тип бота                | Рекомендуемый язык | Обоснование                                              |
-| ----------------------- | ------------------ | -------------------------------------------------------- |
-| **Простой уведомитель** | Python, PHP        | Быстрая разработка                                       |
-| **Бизнес-бот с БД**     | Python, JavaScript | Хорошие ORM и интеграции                                 |
-| **ИИ-бот**              | Python             | Лучшие ML библиотеки (scikit-learn, TensorFlow, PyTorch) |
-| **Высоконагруженный**   | Go, Java           | Производительность и масштабируемость                    |
-| **Интеграция с веб**    | JavaScript, PHP    | Единая экосистема                                        |
-
-#### 🎯 Стратегия поддержки языков
-
-**Фаза 1 (MVP)**: Python-first подход
-
-- Приоритет на `python-telegram-bot` и `aiogram`
-- Покрытие ~75% рынка (Python + частично JS разработчики)
-
-**Фаза 2**: Расширение экосистемы
-
-```
-Версия 1.0:  Python (PTB, aiogram)           - 45% рынка
-Версия 1.5:  + JavaScript (telegraf, grammy) - +30% рынка
-Версия 2.0:  + Go, PHP поддержка            - +18% рынка
-Версия 2.5:  + Java/Kotlin, C#              - +6% рынка
-```
-
-**Универсальная инфраструктура**:
-
-- Docker контейнеры работают с любым языком
-- Система мониторинга не зависит от языка бота
-- CLI инструменты остаются едиными
-- Шаблоны для разных языков и фреймворков
-
-### 🏗️ Архитектура целевого решения
+### Минимальная структура фреймворка
 
 ```
 telegram-bot-stack/
-├── telegram_bot_stack/           # Основной пакет
+├── telegram_bot_stack/              # Основной пакет
 │   ├── __init__.py
-│   ├── core/                     # Ядро фреймворка
-│   │   ├── __init__.py
-│   │   ├── bot_base.py          # Базовый класс для ботов
-│   │   ├── manager.py           # Менеджер развертывания
-│   │   ├── config.py            # Система конфигурации
-│   │   └── exceptions.py        # Исключения
-│   ├── infrastructure/          # Инфраструктурные компоненты
-│   │   ├── __init__.py
-│   │   ├── docker/              # Docker конфигурации
-│   │   ├── monitoring/          # Системы мониторинга
-│   │   ├── deployment/          # Скрипты развертывания
-│   │   └── logging/             # Конфигурации логирования
-│   ├── templates/               # Шаблоны проектов
-│   │   ├── python/              # Python шаблоны
-│   │   │   ├── basic-ptb/       # Базовый с python-telegram-bot
-│   │   │   ├── basic-aiogram/   # Базовый с aiogram
-│   │   │   ├── advanced/        # Продвинутый с БД и мониторингом
-│   │   │   └── ai-assistant/    # ИИ-ассистент с OpenAI
-│   │   ├── javascript/          # JavaScript шаблоны (v1.5+)
-│   │   │   ├── telegraf/        # Telegraf фреймворк
-│   │   │   └── grammy/          # Grammy фреймворк
-│   │   ├── go/                  # Go шаблоны (v2.0+)
-│   │   ├── php/                 # PHP шаблоны (v2.0+)
-│   │   └── custom/              # Кастомные шаблоны
-│   ├── cli/                     # Интерфейс командной строки
-│   │   ├── __init__.py
-│   │   ├── commands.py          # CLI команды
-│   │   ├── generators.py        # Генераторы проектов
-│   │   └── validators.py        # Валидаторы
-│   └── utils/                   # Утилиты
-│       ├── __init__.py
-│       ├── environment.py       # Работа с окружением
-│       ├── system.py            # Системные утилиты
-│       └── helpers.py           # Вспомогательные функции
-├── templates/                   # Внешние шаблоны
-├── docs/                        # Документация
-├── tests/                       # Тесты
-├── examples/                    # Примеры использования
-├── pyproject.toml              # Конфигурация пакета
-├── README.md
-└── LICENSE
+│   ├── bot_base.py                 # Базовый класс с общими паттернами
+│   ├── config.py                   # Система конфигурации
+│   ├── user_manager.py             # Управление пользователями
+│   ├── admin_manager.py            # Админ-система
+│   ├── storage/                    # 🎯 Storage Abstraction Layer
+│   │   ├── __init__.py            # Factory функция
+│   │   ├── base.py                # StorageBackend interface
+│   │   ├── json.py                # JSONStorage (по умолчанию)
+│   │   └── sql.py                 # SQLStorage (SQLite/PostgreSQL)
+│   ├── scheduler.py                # Планировщик задач
+│   ├── decorators.py               # Декораторы (@admin_required и т.д.)
+│   └── exceptions.py               # Исключения
+├── examples/                       # Примеры использования
+│   ├── echo_bot/                   # Простейший бот
+│   ├── status_bot/                 # Бот с состоянием
+│   ├── poll_bot/                   # Бот с опросами (демо SQL storage)
+│   └── quit_smoking_bot/           # Мигрированный существующий бот
+├── tests/                          # Comprehensive тесты
+│   ├── test_bot_base.py
+│   ├── test_user_manager.py
+│   ├── test_admin_manager.py
+│   ├── test_storage_json.py       # Тесты JSON storage
+│   └── test_storage_sql.py        # Тесты SQL storage
+├── docs/                           # Документация
+│   ├── quickstart.md
+│   ├── storage_guide.md           # 🎯 Руководство по Storage
+│   ├── migration_guide.md
+│   └── api_reference.md
+├── pyproject.toml
+└── README.md
 ```
 
-## 🚀 Этапы реализации
+**Важно:** Никаких `infrastructure/deployment/monitoring/` директорий в MVP. Это все можно добавить позже.
 
-### Этап 1: Подготовка и планирование (1-2 недели)
+### 🎯 Почему Storage Abstraction Layer включен в MVP?
 
-#### 1.1 Создание базовой структуры пакета
+**Проблема:** Большинство ботов начинаются с JSON файлов, но при росте (>10k пользователей) сталкиваются с проблемами:
 
-- [ ] Создать новый репозиторий `telegram-bot-stack`
-- [ ] Настроить `pyproject.toml` с правильными зависимостями
-- [ ] Создать базовую структуру директорий
-- [ ] Настроить CI/CD пайплайн
+- Медленная работа (O(n) поиск)
+- Отсутствие транзакций (race conditions)
+- Нет индексов и сложных запросов
+- Неудобная аналитика
 
-#### 1.2 Извлечение переиспользуемых компонентов
+**Традиционное решение:** Переписывать весь код работы с данными при переходе на БД 😱
 
-- [ ] Выделить универсальные части из текущих `scripts/`
-- [ ] Адаптировать систему управления Docker
-- [ ] Универсализировать систему мониторинга и логирования
-
-### Этап 2: Ядро фреймворка (2-3 недели)
-
-#### 2.1 Базовые классы и абстракции
+**Наше решение:** Storage Abstraction Layer с единым API для JSON и SQL!
 
 ```python
-# telegram_bot_stack/core/bot_base.py
+# День 1: Быстрый старт с JSON
+config = BotConfig(storage_backend="json")  # Работает из коробки
+bot = MyBot(config)
+bot.storage.save("users", "123", {"name": "John"})
+
+# Месяц 6: Переход на БД - одна строка!
+config = BotConfig(
+    storage_backend="sqlite",
+    database_url="sqlite:///bot.db"
+)
+# API остается тот же, код не меняется!
+```
+
+**Преимущества:**
+
+- ✅ **Легкий старт** - JSON работает без настройки
+- ✅ **Плавный рост** - переход на БД без переписывания кода
+- ✅ **Конкурентное преимущество** - никто другой не предлагает
+- ✅ **Единый API** - учишь один раз, работает везде
+
+**Стоимость:** +1 неделя разработки (12% от MVP), но окупается огромной ценностью для пользователей.
+
+### Ключевые компоненты
+
+#### 1. BotBase - Базовый класс с общими паттернами
+
+```python
+# telegram_bot_stack/bot_base.py
+from telegram.ext import Application, CommandHandler
+from typing import Optional
+import asyncio
+
 class TelegramBotBase:
-    """Базовый класс для всех Telegram ботов"""
+    """
+    Базовый класс для Telegram ботов.
+    Инкапсулирует общие паттерны из quit-smoking-bot.
+    """
 
     def __init__(self, config: BotConfig):
         self.config = config
-        self.application = None
-        self.scheduler = None
 
-    async def setup(self):
+        # Built-in components
+        self.user_manager = UserManager(config.data_dir)
+        self.admin_manager = AdminManager(config.data_dir)
+        self.storage = Storage(config.data_dir)
+        self.scheduler = NotificationScheduler(config.timezone)
+
+        self.application: Optional[Application] = None
+        self._running = False
+        self._shutdown_event = asyncio.Event()
+
+    # ==================== HOOKS FOR CUSTOMIZATION ====================
+
+    async def on_user_registered(self, user_id: int) -> None:
+        """Вызывается когда новый пользователь отправляет /start"""
+        pass
+
+    async def get_user_status(self, user_id: int) -> str:
+        """Переопределите для предоставления кастомного статуса"""
+        return "Bot is working!"
+
+    async def on_notification_time(self) -> str:
+        """Переопределите для кастомных уведомлений"""
+        return "This is a scheduled notification"
+
+    # ==================== BUILT-IN COMMAND HANDLERS ====================
+
+    async def handle_start(self, update, context):
+        """Встроенный обработчик /start"""
+        user_id = update.effective_user.id
+
+        # Автоматическая регистрация первого админа
+        if not self.admin_manager.get_all_admins():
+            self.admin_manager.add_admin(user_id)
+            message = self.config.welcome_message + "\n\n✨ Вы назначены первым администратором бота."
+        else:
+            message = self.config.welcome_message
+
+        self.user_manager.add_user(user_id)
+        await self.on_user_registered(user_id)
+        await update.message.reply_text(message)
+
+    async def handle_status(self, update, context):
+        """Встроенный обработчик /status"""
+        user_id = update.effective_user.id
+        status = await self.get_user_status(user_id)
+        await update.message.reply_text(status)
+
+    async def handle_my_id(self, update, context):
+        """Встроенный обработчик /my_id"""
+        user_id = update.effective_user.id
+        user_name = update.effective_user.first_name
+        await update.message.reply_text(
+            f"Your user ID: {user_id}\nName: {user_name}"
+        )
+
+    # ==================== ADMIN COMMANDS (BUILT-IN) ====================
+
+    @admin_required
+    async def handle_list_users(self, update, context):
+        """Список всех пользователей (админ)"""
+        users = self.user_manager.get_all_users()
+        if not users:
+            await update.message.reply_text("No registered users.")
+            return
+
+        text = "Registered users:\n" + "\n".join(f"{i}. {uid}" for i, uid in enumerate(users, 1))
+        await update.message.reply_text(text)
+
+    @admin_required
+    async def handle_list_admins(self, update, context):
+        """Список администраторов (админ)"""
+        admins = self.admin_manager.get_all_admins()
+        text = "Administrators:\n" + "\n".join(f"{i}. {uid}" for i, uid in enumerate(admins, 1))
+        await update.message.reply_text(text)
+
+    @admin_required
+    async def handle_add_admin(self, update, context):
+        """Добавить администратора (админ)"""
+        if not context.args or len(context.args) != 1:
+            await update.message.reply_text("Usage: /add_admin USER_ID")
+            return
+
+        try:
+            new_admin_id = int(context.args[0])
+            if self.admin_manager.add_admin(new_admin_id):
+                await update.message.reply_text(f"User {new_admin_id} is now admin.")
+                await self.notify_new_admin(new_admin_id, context)
+            else:
+                await update.message.reply_text(f"User {new_admin_id} is already admin.")
+        except ValueError:
+            await update.message.reply_text("Invalid user ID.")
+
+    # ==================== LIFECYCLE METHODS ====================
+
+    async def setup(self) -> bool:
         """Настройка бота"""
+        try:
+            # Создание приложения
+            self.application = Application.builder().token(self.config.bot_token).build()
+
+            # Регистрация стандартных команд
+            self.application.add_handler(CommandHandler("start", self.handle_start))
+            self.application.add_handler(CommandHandler("status", self.handle_status))
+            self.application.add_handler(CommandHandler("my_id", self.handle_my_id))
+
+            # Админ команды
+            self.application.add_handler(CommandHandler("list_users", self.handle_list_users))
+            self.application.add_handler(CommandHandler("list_admins", self.handle_list_admins))
+            self.application.add_handler(CommandHandler("add_admin", self.handle_add_admin))
+
+            # Пользовательские команды
+            await self.register_custom_handlers()
+
+            # Настройка scheduler
+            if self.config.enable_scheduler:
+                self.scheduler.add_job(
+                    self.send_scheduled_notifications,
+                    trigger='cron',
+                    **self.config.notification_schedule
+                )
+
+            return True
+        except Exception as e:
+            logger.error(f"Setup failed: {e}")
+            return False
+
+    async def register_custom_handlers(self):
+        """Переопределите для добавления кастомных команд"""
         pass
 
-    async def start(self):
+    async def run(self):
         """Запуск бота"""
-        pass
+        if not await self.setup():
+            return
 
-    async def stop(self):
-        """Остановка бота"""
-        pass
+        self._running = True
 
-    def add_handlers(self):
-        """Добавление обработчиков - переопределяется в наследниках"""
-        raise NotImplementedError
+        try:
+            if self.config.enable_scheduler:
+                self.scheduler.start()
+
+            logger.info(f"🚀 Bot {self.config.bot_name} started")
+
+            await self.application.initialize()
+            await self.application.start()
+            await self.application.updater.start_polling()
+
+            # Keep running until shutdown
+            while self._running:
+                await asyncio.sleep(1)
+
+        except Exception as e:
+            logger.error(f"Error running bot: {e}")
+        finally:
+            await self.shutdown()
+
+    async def shutdown(self):
+        """Graceful shutdown"""
+        if not self._running:
+            return
+
+        self._running = False
+        logger.info("Shutting down bot...")
+
+        try:
+            if self.scheduler and self.scheduler.running:
+                self.scheduler.shutdown(wait=True)
+
+            if self.application:
+                await self.application.stop()
+                await self.application.shutdown()
+
+            logger.info("Shutdown complete")
+            self._shutdown_event.set()
+        except Exception as e:
+            logger.error(f"Error during shutdown: {e}")
 ```
 
-#### 2.2 Система конфигурации
+#### 2. UserManager - Управление пользователями
 
 ```python
-# telegram_bot_stack/core/config.py
-@dataclass
-class BotConfig:
-    """Конфигурация бота"""
-    name: str
-    token: str
-    timezone: str = "UTC"
-    log_level: str = "INFO"
-    environment: str = "development"
+# telegram_bot_stack/user_manager.py
+from pathlib import Path
+import json
+from typing import List, Set
 
-    # Docker настройки
-    docker_image: str = None
-    docker_ports: List[str] = field(default_factory=list)
+class UserManager:
+    """Управление пользователями бота"""
 
-    # Мониторинг
-    enable_monitoring: bool = False
-    health_check_interval: int = 30
+    def __init__(self, data_dir: Path):
+        self.data_dir = Path(data_dir)
+        self.data_dir.mkdir(parents=True, exist_ok=True)
+        self.users_file = self.data_dir / "users.json"
+        self._users: Set[int] = self._load_users()
 
-    @classmethod
-    def from_env(cls, env_file: str = ".env") -> "BotConfig":
-        """Загрузка конфигурации из файла окружения"""
-        pass
+    def _load_users(self) -> Set[int]:
+        """Загрузка пользователей из файла"""
+        if self.users_file.exists():
+            with open(self.users_file, 'r') as f:
+                return set(json.load(f))
+        return set()
+
+    def _save_users(self) -> None:
+        """Сохранение пользователей в файл"""
+        with open(self.users_file, 'w') as f:
+            json.dump(list(self._users), f, indent=2)
+
+    def add_user(self, user_id: int) -> bool:
+        """Добавить пользователя"""
+        if user_id not in self._users:
+            self._users.add(user_id)
+            self._save_users()
+            return True
+        return False
+
+    def remove_user(self, user_id: int) -> bool:
+        """Удалить пользователя"""
+        if user_id in self._users:
+            self._users.remove(user_id)
+            self._save_users()
+            return True
+        return False
+
+    def get_all_users(self) -> List[int]:
+        """Получить всех пользователей"""
+        return list(self._users)
+
+    def is_user_registered(self, user_id: int) -> bool:
+        """Проверить регистрацию пользователя"""
+        return user_id in self._users
 ```
 
-#### 2.3 Менеджер развертывания
+#### 3. Storage Abstraction Layer - Универсальное хранилище 🎯
+
+**Ключевая особенность фреймворка:** Единый API для разных storage backends.
+
+##### 3.1 Базовый интерфейс
 
 ```python
-# telegram_bot_stack/core/manager.py
-class DeploymentManager:
-    """Менеджер для развертывания и управления ботами"""
+# telegram_bot_stack/storage/base.py
+from abc import ABC, abstractmethod
+from typing import Any, Dict, List, Optional
 
-    def __init__(self, config: BotConfig):
-        self.config = config
+class StorageBackend(ABC):
+    """Унифицированный интерфейс для хранилища данных"""
 
-    def create_project(self, template: str = "basic"):
-        """Создание нового проекта бота"""
+    @abstractmethod
+    def save(self, collection: str, key: str, data: Dict) -> bool:
+        """Сохранить данные
+
+        Args:
+            collection: Имя коллекции/таблицы (users, polls, etc)
+            key: Уникальный ключ записи
+            data: Данные для сохранения
+        """
         pass
 
-    def deploy_local(self):
-        """Локальное развертывание"""
+    @abstractmethod
+    def load(self, collection: str, key: str) -> Optional[Dict]:
+        """Загрузить данные по ключу"""
         pass
 
-    def deploy_vps(self, host: str, **kwargs):
-        """Развертывание на VPS"""
+    @abstractmethod
+    def load_all(self, collection: str) -> List[Dict]:
+        """Загрузить все записи из коллекции"""
         pass
 
-    def start(self, environment: str = "local"):
-        """Запуск бота"""
+    @abstractmethod
+    def delete(self, collection: str, key: str) -> bool:
+        """Удалить запись"""
         pass
 
-    def stop(self):
-        """Остановка бота"""
+    @abstractmethod
+    def query(self, collection: str, filters: Dict) -> List[Dict]:
+        """Поиск с фильтрами
+
+        Example:
+            storage.query("users", {
+                "is_active": True,
+                "age__gte": 18,  # age >= 18
+                "name__contains": "John"
+            })
+        """
         pass
 
-    def status(self):
-        """Статус бота"""
+    @abstractmethod
+    def count(self, collection: str, filters: Optional[Dict] = None) -> int:
+        """Подсчет записей"""
         pass
 ```
 
-### Этап 3: Инфраструктурные компоненты (2-3 недели)
-
-#### 3.1 Docker шаблоны
-
-```dockerfile
-# telegram_bot_stack/infrastructure/docker/Dockerfile.template
-FROM python:3.11-slim
-
-WORKDIR /app
-
-# Системные зависимости
-RUN apt-get update && apt-get install -y \
-    gcc \
-    && rm -rf /var/lib/apt/lists/*
-
-# Python зависимости
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Код приложения
-COPY . .
-
-# Создание пользователя
-RUN groupadd -r botuser && useradd -r -g botuser botuser
-RUN chown -R botuser:botuser /app
-USER botuser
-
-# Здоровье контейнера
-HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
-    CMD python -c "import requests; requests.get('http://localhost:8000/health')" || exit 1
-
-CMD ["python", "-m", "{{BOT_MODULE}}"]
-```
-
-#### 3.2 Docker Compose шаблоны
-
-```yaml
-# telegram_bot_stack/infrastructure/docker/docker-compose.template.yml
-version: "3.8"
-
-name: ${BOT_NAME}
-
-services:
-  bot:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: ${BOT_NAME}:latest
-    container_name: ${BOT_NAME}
-    restart: unless-stopped
-
-    environment:
-      - BOT_TOKEN=${BOT_TOKEN}
-      - TZ=${TZ:-UTC}
-      - LOG_LEVEL=${LOG_LEVEL:-INFO}
-      - ENVIRONMENT=production
-
-    volumes:
-      - ./data:/app/data:rw
-      - ./logs:/app/logs:rw
-
-    healthcheck:
-      test: ["CMD", "python", "-c", "import sys; sys.exit(0)"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
-
-    deploy:
-      resources:
-        limits:
-          memory: 256M
-          cpus: "0.5"
-        reservations:
-          memory: 128M
-          cpus: "0.25"
-
-  # Опциональные сервисы
-  monitoring:
-    image: prom/prometheus
-    profiles: ["monitoring"]
-    ports:
-      - "9090:9090"
-    volumes:
-      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
-
-networks:
-  default:
-    name: ${BOT_NAME}-network
-```
-
-#### 3.3 Система мониторинга
+##### 3.2 JSON Storage (по умолчанию)
 
 ```python
-# telegram_bot_stack/infrastructure/monitoring/health.py
-class HealthChecker:
-    """Система проверки здоровья бота"""
+# telegram_bot_stack/storage/json.py
+import json
+from pathlib import Path
+from typing import Dict, List, Optional
+from .base import StorageBackend
 
-    def __init__(self, config: BotConfig):
-        self.config = config
+class JSONStorage(StorageBackend):
+    """Простое хранилище на JSON файлах - работает из коробки!"""
 
-    async def check_bot_health(self) -> HealthStatus:
-        """Проверка состояния бота"""
-        pass
+    def __init__(self, data_dir: Path):
+        self.data_dir = Path(data_dir)
+        self.data_dir.mkdir(parents=True, exist_ok=True)
 
-    async def check_database_health(self) -> HealthStatus:
-        """Проверка состояния БД"""
-        pass
+    def _get_file_path(self, collection: str) -> Path:
+        return self.data_dir / f"{collection}.json"
 
-    async def comprehensive_check(self) -> Dict[str, HealthStatus]:
-        """Комплексная проверка"""
-        pass
+    def _load_collection(self, collection: str) -> Dict:
+        file_path = self._get_file_path(collection)
+        if file_path.exists():
+            with open(file_path, 'r') as f:
+                return json.load(f)
+        return {}
+
+    def _save_collection(self, collection: str, data: Dict):
+        file_path = self._get_file_path(collection)
+        with open(file_path, 'w') as f:
+            json.dump(data, f, indent=2)
+
+    def save(self, collection: str, key: str, data: Dict) -> bool:
+        coll_data = self._load_collection(collection)
+        coll_data[key] = data
+        self._save_collection(collection, coll_data)
+        return True
+
+    def load(self, collection: str, key: str) -> Optional[Dict]:
+        coll_data = self._load_collection(collection)
+        return coll_data.get(key)
+
+    def load_all(self, collection: str) -> List[Dict]:
+        coll_data = self._load_collection(collection)
+        return list(coll_data.values())
+
+    def query(self, collection: str, filters: Dict) -> List[Dict]:
+        """Простая фильтрация для JSON"""
+        items = self.load_all(collection)
+
+        def matches_filters(item):
+            for key, value in filters.items():
+                # Поддержка базовых операторов
+                if "__" in key:
+                    field, op = key.split("__", 1)
+                    if op == "gte" and item.get(field, 0) < value:
+                        return False
+                    if op == "lte" and item.get(field, 0) > value:
+                        return False
+                    if op == "contains" and value not in item.get(field, ""):
+                        return False
+                else:
+                    if item.get(key) != value:
+                        return False
+            return True
+
+        return [item for item in items if matches_filters(item)]
+
+    def count(self, collection: str, filters: Optional[Dict] = None) -> int:
+        if filters:
+            return len(self.query(collection, filters))
+        return len(self.load_all(collection))
 ```
 
-### Этап 4: Система шаблонов (1-2 недели)
-
-#### 4.1 Генератор проектов
+##### 3.3 SQL Storage (SQLite/PostgreSQL)
 
 ```python
-# telegram_bot_stack/cli/generators.py
-class ProjectGenerator:
-    """Генератор проектов ботов"""
+# telegram_bot_stack/storage/sql.py
+from sqlalchemy import create_engine, Column, String, JSON, Integer
+from sqlalchemy.orm import declarative_base, sessionmaker
+from typing import Dict, List, Optional
+from .base import StorageBackend
 
-    def __init__(self, template_dir: Path):
-        self.template_dir = template_dir
+Base = declarative_base()
 
-    def create_project(
-        self,
-        name: str,
-        template: str = "basic",
-        target_dir: Path = None,
-        **template_vars
-    ):
-        """Создание проекта из шаблона"""
-        pass
+class StorageRecord(Base):
+    """Таблица для хранения данных"""
+    __tablename__ = "storage"
 
-    def list_templates(self) -> List[str]:
-        """Список доступных шаблонов"""
-        pass
+    id = Column(Integer, primary_key=True)
+    collection = Column(String, index=True)
+    key = Column(String, index=True)
+    data = Column(JSON)
+
+class SQLStorage(StorageBackend):
+    """SQLite/PostgreSQL хранилище через SQLAlchemy"""
+
+    def __init__(self, database_url: str):
+        """
+        Args:
+            database_url:
+                - "sqlite:///data/bot.db" для SQLite
+                - "postgresql://user:pass@localhost/dbname" для PostgreSQL
+        """
+        self.engine = create_engine(database_url)
+        Base.metadata.create_all(self.engine)
+        self.Session = sessionmaker(bind=self.engine)
+
+    def save(self, collection: str, key: str, data: Dict) -> bool:
+        session = self.Session()
+        try:
+            record = session.query(StorageRecord).filter_by(
+                collection=collection, key=key
+            ).first()
+
+            if record:
+                record.data = data
+            else:
+                record = StorageRecord(
+                    collection=collection,
+                    key=key,
+                    data=data
+                )
+                session.add(record)
+
+            session.commit()
+            return True
+        except Exception as e:
+            session.rollback()
+            logger.error(f"Failed to save: {e}")
+            return False
+        finally:
+            session.close()
+
+    def load(self, collection: str, key: str) -> Optional[Dict]:
+        session = self.Session()
+        try:
+            record = session.query(StorageRecord).filter_by(
+                collection=collection, key=key
+            ).first()
+            return record.data if record else None
+        finally:
+            session.close()
+
+    def load_all(self, collection: str) -> List[Dict]:
+        session = self.Session()
+        try:
+            records = session.query(StorageRecord).filter_by(
+                collection=collection
+            ).all()
+            return [r.data for r in records]
+        finally:
+            session.close()
+
+    def query(self, collection: str, filters: Dict) -> List[Dict]:
+        session = self.Session()
+        try:
+            records = session.query(StorageRecord).filter_by(
+                collection=collection
+            ).all()
+
+            # Фильтрация (можно оптимизировать через JSONB в Postgres)
+            results = []
+            for record in records:
+                if self._matches_filters(record.data, filters):
+                    results.append(record.data)
+            return results
+        finally:
+            session.close()
+
+    def count(self, collection: str, filters: Optional[Dict] = None) -> int:
+        if filters:
+            return len(self.query(collection, filters))
+
+        session = self.Session()
+        try:
+            return session.query(StorageRecord).filter_by(
+                collection=collection
+            ).count()
+        finally:
+            session.close()
+
+    def _matches_filters(self, item: Dict, filters: Dict) -> bool:
+        """Та же логика что и в JSONStorage"""
+        for key, value in filters.items():
+            if "__" in key:
+                field, op = key.split("__", 1)
+                if op == "gte" and item.get(field, 0) < value:
+                    return False
+                if op == "lte" and item.get(field, 0) > value:
+                    return False
+                if op == "contains" and value not in item.get(field, ""):
+                    return False
+            else:
+                if item.get(key) != value:
+                    return False
+        return True
 ```
 
-#### 4.2 Базовый шаблон
+##### 3.4 Factory функция
+
+```python
+# telegram_bot_stack/storage/__init__.py
+from .base import StorageBackend
+from .json import JSONStorage
+from .sql import SQLStorage
+
+def create_storage(
+    backend: str = "json",
+    **kwargs
+) -> StorageBackend:
+    """Factory для создания Storage backend
+
+    Args:
+        backend: "json", "sqlite", "postgres"
+        **kwargs: Параметры для backend
+            - data_dir: для JSON
+            - database_url: для SQL
+
+    Examples:
+        # JSON (по умолчанию)
+        storage = create_storage("json", data_dir="./data")
+
+        # SQLite
+        storage = create_storage("sqlite", database_url="sqlite:///bot.db")
+
+        # PostgreSQL
+        storage = create_storage("postgres",
+            database_url="postgresql://user:pass@localhost/db")
+    """
+    if backend == "json":
+        return JSONStorage(kwargs.get("data_dir", "./data"))
+    elif backend in ("sqlite", "postgres", "postgresql"):
+        if "database_url" not in kwargs:
+            raise ValueError("database_url required for SQL storage")
+        return SQLStorage(kwargs["database_url"])
+    else:
+        raise ValueError(f"Unknown storage backend: {backend}")
+
+__all__ = ["StorageBackend", "JSONStorage", "SQLStorage", "create_storage"]
+```
+
+##### 3.5 Использование в боте
+
+**Простой старт (JSON):**
+
+```python
+from telegram_bot_stack import BotConfig, TelegramBotBase
+
+config = BotConfig(
+    bot_token="...",
+    storage_backend="json"  # По умолчанию, можно не указывать
+)
+
+bot = MyBot(config)
+# Работает из коробки!
+bot.storage.save("polls", "poll_1", {"question": "Favorite color?"})
+```
+
+**Переход на БД (одна строка):**
+
+```python
+config = BotConfig(
+    bot_token="...",
+    storage_backend="sqlite",
+    database_url="sqlite:///data/bot.db"
+)
+
+bot = MyBot(config)
+# API тот же самый, но теперь с БД!
+bot.storage.save("polls", "poll_1", {"question": "Favorite color?"})
+
+# Сложные запросы теперь возможны:
+active_polls = bot.storage.query("polls", {"status": "active"})
+```
+
+#### 4. Декораторы
+
+```python
+# telegram_bot_stack/decorators.py
+from functools import wraps
+
+def admin_required(func):
+    """Декоратор для проверки прав администратора"""
+    @wraps(func)
+    async def wrapper(self, update, context):
+        user_id = update.effective_user.id
+        if not self.admin_manager.is_admin(user_id):
+            await update.message.reply_text("⛔ У вас нет прав для этой команды.")
+            return
+        return await func(self, update, context)
+    return wrapper
+
+def user_registered_required(func):
+    """Декоратор для проверки регистрации пользователя"""
+    @wraps(func)
+    async def wrapper(self, update, context):
+        user_id = update.effective_user.id
+        if not self.user_manager.is_user_registered(user_id):
+            await update.message.reply_text("❌ Сначала отправьте /start для регистрации.")
+            return
+        return await func(self, update, context)
+    return wrapper
+```
+
+## 🚀 Поэтапный план реализации
+
+### Фаза 0: Рефакторинг текущего бота (1-2 недели)
+
+**Цель:** Подготовить код quit-smoking-bot к извлечению общих компонентов.
+
+#### 0.1 Выделение переиспользуемых компонентов
+
+**Текущая структура:**
 
 ```
-templates/basic/
-├── {{bot_name}}/
+src/
+├── bot.py           # Вся логика в одном классе
+├── users.py         # Управление пользователями + админы
+├── status.py        # Специфичная логика (отказ от курения)
+└── quotes.py        # Цитаты
+```
+
+**Новая структура:**
+
+```
+src/
+├── core/                      # Переиспользуемые компоненты
 │   ├── __init__.py
-│   ├── bot.py.j2                # Основной файл бота (Jinja2 шаблон)
-│   ├── config.py.j2            # Конфигурация
-│   ├── handlers/               # Обработчики
-│   │   ├── __init__.py
-│   │   └── basic.py.j2
-│   └── utils/                  # Утилиты
-│       ├── __init__.py
-│       └── helpers.py.j2
-├── data/                       # Данные
-├── logs/                       # Логи
-├── tests/                      # Тесты
-│   └── test_bot.py.j2
-├── .env.example               # Пример переменных окружения
-├── .gitignore
-├── Dockerfile.j2              # Docker конфигурация
-├── docker-compose.yml.j2      # Docker Compose
-├── pyproject.toml.j2          # Python проект
-├── README.md.j2               # Документация
-└── Makefile.j2               # Make команды
+│   ├── bot_base.py           # Базовый класс (будущий фреймворк)
+│   ├── user_manager.py       # Из users.py (общая часть)
+│   ├── admin_manager.py      # Из users.py (админы)
+│   └── storage.py            # Абстракция хранения
+├── quit_smoking/             # Специфичная логика
+│   ├── __init__.py
+│   ├── bot.py               # Наследует bot_base.py
+│   ├── status_manager.py    # Из status.py
+│   └── quotes_manager.py    # Из quotes.py
+└── config.py                # Конфигурация
 ```
 
-#### 4.3 Многоязыковые шаблоны
+**Задачи:**
 
-**Python шаблоны (v1.0)**:
+- [ ] Создать `src/core/` директорию
+- [ ] Извлечь общие методы работы с пользователями в `user_manager.py`
+- [ ] Извлечь админ-систему в `admin_manager.py`
+- [ ] Создать абстракцию `Storage` для работы с JSON
+- [ ] Создать базовый класс `BotBase` с общими паттернами
+- [ ] Рефакторить `QuitSmokingBot` для наследования от `BotBase`
 
-```
-templates/python/
-├── basic-ptb/                    # python-telegram-bot базовый
-│   ├── {{bot_name}}/
-│   │   ├── bot.py.j2            # PTB синтаксис
-│   │   ├── handlers/
-│   │   │   └── commands.py.j2   # CommandHandler, MessageHandler
-│   │   └── config.py.j2
-│   └── requirements.txt.j2      # python-telegram-bot>=22.0
-├── basic-aiogram/               # aiogram базовый
-│   ├── {{bot_name}}/
-│   │   ├── main.py.j2           # aiogram 3.x синтаксис
-│   │   ├── handlers/
-│   │   │   └── basic.py.j2      # Router, message, command
-│   │   └── config.py.j2
-│   └── requirements.txt.j2      # aiogram>=3.0
-├── advanced/                    # Продвинутый с БД
-│   ├── {{bot_name}}/
-│   │   ├── database/
-│   │   │   ├── models.py.j2     # SQLAlchemy модели
-│   │   │   └── crud.py.j2       # CRUD операции
-│   │   ├── middleware/
-│   │   └── services/
-│   └── requirements.txt.j2      # + sqlalchemy, alembic
-└── ai-assistant/                # ИИ-ассистент
-    ├── {{bot_name}}/
-    │   ├── ai/
-    │   │   ├── openai_client.py.j2
-    │   │   └── prompts.py.j2
-    │   └── handlers/
-    └── requirements.txt.j2      # + openai, langchain
+#### 0.2 Создание тестов
+
+```python
+# tests/core/test_user_manager.py
+def test_add_user():
+    manager = UserManager(Path("/tmp/test"))
+    assert manager.add_user(12345) == True
+    assert 12345 in manager.get_all_users()
+
+def test_remove_user():
+    manager = UserManager(Path("/tmp/test"))
+    manager.add_user(12345)
+    assert manager.remove_user(12345) == True
+    assert 12345 not in manager.get_all_users()
+
+# tests/core/test_storage.py
+def test_save_and_load():
+    storage = Storage(Path("/tmp/test"))
+    data = {"key": "value", "number": 42}
+    storage.save("test_data", data)
+    loaded = storage.load("test_data")
+    assert loaded == data
 ```
 
-**JavaScript шаблоны (v1.5)**:
+**Задачи:**
 
-```
-templates/javascript/
-├── telegraf/                    # Telegraf фреймворк
-│   ├── {{bot_name}}/
-│   │   ├── index.js.j2         # Основной файл
-│   │   ├── handlers/
-│   │   │   └── commands.js.j2  # Telegraf синтаксис
-│   │   └── config.js.j2
-│   ├── package.json.j2         # telegraf, dotenv
-│   └── Dockerfile.j2           # Node.js образ
-└── grammy/                     # Grammy фреймворк
-    ├── {{bot_name}}/
-    │   ├── bot.ts.j2           # TypeScript поддержка
-    │   └── handlers/
-    ├── package.json.j2         # grammy, @types/node
-    └── tsconfig.json.j2
-```
+- [ ] Создать `tests/core/` директорию
+- [ ] Написать тесты для `UserManager`
+- [ ] Написать тесты для `AdminManager`
+- [ ] Написать тесты для `Storage`
+- [ ] Написать тесты для `BotBase`
+- [ ] Настроить CI для автоматического запуска тестов
 
-**Инструменты генерации**:
+#### 0.3 Проверка рефакторинга
+
+**Критерии успеха:**
+
+✅ `QuitSmokingBot` наследует от `BotBase` и использует общие компоненты
+✅ Код бота сократился минимум на 30%
+✅ Все существующие функции работают
+✅ Все тесты проходят (coverage > 80%)
+✅ Легко понять, какой код общий, а какой специфичный
+
+**Если что-то из критериев не выполняется** - абстракции неправильные, нужно пересмотреть подход.
+
+### Фаза 1: Minimal Viable Framework (3-4 недели)
+
+**Цель:** Создать минимальный но полезный фреймворк на основе проверенных абстракций, включая Storage Abstraction Layer.
+
+#### 1.1 Создание нового репозитория
 
 ```bash
-# Выбор шаблона по языку и библиотеке
-tb-stack init my-bot --language python --framework ptb
-tb-stack init my-bot --language python --framework aiogram
-tb-stack init my-bot --language javascript --framework telegraf
-tb-stack init my-bot --language go --framework telebot
+# Создать новый проект
+mkdir telegram-bot-stack
+cd telegram-bot-stack
 
-# Автоопределение по предпочтениям
-tb-stack init my-bot --template ai-assistant  # Python + OpenAI
-tb-stack init my-bot --template web-app       # JS + Express интеграция
-tb-stack init my-bot --template high-load     # Go + производительность
+# Инициализация
+git init
+python3 -m venv venv
+source venv/bin/activate
 ```
 
-### Этап 5: CLI интерфейс (1 неделя)
+#### 1.2 Базовая структура пакета
 
-#### 5.1 Основные команды
-
-```bash
-# Создание нового проекта
-tb-stack init my-bot --template basic
-tb-stack init my-bot --template advanced --with-database --with-monitoring
-
-# Многоязыковая поддержка
-tb-stack init my-bot --language python --framework ptb
-tb-stack init my-bot --language python --framework aiogram
-tb-stack init my-bot --language javascript --framework telegraf
-tb-stack init my-bot --language go --framework telebot
-
-# Специализированные шаблоны
-tb-stack init ai-bot --template ai-assistant    # Python + OpenAI
-tb-stack init shop-bot --template ecommerce     # Python + БД + платежи
-tb-stack init game-bot --template game          # Python + игровая логика
-
-# Локальная разработка
-tb-stack dev start
-tb-stack dev stop
-tb-stack dev logs --follow
-tb-stack dev status
-
-# Развертывание на VPS
-tb-stack deploy vps --host example.com --user deploy
-tb-stack deploy docker --registry my-registry.com
-
-# Управление
-tb-stack start --environment production
-tb-stack stop
-tb-stack restart
-tb-stack status --detailed
-tb-stack logs --lines 100 --follow
-
-# Утилиты
-tb-stack validate    # Проверка конфигурации
-tb-stack backup     # Создание backup'а
-tb-stack migrate    # Миграция данных
-tb-stack health     # Проверка здоровья
-
-# Шаблоны
-tb-stack templates list
-tb-stack templates add my-template --from ./template/
+```
+telegram-bot-stack/
+├── telegram_bot_stack/
+│   ├── __init__.py
+│   ├── bot_base.py
+│   ├── config.py
+│   ├── user_manager.py
+│   ├── admin_manager.py
+│   ├── storage.py
+│   ├── scheduler.py
+│   ├── decorators.py
+│   └── exceptions.py
+├── examples/
+│   ├── echo_bot/
+│   │   ├── bot.py
+│   │   └── README.md
+│   └── quit_smoking_bot/  # Мигрированный бот
+│       ├── bot.py
+│       ├── status_manager.py
+│       └── README.md
+├── tests/
+│   ├── __init__.py
+│   ├── test_bot_base.py
+│   ├── test_user_manager.py
+│   ├── test_admin_manager.py
+│   ├── test_storage.py
+│   └── conftest.py
+├── docs/
+│   ├── quickstart.md
+│   ├── migration_guide.md
+│   └── api_reference.md
+├── .github/
+│   └── workflows/
+│       └── ci.yml
+├── pyproject.toml
+├── README.md
+├── LICENSE
+└── .gitignore
 ```
 
-#### 5.2 Реализация CLI
+#### 1.3 Копирование проверенных компонентов
+
+**Из quit-smoking-bot/src/core/ → telegram-bot-stack/telegram_bot_stack/**
+
+- [ ] `bot_base.py` - базовый класс
+- [ ] `user_manager.py` - управление пользователями
+- [ ] `admin_manager.py` - админ-система
+- [ ] `scheduler.py` - планировщик (если есть)
+
+**Важно:** Не копировать специфичную логику (status_manager, quotes_manager)!
+
+#### 1.3.5 Разработка Storage Abstraction Layer 🎯
+
+**Новый компонент для MVP:**
+
+- [ ] `storage/base.py` - StorageBackend interface
+- [ ] `storage/json.py` - JSONStorage (по умолчанию)
+- [ ] `storage/sql.py` - SQLStorage (SQLite + PostgreSQL)
+- [ ] `storage/__init__.py` - Factory функция
+- [ ] Тесты для всех storage backends
+- [ ] Документация по миграции JSON → SQL
+
+**Время:** ~5-7 дней дополнительно
+
+#### 1.4 Создание примеров
+
+**Простой echo bot:**
 
 ```python
-# telegram_bot_stack/cli/commands.py
-import click
-from .generators import ProjectGenerator
-from ..core.manager import DeploymentManager
-
-@click.group()
-def cli():
-    """Telegram Bot Stack - универсальный инструмент для развертывания ботов"""
-    pass
-
-@cli.command()
-@click.argument('name')
-@click.option('--template', default='basic', help='Шаблон проекта')
-@click.option('--language', default='python',
-              type=click.Choice(['python', 'javascript', 'go', 'php']),
-              help='Язык программирования')
-@click.option('--framework',
-              type=click.Choice(['ptb', 'aiogram', 'telegraf', 'grammy', 'telebot']),
-              help='Фреймворк для работы с Telegram API')
-@click.option('--with-database', is_flag=True, help='Добавить поддержку БД')
-@click.option('--with-monitoring', is_flag=True, help='Добавить мониторинг')
-@click.option('--with-ai', is_flag=True, help='Добавить ИИ интеграцию')
-def init(name, template, language, framework, with_database, with_monitoring, with_ai):
-    """Создать новый проект бота"""
-
-    # Автоопределение фреймворка по языку
-    if not framework:
-        framework_defaults = {
-            'python': 'ptb',
-            'javascript': 'telegraf',
-            'go': 'telebot',
-            'php': 'longman'
-        }
-        framework = framework_defaults.get(language, 'ptb')
-
-    generator = ProjectGenerator()
-    generator.create_project(
-        name=name,
-        template=template,
-        language=language,
-        framework=framework,
-        with_database=with_database,
-        with_monitoring=with_monitoring,
-        with_ai=with_ai
-    )
-
-@cli.group()
-def dev():
-    """Команды для локальной разработки"""
-    pass
-
-@dev.command()
-def start():
-    """Запуск бота локально"""
-    manager = DeploymentManager.from_current_dir()
-    manager.start(environment="development")
-
-# ... другие команды
-```
-
-### Этап 6: Интеграция с существующими решениями (1 неделя)
-
-#### 6.1 Поддержка популярных библиотек
-
-```python
-# Поддержка python-telegram-bot
-from telegram_bot_stack.integrations.ptb import PTBBotBase
-
-class MyBot(PTBBotBase):
-    def add_handlers(self):
-        self.application.add_handler(CommandHandler("start", self.start))
-
-# Поддержка aiogram
-from telegram_bot_stack.integrations.aiogram import AiogramBotBase
-
-class MyBot(AiogramBotBase):
-    def register_handlers(self):
-        self.dp.message.register(self.start_handler, commands=["start"])
-```
-
-#### 6.2 Интеграция с облачными платформами
-
-```python
-# telegram_bot_stack/infrastructure/deployment/providers/
-├── aws.py          # AWS EC2/ECS
-├── digitalocean.py # DigitalOcean Droplets
-├── hetzner.py      # Hetzner Cloud
-├── vps.py          # Generic VPS
-└── docker.py       # Docker Registry
-```
-
-### Этап 7: Документация и примеры (1 неделя)
-
-#### 7.1 Документация
-
-```
-docs/
-├── index.md                    # Главная страница
-├── quickstart.md              # Быстрый старт
-├── tutorials/                 # Туториалы
-│   ├── basic-bot.md
-│   ├── advanced-bot.md
-│   └── production-deployment.md
-├── reference/                 # Справочник API
-│   ├── core.md
-│   ├── cli.md
-│   └── templates.md
-├── deployment/                # Развертывание
-│   ├── local.md
-│   ├── vps.md
-│   └── docker.md
-└── examples/                  # Примеры
-    ├── echo-bot/
-    ├── weather-bot/
-    └── shop-bot/
-```
-
-#### 7.2 Примеры ботов
-
-```python
-# examples/echo-bot/bot.py
+# examples/echo_bot/bot.py
 from telegram_bot_stack import TelegramBotBase, BotConfig
+from telegram.ext import MessageHandler, filters
 
 class EchoBot(TelegramBotBase):
-    def add_handlers(self):
-        from telegram.ext import MessageHandler, filters
+    """Простейший бот - повторяет сообщения"""
 
+    async def register_custom_handlers(self):
+        """Регистрация кастомных обработчиков"""
         self.application.add_handler(
-            MessageHandler(filters.TEXT, self.echo)
+            MessageHandler(filters.TEXT & ~filters.COMMAND, self.echo)
         )
 
     async def echo(self, update, context):
+        """Повторить сообщение пользователя"""
         await update.message.reply_text(update.message.text)
 
 if __name__ == "__main__":
     config = BotConfig.from_env()
     bot = EchoBot(config)
-    bot.run()
+
+    import asyncio
+    asyncio.run(bot.run())
 ```
 
-### Этап 8: Тестирование и оптимизация (1 неделя)
-
-#### 8.1 Тесты
+**Мигрированный quit-smoking bot:**
 
 ```python
-# tests/test_core.py
-import pytest
-from telegram_bot_stack.core import BotConfig, DeploymentManager
+# examples/quit_smoking_bot/bot.py
+from telegram_bot_stack import TelegramBotBase, BotConfig
+from .status_manager import StatusManager
 
-def test_config_from_env():
-    config = BotConfig.from_env("tests/fixtures/.env.test")
-    assert config.name == "test-bot"
-    assert config.token == "123:test"
+class QuitSmokingBot(TelegramBotBase):
+    """Бот для отслеживания отказа от курения"""
 
-def test_project_generation():
-    generator = ProjectGenerator()
-    project_dir = generator.create_project(
-        name="test-bot",
-        template="basic",
-        target_dir="/tmp/test"
+    def __init__(self, config: BotConfig):
+        super().__init__(config)
+        self.status_manager = StatusManager(config)
+
+    async def get_user_status(self, user_id: int) -> str:
+        """Статус пользователя (кастомная логика)"""
+        return self.status_manager.get_status_info("status")
+
+    async def on_notification_time(self) -> str:
+        """Ежемесячное уведомление"""
+        return self.status_manager.get_status_info("monthly_notification")
+
+if __name__ == "__main__":
+    config = BotConfig.from_env()
+    bot = QuitSmokingBot(config)
+
+    import asyncio
+    asyncio.run(bot.run())
+```
+
+**Пример с SQL storage (poll_bot):**
+
+```python
+# examples/poll_bot/bot.py
+from telegram_bot_stack import TelegramBotBase, BotConfig
+from telegram.ext import CommandHandler
+from datetime import datetime
+
+class PollBot(TelegramBotBase):
+    """Бот для проведения опросов с использованием SQL storage"""
+
+    async def register_custom_handlers(self):
+        """Регистрация команд для опросов"""
+        self.application.add_handler(CommandHandler("create_poll", self.create_poll))
+        self.application.add_handler(CommandHandler("vote", self.vote))
+        self.application.add_handler(CommandHandler("results", self.show_results))
+        self.application.add_handler(CommandHandler("active_polls", self.list_polls))
+
+    @user_registered_required
+    async def create_poll(self, update, context):
+        """Создать новый опрос"""
+        if not context.args:
+            await update.message.reply_text("Usage: /create_poll Question?")
+            return
+
+        question = " ".join(context.args)
+        poll_id = f"poll_{datetime.now().timestamp()}"
+
+        # Сохранение в storage (работает с JSON и SQL одинаково!)
+        self.storage.save("polls", poll_id, {
+            "question": question,
+            "created_by": update.effective_user.id,
+            "created_at": datetime.now().isoformat(),
+            "status": "active",
+            "votes": {}
+        })
+
+        await update.message.reply_text(f"✅ Опрос создан!\nID: {poll_id}")
+
+    @user_registered_required
+    async def list_polls(self, update, context):
+        """Список активных опросов (демонстрация query)"""
+        # Query работает с обоими backends!
+        active_polls = self.storage.query("polls", {"status": "active"})
+
+        if not active_polls:
+            await update.message.reply_text("Нет активных опросов")
+            return
+
+        text = "📊 Активные опросы:\n\n"
+        for poll in active_polls:
+            text += f"• {poll['question']}\n"
+
+        await update.message.reply_text(text)
+
+if __name__ == "__main__":
+    # Легко переключаться между JSON и SQL!
+    config = BotConfig(
+        bot_token="...",
+        storage_backend="sqlite",  # Или "json" для простоты
+        database_url="sqlite:///data/polls.db"
     )
-    assert project_dir.exists()
-    assert (project_dir / "bot.py").exists()
 
-# tests/test_cli.py
-from click.testing import CliRunner
-from telegram_bot_stack.cli import cli
+    bot = PollBot(config)
 
-def test_init_command():
-    runner = CliRunner()
-    with runner.isolated_filesystem():
-        result = runner.invoke(cli, ["init", "my-bot"])
-        assert result.exit_code == 0
-        assert Path("my-bot").exists()
+    import asyncio
+    asyncio.run(bot.run())
 ```
-
-#### 8.2 Performance тесты
-
-```python
-# tests/test_performance.py
-import pytest
-import time
-from telegram_bot_stack.core import DeploymentManager
-
-def test_startup_time():
-    start = time.time()
-    manager = DeploymentManager(config)
-    manager.start()
-    startup_time = time.time() - start
-    assert startup_time < 10  # Должен стартовать за 10 секунд
-```
-
-### Этап 9: Публикация и распространение (1 неделя)
-
-#### 9.1 Подготовка к публикации
 
 ```toml
-# pyproject.toml
-[build-system]
-requires = ["setuptools>=61.0", "wheel"]
-build-backend = "setuptools.build_meta"
+# examples/poll_bot/pyproject.toml
+[project]
+dependencies = [
+    "telegram-bot-stack[database]",  # Включает SQLAlchemy
+]
+```
 
+**Критерий успеха:** Все примеры работают с минимальным количеством кода!
+
+#### 1.5 Тестирование и документация
+
+- [ ] Портировать тесты из quit-smoking-bot
+- [ ] Добавить integration тесты
+- [ ] Написать API Reference
+- [ ] Создать Migration Guide
+- [ ] Добавить примеры в README
+
+#### 1.6 Настройка pyproject.toml
+
+```toml
 [project]
 name = "telegram-bot-stack"
-version = "1.0.0"
-description = "Universal framework for deploying Telegram bots to VPS with ease"
+version = "0.1.0"
+description = "Minimal but powerful framework for Telegram bots based on python-telegram-bot"
 readme = "README.md"
 requires-python = ">=3.9"
 authors = [
     {name = "Your Name", email = "your.email@example.com"}
 ]
 license = {text = "MIT"}
-classifiers = [
-    "Development Status :: 5 - Production/Stable",
-    "Intended Audience :: Developers",
-    "Topic :: Communications :: Chat",
-    "Topic :: Software Development :: Libraries :: Application Frameworks",
-    "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-]
 
 dependencies = [
-    "python-telegram-bot>=20.0",
-    "click>=8.0",
-    "jinja2>=3.0",
-    "pydantic>=2.0",
-    "python-dotenv>=1.0",
-    "docker>=6.0",
-    "paramiko>=3.0",  # SSH для VPS
-    "rich>=13.0",     # Красивый вывод
+    "python-telegram-bot[job-queue]>=22.3,<23.0",
+    "APScheduler>=3.11.0,<4.0",
+    "python-dotenv>=1.1.0",
 ]
 
 [project.optional-dependencies]
+# Database backends (опционально)
+database = [
+    "sqlalchemy>=2.0,<3.0",
+    "alembic>=1.13,<2.0",  # Для миграций БД
+]
+postgres = [
+    "psycopg2-binary>=2.9",  # PostgreSQL драйвер
+]
+
+# Полная установка с БД
+all = [
+    "sqlalchemy>=2.0,<3.0",
+    "alembic>=1.13,<2.0",
+    "psycopg2-binary>=2.9",
+]
+
+# Для разработки
 dev = [
-    "pytest>=7.0",
+    "pytest>=8.0",
     "pytest-asyncio>=0.21",
-    "black>=23.0",
+    "pytest-cov>=4.0",
     "ruff>=0.1",
     "mypy>=1.5",
     "pre-commit>=3.0",
 ]
-aiogram = [
-    "aiogram>=3.0",
-]
-monitoring = [
-    "prometheus-client>=0.17",
-    "grafana-api>=1.0",
-]
-
-[project.scripts]
-tb-stack = "telegram_bot_stack.cli:cli"
 
 [project.urls]
 Homepage = "https://github.com/yourusername/telegram-bot-stack"
-Repository = "https://github.com/yourusername/telegram-bot-stack"
 Documentation = "https://telegram-bot-stack.readthedocs.io"
-"Issue Tracker" = "https://github.com/yourusername/telegram-bot-stack/issues"
+Repository = "https://github.com/yourusername/telegram-bot-stack"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "--cov=telegram_bot_stack --cov-report=html --cov-report=term"
+
+[tool.ruff]
+line-length = 88
+target-version = "py39"
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
 ```
 
-#### 9.2 CI/CD пайплайн
+**Примеры установки:**
+
+```bash
+# Базовая установка (только JSON storage)
+pip install telegram-bot-stack
+
+# С поддержкой SQL (SQLite + PostgreSQL)
+pip install telegram-bot-stack[database]
+
+# С PostgreSQL драйвером
+pip install telegram-bot-stack[database,postgres]
+
+# Полная установка (всё)
+pip install telegram-bot-stack[all]
+
+# Для разработки
+pip install telegram-bot-stack[dev]
+```
+
+### Фаза 2: Инфраструктура и утилиты (1-2 недели)
+
+**Цель:** Добавить инструменты для удобной работы с фреймворком.
+
+#### 2.1 Docker шаблоны
+
+Копировать проверенные Docker конфигурации из quit-smoking-bot:
+
+```
+telegram_bot_stack/
+└── docker/
+    ├── Dockerfile.template
+    ├── docker-compose.yml.template
+    ├── entrypoint.py.template
+    └── README.md
+```
+
+**Использование:**
+
+```bash
+# В проекте пользователя
+cp -r venv/lib/python3.9/site-packages/telegram_bot_stack/docker/* .
+# Редактируем docker-compose.yml под свои нужды
+docker-compose up -d
+```
+
+#### 2.2 Management скрипты
+
+Копировать систему управления из quit-smoking-bot:
+
+```
+telegram_bot_stack/
+└── management/
+    ├── manager.py.template
+    ├── Makefile.template
+    └── scripts/
+        ├── actions.py
+        ├── docker_utils.py
+        ├── health.py
+        └── ...
+```
+
+#### 2.3 Project generator (опционально)
+
+Если нужен генератор проектов, использовать **cookiecutter**, а не Jinja2:
+
+```bash
+# Установка
+pip install cookiecutter
+
+# Создание нового проекта
+cookiecutter gh:telegram-bot-stack/cookiecutter-bot
+
+# Будут заданы вопросы:
+# - Bot name?
+# - Bot token?
+# - Enable admin system? [Y/n]
+# - Enable scheduler? [Y/n]
+# - Docker deployment? [Y/n]
+```
+
+### Фаза 3: Документация и публикация (1 неделя)
+
+#### 3.1 Comprehensive документация
+
+**README.md:**
+
+````markdown
+# Telegram Bot Stack
+
+Minimal but powerful framework for building production-ready Telegram bots.
+
+## Features
+
+- 🚀 Quick start - working bot in 10 lines of code
+- 👥 Built-in user management
+- 🔐 Admin system with permissions
+- 📅 Scheduler for periodic notifications
+- 💾 Data persistence
+- 🐳 Production-ready Docker setup
+- 📊 Health monitoring
+- 🧪 Fully tested
+
+## Quick Start
+
+```python
+from telegram_bot_stack import TelegramBotBase, BotConfig
+
+class MyBot(TelegramBotBase):
+    async def get_user_status(self, user_id: int) -> str:
+        return "Hello from my bot!"
+
+if __name__ == "__main__":
+    config = BotConfig.from_env()
+    bot = MyBot(config)
+
+    import asyncio
+    asyncio.run(bot.run())
+```
+````
+
+## Installation
+
+```bash
+pip install telegram-bot-stack
+```
+
+## Documentation
+
+- [Quick Start Guide](docs/quickstart.md)
+- [API Reference](docs/api_reference.md)
+- [Migration Guide](docs/migration_guide.md)
+- [Examples](examples/)
+
+````
+
+**docs/quickstart.md** - пошаговое руководство
+**docs/api_reference.md** - полное описание API
+**docs/migration_guide.md** - как мигрировать существующий бот
+
+#### 3.2 CI/CD Pipeline
 
 ```yaml
 # .github/workflows/ci.yml
@@ -839,10 +1298,11 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.9, 3.10, 3.11, 3.12]
+        python-version: [3.9, "3.10", "3.11", "3.12"]
 
     steps:
       - uses: actions/checkout@v4
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -853,12 +1313,18 @@ jobs:
           pip install -e ".[dev]"
 
       - name: Run tests
-        run: pytest
+        run: |
+          pytest --cov --cov-report=xml
 
-      - name: Run linting
+      - name: Upload coverage
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage.xml
+
+      - name: Lint
         run: |
           ruff check .
-          mypy .
+          mypy telegram_bot_stack
 
   publish:
     needs: test
@@ -869,7 +1335,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v4
         with:
-          python-version: 3.11
+          python-version: "3.11"
 
       - name: Build package
         run: |
@@ -879,632 +1345,583 @@ jobs:
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          user: __token__
           password: ${{ secrets.PYPI_API_TOKEN }}
-```
+````
 
-## 📊 Сравнение с существующими решениями
-
-### Расширенный анализ конкурентов
-
-После глубокого исследования рынка мы выявили несколько категорий конкурентов. Важно понимать, что большинство из них решают только ЧАСТЬ проблем, которые покрывает наш `telegram-bot-stack`.
-
-#### 🎨 **1. No-Code/Low-Code платформы**
-
-| Решение       | Целевая аудитория       | Возможности                             | Ограничения                               | Наше преимущество              |
-| ------------- | ----------------------- | --------------------------------------- | ----------------------------------------- | ------------------------------ |
-| **Chatfuel**  | Маркетологи, SMM        | Визуальный редактор, аналитика          | Ограниченная кастомизация, платные тарифы | Полный контроль над кодом      |
-| **ManyBot**   | Начинающие              | Простой интерфейс, базовые функции      | Очень ограниченный функционал             | Professional-grade возможности |
-| **PuzzleBot** | Русскоязычная аудитория | Быстрая настройка, поддержка на русском | Только базовые сценарии                   | Сложная бизнес-логика          |
-| **BotMother** | Маркетинг-агентства     | Мультиканальность                       | Нет контроля над инфраструктурой          | Собственная инфраструктура     |
-| **SendPulse** | Email-маркетологи       | Интеграция с email, CRM                 | Фокус на маркетинг, не на разработку      | Development-first подход       |
-
-**Вывод**: Эти платформы НЕ конкуренты, так как нацелены на совершенно другую аудиторию (маркетологи vs разработчики).
-
-#### ☁️ **2. Облачные хостинг-платформы**
-
-| Решение                       | Специализация           | Плюсы                      | Минусы                                      | Наше преимущество                      |
-| ----------------------------- | ----------------------- | -------------------------- | ------------------------------------------- | -------------------------------------- |
-| **Railway.app**               | Универсальный хостинг   | GitHub интеграция          | Не специализирован под боты                 | Bot-specific оптимизации               |
-| **Render**                    | Веб-приложения          | Простота использования     | Дорогие тарифы, нет bot templates           | Готовые шаблоны + дешевле              |
-| **Bothost.ru**                | Telegram боты           | Специализация на ботах     | Только хостинг, нет инструментов разработки | Full stack решение                     |
-| **Heroku**                    | Универсальный PaaS      | Много интеграций           | Дорого, нет бесплатного тарифа              | Включает development tools             |
-| **DigitalOcean App Platform** | Контейнерные приложения | Хорошая производительность | Нужна настройка инфраструктуры              | Готовая к использованию инфраструктура |
-
-**Вывод**: Это частичные конкуренты в сфере хостинга, но они НЕ предоставляют development framework.
-
-#### 🛠️ **3. DevOps/Infrastructure решения**
-
-| Решение          | Назначение             | Возможности                     | Ограничения                     | Наше преимущество             |
-| ---------------- | ---------------------- | ------------------------------- | ------------------------------- | ----------------------------- |
-| **CapRover**     | Self-hosted PaaS       | Open source, гибкость           | Требует серьезных DevOps знаний | Специализация под боты        |
-| **Dokku**        | Mini-Heroku            | Простота Heroku + контроль      | Только для одного сервера       | Мульти-сервер + bot templates |
-| **Portainer**    | Docker GUI             | Удобное управление контейнерами | Только UI, нет автоматизации    | Полная автоматизация + CLI    |
-| **Docker Swarm** | Оркестрация            | Встроенный в Docker             | Сложная настройка               | One-click setup               |
-| **Kubernetes**   | Enterprise оркестрация | Максимальная масштабируемость   | Очень сложный                   | Простота использования        |
-
-**Вывод**: Эти решения требуют высокой экспертизы и НЕ специализированы под Telegram ботов.
-
-#### 📚 **4. Библиотеки разработки (уже проанализированы)**
-
-| Решение                 | Роль            | Отношение к нашему проекту                   |
-| ----------------------- | --------------- | -------------------------------------------- |
-| **python-telegram-bot** | API wrapper     | **Партнер** - мы используем их библиотеку    |
-| **aiogram**             | Async framework | **Партнер** - поддерживаем в шаблонах        |
-| **pyrogram**            | Extended API    | **Потенциальный партнер** для v2.0           |
-| **telethon**            | MTProto client  | **Потенциальный партнер** для advanced ботов |
-
-**Вывод**: Это НЕ конкуренты, а партнеры - мы строим экосистему ВОКРУГ их библиотек.
-
-#### 🔧 **5. Automation & Integration платформы**
-
-| Решение               | Фокус               | Плюсы                       | Минусы                    | Наше преимущество      |
-| --------------------- | ------------------- | --------------------------- | ------------------------- | ---------------------- |
-| **Zapier**            | Workflow automation | Много интеграций            | Не для разработки ботов   | Native bot development |
-| **Integromat (Make)** | Process automation  | Визуальные сценарии         | Не предназначен для ботов | Bot-first architecture |
-| **GitHub Actions**    | CI/CD               | Отличная интеграция с кодом | Только CI/CD, нет runtime | Полный lifecycle       |
-| **GitLab CI**         | DevOps pipeline     | Встроенный в GitLab         | Не специализирован        | Bot-specific pipelines |
-
-**Вывод**: Это инструменты автоматизации, которые могут ДОПОЛНЯТЬ наш проект, но не заменяют его.
-
-#### 📈 **6. Analytics & Management боты**
-
-| Решение           | Назначение        | Аудитория         | Наше отличие                      |
-| ----------------- | ----------------- | ----------------- | --------------------------------- |
-| **TGStat Bot**    | Аналитика каналов | Владельцы каналов | Мы помогаем СОЗДАВАТЬ ботов       |
-| **Combot**        | Модерация групп   | Администраторы    | Мы даем инструменты разработчикам |
-| **Anti-Spam Bot** | Защита от спама   | Модераторы        | Наш фокус на development          |
-
-**Вывод**: Эти боты решают конкретные задачи, а мы предоставляем платформу для создания ЛЮБЫХ ботов.
-
-#### 🏆 **Итоговая таблица конкурентного анализа**
-
-| Категория конкурентов | Покрытие нашего функционала | Статус конкуренции      | Стратегия                  |
-| --------------------- | --------------------------- | ----------------------- | -------------------------- |
-| **No-Code платформы** | 0% - другая аудитория       | ❌ НЕ конкуренты        | Игнорировать               |
-| **Облачные хостинги** | 30% - только хостинг        | 🟡 Частичные конкуренты | Интеграция + превосходство |
-| **DevOps решения**    | 40% - инфраструктура        | 🟡 Частичные конкуренты | Специализация + простота   |
-| **Dev библиотеки**    | 50% - только код            | ✅ Партнеры             | Сотрудничество             |
-| **Automation tools**  | 20% - только CI/CD          | 🟡 Дополняющие          | Интеграция                 |
-| **Специфичные боты**  | 5% - узкие задачи           | ❌ НЕ конкуренты        | Игнорировать               |
-
-### 🎯 **Уникальное позиционирование telegram-bot-stack**
-
-**Мы единственные, кто предоставляет:**
-
-1. **100% покрытие lifecycle** - от шаблона до production
-2. **Bot-specific оптимизации** - заточено именно под Telegram ботов
-3. **Developer Experience** - для программистов, а не маркетологов
-4. **Multi-framework support** - поддержка всех популярных библиотек
-5. **Production-ready из коробки** - мониторинг, логи, backup, scaling
-
-**Наша ниша**: Единственная платформа, которая превращает разработку ботов из месяцев DevOps работы в несколько команд CLI.
-
-## 🎛️ Примеры использования
-
-### Быстрый старт
+#### 3.3 Публикация на PyPI
 
 ```bash
-# Установка
-pip install telegram-bot-stack
+# Локальная сборка и проверка
+python -m build
+twine check dist/*
 
-# Создание нового бота
-tb-stack init my-awesome-bot --template advanced --with-monitoring
+# Публикация на Test PyPI
+twine upload --repository testpypi dist/*
 
-# Переход в директорию
-cd my-awesome-bot
+# Проверка установки
+pip install --index-url https://test.pypi.org/simple/ telegram-bot-stack
 
-# Настройка токена
-echo "BOT_TOKEN=your_token_here" > .env
-
-# Локальная разработка
-tb-stack dev start
-
-# Развертывание на VPS
-tb-stack deploy vps --host my-server.com --user deploy
+# Публикация на Production PyPI
+twine upload dist/*
 ```
 
-### Многоязыковые сценарии
+## 📖 Стратегия миграции существующих ботов
 
-#### Python проекты
+### Пример: Миграция quit-smoking-bot
+
+**До миграции (текущий код):**
+
+```python
+# src/bot.py (~720 строк)
+class QuitSmokingBot:
+    def __init__(self):
+        self.user_manager = UserManager()
+        self.quotes_manager = QuotesManager()
+        self.status_manager = StatusManager(self.quotes_manager)
+        self.scheduler = None
+        self.application = None
+        # ... много boilerplate кода
+
+    async def start(self, update, context):
+        user_id = update.effective_user.id
+        if not self.user_manager.get_all_admins():
+            self.user_manager.add_admin(user_id)
+            # ... логика первого админа
+        self.user_manager.add_user(user_id)
+        await update.message.reply_text(WELCOME_MESSAGE)
+
+    # ... еще 15 методов для команд
+    # ... setup, run, shutdown - стандартные методы
+```
+
+**После миграции:**
+
+```python
+# quit_smoking_bot/bot.py (~150 строк)
+from telegram_bot_stack import TelegramBotBase, BotConfig
+from .status_manager import StatusManager
+
+class QuitSmokingBot(TelegramBotBase):
+    """Бот для отслеживания отказа от курения"""
+
+    def __init__(self, config: BotConfig):
+        super().__init__(config)  # ← Вся инфраструктура уже есть!
+        self.status_manager = StatusManager(config)
+
+    async def get_user_status(self, user_id: int) -> str:
+        """Переопределяем для кастомного статуса"""
+        return self.status_manager.get_status_info("status")
+
+    async def on_notification_time(self) -> str:
+        """Переопределяем для ежемесячных уведомлений"""
+        return self.status_manager.get_status_info("monthly_notification")
+
+# Всё! Больше ничего не нужно:
+# - User management встроен
+# - Admin system встроен
+# - Scheduler встроен
+# - Setup/run/shutdown встроены
+```
+
+**Результат:**
+
+- ✅ Код сократился с ~720 до ~150 строк (~80% reduction)
+- ✅ Фокус только на бизнес-логике (status, notifications)
+- ✅ Вся инфраструктура переиспользуется
+- ✅ Легко поддерживать и расширять
+
+### Чеклист миграции для любого бота
+
+1. **Установить фреймворк:**
+
+   ```bash
+   pip install telegram-bot-stack
+   ```
+
+2. **Создать конфигурацию:**
+
+   ```python
+   # config.py
+   from telegram_bot_stack import BotConfig
+
+   config = BotConfig(
+       bot_token="YOUR_TOKEN",
+       bot_name="My Bot",
+       data_dir="./data",
+       enable_scheduler=True,
+       notification_schedule={'hour': 10, 'minute': 0}
+   )
+   ```
+
+3. **Рефакторить основной класс:**
+
+   ```python
+   # Было:
+   class MyBot:
+       def __init__(self):
+           # Много инициализации
+
+   # Стало:
+   class MyBot(TelegramBotBase):
+       def __init__(self, config):
+           super().__init__(config)
+           # Только кастомная инициализация
+   ```
+
+4. **Переопределить хуки:**
+
+   - `async def on_user_registered(user_id)` - когда пользователь регистрируется
+   - `async def get_user_status(user_id)` - для команды /status
+   - `async def on_notification_time()` - для scheduled notifications
+   - `async def register_custom_handlers()` - для дополнительных команд
+
+5. **Удалить boilerplate:**
+
+   - User management
+   - Admin system
+   - Scheduler setup
+   - Application lifecycle (setup/run/shutdown)
+   - Signal handlers
+
+6. **Тестирование:**
+   ```bash
+   python bot.py
+   ```
+
+## 📊 Roadmap и версии
+
+### Version 0.1.0 - MVP (7-9 недель)
+
+**Цель:** Минимальный но полезный фреймворк с Storage Abstraction Layer
+
+✅ Базовый класс `TelegramBotBase`
+✅ User management
+✅ Admin system
+✅ **Storage Abstraction Layer** 🎯
+
+- JSONStorage (default, zero-setup)
+- SQLStorage (SQLite + PostgreSQL)
+- Unified API для обоих
+  ✅ Scheduler
+  ✅ Examples (echo_bot, poll_bot, quit_smoking_bot)
+  ✅ Comprehensive tests (>80% coverage)
+  ✅ Documentation + Storage Guide
+  ✅ PyPI publication
+
+**Критерий успеха:**
+
+- quit-smoking-bot успешно мигрирован
+- 10+ early adopters используют фреймворк
+- Получена обратная связь
+
+### Version 0.2.0 - Refinement (4-6 недель)
+
+**На основе feedback от early adopters:**
+
+- 🔄 Улучшение API на основе реального использования
+- 🔄 Дополнительные декораторы (`@rate_limit`, `@log_usage`)
+- 🔄 Middleware support
+- 🔄 Webhook support (в дополнение к polling)
+- 🔄 Улучшенное логирование
+- 🔄 Больше примеров
+
+### Version 1.0.0 - Stable (после feedback)
+
+**Production-ready release:**
+
+- ✅ Stable API (semantic versioning)
+- ✅ Comprehensive documentation
+- ✅ 90%+ test coverage
+- ✅ Performance optimizations
+- ✅ Security audit
+- ✅ Migration tools
+- ✅ Community templates
+
+### Version 1.x - Extensions (по требованию)
+
+**Только если есть реальная потребность:**
+
+- Database backends (PostgreSQL, MongoDB) вместо JSON
+- Redis для кэширования
+- Prometheus metrics
+- Grafana dashboards
+- Cloud deployment tools (AWS, GCP, Azure)
+- Kubernetes configs
+
+### Version 2.0+ - Multi-language (если нужно)
+
+**Только если Python версия успешна:**
+
+- JavaScript/TypeScript support
+- Go support
+- Unified infrastructure
+
+**Важно:** Не начинать версию 2.0 пока 1.0 не стабильна и популярна!
+
+## 🧪 Тестирование
+
+### Стратегия тестирования
+
+**Unit Tests:**
+
+```python
+# tests/test_user_manager.py
+def test_add_user():
+    manager = UserManager(tmp_path)
+    assert manager.add_user(123) == True
+    assert 123 in manager.get_all_users()
+
+# tests/test_bot_base.py
+@pytest.mark.asyncio
+async def test_handle_start():
+    bot = TestBot(test_config)
+    update = create_test_update(user_id=123)
+    await bot.handle_start(update, None)
+    assert bot.user_manager.is_user_registered(123)
+```
+
+**Integration Tests:**
+
+```python
+# tests/integration/test_full_flow.py
+@pytest.mark.asyncio
+async def test_user_registration_and_status():
+    bot = EchoBot(test_config)
+    await bot.setup()
+
+    # Simulate /start
+    update = create_test_update(user_id=123, text="/start")
+    await bot.application.process_update(update)
+
+    # Check user registered
+    assert bot.user_manager.is_user_registered(123)
+
+    # Simulate /status
+    update = create_test_update(user_id=123, text="/status")
+    await bot.application.process_update(update)
+    # ... assert response
+```
+
+**Coverage Requirements:**
+
+- Минимум 80% для MVP
+- Цель 90%+ для stable release
+- 100% для critical components (user_manager, admin_manager)
+
+### CI/CD Integration
+
+Автоматический запуск тестов:
+
+- На каждый push
+- На pull request
+- Перед публикацией на PyPI
+
+## 🎯 Сравнение: До и После
+
+### Пример: Создание бота для опросов
+
+**Без фреймворка (традиционный подход):**
+
+```python
+# poll_bot.py (~400-500 строк)
+import json
+import logging
+from pathlib import Path
+from telegram import Update
+from telegram.ext import Application, CommandHandler, ContextTypes
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+
+class PollBot:
+    def __init__(self):
+        # Управление пользователями - писать с нуля
+        self.users_file = Path("data/users.json")
+        self.users = self._load_users()
+
+        # Управление админами - писать с нуля
+        self.admins_file = Path("data/admins.json")
+        self.admins = self._load_admins()
+
+        # Scheduler - настраивать с нуля
+        self.scheduler = AsyncIOScheduler()
+
+        # Application - настраивать с нуля
+        self.application = None
+
+    def _load_users(self):
+        # Логика загрузки пользователей
+        if self.users_file.exists():
+            with open(self.users_file) as f:
+                return set(json.load(f))
+        return set()
+
+    def _save_users(self):
+        # Логика сохранения пользователей
+        with open(self.users_file, 'w') as f:
+            json.dump(list(self.users), f)
+
+    # ... еще ~50 строк boilerplate для user management
+    # ... еще ~50 строк boilerplate для admin system
+    # ... еще ~100 строк для setup/run/shutdown
+
+    async def send_poll(self, update, context):
+        # Бизнес-логика опросов
+        user_id = update.effective_user.id
+        # ... логика
+
+    # ... остальные команды
+
+# Итого: ~400-500 строк кода, много boilerplate
+```
+
+**С фреймворком telegram-bot-stack:**
+
+```python
+# poll_bot.py (~80-100 строк)
+from telegram_bot_stack import TelegramBotBase, BotConfig
+from telegram import Update
+from telegram.ext import CommandHandler
+
+class PollBot(TelegramBotBase):
+    """Бот для проведения опросов"""
+
+    def __init__(self, config: BotConfig):
+        super().__init__(config)  # ← Вся инфраструктура готова!
+        self.active_polls = {}
+
+    async def register_custom_handlers(self):
+        """Регистрация команд для опросов"""
+        self.application.add_handler(
+            CommandHandler("create_poll", self.create_poll)
+        )
+        self.application.add_handler(
+            CommandHandler("vote", self.vote)
+        )
+        self.application.add_handler(
+            CommandHandler("results", self.show_results)
+        )
+
+    @user_registered_required
+    async def create_poll(self, update, context):
+        """Создать новый опрос"""
+        # Только бизнес-логика!
+        question = " ".join(context.args)
+        poll_id = self._generate_poll_id()
+        self.active_polls[poll_id] = {
+            'question': question,
+            'votes': {}
+        }
+        self.storage.save(f'poll_{poll_id}', self.active_polls[poll_id])
+        await update.message.reply_text(f"Опрос создан! ID: {poll_id}")
+
+    @user_registered_required
+    async def vote(self, update, context):
+        """Проголосовать в опросе"""
+        # Только бизнес-логика!
+        poll_id, choice = context.args
+        user_id = update.effective_user.id
+
+        if poll_id in self.active_polls:
+            self.active_polls[poll_id]['votes'][user_id] = choice
+            self.storage.save(f'poll_{poll_id}', self.active_polls[poll_id])
+            await update.message.reply_text("Ваш голос учтен!")
+
+    @admin_required
+    async def show_results(self, update, context):
+        """Показать результаты (только админ)"""
+        poll_id = context.args[0]
+        poll = self.active_polls.get(poll_id)
+        if poll:
+            results = self._calculate_results(poll)
+            await update.message.reply_text(results)
+
+# Итого: ~80-100 строк, только бизнес-логика!
+
+if __name__ == "__main__":
+    config = BotConfig.from_env()
+    bot = PollBot(config)
+
+    import asyncio
+    asyncio.run(bot.run())
+```
+
+**Результат:**
+
+- ❌ Без фреймворка: ~400-500 строк (80% boilerplate, 20% логика)
+- ✅ С фреймворком: ~80-100 строк (10% настройка, 90% логика)
+- **Сокращение кода: 75-80%**
+- **Фокус на бизнес-логике, а не на инфраструктуре**
+
+## 💰 Монетизация (опционально)
+
+> **Примечание:** Раздел монетизации вынесен за пределы технического плана и приведен здесь только для справки. На этапе MVP фокус должен быть на создании ценности, а не на заработке.
+
+### Возможные модели (после стабильной версии 1.0)
+
+1. **Open Source Core + Premium Extensions**
+
+   - Core остается бесплатным
+   - Premium templates ($9-29)
+   - Advanced features (database backends, cloud deploy) ($49-99)
+
+2. **Managed Hosting**
+
+   - Free tier: 1 bot
+   - Pro: $9/month (5 bots)
+   - Enterprise: Custom pricing
+
+3. **Consulting & Support**
+   - Custom bot development
+   - Enterprise support contracts
+   - Training и workshops
+
+**Важно:** Монетизация возможна только после:
+
+- Stable 1.0 release
+- Active community (1000+ users)
+- Доказанная ценность продукта
+
+## 📋 Checklist перед публикацией MVP
+
+### Code Quality
+
+- [ ] All tests pass (coverage > 80%)
+- [ ] No linter errors
+- [ ] Type hints everywhere
+- [ ] Docstrings для всех public methods
+
+### Documentation
+
+- [ ] README.md with quick start
+- [ ] API Reference complete
+- [ ] Migration Guide with examples
+- [ ] CHANGELOG.md
+- [ ] CONTRIBUTING.md
+
+### Examples
+
+- [ ] echo_bot работает
+- [ ] quit_smoking_bot успешно мигрирован
+- [ ] Минимум 3 разных примера
+
+### Infrastructure
+
+- [ ] CI/CD настроен
+- [ ] PyPI package builds correctly
+- [ ] Docker templates работают
+- [ ] License file (MIT)
+
+### Community
+
+- [ ] GitHub repo готов
+- [ ] Issue templates
+- [ ] Code of conduct
+- [ ] Contributing guidelines
+
+## 🎓 Lessons Learned
+
+### Что НЕ делать
+
+❌ **Over-engineering** - не создавать сложную архитектуру до понимания потребностей
+❌ **Jinja2 templates** - не генерировать код через строковые шаблоны
+❌ **Многоязыковая поддержка сразу** - сначала сделать отличный Python framework
+❌ **Монетизация до создания ценности** - сначала продукт, потом деньги
+❌ **Игнорирование тестов** - тесты критичны для фреймворка
+
+### Что делать правильно
+
+✅ **Start Simple** - начать с минимального набора проверенных абстракций
+✅ **Migrate existing bot** - использовать реальный проект для валидации
+✅ **Test extensively** - comprehensive testing с первого дня
+✅ **Document everything** - хорошая документация = успех фреймворка
+✅ **Listen to users** - развивать на основе реального feedback
+
+## 🚀 Заключение
+
+### Что изменилось в плане
+
+**Было (первоначальный план):**
+
+- 8-10 недель разработки
+- 5 уровней абстракции
+- Jinja2 code generation
+- Многоязыковая поддержка с v1.5
+- Сложная infrastructure
+- 20% документа о монетизации
+- JSON только для хранения
+
+**Стало (обновленный план v2):**
+
+- 7-9 недель до MVP (+1 неделя на Storage)
+- 2 уровня абстракции (core + examples)
+- Code-based templates
+- Только Python (по крайней мере до v2.0)
+- Минимальная but proven infrastructure
+- Фокус на технической реализации
+- **Storage Abstraction Layer** - JSON + SQL с единым API 🎯
+
+### Критерии успеха MVP
+
+1. ✅ quit-smoking-bot успешно мигрирован на фреймворк
+2. ✅ Код существующего бота сократился на 70-80%
+3. ✅ 3+ рабочих примера (echo_bot, poll_bot с SQL, quit_smoking_bot)
+4. ✅ Storage работает с JSON и SQL одинаково
+5. ✅ Test coverage > 80%
+6. ✅ 10+ early adopters используют фреймворк
+7. ✅ Позитивная обратная связь
+
+### Следующие шаги
+
+**Неделя 1-2: Фаза 0 - Рефакторинг**
 
 ```bash
-# Простой бот с python-telegram-bot
-tb-stack init echo-bot --language python --framework ptb
-
-# Современный асинхронный бот с aiogram
-tb-stack init async-bot --language python --framework aiogram --with-database
-
-# ИИ-ассистент с OpenAI
-tb-stack init ai-helper --template ai-assistant --with-ai
-cd ai-helper
-echo "OPENAI_API_KEY=your_key" >> .env
-tb-stack dev start
+cd quit-smoking-bot
+git checkout -b refactor/extract-framework-components
+# Выделение общих компонентов
+# Создание bot_base.py
+# Написание тестов
 ```
 
-#### JavaScript проекты
+**Неделя 3-6: Фаза 1 - MVF + Storage**
 
 ```bash
-# Telegraf бот (v1.5+)
-tb-stack init js-bot --language javascript --framework telegraf
-
-# Современный TypeScript бот с Grammy
-tb-stack init ts-bot --language javascript --framework grammy
+mkdir telegram-bot-stack
+cd telegram-bot-stack
+# Создание пакета
+# Портирование компонентов
+# Разработка Storage Abstraction Layer (JSON + SQL)
+# Миграция quit-smoking-bot
+# Создание poll_bot примера
 ```
 
-#### Специализированные боты
+**Неделя 7-8: Фаза 2-3 - Инфраструктура и документация**
 
 ```bash
-# Высоконагруженный бот на Go (v2.0+)
-tb-stack init fast-bot --language go --framework telebot
-
-# E-commerce бот с базой данных
-tb-stack init shop-bot --template ecommerce --with-database --with-monitoring
-
-# Игровой бот
-tb-stack init game-bot --template game --language python --framework aiogram
+# Docker templates
+# Documentation (включая Storage Guide)
+# CI/CD setup
 ```
 
-### Создание кастомного шаблона
+**Неделя 9: Публикация и feedback**
 
 ```bash
-# Создание шаблона
-tb-stack templates create my-template --base advanced
-
-# Редактирование шаблона
-# edit templates/my-template/...
-
-# Использование
-tb-stack init new-bot --template my-template
+# PyPI publication
+# Announce в сообществах
+# Сбор feedback
 ```
 
-### Мониторинг и управление
+### Важное напоминание
 
-```bash
-# Статус всех сервисов
-tb-stack status --detailed
+> **"Perfect is the enemy of good"** - лучше выпустить простой но полезный MVP через 7-9 недель, чем потратить 6 месяцев на идеальный фреймворк, который никто не будет использовать.
 
-# Логи в реальном времени
-tb-stack logs --follow --filter ERROR
+Фокус на:
 
-# Создание backup'а
-tb-stack backup --include data,logs
+1. Решение реальной проблемы (boilerplate в Telegram ботах)
+2. Проверенные абстракции (из работающего бота)
+3. Отличный developer experience
+4. Быстрая итерация на основе feedback
 
-# Масштабирование
-tb-stack scale --replicas 3
-```
+**Главное правило:** Если абстракция не упрощает код quit-smoking-bot - она не нужна в фреймворке!
 
-## 📅 Временные рамки и ресурсы
+---
 
-### Общий план (8-10 недель)
-
-| Этап               | Время      | Ресурсы                | Приоритет   |
-| ------------------ | ---------- | ---------------------- | ----------- |
-| 1. Подготовка      | 1-2 недели | 1 разработчик          | Высокий     |
-| 2. Ядро фреймворка | 2-3 недели | 1-2 разработчика       | Критический |
-| 3. Инфраструктура  | 2-3 недели | 1 разработчик          | Высокий     |
-| 4. Шаблоны         | 1-2 недели | 1 разработчик          | Средний     |
-| 5. CLI             | 1 неделя   | 1 разработчик          | Высокий     |
-| 6. Интеграции      | 1 неделя   | 1 разработчик          | Средний     |
-| 7. Документация    | 1 неделя   | 1 технический писатель | Высокий     |
-| 8. Тестирование    | 1 неделя   | 1-2 разработчика       | Критический |
-| 9. Публикация      | 1 неделя   | 1 разработчик          | Средний     |
-
-### Минимально жизнеспособный продукт (MVP)
-
-**Сроки: 4-5 недель**
-
-Включает:
-
-- Базовый фреймворк (этапы 1-2)
-- Простые Docker шаблоны (часть этапа 3)
-- Базовый CLI (этап 5)
-- Один шаблон бота (часть этапа 4)
-
-## 🔮 Перспективы развития
-
-### Версия 1.0 (MVP) - Python First
-
-**Охват рынка**: ~45% (Python разработчики)
-
-- Базовый функционал развертывания и управления
-- Поддержка `python-telegram-bot` и `aiogram`
-- Простые шаблоны (basic, advanced)
-- Docker развертывание на VPS
-- CLI с основными командами
-
-### Версия 1.5 - JavaScript экосистема
-
-**Охват рынка**: ~75% (Python + JavaScript)
-
-- Поддержка JavaScript/Node.js ботов
-- Шаблоны для `telegraf` и `grammy` фреймворков
-- TypeScript поддержка
-- Web UI для управления проектами
-- Автоматические обновления и миграции
-
-### Версия 2.0 - Расширение языков
-
-**Охват рынка**: ~93% (Python + JS + Go + PHP)
-
-- Поддержка Go и PHP ботов
-- Kubernetes оркестрация
-- Микросервисная архитектура
-- Marketplace шаблонов сообщества
-- Cloud провайдеры интеграция (AWS, GCP, Azure)
-
-### Версия 2.5 - ИИ и автоматизация
-
-**Охват рынка**: ~99% (все основные языки)
-
-- AI-ассистент для генерации кода ботов
-- Автоматическое масштабирование по нагрузке
-- Встроенная аналитика и метрики
-- Multi-cloud развертывание
-- Интеграция с популярными ИИ сервисами
-
-### Языковая стратегия по версиям
-
-```
-v1.0:  Python (PTB + aiogram)                    45% рынка
-v1.5:  + JavaScript (Telegraf + Grammy)          +30% = 75%
-v2.0:  + Go (telebot) + PHP (longman)           +18% = 93%
-v2.5:  + Java/Kotlin + C# + Rust                +6%  = 99%
-```
-
-## 💡 Рекомендации по реализации
-
-### Архитектурные принципы
-
-1. **Модульность**: Каждый компонент должен быть независимым
-2. **Расширяемость**: Легкое добавление новых шаблонов и провайдеров
-3. **Простота**: Минимальная кривая обучения
-4. **Надежность**: Graceful degradation и error handling
-5. **Performance**: Быстрый старт и низкое потребление ресурсов
-
-### Технические решения
-
-1. **Plugin система**: Для расширения функционала
-2. **Event-driven архитектура**: Для loose coupling
-3. **Async/await**: Для высокой производительности
-4. **Type hints**: Для лучшей разработки
-5. **Rich logging**: Для debugging и мониторинга
-
-### Качество кода
-
-1. **100% type coverage** с mypy
-2. **90%+ test coverage** с pytest
-3. **Автоматический linting** с ruff
-4. **Pre-commit hooks** для качества
-5. **Comprehensive documentation** с примерами
-
-## 💰 Стратегии монетизации
-
-### 📈 Поэтапный план монетизации
-
-#### Этап 1: MVP - Построение аудитории (месяцы 1-6)
-
-**Модель**: Полностью бесплатный Open Source
-
-- 🎯 **Цель**: Захват рынка и построение сообщества
-- 📊 **Метрики**: 10,000+ установок, 500+ GitHub звезд, 100+ активных пользователей
-- 🔑 **Стратегия**: Создание brand awareness в Python/Telegram сообществах
-
-#### Этап 2: Freemium модель (месяцы 7-18)
-
-**Модель**: Базовый Open Source + Premium надстройки
-
-- 🎯 **Цель**: Первые доходы и validation бизнес-модели
-- 📊 **Метрики**: 2-5% conversion rate, $10-50k MRR
-- 🔑 **Стратегия**: Premium шаблоны и расширенные возможности
-
-#### Этап 3: Multi-tier SaaS (месяцы 19+)
-
-**Модель**: Комплексная SaaS платформа с разными тарифами
-
-- 🎯 **Цель**: Масштабирование и enterprise клиенты
-- 📊 **Метрики**: $100k+ MRR, enterprise контракты
-- 🔑 **Стратегия**: Полноценная бизнес-платформа
-
-### 💡 Модели монетизации
-
-#### 1. **📦 Premium Templates & Boilerplates**
-
-**Базовые (бесплатные)**:
-
-- Simple echo bot (PTB, aiogram)
-- Basic commands bot
-- Webhook setup template
-
-**Premium ($9-49 per template)**:
-
-```bash
-tb-stack marketplace install premium-ecommerce    # $29
-tb-stack marketplace install ai-assistant-pro     # $49
-tb-stack marketplace install crypto-trading-bot   # $99
-tb-stack marketplace install enterprise-crm       # $199
-```
-
-**Premium категории**:
-
-- 🛒 **E-commerce bots**: Магазины, каталоги, платежи ($29-99)
-- 🤖 **AI-powered bots**: OpenAI, LangChain интеграции ($49-199)
-- 📊 **Analytics & CRM**: Метрики, воронки, интеграции ($39-149)
-- 🎮 **Gaming bots**: Игровая механика, leaderboards ($19-79)
-- 🏢 **Enterprise templates**: Корпоративные решения ($99-499)
-
-#### 2. **☁️ Managed Hosting & Infrastructure**
-
-**Free tier**:
-
-- 1 bot, 1,000 сообщений/месяц
-- Community support
-- Basic monitoring
-
-**Starter ($9/месяц)**:
-
-- 3 bots, 10,000 сообщений/месяц
-- Email support
-- Advanced monitoring
-- Automatic backups
-
-**Pro ($29/месяц)**:
-
-- 10 bots, 100,000 сообщений/месяц
-- Priority support
-- Custom domains
-- Advanced analytics
-- A/B testing
-
-**Enterprise ($199/месяц)**:
-
-- Unlimited bots и сообщения
-- Dedicated infrastructure
-- White-label solution
-- Custom integrations
-- SLA 99.9% uptime
-
-#### 3. **🔧 Advanced CLI & Tools**
-
-**Open Source CLI** (бесплатно):
-
-- Базовые команды (init, deploy, status)
-- Community templates
-- Basic monitoring
-
-**Pro CLI** ($19/месяц):
-
-```bash
-tb-stack pro login
-tb-stack deploy --auto-scale --monitoring
-tb-stack analytics --advanced
-tb-stack backup --encrypted --scheduled
-tb-stack marketplace --premium-access
-```
-
-**Enterprise CLI** ($99/месяц):
-
-- Multi-tenant management
-- Team collaboration features
-- Enterprise security
-- Custom deployment pipelines
-- Advanced orchestration
-
-#### 4. **🎓 Education & Training**
-
-**Telegram Bot Academy** ($197-497):
-
-- 📚 "Zero to Production" курс ($197)
-- 🎯 "Advanced Bot Architectures" ($297)
-- 🏢 "Enterprise Bot Development" ($497)
-- 👥 Corporate training (custom pricing)
-
-**Certification Programs** ($99-299):
-
-- Certified Telegram Bot Developer
-- Advanced Bot Architect
-- Bot DevOps Engineer
-
-#### 5. **🤝 Consulting & Custom Development**
-
-**Pricing tiers**:
-
-- 💡 **Bot Architecture Consultation**: $150/hour
-- 🔧 **Custom Template Development**: $2,000-10,000
-- 🏢 **Enterprise Implementation**: $10,000-50,000
-- 🎯 **Performance Optimization**: $5,000-25,000
-
-**Package deals**:
-
-- 📦 **Startup Package**: Bot + hosting setup ($999)
-- 🚀 **Scale Package**: Architecture + optimization ($4,999)
-- 🏢 **Enterprise Package**: Full implementation ($25,000+)
-
-#### 6. **🛒 Marketplace & Ecosystem**
-
-**Revenue sharing model** (70% developer / 30% platform):
-
-**Categories**:
-
-- 🔌 **Integrations**: Payment providers, CRM, analytics ($9-99)
-- 🎨 **UI Themes**: Keyboard layouts, message templates ($5-29)
-- 📊 **Analytics Plugins**: Advanced metrics, reporting ($19-79)
-- 🔒 **Security Modules**: Auth, rate limiting, encryption ($29-149)
-- 🤖 **AI Services**: NLP, ML models, chatbot brains ($49-299)
-
-**Marketplace statistics potential**:
-
-- 1000+ developers selling components
-- $50k+ monthly marketplace revenue
-- 20,000+ transactions per month
-
-### 📊 Прогноз доходов по этапам
-
-#### MVP Phase (Месяцы 1-6): $0 MRR
-
-- Focus on adoption and community building
-- Open source strategy для market penetration
-
-#### Freemium Phase (Месяцы 7-18): $5k-50k MRR
-
-```
-Premium Templates:     $2,000-15,000/month
-Managed Hosting:       $1,000-20,000/month
-Pro CLI:              $500-5,000/month
-Consulting:           $1,500-10,000/month
-TOTAL:                $5,000-50,000/month
-```
-
-#### Scale Phase (Месяцы 19-36): $50k-500k MRR
-
-```
-Premium Templates:     $15,000-100,000/month
-Managed Hosting:       $20,000-200,000/month
-Pro/Enterprise CLI:    $5,000-50,000/month
-Education:            $3,000-30,000/month
-Consulting:           $10,000-100,000/month
-Marketplace:          $2,000-20,000/month
-TOTAL:                $55,000-500,000/month
-```
-
-#### Enterprise Phase (Месяцы 37+): $500k+ MRR
-
-- Enterprise contracts: $100k-1M per deal
-- White-label licensing: $50k-500k per client
-- Global expansion and partnerships
-
-### 🎯 Конкурентный анализ цен
-
-| Решение                | Базовый план | Pro план      | Enterprise | Наше преимущество       |
-| ---------------------- | ------------ | ------------- | ---------- | ----------------------- |
-| **Heroku**             | $7/month     | $25-500/month | Custom     | Специализация на ботах  |
-| **Railway**            | $5/month     | $20/month     | Custom     | Готовые шаблоны         |
-| **DigitalOcean**       | $5/month     | $20-160/month | Custom     | Bot-specific features   |
-| **Render**             | Free tier    | $7-85/month   | Custom     | Полный lifecycle        |
-| **telegram-bot-stack** | Free + $9    | $29/month     | $199/month | **Уникальная ценность** |
-
-### 🚀 Go-to-Market стратегия
-
-#### Канал 1: Community-Led Growth
-
-- **GitHub/Open Source**: Viral growth через качество продукта
-- **Developer Communities**: Reddit, Hacker News, DEV.to
-- **Telegram Communities**: Bot developers, Python communities
-- **Content Marketing**: Technical blog posts, tutorials
-
-#### Канал 2: Product-Led Growth
-
-- **Freemium Experience**: Попробовать → влюбиться → upgrade
-- **Referral Programs**: Скидки за приглашения разработчиков
-- **Integration Partnerships**: Партнерство с популярными библиотеками
-
-#### Канал 3: Sales-Led Growth (Enterprise)
-
-- **Direct Sales**: Outreach к крупным компаниям
-- **Partner Channel**: Через DevOps консультантов и агентства
-- **Conference Speaking**: Python, DevOps, Telegram конференции
-
-### 💼 Enterprise стратегия
-
-#### White-Label Platform ($50k-500k)
-
-```bash
-# Полностью брендированное решение
-acme-bot-stack init my-enterprise-bot
-acme-bot-stack deploy --acme-cloud
-acme-bot-stack monitor --acme-dashboard
-```
-
-**Enterprise features**:
-
-- 🏢 Custom branding and domains
-- 🔒 Enhanced security and compliance
-- 📊 Advanced analytics and reporting
-- 👥 Team management and permissions
-- 🔧 Custom integrations and APIs
-- 📞 Dedicated support and success manager
-
-#### Industry-Specific Solutions
-
-- **FinTech Bots**: Compliance, security, integrations ($100k+)
-- **Healthcare Bots**: HIPAA compliance, patient data ($150k+)
-- **E-commerce Platforms**: Shopping bots at scale ($75k+)
-- **Media & Entertainment**: Content delivery bots ($50k+)
-
-### 🎯 Ключевые метрики для отслеживания
-
-#### Product Metrics
-
-- **Adoption**: Установки, активные пользователи
-- **Engagement**: Боты созданы, развернуты, активны
-- **Retention**: Monthly/yearly retention rates
-- **NPS**: Net Promoter Score от пользователей
-
-#### Business Metrics
-
-- **MRR**: Monthly Recurring Revenue growth
-- **CAC**: Customer Acquisition Cost
-- **LTV**: Customer Lifetime Value
-- **Conversion**: Free → Paid conversion rate
-- **Churn**: Monthly churn rate по тарифам
-
-### 🔄 Feedback Loop для развития
-
-1. **Community Feedback** → New features roadmap
-2. **Usage Analytics** → Product optimization
-3. **Customer Success** → Enterprise feature development
-4. **Market Research** → Pricing optimization
-5. **Competitor Analysis** → Differentiation strategy
-
-Эта стратегия позволит превратить `telegram-bot-stack` из open source проекта в sustainable business с multiple revenue streams! 💰
-
-## 📋 Заключение
-
-Преобразование текущего проекта `quit-smoking-bot` в универсальный пакет `telegram-bot-stack` представляет собой амбициозную, но реализуемую задачу.
-
-### Ключевые преимущества:
-
-1. **Огромная аудитория**: Python доминирует (45% рынка) + JavaScript (30%) = 75% покрытие с v1.5
-2. **Техническая база**: Текущий проект уже содержит продвинутую инфраструктуру
-3. **Конкурентное преимущество**: Единственное решение с полным lifecycle management
-4. **Многоязыковая стратегия**: Пошаговое покрытие до 99% рынка к версии 2.5
-5. **Масштабируемость**: Универсальная Docker-инфраструктура для любых языков
-
-### Риски и митигация:
-
-1. **Сложность**: Разбиение на этапы и MVP подход
-2. **Конкуренция**: Фокус на unique value proposition
-3. **Поддержка**: Активное сообщество и документация
-4. **Совместимость**: Тщательное тестирование на разных платформах
-
-### 🚀 Рекомендуемый план старта
-
-**Немедленные действия (1-2 недели)**:
-
-1. **Создать репозиторий** `telegram-bot-stack`
-2. **Валидировать концепцию** - опросить Python/JS сообщества
-3. **Извлечь инфраструктуру** из текущего проекта
-4. **Создать MVP с Python-first подходом**
-
-**Этап MVP (4-6 недель)**:
-
-- Фокус на Python (`python-telegram-bot` + `aiogram`)
-- 2-3 базовых шаблона
-- CLI с основными командами
-- Docker развертывание
-- Публикация в PyPI
-
-**Критерии успеха MVP**:
-
-- 1000+ загрузок в первый месяц
-- 10+ GitHub звезд
-- Позитивная обратная связь в Python сообществах
-- Использование минимум 5 разными разработчиками
-
-**После MVP**:
-
-- JavaScript поддержка (версия 1.5)
-- Расширение до остальных языков
-- Коммерциализация (premium шаблоны, поддержка)
-
-Данный подход позволит захватить 45% рынка с первой версии и масштабироваться до практически полного покрытия рынка Telegram ботов.
+**Готовы начать?** Следующий шаг: создать ветку `refactor/extract-framework-components` в quit-smoking-bot и начать Фазу 0! 🚀
