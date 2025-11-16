@@ -1,0 +1,117 @@
+name: 🎯 Feature Request
+description: Suggest a new feature for the Quit Smoking Bot
+title: "[Feature] "
+labels: ["feature", "status:planning"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Thanks for suggesting a new feature! 🚀
+
+        This form will help structure your feature request.
+        Cloud Agent will automatically analyze and label your issue.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 🎯 Feature Description
+      description: What feature would you like to see?
+      placeholder: "I would like to add..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: motivation
+    attributes:
+      label: 💡 Motivation
+      description: Why is this feature important? What problem does it solve?
+      placeholder: "This feature would help users..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: implementation
+    attributes:
+      label: 📋 Proposed Implementation
+      description: How do you envision this feature working?
+      placeholder: "The feature could work by..."
+    validations:
+      required: false
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: 🎨 Component
+      description: Which component does this feature relate to?
+      options:
+        - Bot Commands
+        - Notifications
+        - User Management
+        - Prize System
+        - Docker/Deployment
+        - CLI Tools
+        - Monitoring
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: ⚡ Priority
+      description: How important is this feature?
+      options:
+        - Low - Nice to have
+        - Medium - Would improve the bot
+        - High - Important for users
+        - Critical - Essential feature
+    validations:
+      required: true
+
+  - type: textarea
+    id: impact
+    attributes:
+      label: 📊 Expected Impact
+      description: Who will benefit from this feature?
+      placeholder: |
+        - **Users**: All users will benefit by...
+        - **Admins**: Admins will be able to...
+        - **System**: This will improve...
+    validations:
+      required: false
+
+  - type: textarea
+    id: related
+    attributes:
+      label: 🔗 Related Issues
+      description: Are there any related issues or discussions?
+      placeholder: "#123, #456"
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: ✅ Checklist
+      description: Before submitting
+      options:
+        - label: I have searched existing issues to avoid duplicates
+          required: true
+        - label: This feature aligns with the bot's core purpose
+          required: true
+        - label: I am willing to help implement this feature
+          required: false
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+
+        **🤖 Cloud Agent Commands:**
+        After creating this issue, you can use these commands in comments:
+        - `/breakdown` - Break into subtasks
+        - `/estimate` - Get time estimate
+        - `/accept` - Generate acceptance criteria
+        - `/relate` - Find related files/issues

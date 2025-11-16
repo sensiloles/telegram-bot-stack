@@ -2,6 +2,16 @@
 
 A specialized Telegram bot to track your smoke-free journey with a progressive prize fund system and motivational support.
 
+## 🤖 New: Cloud Agent Issue Automation
+
+**Automated Issue Management** - Create, label, and break down GitHub Issues automatically!
+
+🎤 **Voice/Text Commands** • 🏷️ **Smart Labeling** • 📋 **Task Breakdown** • ✅ **Acceptance Criteria** • 🔍 **Context Analysis**
+
+👉 **[Learn More about Cloud Agent](.github/docs/cloud-agent/README.md)**
+
+---
+
 ## 🌟 Features
 
 ### 🎯 Core Bot Features
@@ -437,9 +447,24 @@ BOT_TIMEZONE = ZoneInfo("Europe/Moscow")  # Change as needed
 
 This project uses modern Python packaging with `pyproject.toml`:
 
-- **Main dependencies**: Defined in `pyproject.toml`
+- **Main dependencies**: Defined in `pyproject.toml` for bot functionality
+- **Development tools**: Optional group `dev` for linting, testing, type checking
+- **GitHub Actions**: Optional group `github-actions` for workflow automation
 - **Local usage**: Run without Docker using `python3 src/bot.py`
 - **No requirements.txt files**: All managed through pyproject.toml
+
+Install optional dependencies as needed:
+
+```bash
+# Development tools
+pip install -e ".[dev]"
+
+# GitHub Actions dependencies (for local testing)
+pip install -e ".[github-actions]"
+
+# All optional dependencies
+pip install -e ".[dev,github-actions]"
+```
 
 ## 🔍 Troubleshooting
 
@@ -659,6 +684,22 @@ git stash pop
 ```
 
 ## 🤝 Contributing
+
+### Using Cloud Agent for Issues
+
+This project uses **Cloud Agent** for automated issue management:
+
+1. **Create an Issue** using templates at [Issues → New](../../issues/new/choose)
+2. **Auto-Labeling** - Labels are applied automatically based on content
+3. **Use Slash Commands** in comments:
+   - `/breakdown` - Break into subtasks
+   - `/accept` - Generate acceptance criteria
+   - `/estimate` - Get time estimate
+   - `/relate` - Find related files
+
+📚 **[Full Cloud Agent Guide](.github/docs/cloud-agent/GUIDE.md)**
+
+### Standard Contributing Process
 
 1. Fork the repository
 2. Create your feature branch
