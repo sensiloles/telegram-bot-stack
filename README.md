@@ -77,6 +77,81 @@ For development setup, VS Code configuration, and detailed build instructions, s
 
 **📚 [Development Guide](DEVELOPMENT.md)** - Complete development environment setup, IDE configuration, and troubleshooting.
 
+## 🧪 Testing
+
+The project includes comprehensive test coverage for all core components with 80%+ code coverage.
+
+### Running Tests
+
+```bash
+# Run all tests with coverage
+python3 -m pytest
+
+# Run specific test file
+python3 -m pytest tests/core/test_storage.py
+
+# Run with verbose output
+python3 -m pytest -v
+
+# Run with coverage report
+python3 -m pytest --cov=src/core --cov-report=html
+```
+
+### Test Structure
+
+```
+tests/
+├── __init__.py
+├── conftest.py                    # Shared fixtures
+├── core/                          # Core component tests
+│   ├── test_storage.py           # Storage layer tests (100% coverage)
+│   ├── test_user_manager.py      # User management tests (100% coverage)
+│   ├── test_admin_manager.py     # Admin management tests (100% coverage)
+│   └── test_bot_base.py          # Bot base class tests (68% coverage)
+└── integration/                   # Integration tests
+    └── test_full_flow.py         # End-to-end workflow tests
+```
+
+### Coverage Report
+
+| Component          | Coverage | Status                     |
+| ------------------ | -------- | -------------------------- |
+| `storage.py`       | 100%     | ✅ Excellent               |
+| `user_manager.py`  | 100%     | ✅ Excellent               |
+| `admin_manager.py` | 100%     | ✅ Excellent               |
+| `bot_base.py`      | 68%      | ⚠️ Good                    |
+| **Overall Core**   | **81%**  | ✅ **Meets 80% threshold** |
+
+### Test Features
+
+- ✅ **111 tests** covering core functionality
+- ✅ **Async test support** with pytest-asyncio
+- ✅ **Integration tests** for complete workflows
+- ✅ **Error handling tests** for robustness
+- ✅ **Fixtures** for test isolation and reusability
+- ✅ **Mock support** for Telegram API testing
+- ✅ **CI/CD integration** with GitHub Actions
+
+### Continuous Integration
+
+Tests run automatically on every push and pull request via GitHub Actions:
+
+- ✅ Tests on Python 3.9, 3.10, 3.11, 3.12
+- ✅ Code linting with Ruff
+- ✅ Type checking with mypy
+- ✅ Coverage reporting
+- ✅ Automated coverage threshold checks
+
+See [`.github/workflows/tests.yml`](.github/workflows/tests.yml) for CI/CD configuration.
+
+### Adding New Tests
+
+1. Create test file in appropriate directory (`tests/core/` or `tests/integration/`)
+2. Import fixtures from `conftest.py`
+3. Use descriptive test names: `test_<feature>_<scenario>`
+4. Run tests locally before committing
+5. Ensure coverage remains above 80%
+
 ## 📖 How It Works
 
 ### Starting Date Configuration
