@@ -2,6 +2,17 @@
 
 <!-- version list -->
 
+## v1.2.0 (2025-11-17)
+
+### Features
+
+- **ci**: Add PyPI publication workflow and documentation
+  ([`6c82a7f`](https://github.com/sensiloles/telegram-bot-stack/commit/6c82a7f6ba5ce3aa74f30895c2a19456a3d2050a))
+
+- **pypi**: Prepare package for PyPI publication
+  ([`6c82a7f`](https://github.com/sensiloles/telegram-bot-stack/commit/6c82a7f6ba5ce3aa74f30895c2a19456a3d2050a))
+
+
 ## v1.1.2 (2025-11-17)
 
 ### Bug Fixes
