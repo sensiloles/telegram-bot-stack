@@ -204,15 +204,25 @@ def create_pull_request(
     """
     try:
         print("📝 Creating Pull Request...")
+        print(f"   Repository: {repo.full_name}")
         print(f"   From: {head}")
         print(f"   To: {base}")
         print(f"   Title: {title}")
         print(f"   Draft: {draft}")
 
+        # For same repository, use simple branch name
+        # For cross-repository, use owner:branch format
+        head_ref = head
+        if ":" not in head:
+            # Simple branch name (same repo)
+            head_ref = head
+
+        print(f"   Head ref: {head_ref}")
+
         pr = repo.create_pull(
             title=title,
             body=body,
-            head=head,
+            head=head_ref,
             base=base,
             draft=draft,
         )
@@ -227,6 +237,11 @@ def create_pull_request(
         print("❌ Error: Failed to create Pull Request", file=sys.stderr)
         if e.status == 401:
             print("Invalid token or missing 'repo' scope", file=sys.stderr)
+        elif e.status == 403:
+            print("Permission denied. Check token permissions:", file=sys.stderr)
+            print("  - Required: Pull requests: Read & Write", file=sys.stderr)
+            print("  - Required: Contents: Read (CRITICAL!)", file=sys.stderr)
+            print("  - Required: Metadata: Read", file=sys.stderr)
         elif e.status == 404:
             print("Repository not found or no access", file=sys.stderr)
         elif e.status == 422:
@@ -237,12 +252,43 @@ def create_pull_request(
             elif "no commits between" in str(e).lower():
                 print(f"No commits between {base} and {head}", file=sys.stderr)
             else:
-                print(
-                    f"Validation failed: {e.data.get('message', str(e))}",
-                    file=sys.stderr,
+                # Print detailed error info
+                error_msg = (
+                    e.data.get("message", str(e))
+                    if hasattr(e, "data") and e.data
+                    else str(e)
                 )
+                print(f"Validation failed: {error_msg}", file=sys.stderr)
+                if hasattr(e, "data") and e.data and "errors" in e.data:
+                    print("Details:", file=sys.stderr)
+                    for error in e.data["errors"]:
+                        print(f"  - {error}", file=sys.stderr)
+
+                    # Check for "not all refs are readable" error
+                    if any(
+                        "not all refs are readable" in str(err).lower()
+                        for err in e.data["errors"]
+                    ):
+                        print("\n⚠️  This error usually means:", file=sys.stderr)
+                        print(
+                            "   1. Token missing 'Contents: Read' permission (MOST COMMON)",
+                            file=sys.stderr,
+                        )
+                        print(
+                            "   2. Branch doesn't exist or not pushed", file=sys.stderr
+                        )
+                        print(
+                            "   3. Token missing 'Metadata: Read' permission",
+                            file=sys.stderr,
+                        )
+                        print(
+                            "\n💡 Solution: Update token with 'Contents: Read' permission",
+                            file=sys.stderr,
+                        )
         else:
-            print(f"GitHub API error: {e}", file=sys.stderr)
+            print(f"GitHub API error (status {e.status}): {e}", file=sys.stderr)
+            if hasattr(e, "data") and e.data:
+                print(f"Details: {e.data}", file=sys.stderr)
         sys.exit(1)
 
 
