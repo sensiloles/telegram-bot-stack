@@ -2,8 +2,8 @@
 
 from pathlib import Path
 
-from src.core.storage import Storage
-from src.core.user_manager import UserManager
+from telegram_bot_stack.storage import MemoryStorage
+from telegram_bot_stack.user_manager import UserManager
 
 
 class TestUserManager:
@@ -11,8 +11,8 @@ class TestUserManager:
 
     def test_init_loads_existing_users(self, tmp_path: Path):
         """Test that UserManager loads existing users on initialization."""
-        storage = Storage(tmp_path)
-        storage.save("test_users.json", [12345, 67890])
+        storage = MemoryStorage()
+        storage.save("test_users", [12345, 67890])
 
         manager = UserManager(storage, "test_users")
 
@@ -109,7 +109,7 @@ class TestUserManager:
 
     def test_persistence_across_instances(self, tmp_path: Path):
         """Test that users persist across UserManager instances."""
-        storage = Storage(tmp_path)
+        storage = MemoryStorage()
 
         # First instance - add users
         manager1 = UserManager(storage, "test_users")
@@ -124,13 +124,12 @@ class TestUserManager:
         assert 12345 in users
         assert 67890 in users
 
-    def test_save_users_creates_file(self, user_manager: UserManager, tmp_path: Path):
-        """Test that save_users creates a file in storage."""
+    def test_save_users_creates_entry(self, user_manager: UserManager, tmp_path: Path):
+        """Test that save_users creates entry in storage."""
         user_manager.add_user(12345)
 
-        # Verify file was created
-        filepath = user_manager.storage.base_dir / f"{user_manager.storage_key}.json"
-        assert filepath.exists()
+        # Verify data was saved
+        assert user_manager.storage.exists(user_manager.storage_key)
 
     def test_add_user_saves_automatically(self, user_manager: UserManager):
         """Test that adding a user automatically saves to storage."""
@@ -184,7 +183,7 @@ class TestUserManager:
         assert user_manager.user_exists(12345) is True
         assert user_manager.get_user_count() == 1
 
-    def test_custom_storage_key(self, temp_storage: Storage):
+    def test_custom_storage_key(self, temp_storage: MemoryStorage):
         """Test using custom storage key."""
         manager1 = UserManager(temp_storage, "custom_users")
         manager2 = UserManager(temp_storage, "other_users")

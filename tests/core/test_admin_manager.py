@@ -2,8 +2,8 @@
 
 from pathlib import Path
 
-from src.core.admin_manager import AdminManager
-from src.core.storage import Storage
+from telegram_bot_stack.admin_manager import AdminManager
+from telegram_bot_stack.storage import MemoryStorage
 
 
 class TestAdminManager:
@@ -11,8 +11,8 @@ class TestAdminManager:
 
     def test_init_loads_existing_admins(self, tmp_path: Path):
         """Test that AdminManager loads existing admins on initialization."""
-        storage = Storage(tmp_path)
-        storage.save("test_admins.json", [12345, 67890])
+        storage = MemoryStorage()
+        storage.save("test_admins", [12345, 67890])
 
         manager = AdminManager(storage, "test_admins")
 
@@ -136,7 +136,7 @@ class TestAdminManager:
 
     def test_persistence_across_instances(self, tmp_path: Path):
         """Test that admins persist across AdminManager instances."""
-        storage = Storage(tmp_path)
+        storage = MemoryStorage()
 
         # First instance - add admins
         manager1 = AdminManager(storage, "test_admins")
@@ -150,13 +150,12 @@ class TestAdminManager:
         assert manager2.is_admin(67890) is True
         assert manager2.get_admin_count() == 2
 
-    def test_save_admins_creates_file(self, admin_manager: AdminManager):
-        """Test that save_admins creates a file in storage."""
+    def test_save_admins_creates_entry(self, admin_manager: AdminManager):
+        """Test that save_admins creates entry in storage."""
         admin_manager.add_admin(12345)
 
-        # Verify file was created
-        filepath = admin_manager.storage.base_dir / f"{admin_manager.storage_key}.json"
-        assert filepath.exists()
+        # Verify data was saved
+        assert admin_manager.storage.exists(admin_manager.storage_key)
 
     def test_add_admin_saves_automatically(self, admin_manager: AdminManager):
         """Test that adding an admin automatically saves to storage."""
@@ -202,7 +201,7 @@ class TestAdminManager:
         assert result is True
         assert admin_manager.is_admin(12345) is True
 
-    def test_custom_storage_key(self, temp_storage: Storage):
+    def test_custom_storage_key(self, temp_storage: MemoryStorage):
         """Test using custom storage key."""
         manager1 = AdminManager(temp_storage, "custom_admins")
         manager2 = AdminManager(temp_storage, "other_admins")

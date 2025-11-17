@@ -4,8 +4,8 @@ from pathlib import Path
 
 import pytest
 
-from src.core.bot_base import BotBase
-from src.core.storage import Storage
+from telegram_bot_stack.bot_base import BotBase
+from telegram_bot_stack.storage import JSONStorage, MemoryStorage
 
 
 class TestFullUserFlow:
@@ -14,7 +14,7 @@ class TestFullUserFlow:
     @pytest.mark.asyncio
     async def test_user_registration_and_admin_flow(self, tmp_path: Path):
         """Test complete flow: registration, admin assignment, and management."""
-        storage = Storage(tmp_path)
+        storage = MemoryStorage()
         bot = BotBase(
             storage=storage,
             bot_name="Integration Test Bot",
@@ -57,7 +57,7 @@ class TestFullUserFlow:
     @pytest.mark.asyncio
     async def test_admin_removal_and_last_admin_protection(self, tmp_path: Path):
         """Test admin removal flow with last admin protection."""
-        storage = Storage(tmp_path)
+        storage = MemoryStorage()
         bot = BotBase(
             storage=storage,
             bot_name="Test Bot",
@@ -89,7 +89,7 @@ class TestFullUserFlow:
     @pytest.mark.asyncio
     async def test_data_persistence_across_bot_instances(self, tmp_path: Path):
         """Test that user and admin data persists across bot restarts."""
-        storage = Storage(tmp_path)
+        storage = MemoryStorage()
 
         # First bot instance - register users and admins
         bot1 = BotBase(storage=storage, bot_name="Bot1")
@@ -113,7 +113,7 @@ class TestFullUserFlow:
     @pytest.mark.asyncio
     async def test_multiple_operations_sequence(self, tmp_path: Path):
         """Test sequence of multiple operations."""
-        storage = Storage(tmp_path)
+        storage = MemoryStorage()
         bot = BotBase(storage=storage, bot_name="Test Bot")
 
         # Register multiple users
@@ -145,8 +145,8 @@ class TestFullUserFlow:
     @pytest.mark.asyncio
     async def test_storage_isolation_between_bots(self, tmp_path: Path):
         """Test that different bots with different storage don't interfere."""
-        storage1 = Storage(tmp_path / "bot1")
-        storage2 = Storage(tmp_path / "bot2")
+        storage1 = JSONStorage(tmp_path / "bot1")
+        storage2 = JSONStorage(tmp_path / "bot2")
 
         bot1 = BotBase(storage=storage1, bot_name="Bot1")
         bot2 = BotBase(storage=storage2, bot_name="Bot2")
@@ -164,7 +164,7 @@ class TestFullUserFlow:
     @pytest.mark.asyncio
     async def test_edge_case_empty_bot(self, tmp_path: Path):
         """Test bot behavior with no users or admins."""
-        storage = Storage(tmp_path)
+        storage = MemoryStorage()
         bot = BotBase(storage=storage, bot_name="Empty Bot")
 
         # Initial state
@@ -181,7 +181,7 @@ class TestFullUserFlow:
     @pytest.mark.asyncio
     async def test_concurrent_user_and_admin_operations(self, tmp_path: Path):
         """Test mixed user and admin operations."""
-        storage = Storage(tmp_path)
+        storage = MemoryStorage()
         bot = BotBase(storage=storage, bot_name="Test Bot")
 
         # Add users
@@ -209,11 +209,11 @@ class TestFullUserFlow:
     @pytest.mark.asyncio
     async def test_bot_initialization_with_existing_data(self, tmp_path: Path):
         """Test bot initializes correctly with pre-existing data."""
-        storage = Storage(tmp_path)
+        storage = MemoryStorage()
 
-        # Pre-populate storage
-        storage.save("bot_users.json", [12345, 67890, 11111])
-        storage.save("bot_admins.json", [12345])
+        # Pre-populate storage (without .json extension for consistency)
+        storage.save("bot_users", [12345, 67890, 11111])
+        storage.save("bot_admins", [12345])
 
         # Create bot with existing data
         bot = BotBase(storage=storage, bot_name="Test Bot")
@@ -227,7 +227,7 @@ class TestFullUserFlow:
     @pytest.mark.asyncio
     async def test_full_lifecycle_first_user_scenario(self, tmp_path: Path):
         """Test complete lifecycle of first user becoming admin."""
-        storage = Storage(tmp_path)
+        storage = MemoryStorage()
         bot = BotBase(storage=storage, bot_name="Test Bot")
 
         # Verify initial empty state

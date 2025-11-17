@@ -49,10 +49,11 @@ python3 .github/workflows/scripts/read_issues.py --list --state open
 - 🏗️ **BotBase Class**: Inherit and customize - 70% less boilerplate code
 - 👥 **User Management**: Built-in user registration and tracking
 - 🔐 **Admin System**: Multi-admin support with protection mechanisms
-- 💾 **Storage Abstraction**: JSON storage with unified API (SQL support planned)
+- 💾 **Storage Abstraction**: Multiple backends (JSON, Memory) with unified API
 - 📅 **Scheduler Integration**: APScheduler for periodic tasks
 - 🎯 **Hook Pattern**: Override methods for custom behavior
-- 🧪 **Comprehensive Tests**: 111 tests with 81% coverage
+- 🧪 **Comprehensive Tests**: 131 tests with 80% coverage
+- 📦 **PyPI Package**: Install via `pip install telegram-bot-stack` (coming soon)
 
 ### 🛡️ Production-Grade Infrastructure
 
@@ -68,30 +69,52 @@ python3 .github/workflows/scripts/read_issues.py --list --state open
 
 ## 🚀 Quick Start
 
-### Option 1: Use Example Bot (Quit Smoking Tracker)
+### Installation
 
 ```bash
-# Clone the repository
+# Install from source (PyPI package coming soon)
 git clone https://github.com/sensiloles/telegram-bot-stack.git
 cd telegram-bot-stack
+pip install -e .
 
-# Setup and start the example bot
-python3 manager.py setup --token "YOUR_BOT_TOKEN_HERE"
-python3 manager.py start
+# Or run example bots directly
+cd telegram-bot-stack
+python3 -m pip install -e .
+```
 
-# Check status
-python3 manager.py status
+### Option 1: Run Example Bots
+
+```bash
+# Set your bot token
+export TELEGRAM_BOT_TOKEN="your_token_here"
+
+# Run Echo Bot (simplest example)
+cd examples/echo_bot
+python3 bot.py
+
+# Run Counter Bot (state management example)
+cd examples/counter_bot
+python3 bot.py
+
+# Run Quit Smoking Bot (real-world example)
+cd examples/quit_smoking_bot
+python3 bot.py
 ```
 
 ### Option 2: Build Your Own Bot
 
 ```python
 # my_bot.py
-from src.core.bot_base import BotBase
+from telegram_bot_stack import BotBase
+from telegram_bot_stack.storage import JSONStorage
 from pathlib import Path
 
 class MyBot(BotBase):
     """Your custom bot - override hooks for custom behavior."""
+
+    def get_welcome_message(self) -> str:
+        """Override to provide custom welcome message."""
+        return "Welcome to My Custom Bot!"
 
     async def get_user_status(self, user_id: int) -> str:
         """Override to provide custom status."""
@@ -137,7 +160,7 @@ python3 -m pytest tests/core/test_storage.py
 python3 -m pytest -v
 
 # Run with coverage report
-python3 -m pytest --cov=src/core --cov-report=html
+python3 -m pytest --cov=telegram_bot_stack --cov-report=html
 ```
 
 ### Test Structure
@@ -147,7 +170,7 @@ tests/
 ├── __init__.py
 ├── conftest.py                    # Shared fixtures
 ├── core/                          # Core component tests
-│   ├── test_storage.py           # Storage layer tests (100% coverage)
+│   ├── test_storage.py           # Storage abstraction tests (100+ tests)
 │   ├── test_user_manager.py      # User management tests (100% coverage)
 │   ├── test_admin_manager.py     # Admin management tests (100% coverage)
 │   └── test_bot_base.py          # Bot base class tests (68% coverage)
@@ -157,17 +180,19 @@ tests/
 
 ### Coverage Report
 
-| Component          | Coverage | Status                     |
-| ------------------ | -------- | -------------------------- |
-| `storage.py`       | 100%     | ✅ Excellent               |
-| `user_manager.py`  | 100%     | ✅ Excellent               |
-| `admin_manager.py` | 100%     | ✅ Excellent               |
-| `bot_base.py`      | 68%      | ⚠️ Good                    |
-| **Overall Core**   | **81%**  | ✅ **Meets 80% threshold** |
+| Component             | Coverage | Status                     |
+| --------------------- | -------- | -------------------------- |
+| `storage/json.py`     | 83%      | ✅ Excellent               |
+| `storage/memory.py`   | 80%      | ✅ Excellent               |
+| `storage/__init__.py` | 100%     | ✅ Excellent               |
+| `user_manager.py`     | 100%     | ✅ Excellent               |
+| `admin_manager.py`    | 100%     | ✅ Excellent               |
+| `bot_base.py`         | 68%      | ⚠️ Good                    |
+| **Overall Package**   | **80%**  | ✅ **Meets 80% threshold** |
 
 ### Test Features
 
-- ✅ **111 tests** covering core functionality
+- ✅ **131 tests** covering core functionality
 - ✅ **Async test support** with pytest-asyncio
 - ✅ **Integration tests** for complete workflows
 - ✅ **Error handling tests** for robustness
@@ -199,27 +224,39 @@ See [`.github/workflows/tests.yml`](.github/workflows/tests.yml) for CI/CD confi
 
 > 📖 **Detailed Architecture Documentation:** See [`ARCHITECTURE.md`](ARCHITECTURE.md) for comprehensive design documentation, data flow diagrams, and extension patterns.
 
-### Layered Design
+### Package Structure
 
-The project follows a **layered architecture** separating reusable framework components from bot-specific logic:
+The framework is now available as a standalone package `telegram-bot-stack`:
 
 ```
-src/
-├── core/                    # 🔧 Reusable Framework Layer
-│   ├── bot_base.py         # Base class with common patterns
-│   ├── storage.py          # Storage abstraction (JSON)
-│   ├── user_manager.py     # Generic user management
-│   └── admin_manager.py    # Generic admin system
+telegram-bot-stack/
+├── telegram_bot_stack/          # 📦 PyPI Package (installable)
+│   ├── __init__.py             # Public API exports
+│   ├── bot_base.py             # Base class with common patterns
+│   ├── user_manager.py         # Generic user management
+│   ├── admin_manager.py        # Generic admin system
+│   └── storage/                # Storage abstraction layer
+│       ├── base.py             # StorageBackend interface
+│       ├── json.py             # JSONStorage (file-based)
+│       └── memory.py           # MemoryStorage (for testing)
 │
-└── quit_smoking/            # 🎯 Application Layer
-    ├── bot.py              # QuitSmokingBot (inherits BotBase)
-    ├── status_manager.py   # Quit smoking tracking logic
-    └── quotes_manager.py   # Motivational quotes
+├── examples/                    # 📚 Example Bots
+│   ├── echo_bot/               # Simplest example (5-10 lines)
+│   ├── counter_bot/            # State management example
+│   └── quit_smoking_bot/       # Real-world application
+│
+├── tests/                       # 🧪 Test Suite
+│   ├── core/                   # Unit tests (131 tests)
+│   └── integration/            # End-to-end tests
+│
+└── src/                         # 🎯 Legacy Application Layer
+    ├── core/                   # (To be removed - replaced by package)
+    └── quit_smoking/           # Original bot implementation
 ```
 
 ### Key Components
 
-**BotBase** (`src/core/bot_base.py`)
+**BotBase** (`telegram_bot_stack.bot_base.BotBase`)
 
 - Common Telegram bot patterns (user/admin management, commands)
 - Command registration and routing
@@ -229,59 +266,72 @@ src/
   - `get_user_status(user_id)` - Override to provide custom status
   - `get_welcome_message()` - Override for custom welcome message
 
-**Storage** (`src/core/storage.py`)
+**Storage Abstraction** (`telegram_bot_stack.storage`)
 
-- JSON file operations
-- Type-safe data persistence
-- CRUD operations with error handling
-- **100% test coverage**
+- **StorageBackend interface** - Unified API for all storage backends
+- **JSONStorage** - File-based storage (production ready)
+- **MemoryStorage** - In-memory storage (fast, for testing)
+- **Factory function** - `create_storage("json", base_dir="data")`
 
-**UserManager** (`src/core/user_manager.py`)
+**UserManager** (`telegram_bot_stack.user_manager.UserManager`)
 
 - User registration and removal
 - User existence checks
 - Data persistence via Storage
 - **100% test coverage**
 
-**AdminManager** (`src/core/admin_manager.py`)
+**AdminManager** (`telegram_bot_stack.admin_manager.AdminManager`)
 
 - Admin assignment and removal
 - Auto-assign first user as admin
 - Last admin protection (can't remove last admin)
 - **100% test coverage**
 
-**QuitSmokingBot** (`src/quit_smoking/bot.py`) - Example Implementation
+### Example Bots
 
-- Inherits from `BotBase`
-- Overrides hooks for quit smoking logic:
-  - `get_user_status()` → Returns smoke-free status
-  - `on_scheduled_notification()` → Sends motivational quotes
-- **Complete working example** showing framework usage
+**Echo Bot** (`examples/echo_bot/`) - Simplest Example
+
+- 5-10 lines of code
+- Echoes back user messages
+- Demonstrates minimal framework usage
+
+**Counter Bot** (`examples/counter_bot/`) - State Management
+
+- Per-user counter with persistence
+- Demonstrates storage API usage
+- Custom commands (increment, decrement, reset)
+
+**Quit Smoking Bot** (`examples/quit_smoking_bot/`) - Real-World Example
+
+- Complete tracking application
+- Custom business logic (prize fund calculation)
+- Integration with custom managers
+- Demonstrates hook customization
 
 ### Design Principles
 
-1. **Separation of Concerns**: Framework (core) vs Application (quit_smoking example)
+1. **Separation of Concerns**: Framework (telegram_bot_stack) vs Application (examples)
 2. **Inheritance over Composition**: BotBase provides foundation
-3. **Dependency Injection**: Managers injected into BotBase
+3. **Dependency Injection**: Storage backend injected into components
 4. **Hook Pattern**: Subclasses override hooks for customization
 5. **Single Responsibility**: Each component has one clear purpose
+6. **Storage Abstraction**: Unified interface for multiple backends
 
-### Roadmap: PyPI Package
-
-**Current (Phase 0):** Framework code in `src/core/`
-**Next (Phase 1):** Extract to standalone `telegram-bot-stack` PyPI package
+### Installation & Usage
 
 ```python
-# Future usage (Phase 1+)
-pip install telegram-bot-stack
+# Install from source (PyPI package coming soon)
+pip install -e .
 
-from telegram_bot_stack import BotBase, BotConfig
+# Use the framework
+from telegram_bot_stack import BotBase
+from telegram_bot_stack.storage import JSONStorage
 
 class MyBot(BotBase):
-    async def get_user_status(self, user_id):
-        return "Custom status logic"
+    def get_welcome_message(self) -> str:
+        return "Welcome to My Bot!"
 
-# Same simple API, installable from PyPI!
+# Simple, clean API ready for PyPI!
 ```
 
 ## 📖 Example: Quit Smoking Bot

@@ -5,14 +5,14 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from src.core.bot_base import BotBase
-from src.core.storage import Storage
+from telegram_bot_stack.bot_base import BotBase
+from telegram_bot_stack.storage import MemoryStorage
 
 
 @pytest.fixture
 def bot_config(tmp_path: Path):
     """Create test bot configuration."""
-    storage = Storage(tmp_path)
+    storage = MemoryStorage()
     return {
         "storage": storage,
         "bot_name": "Test Bot",

@@ -1,14 +1,13 @@
 """Pytest configuration and shared fixtures."""
 
 import asyncio
-from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from src.core.admin_manager import AdminManager
-from src.core.storage import Storage
-from src.core.user_manager import UserManager
+from telegram_bot_stack.admin_manager import AdminManager
+from telegram_bot_stack.storage import MemoryStorage
+from telegram_bot_stack.user_manager import UserManager
 
 
 @pytest.fixture(scope="session")
@@ -20,20 +19,19 @@ def event_loop():
 
 
 @pytest.fixture
-def temp_storage(tmp_path: Path) -> Storage:
+def temp_storage() -> MemoryStorage:
     """Create temporary storage for testing.
 
-    Args:
-        tmp_path: Pytest's temporary directory fixture
+    Uses MemoryStorage for fast tests without file I/O.
 
     Returns:
-        Storage instance with temporary directory
+        MemoryStorage instance
     """
-    return Storage(tmp_path)
+    return MemoryStorage()
 
 
 @pytest.fixture
-def user_manager(temp_storage: Storage) -> UserManager:
+def user_manager(temp_storage: MemoryStorage) -> UserManager:
     """Create UserManager with temporary storage.
 
     Args:
@@ -46,7 +44,7 @@ def user_manager(temp_storage: Storage) -> UserManager:
 
 
 @pytest.fixture
-def admin_manager(temp_storage: Storage) -> AdminManager:
+def admin_manager(temp_storage: MemoryStorage) -> AdminManager:
     """Create AdminManager with temporary storage.
 
     Args:
