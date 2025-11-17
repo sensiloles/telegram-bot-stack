@@ -52,10 +52,12 @@ jobs:
       - name: Python Semantic Release
         if: steps.check_release.outputs.release_needed == 'true'
         id: semantic_release
-        uses: python-semantic-release/python-semantic-release@v8.7.0
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          root_options: "-vv"
+        run: |
+          pip install python-semantic-release
+          semantic-release version --print
+          semantic-release publish
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish to GitHub Packages (optional)
         if: steps.semantic_release.outputs.released == 'true'
