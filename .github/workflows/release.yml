@@ -1,0 +1,91 @@
+name: Release
+
+# Automatic release on merge to main
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+  packages: write
+
+jobs:
+  release:
+    name: Semantic Release
+    runs-on: ubuntu-latest
+
+    # Don't run on docs-only changes
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Full history for changelog
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install python-semantic-release
+
+      - name: Check if release needed
+        id: check_release
+        run: |
+          # Check if there are any feat/fix commits since last release
+          if git log $(git describe --tags --abbrev=0 2>/dev/null || echo HEAD~10)..HEAD --oneline | grep -qE '^[a-f0-9]+ (feat|fix|perf)[\(:]'; then
+            echo "release_needed=true" >> $GITHUB_OUTPUT
+          else
+            echo "release_needed=false" >> $GITHUB_OUTPUT
+            echo "ℹ️ No release-worthy commits found"
+          fi
+
+      - name: Python Semantic Release
+        if: steps.check_release.outputs.release_needed == 'true'
+        id: semantic_release
+        uses: python-semantic-release/python-semantic-release@v8.7.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          root_options: "-vv"
+
+      - name: Publish to GitHub Packages (optional)
+        if: steps.semantic_release.outputs.released == 'true'
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          pip install build twine
+          python -m build
+          echo "📦 Package built successfully"
+          # Uncomment to publish to GitHub Packages:
+          # twine upload --repository-url https://upload.pypi.org/legacy/ dist/*
+
+      - name: Release Summary
+        if: always()
+        run: |
+          echo "## 📊 Release Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.semantic_release.outputs.released }}" == "true" ]; then
+            echo "✅ **New Release Created!**" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "- **Version:** ${{ steps.semantic_release.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+            echo "- **Tag:** ${{ steps.semantic_release.outputs.tag }}" >> $GITHUB_STEP_SUMMARY
+            echo "- **Install:** \`pip install git+https://github.com/${{ github.repository }}.git@${{ steps.semantic_release.outputs.tag }}\`" >> $GITHUB_STEP_SUMMARY
+          elif [ "${{ steps.check_release.outputs.release_needed }}" == "false" ]; then
+            echo "ℹ️ **No release needed**" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Only docs/chore commits found. No version bump required." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Release failed**" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Check logs for details." >> $GITHUB_STEP_SUMMARY
+          fi

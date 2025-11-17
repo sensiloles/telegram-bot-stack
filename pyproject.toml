@@ -69,6 +69,11 @@ github-actions = [
 "gitpython>=3.1.40",
 ]
 
+# Release automation
+release = [
+"python-semantic-release>=8.7.0",
+]
+
 [project.urls]
 Homepage = "https://github.com/sensiloles/telegram-bot-stack"
 Repository = "https://github.com/sensiloles/telegram-bot-stack"
