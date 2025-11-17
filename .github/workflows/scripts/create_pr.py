@@ -10,9 +10,10 @@ Features:
 - Generates PR description from commits
 - Links to issues automatically
 - Supports draft PRs
+- Auto-assigns PR to current user
 
 Usage:
-    # Basic (auto-generate description from commits)
+    # Basic (auto-generate description from commits, auto-assign to you)
     python create_pr.py --title "feat(storage): add Redis backend"
 
     # With custom description from file
@@ -20,6 +21,12 @@ Usage:
 
     # Link to issue
     python create_pr.py --title "fix(auth): resolve bug" --closes 42
+
+    # Assign to specific user
+    python create_pr.py --title "feat: feature" --assignee username
+
+    # Don't assign anyone
+    python create_pr.py --title "feat: feature" --no-assign
 
     # Draft PR
     python create_pr.py --title "feat: WIP feature" --draft
@@ -188,6 +195,8 @@ def create_pull_request(
     head: str,
     base: str = "main",
     draft: bool = False,
+    assignee: Optional[str] = None,
+    auto_assign: bool = True,
 ):
     """Create GitHub Pull Request.
 
@@ -198,6 +207,8 @@ def create_pull_request(
         head: Source branch
         base: Target branch
         draft: Create as draft PR
+        assignee: Username to assign (if None and auto_assign=True, assigns current user)
+        auto_assign: Automatically assign current user if assignee not specified
 
     Returns:
         Created PullRequest object
@@ -230,6 +241,27 @@ def create_pull_request(
         print("✅ Pull Request created successfully!")
         print(f"   Number: #{pr.number}")
         print(f"   URL: {pr.html_url}")
+
+        # Assign to user
+        if auto_assign or assignee:
+            try:
+                # Get GitHub client from repo
+                gh = repo._requester._Github
+
+                # Get user to assign
+                if assignee:
+                    user_to_assign = assignee
+                else:
+                    # Get current authenticated user
+                    current_user = gh.get_user()
+                    user_to_assign = current_user.login
+
+                # Add assignee to PR
+                pr.add_to_assignees(user_to_assign)
+                print(f"👤 Assigned to: @{user_to_assign}")
+            except Exception as e:
+                print(f"⚠️  Warning: Could not assign PR: {e}", file=sys.stderr)
+                # Don't fail the whole operation if assignment fails
 
         return pr
 
@@ -375,6 +407,18 @@ Examples:
         help="Show what would be created without actually creating it",
     )
 
+    parser.add_argument(
+        "--assignee",
+        type=str,
+        help="GitHub username to assign (default: current user)",
+    )
+
+    parser.add_argument(
+        "--no-assign",
+        action="store_true",
+        help="Do not assign anyone to the PR",
+    )
+
     args = parser.parse_args()
 
     try:
@@ -441,6 +485,8 @@ Examples:
             head=head_branch,
             base=args.base,
             draft=args.draft,
+            assignee=args.assignee,
+            auto_assign=not args.no_assign,
         )
 
     except KeyboardInterrupt:

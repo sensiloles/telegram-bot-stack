@@ -279,7 +279,7 @@ telegram-bot-stack/
 │       ├── status_manager.py
 │       └── quotes_manager.py
 ├── tests/
-│   ├── core/            # Framework tests (81% coverage)
+│   ├── core/            # Framework tests
 │   └── integration/     # End-to-end tests
 ├── scripts/             # Management scripts
 ├── docker/              # Docker configuration
@@ -438,8 +438,6 @@ python3 -m pytest
 ```bash
 python3 -m pytest --cov=telegram_bot_stack --cov-report=term
 ```
-
-**Coverage threshold:** 79% for `telegram_bot_stack/` (currently at 80%)
 
 ---
 
