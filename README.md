@@ -71,16 +71,33 @@ python3 .github/workflows/scripts/read_issues.py --list --state open
 
 ### Installation
 
+#### Option 1: Install from GitHub (Recommended)
+
 ```bash
-# Install from source (PyPI package coming soon)
+# Install latest version directly from GitHub
+pip install git+https://github.com/sensiloles/telegram-bot-stack.git
+
+# Install specific version
+pip install git+https://github.com/sensiloles/telegram-bot-stack.git@v0.1.0
+```
+
+#### Option 2: Install from Source
+
+```bash
+# Clone and install in development mode
 git clone https://github.com/sensiloles/telegram-bot-stack.git
 cd telegram-bot-stack
 pip install -e .
-
-# Or run example bots directly
-cd telegram-bot-stack
-python3 -m pip install -e .
 ```
+
+#### Option 3: PyPI (Coming Soon)
+
+```bash
+# Will be available after public release
+pip install telegram-bot-stack
+```
+
+> 📝 **Note:** For private/internal use, see [Private Installation Guide](docs/private_installation.md)
 
 ### Option 1: Run Example Bots
 

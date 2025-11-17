@@ -4,19 +4,43 @@ Get started with `telegram-bot-stack` in minutes! This guide will walk you throu
 
 ## Installation
 
-### Option 1: Install from Source
+### Option 1: Install from GitHub (Recommended)
 
 ```bash
+# Install latest version directly from GitHub
+pip install git+https://github.com/sensiloles/telegram-bot-stack.git
+
+# Or install specific version
+pip install git+https://github.com/sensiloles/telegram-bot-stack.git@v0.1.0
+```
+
+**Advantages:**
+- ✅ No cloning needed
+- ✅ Works like normal pip package
+- ✅ Easy to specify versions via git tags
+
+### Option 2: Install from Source
+
+```bash
+# Clone and install in development mode
 git clone https://github.com/sensiloles/telegram-bot-stack.git
 cd telegram-bot-stack
 pip install -e .
 ```
 
-### Option 2: Install from PyPI (Coming Soon)
+**Use this when:**
+- You want to modify the framework
+- You need editable installation for development
+
+### Option 3: Install from PyPI (Coming Soon)
 
 ```bash
 pip install telegram-bot-stack
 ```
+
+**Status:** Available after public release to PyPI
+
+> 📝 **For private installations:** See [Private Installation Guide](private_installation.md) for GitHub Packages, self-hosted PyPI, and other options
 
 ## Prerequisites
 
