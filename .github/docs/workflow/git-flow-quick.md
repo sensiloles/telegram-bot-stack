@@ -13,8 +13,8 @@ git checkout -b feature/my-feature
 git add .
 git commit -m "feat(bot): add cool feature"
 
-# 3. Push & create PR
-git push origin feature/my-feature
+# 3. Push & create PR (set upstream on first push)
+git push -u origin feature/my-feature
 # → Go to GitHub → Create Pull Request
 
 # 4. Wait for:
@@ -35,6 +35,19 @@ fix:   Bug fix        → Patch version bump (0.1.0 → 0.1.1)
 docs:  Documentation  → No version bump
 chore: Maintenance    → No version bump
 ```
+
+## 🏷️ PR Title Format
+
+**Same as commits:** `type(scope): description`
+
+```bash
+# PR Title examples:
+feat(storage): add Redis backend
+fix(auth): resolve token validation
+docs(api): update API reference
+```
+
+**See:** [PR Naming Guide](.github/PR_NAMING_GUIDE.md)
 
 ### Examples
 
@@ -72,8 +85,8 @@ git push --force
 # ✅ Create branches
 git checkout -b feature/anything
 
-# ✅ Push to your branch
-git push origin feature/anything
+# ✅ Push to your branch (with upstream on first push)
+git push -u origin feature/anything
 
 # ✅ Create PRs
 # (on GitHub)
@@ -127,6 +140,7 @@ After merging to `main`:
 6. **Publishes release**
 
 Install specific version:
+
 ```bash
 pip install git+https://github.com/sensiloles/telegram-bot-stack.git@v0.2.0
 ```

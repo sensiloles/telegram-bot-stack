@@ -1,191 +1,183 @@
-# Quit Smoking Bot Management
-# Simplified interface using the modern manager.py
-
-# Load environment variables
-ifneq (,$(wildcard ./.env))
-    include .env
-    export
-endif
-
-# Modern Python manager
-MANAGER := python3 manager.py
-
-# Colors for output
-RED := \033[0;31m
-GREEN := \033[0;32m
-YELLOW := \033[1;33m
-BLUE := \033[0;34m
-NC := \033[0m # No Color
-
-.PHONY: help setup install start stop restart status logs clean build code-check dev-setup python-setup
+.PHONY: help setup install test test-fast test-cov lint format type-check ci clean status pr-check pr-create issue-list dev-shell
 
 # Default target
 .DEFAULT_GOAL := help
 
+# Colors for output
+BLUE := \033[0;34m
+GREEN := \033[0;32m
+YELLOW := \033[0;33m
+RED := \033[0;31m
+NC := \033[0m # No Color
+
+##@ General
+
 help: ## Show this help message
-	@echo "$(GREEN)🤖 Quit Smoking Bot Management$(NC)"
-	@echo "======================================"
-	@echo ""
-	@echo "$(BLUE)📦 Setup & Installation:$(NC)"
-	@echo "  $(GREEN)dev-setup$(NC)       Complete development setup (Python + Docker)"
-	@echo "  $(GREEN)python-setup$(NC)    Setup Python virtual environment only"
-	@echo "  $(GREEN)setup$(NC)           Initial Docker project setup"
-	@echo "  $(GREEN)install$(NC)         Full installation (setup + start)"
-	@echo ""
-	@echo "$(BLUE)🚀 Service Management:$(NC)"
-	@echo "  $(GREEN)start$(NC)           Start the bot (Docker)"
-	@echo "  $(GREEN)start-local$(NC)     Start the bot locally"
-	@echo "  $(GREEN)stop$(NC)            Stop the bot (Docker)"
-	@echo "  $(GREEN)stop-local$(NC)      Stop the bot locally"
-	@echo "  $(GREEN)restart$(NC)         Restart the bot (Docker)"
-	@echo ""
-	@echo "$(BLUE)📊 Status & Monitoring:$(NC)"
-	@echo "  $(GREEN)status$(NC)          Show comprehensive bot status with diagnostics"
-	@echo "  $(GREEN)logs$(NC)            Show logs"
-	@echo "  $(GREEN)logs-follow$(NC)     Follow logs in real-time"
-	@echo ""
-	@echo "$(BLUE)🧹 Maintenance:$(NC)"
-	@echo "  $(GREEN)clean$(NC)           Clean up containers and images"
-	@echo "  $(GREEN)clean-deep$(NC)      Deep cleanup (removes containers, images, logs)"
-	@echo "  $(GREEN)build$(NC)           Build Docker image"
-	@echo ""
-	@echo "$(BLUE)🔧 Development:$(NC)"
-	@echo "  $(GREEN)code-check$(NC)      Run pre-commit hooks (formatting, linting)"
-	@echo "  $(GREEN)check-env$(NC)       Complete environment compatibility check"
-	@echo "  $(GREEN)check-versions$(NC)  Check dependency versions only"
-	@echo "  $(GREEN)test-local$(NC)      Test bot startup locally"
-	@echo "  $(GREEN)start-local$(NC)     Start bot locally (needs .env)"
-	@echo "  $(GREEN)stop-local$(NC)      Stop locally running bot"
-	@echo "  $(GREEN)test-both-envs$(NC)  Test both local and Docker environments"
-	@echo "  $(GREEN)fix-deps$(NC)        Fix dependency issues (force reinstall)"
-	@echo ""
-	@echo ""
-	@echo "$(BLUE)💡 Quick Examples:$(NC)"
-	@echo "  make install             # Complete setup and start"
-	@echo "  make start               # Start the bot"
-	@echo "  make logs-follow         # Watch logs in real-time"
-	@echo "  make status              # Comprehensive bot status with diagnostics"
-	@echo "  make stop                # Stop the bot"
+	@echo '$(GREEN)telegram-bot-stack - Development Commands$(NC)'
+	@echo ''
+	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make $(YELLOW)<target>$(NC)\n"} /^[a-zA-Z_-]+:.*?##/ { printf "  $(BLUE)%-20s$(NC) %s\n", $$1, $$2 } /^##@/ { printf "\n$(GREEN)%s$(NC)\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
 
-# Setup and installation
-setup: ## Initial project setup
-	@echo "$(BLUE)🎯 Setting up project...$(NC)"
-	@$(MANAGER) setup
+##@ Setup & Installation
 
-install: ## Full installation (setup + start with monitoring)
-	@echo "$(BLUE)🚀 Full installation...$(NC)"
-	@$(MANAGER) setup
-	@$(MANAGER) start --monitoring
-	@echo "$(GREEN)✅ Installation completed!$(NC)"
+setup: ## Complete development environment setup
+	@echo "$(GREEN)Setting up development environment...$(NC)"
+	python3 -m pip install --upgrade pip
+	pip install -e ".[dev,github-actions]"
+	pre-commit install
+	@echo "$(GREEN)✓ Setup complete!$(NC)"
 
-# Service management
-start: ## Start the bot
-	@echo "$(BLUE)🚀 Starting bot...$(NC)"
-	@$(MANAGER) start
+install: ## Install package in development mode
+	@echo "$(GREEN)Installing package...$(NC)"
+	pip install -e .
+	@echo "$(GREEN)✓ Package installed!$(NC)"
 
-start-full: ## Start with monitoring and logging
-	@echo "$(BLUE)🚀 Starting bot with full features...$(NC)"
-	@$(MANAGER) start --monitoring --logging
+install-dev: ## Install with all development dependencies
+	@echo "$(GREEN)Installing with dev dependencies...$(NC)"
+	pip install -e ".[dev,github-actions,release]"
+	@echo "$(GREEN)✓ Dev dependencies installed!$(NC)"
 
-stop: ## Stop the bot
-	@echo "$(BLUE)🛑 Stopping bot...$(NC)"
-	@$(MANAGER) stop
+##@ Testing
 
-restart: ## Restart the bot
-	@echo "$(BLUE)🔄 Restarting bot...$(NC)"
-	@$(MANAGER) restart
+test: ## Run all tests
+	@echo "$(GREEN)Running all tests...$(NC)"
+	pytest
 
-restart-rebuild: ## Restart with container rebuild
-	@echo "$(BLUE)🔄 Restarting with rebuild...$(NC)"
-	@$(MANAGER) restart --rebuild
+test-fast: ## Run tests without coverage (faster)
+	@echo "$(GREEN)Running fast tests...$(NC)"
+	pytest -v --no-cov
 
-# Status and logs
-status: ## Show comprehensive bot status with full diagnostics
-	@$(MANAGER) status
+test-cov: ## Run tests with coverage report
+	@echo "$(GREEN)Running tests with coverage...$(NC)"
+	pytest --cov=telegram_bot_stack --cov-report=term --cov-report=html
+	@echo "$(YELLOW)Coverage report: htmlcov/index.html$(NC)"
 
-logs: ## Show logs
-	@$(MANAGER) logs
+test-watch: ## Run tests in watch mode (requires pytest-watch)
+	@echo "$(GREEN)Running tests in watch mode...$(NC)"
+	ptw -- --no-cov
 
-logs-follow: ## Follow logs in real-time
-	@$(MANAGER) logs --follow
+test-unit: ## Run only unit tests
+	@echo "$(GREEN)Running unit tests...$(NC)"
+	pytest tests/core/ -v
 
-# Maintenance
-clean: ## Clean up containers and images
-	@echo "$(BLUE)🧹 Cleaning up...$(NC)"
-	@$(MANAGER) clean
+test-integration: ## Run only integration tests
+	@echo "$(GREEN)Running integration tests...$(NC)"
+	pytest tests/integration/ -v
 
-clean-deep: ## Deep cleanup (removes containers, images, logs)
-	@echo "$(BLUE)🧹 Deep cleanup...$(NC)"
-	@$(MANAGER) clean --deep
+##@ Code Quality
 
-build: ## Build Docker image with automatic cleanup
-	@echo "$(BLUE)🔨 Building Docker image...$(NC)"
-	@SYSTEM_NAME="$(SYSTEM_NAME)" docker-compose -f docker/docker-compose.yml build
-	@echo "$(BLUE)🧹 Cleaning up dangling images after build...$(NC)"
-	@source venv/bin/activate && python -c "import sys; sys.path.insert(0, 'scripts'); from scripts.docker_utils import cleanup_project_dangling_images; from scripts.environment import load_env; load_env(); cleanup_project_dangling_images(verbose=False)" 2>/dev/null || echo "$(YELLOW)⚠️  Image cleanup failed, but build completed$(NC)"
+lint: ## Run linter (ruff)
+	@echo "$(GREEN)Running linter...$(NC)"
+	ruff check .
 
-# Advanced operations
-token: ## Set bot token interactively
-	@echo "$(BLUE)🔑 Setting bot token...$(NC)"
-	@read -p "Enter your bot token: " token; \
-	$(MANAGER) setup --token "$$token"
+lint-fix: ## Run linter and auto-fix issues
+	@echo "$(GREEN)Running linter with auto-fix...$(NC)"
+	ruff check --fix .
 
-backup: ## Create backup of bot data
-	@echo "$(BLUE)💾 Creating backup...$(NC)"
-	@python3 -c "from scripts.actions import action_backup; action_backup()"
+format: ## Format code with ruff
+	@echo "$(GREEN)Formatting code...$(NC)"
+	ruff format .
 
-# Code quality through pre-commit
-code-check: ## Run pre-commit hooks (code formatting, linting, etc)
-	@echo "$(BLUE)🔧 Running code quality checks via pre-commit...$(NC)"
-	@source venv/bin/activate && pre-commit run --all-files
+format-check: ## Check code formatting without changes
+	@echo "$(GREEN)Checking code format...$(NC)"
+	ruff format --check .
 
-# Compatibility checks
-check-versions: ## Check dependency versions and compatibility
-	@echo "$(BLUE)🔍 Checking dependency versions...$(NC)"
-	@source venv/bin/activate && python3 -c "import telegram; print(f'✅ python-telegram-bot: {telegram.__version__}')" || echo "$(RED)❌ python-telegram-bot not found$(NC)"
-	@source venv/bin/activate && python3 -c "import apscheduler; print(f'✅ APScheduler: {apscheduler.__version__}')" || echo "$(RED)❌ APScheduler not found$(NC)"
-	@echo "$(GREEN)Version check completed$(NC)"
+type-check: ## Run type checker (mypy)
+	@echo "$(GREEN)Running type checker...$(NC)"
+	mypy telegram_bot_stack
 
-check-env: ## Complete environment compatibility check (replaces check_environment.py)
-	@source venv/bin/activate && $(MANAGER) check-env
+pre-commit: ## Run all pre-commit hooks
+	@echo "$(GREEN)Running pre-commit hooks...$(NC)"
+	pre-commit run --all-files
 
-test-local: ## Test bot startup locally
-	@echo "$(BLUE)🧪 Testing local bot startup...$(NC)"
-	@source venv/bin/activate && python3 src/bot.py --help >/dev/null 2>&1 && echo "$(GREEN)✅ Local bot can start$(NC)" || echo "$(RED)❌ Local bot startup failed$(NC)"
+##@ CI/CD
 
-start-local: ## Start bot locally (requires .env with BOT_TOKEN)
-	@echo "$(BLUE)🚀 Starting bot locally...$(NC)"
-	@if [ ! -f .env ]; then \
-		echo "$(RED)❌ .env file not found. Create .env with BOT_TOKEN=your_token$(NC)"; \
+ci: ## Run all CI checks locally (lint, type-check, test)
+	@echo "$(GREEN)Running CI checks locally...$(NC)"
+	@make lint
+	@make type-check
+	@make test
+	@echo "$(GREEN)✓ All CI checks passed!$(NC)"
+
+ci-check: ## Check CI status for current branch
+	@echo "$(GREEN)Checking CI status...$(NC)"
+	@python3 .github/workflows/scripts/check_ci.py --branch $$(git branch --show-current)
+
+pr-check: ## Check CI status for a PR (usage: make pr-check PR=5)
+	@if [ -z "$(PR)" ]; then \
+		echo "$(RED)Error: Please specify PR number$(NC)"; \
+		echo "Usage: make pr-check PR=5"; \
 		exit 1; \
 	fi
-	@source venv/bin/activate && python3 src/bot.py && echo "$(GREEN)✅ Local bot started$(NC)" || echo "$(RED)❌ Failed to start local bot$(NC)"
+	@echo "$(GREEN)Checking PR #$(PR) status...$(NC)"
+	@python3 .github/workflows/scripts/check_ci.py --pr $(PR)
 
-stop-local: ## Stop locally running bot
-	@echo "$(BLUE)🛑 Stopping local bot...$(NC)"
-	@pkill -f 'src/bot.py' 2>/dev/null && echo "$(GREEN)✅ Local bot stopped$(NC)" || echo "$(YELLOW)⚠️ No local bot was running$(NC)"
+##@ Git & GitHub
 
-test-docker: ## Test Docker bot build
-	@echo "$(BLUE)🧪 Testing Docker bot build...$(NC)"
-	@$(MANAGER) status >/dev/null 2>&1 && echo "$(GREEN)✅ Docker environment ready$(NC)" || echo "$(RED)❌ Docker environment not ready$(NC)"
+status: ## Show project status (open issues, current phase)
+	@echo "$(GREEN)Project Status:$(NC)"
+	@echo ""
+	@python3 .github/workflows/scripts/read_issues.py --list --state open 2>/dev/null || echo "$(YELLOW)Install PyGithub to see issues: pip install PyGithub$(NC)"
+	@echo ""
+	@echo "$(GREEN)Current branch:$(NC) $$(git branch --show-current)"
+	@echo "$(GREEN)Last commit:$(NC) $$(git log -1 --oneline)"
 
-test-both-envs: check-env test-local ## Test both local and Docker environments
-	@echo "$(GREEN)🎯 Environment compatibility check completed$(NC)"
+issue-list: ## List open issues
+	@python3 .github/workflows/scripts/read_issues.py --list --state open
 
-fix-deps: ## Fix dependency issues (force reinstall)
-	@echo "$(BLUE)🔧 Fixing dependency issues...$(NC)"
-	@source venv/bin/activate && pip install -U --force-reinstall "python-telegram-bot>=22.0"
-	@echo "$(GREEN)✅ Dependencies fixed$(NC)"
+issue-read: ## Read specific issue (usage: make issue-read ISSUE=4)
+	@if [ -z "$(ISSUE)" ]; then \
+		echo "$(RED)Error: Please specify issue number$(NC)"; \
+		echo "Usage: make issue-read ISSUE=4"; \
+		exit 1; \
+	fi
+	@python3 .github/workflows/scripts/read_issues.py $(ISSUE)
 
-# Development setup
-dev-setup: ## Complete development setup (Python + Docker)
-	@echo "$(BLUE)🚀 Complete development setup...$(NC)"
-	@$(MANAGER) dev-setup
-	@echo "$(GREEN)✅ Development environment ready!$(NC)"
-	@echo "$(YELLOW)💡 Next: Reload VS Code window and run 'make install'$(NC)"
+pr-create: ## Create Pull Request (auto-detects branch, validates title)
+	@if [ -z "$(TITLE)" ]; then \
+		echo "$(RED)Error: Please specify PR title$(NC)"; \
+		echo "Usage: make pr-create TITLE='feat(scope): description' [CLOSES=42]"; \
+		exit 1; \
+	fi
+	@if [ ! -z "$(CLOSES)" ]; then \
+		python3 .github/workflows/scripts/create_pr.py --title "$(TITLE)" --closes $(CLOSES); \
+	else \
+		python3 .github/workflows/scripts/create_pr.py --title "$(TITLE)"; \
+	fi
 
-python-setup: ## Setup Python virtual environment only
-	@echo "$(BLUE)🐍 Setting up Python environment...$(NC)"
-	@$(MANAGER) dev-setup
-	@echo "$(GREEN)✅ Python environment ready!$(NC)"
-	@echo "$(YELLOW)💡 Reload VS Code window to pick up changes$(NC)"
+##@ Development
+
+dev-shell: ## Start development Python shell with imports
+	@echo "$(GREEN)Starting dev shell...$(NC)"
+	@python3 -i -c "from telegram_bot_stack import *; print('✓ telegram_bot_stack imported')"
+
+clean: ## Clean build artifacts and cache files
+	@echo "$(GREEN)Cleaning build artifacts...$(NC)"
+	rm -rf build/
+	rm -rf dist/
+	rm -rf *.egg-info
+	rm -rf htmlcov/
+	rm -rf .coverage
+	rm -rf .pytest_cache/
+	rm -rf .mypy_cache/
+	rm -rf .ruff_cache/
+	find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
+	@echo "$(GREEN)✓ Cleaned!$(NC)"
+
+clean-all: clean ## Clean everything including venv
+	@echo "$(YELLOW)Removing virtual environment...$(NC)"
+	rm -rf venv/
+	@echo "$(GREEN)✓ Everything cleaned!$(NC)"
+
+##@ Documentation
+
+docs-serve: ## Serve documentation locally (if using mkdocs)
+	@echo "$(YELLOW)Documentation server not configured yet$(NC)"
+
+##@ Shortcuts
+
+t: test ## Shortcut for test
+tc: test-cov ## Shortcut for test-cov
+tf: test-fast ## Shortcut for test-fast
+l: lint ## Shortcut for lint
+f: format ## Shortcut for format
+s: status ## Shortcut for status

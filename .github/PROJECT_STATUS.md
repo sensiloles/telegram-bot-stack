@@ -19,7 +19,7 @@ python3 .github/workflows/scripts/read_issues.py <issue_number>
 
 ### 2. Understand Project Plan
 
-- **Full Plan:** `PACKAGE_CONVERSION_PLAN_RU.md` (lines 761-1928)
+- **Full Plan:** `archive/PACKAGE_CONVERSION_PLAN_RU.md` (archived)
 - **Current Phase:** Phase 1 - Minimal Viable Framework ✅ COMPLETE
 - **Next Phase:** Phase 2 - PyPI Publication
 
@@ -108,7 +108,8 @@ telegram-bot-stack/
 │       ├── tests.yml      # ✅ CI/CD pipeline
 │       └── scripts/       # Automation scripts
 ├── LICENSE                # MIT License
-└── PACKAGE_CONVERSION_PLAN_RU.md  # 📖 Master plan
+└── archive/                     # 📖 Archived plans
+    └── PACKAGE_CONVERSION_PLAN_RU.md
 ```
 
 ## 🔑 Key Files to Read First
@@ -116,7 +117,7 @@ telegram-bot-stack/
 **On every new context:**
 
 1. `.github/PROJECT_STATUS.md` (this file) - Current status
-2. `PACKAGE_CONVERSION_PLAN_RU.md` (lines 761-847) - Phase 0 details
+2. `archive/PACKAGE_CONVERSION_PLAN_RU.md` - Master plan (archived)
 3. Open issues via: `python3 .github/workflows/scripts/read_issues.py --list`
 
 **For specific tasks:**
@@ -137,8 +138,8 @@ python3 .github/workflows/scripts/read_issues.py --list --state open
 # 2. Read current issue
 python3 .github/workflows/scripts/read_issues.py <issue_number>
 
-# 3. Check plan context
-# Read PACKAGE_CONVERSION_PLAN_RU.md relevant section
+# 3. Check plan context (if needed)
+# Read archive/PACKAGE_CONVERSION_PLAN_RU.md
 
 # 4. Start implementation
 # Follow issue checklist
@@ -147,8 +148,8 @@ python3 .github/workflows/scripts/read_issues.py <issue_number>
 ### Creating New Phase Issue
 
 ```bash
-# 1. Read plan for next phase
-# PACKAGE_CONVERSION_PLAN_RU.md
+# 1. Read plan for next phase (if needed)
+# archive/PACKAGE_CONVERSION_PLAN_RU.md
 
 # 2. Write issue content to file
 cat > /tmp/issue_content.md << 'EOF'
@@ -170,7 +171,7 @@ python3 .github/workflows/scripts/create_issue.py \
 python3 -m pytest
 
 # With coverage
-python3 -m pytest --cov=src/core --cov-report=term
+python3 -m pytest --cov=telegram_bot_stack --cov-report=term
 
 # Specific test
 python3 -m pytest tests/core/test_storage.py -v
@@ -199,14 +200,14 @@ python3 -m pytest tests/core/test_storage.py -v
 
 - **Issues:** https://github.com/sensiloles/telegram-bot-stack/issues
 - **CI/CD:** https://github.com/sensiloses/telegram-bot-stack/actions
-- **Plan:** `PACKAGE_CONVERSION_PLAN_RU.md`
+- **Plan:** `archive/PACKAGE_CONVERSION_PLAN_RU.md`
 - **Tests:** `.github/workflows/tests.yml`
 
 ## 💡 Important Notes
 
 1. **Use modern PyGithub scripts** in `.github/workflows/scripts/` (not `gh` CLI)
 2. **Token auto-loads** from `.env` - no manual setup needed
-3. **Read PACKAGE_CONVERSION_PLAN_RU.md** for context on phases
+3. **Read `archive/PACKAGE_CONVERSION_PLAN_RU.md`** for context on phases (if needed)
 4. **Check open issues** before starting new work
 5. **Follow Conventional Commits** for all commits
 6. **Update documentation** before committing code changes

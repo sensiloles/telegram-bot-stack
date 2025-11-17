@@ -12,67 +12,53 @@
       "envFile": "${workspaceFolder}/.env"
     },
     {
-      "name": "🤖 Bot: Start Telegram Bot",
+      "name": "🤖 Example: Echo Bot",
       "type": "debugpy",
       "request": "launch",
-      "program": "${workspaceFolder}/src/bot.py",
+      "program": "${workspaceFolder}/examples/echo_bot/bot.py",
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}",
       "python": "./venv/bin/python3",
       "envFile": "${workspaceFolder}/.env"
     },
     {
-      "name": "🤖 Bot: Start with Module",
+      "name": "🤖 Example: Counter Bot",
       "type": "debugpy",
       "request": "launch",
-      "module": "src.bot",
+      "program": "${workspaceFolder}/examples/counter_bot/bot.py",
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}",
       "python": "./venv/bin/python3",
       "envFile": "${workspaceFolder}/.env"
     },
     {
-      "name": "🔧 Manager: Status",
+      "name": "🤖 Example: Quit Smoking Bot",
       "type": "debugpy",
       "request": "launch",
-      "program": "${workspaceFolder}/manager.py",
+      "program": "${workspaceFolder}/examples/quit_smoking_bot/bot.py",
       "console": "integratedTerminal",
-      "args": ["status"],
       "cwd": "${workspaceFolder}",
       "python": "./venv/bin/python3",
       "envFile": "${workspaceFolder}/.env"
     },
     {
-      "name": "🔧 Manager: Start Bot",
+      "name": "🧪 Tests: All",
       "type": "debugpy",
       "request": "launch",
-      "program": "${workspaceFolder}/manager.py",
+      "module": "pytest",
       "console": "integratedTerminal",
-      "args": ["start"],
       "cwd": "${workspaceFolder}",
-      "python": "./venv/bin/python3",
-      "envFile": "${workspaceFolder}/.env"
+      "python": "./venv/bin/python3"
     },
     {
-      "name": "🔧 Manager: Setup",
+      "name": "🧪 Tests: Current File",
       "type": "debugpy",
       "request": "launch",
-      "program": "${workspaceFolder}/manager.py",
-      "console": "integratedTerminal",
-      "args": ["setup"],
-      "cwd": "${workspaceFolder}",
-      "python": "./venv/bin/python3",
-      "envFile": "${workspaceFolder}/.env"
-    },
-    {
-      "name": "📋 Scripts: Health Check",
-      "type": "debugpy",
-      "request": "launch",
-      "program": "${workspaceFolder}/scripts/health.py",
+      "module": "pytest",
+      "args": ["${file}", "-v"],
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}",
-      "python": "./venv/bin/python3",
-      "envFile": "${workspaceFolder}/.env"
+      "python": "./venv/bin/python3"
     }
   ]
 }

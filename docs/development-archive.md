@@ -293,13 +293,13 @@ telegram-bot-stack/
 
 ### Code Organization
 
-**Framework Layer (`src/core/`):**
+**Framework Layer (`telegram_bot_stack/`):**
 
 - Generic, reusable components
 - 100% test coverage for storage/managers
 - Ready for extraction into PyPI package
 
-**Application Layer (`src/quit_smoking/`):**
+**Application Layer (`examples/quit_smoking_bot/`):**
 
 - Bot-specific business logic
 - Inherits from framework components
@@ -401,7 +401,7 @@ See [`ARCHITECTURE.md`](ARCHITECTURE.md) for detailed documentation on:
 
 ### Key Concepts
 
-**Framework Components (`src/core/`):**
+**Framework Components (`telegram_bot_stack/`):**
 
 - `BotBase`: Base class with common bot patterns
 - `Storage`: JSON storage abstraction
@@ -436,10 +436,10 @@ python3 -m pytest
 **Run with coverage:**
 
 ```bash
-python3 -m pytest --cov=src/core --cov-report=term
+python3 -m pytest --cov=telegram_bot_stack --cov-report=term
 ```
 
-**Coverage threshold:** 80% for `src/core/` (currently at 81%)
+**Coverage threshold:** 79% for `telegram_bot_stack/` (currently at 80%)
 
 ---
 

@@ -2,14 +2,14 @@
 
 A reusable Python framework for building production-ready Telegram bots with minimal code. Includes user management, admin system, storage abstraction, and comprehensive testing infrastructure.
 
-> 🎯 **Example:** The `src/quit_smoking/` directory contains a complete quit-smoking tracking bot built with this framework.
+> 🎯 **Example:** The `examples/quit_smoking_bot/` directory contains a complete quit-smoking tracking bot built with this framework.
 
 ## 📍 Quick Navigation (For Agents)
 
 **New to this project?**
 
 1. 🎯 **Current Status:** [`.github/PROJECT_STATUS.md`](.github/PROJECT_STATUS.md) - Phase, progress, what to do next
-2. 📖 **Master Plan:** [`PACKAGE_CONVERSION_PLAN_RU.md`](PACKAGE_CONVERSION_PLAN_RU.md) (lines 761-1928) - Complete roadmap
+2. 📖 **Master Plan:** [`archive/PACKAGE_CONVERSION_PLAN_RU.md`](archive/PACKAGE_CONVERSION_PLAN_RU.md) - Complete roadmap (archived)
 3. 🔧 **Workflow Rules:** [`.cursorrules`](.cursorrules) - Git, testing, conventions
 
 **Quick Links:**
@@ -353,7 +353,7 @@ class MyBot(BotBase):
 
 ## 📖 Example: Quit Smoking Bot
 
-The `src/quit_smoking/` directory contains a complete example bot built with the framework.
+The `examples/quit_smoking_bot/` directory contains a complete example bot built with the framework.
 
 ### Features of Example Bot
 
@@ -543,14 +543,14 @@ quit-smoking-bot/
 
 The project now follows a **layered architecture** to support future framework extraction:
 
-- **`src/core/`** - Reusable telegram bot components:
+- **`telegram_bot_stack/`** - Reusable telegram bot components (published as PyPI package):
 
   - `BotBase` - Base class with common bot patterns (user/admin management, command handling, shutdown)
   - `UserManager` - Generic user registration and tracking
   - `AdminManager` - Generic admin privilege management
   - `Storage` - JSON-based storage abstraction
 
-- **`src/quit_smoking/`** - Bot-specific business logic:
+- **`examples/quit_smoking_bot/`** - Complete bot example with business logic:
   - `QuitSmokingBot` - Inherits from `BotBase`, adds quit smoking tracking
   - `StatusManager` - Tracks smoke-free period and calculates prize fund
   - `QuotesManager` - Manages motivational quotes

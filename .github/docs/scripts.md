@@ -43,6 +43,85 @@ python3 .github/workflows/scripts/create_issue.py --title "New feature"
 python3 .github/workflows/scripts/create_issue.py --title "Test" --file issue.md --dry-run
 ```
 
+### Create Pull Request
+
+```bash
+# Auto-detect branch, auto-generate description from commits
+python3 .github/workflows/scripts/create_pr.py \
+    --title "feat(storage): add Redis backend"
+
+# Link to issue (adds "Closes #42" automatically)
+python3 .github/workflows/scripts/create_pr.py \
+    --title "fix(auth): resolve token validation" \
+    --closes 42
+
+# Custom description from file
+python3 .github/workflows/scripts/create_pr.py \
+    --title "feat(bot): add webhooks" \
+    --file pr_description.md
+
+# Draft PR (for work in progress)
+python3 .github/workflows/scripts/create_pr.py \
+    --title "feat(api): WIP new endpoint" \
+    --draft
+
+# Custom base branch (default is 'main')
+python3 .github/workflows/scripts/create_pr.py \
+    --title "feat: feature" \
+    --base develop
+
+# Dry run (preview PR without creating)
+python3 .github/workflows/scripts/create_pr.py \
+    --title "feat: test" \
+    --dry-run
+```
+
+**Features:**
+
+- ✅ Auto-detects current branch
+- ✅ Validates conventional commit format
+- ✅ Auto-generates description from commits
+- ✅ Links issues with `--closes N`
+- ✅ Supports draft PRs
+- ✅ Dry-run mode for preview
+
+### Check CI Status
+
+```bash
+# Check PR CI status
+python3 .github/workflows/scripts/check_ci.py --pr 5
+
+# Check specific commit
+python3 .github/workflows/scripts/check_ci.py --commit abc123
+
+# Check latest commit on branch
+python3 .github/workflows/scripts/check_ci.py --branch main
+
+# List recent open PRs with CI status
+python3 .github/workflows/scripts/check_ci.py --list-prs
+
+# List all PRs (open and closed)
+python3 .github/workflows/scripts/check_ci.py --list-prs --state all
+
+# JSON output (for automation)
+python3 .github/workflows/scripts/check_ci.py --pr 5 --json
+```
+
+**Features:**
+
+- ✅ Check CI status for PRs
+- ✅ Check CI status for commits
+- ✅ Check CI status for branches
+- ✅ List recent PRs with status
+- ✅ JSON output for automation
+- ✅ Shows check duration
+- ✅ Exit code 1 if checks failing
+
+**Requirements:**
+
+- Classic token with `repo` scope (for check runs access)
+- Or fine-grained token with `Commit statuses: Read` permission
+
 ## 📚 Module: `github_helper.py`
 
 Unified GitHub API helper for all scripts.
@@ -144,6 +223,48 @@ Create GitHub issues:
 - Dry-run mode to preview
 - Interactive mode
 
+### `create_pr.py`
+
+Create GitHub Pull Requests:
+
+- Auto-detects current branch
+- Validates conventional commit format
+- Auto-generates description from commits
+- Links to issues automatically
+- Supports draft PRs
+- Custom base branch support
+
+### `check_ci.py`
+
+Check GitHub Actions CI status:
+
+- Check CI status for Pull Requests
+- Check CI status for specific commits
+- Check CI status for branches
+- List recent PRs with CI status
+- JSON output for automation
+- Shows check duration and details
+
+### `pr_ready.py`
+
+Check if PR is ready to merge:
+
+- Verify all CI checks passed
+- Check for merge conflicts
+- Verify PR approvals
+- Check mergeable state
+- Exit code for scripting (0 = ready, 1 = not ready)
+
+### `project_overview.py`
+
+Quick project status snapshot:
+
+- Git status and branch info
+- Test coverage summary
+- Open PRs with CI status
+- Open issues
+- Quick command reference
+
 ## 🎯 Common Patterns
 
 ### For Cursor Agent
@@ -174,6 +295,28 @@ python3 .github/workflows/scripts/create_issue.py \
     --title "[Phase] Phase 1.1: Component Name" \
     --file /tmp/issue_content.md \
     --labels "phase-1,enhancement"
+```
+
+**Create Pull Request:**
+
+```bash
+# After committing and pushing feature branch
+python3 .github/workflows/scripts/create_pr.py \
+--title "feat(storage): add Redis backend" \
+--closes 42
+```
+
+**Check CI Status:**
+
+```bash
+# Check if PR is ready to merge
+python3 .github/workflows/scripts/check_ci.py --pr 5
+
+# Check PR readiness (all checks)
+python3 .github/workflows/scripts/pr_ready.py --pr 5
+
+# Project overview
+python3 .github/workflows/scripts/project_overview.py
 ```
 
 ### For Automation

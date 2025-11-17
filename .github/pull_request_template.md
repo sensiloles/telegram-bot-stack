@@ -16,10 +16,32 @@
 
 ## 🔗 Related Issue
 
-<!-- Link to related issue(s) -->
+<!--
+Link to related issue(s) using keywords for automatic closing.
 
-Closes #
-Related to #
+GitHub will automatically close issues when PR is merged if you use:
+- Closes #123
+- Fixes #123
+- Resolves #123
+
+Multiple issues:
+- Closes #123, closes #456
+- Fixes #123 and fixes #456
+
+Just reference (won't auto-close):
+- Related to #123
+- See #123
+- Part of #123
+-->
+
+**Auto-close on merge:**
+
+- Closes #
+
+**Reference only:**
+
+- Related to #
+- Part of #
 
 ## 🧪 Testing
 

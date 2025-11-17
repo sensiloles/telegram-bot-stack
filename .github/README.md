@@ -1,144 +1,115 @@
-# 📁 .github Directory Structure
+# 🔧 GitHub Configuration
 
-This directory contains GitHub-specific configuration, workflows, and automation scripts.
-
-## 🚀 Quick Start for Agents
-
-**First time in new context? Read in this order:**
-
-1. `PROJECT_STATUS.md` - Current project status and phase
-2. `HOW_TO_CREATE_ISSUES.md` - Issue creation guide
-3. `workflows/scripts/README.md` - Automation tools
+Automation, workflows, and documentation for telegram-bot-stack.
 
 ## 📂 Directory Structure
 
 ```
 .github/
-├── PROJECT_STATUS.md           # 👈 START HERE - Current status
-├── HOW_TO_CREATE_ISSUES.md     # Issue creation via PyGithub
-├── README.md                    # This file
-│
-├── workflows/                   # GitHub Actions
-│   ├── tests.yml               # CI/CD: tests, linting, coverage
-│   ├── cloud-agent.yml         # Cloud Agent automation
-│   └── scripts/                # Automation scripts
-│       ├── README.md           # Scripts documentation
-│       ├── read_issues.py      # ⭐ Read GitHub issues
-│       ├── auto_label.py       # Auto-labeling
-│       └── ...                 # Other automation
-│
-├── ISSUE_TEMPLATE/              # Issue templates
-│   ├── bug_report.yml
-│   ├── feature_request.yml
-│   └── config.yml
-│
-├── docs/                        # Extended documentation
-│   ├── cloud-agent/            # Cloud Agent guides
-│   └── issue-management/       # Issue management docs
-│
-└── archive/                     # Old/reference files
-    ├── create_github_issue.py  # Reference implementation
-    ├── FIRST_ISSUE_DRAFT.md    # Issue #1 draft
-    └── ...
+├── docs/                     # 📚 Documentation
+│   ├── workflow/            # Git Flow, PRs, Issues
+│   ├── setup/               # Setup guides
+│   └── scripts.md           # Automation scripts reference
+├── workflows/               # ⚙️ CI/CD Workflows
+│   ├── tests.yml           # Test automation
+│   ├── release.yml         # Semantic releases
+│   └── scripts/            # Automation scripts
+├── ISSUE_TEMPLATE/          # 📝 Issue templates
+├── pull_request_template.md # 📝 PR template
+└── PROJECT_STATUS.md        # 📊 Current status (START HERE!)
 ```
 
-## 🎯 Key Files
+## 🚀 Quick Start
 
-### For New Context Setup
+### For New Contributors
 
-| File                               | Purpose                          | Read When             |
-| ---------------------------------- | -------------------------------- | --------------------- |
-| `PROJECT_STATUS.md`                | Current phase, progress, metrics | **Every new context** |
-| `HOW_TO_CREATE_ISSUES.md`          | PyGithub guide with template     | Creating issues       |
-| `workflows/scripts/read_issues.py` | Read issues programmatically     | Checking status       |
+1. **Read:** [`PROJECT_STATUS.md`](PROJECT_STATUS.md) - Current project state
+2. **Setup:** [`docs/setup/getting-started.md`](docs/setup/getting-started.md) - Environment setup
+3. **Workflow:** [`docs/workflow/git-flow.md`](docs/workflow/git-flow.md) - Git workflow
 
-### For Automation
+### For AI Agents (Cursor)
 
-| File                        | Purpose                | Usage                  |
-| --------------------------- | ---------------------- | ---------------------- |
-| `workflows/tests.yml`       | CI/CD pipeline         | Auto-runs on push/PR   |
-| `workflows/cloud-agent.yml` | Cloud Agent automation | Issue commands         |
-| `workflows/scripts/*.py`    | Helper scripts         | Manual/automated tasks |
+See [`.cursorrules`](../.cursorrules) for complete workflow rules.
 
-## 🔍 Common Commands
+**On every new context:**
+1. Read `PROJECT_STATUS.md` - current phase
+2. Check open issues: `python3 .github/workflows/scripts/read_issues.py --list`
+3. Follow issue checklist or user request
 
-### Check Project Status
+## 📚 Documentation
+
+### Workflow Guides
+- **[Git Flow](docs/workflow/git-flow.md)** - Complete Git workflow with semantic releases
+- **[PR Automation](docs/workflow/pr-automation.md)** - Automated Pull Request creation
+- **[PR Naming](docs/workflow/pr-naming.md)** - Naming conventions for PRs
+- **[Issue Linking](docs/workflow/issue-linking.md)** - Link issues with PRs
+- **[Branch Protection](docs/workflow/branch-protection.md)** - Setup branch protection
+
+### Setup Guides
+- **[Getting Started](docs/setup/getting-started.md)** - Complete setup instructions
+- **[Token Setup](docs/setup/token-setup.md)** - Configure GitHub token
+
+### Automation
+- **[Scripts Documentation](docs/scripts.md)** - All automation scripts
+- **Scripts Location:** `workflows/scripts/` - Python automation scripts
+
+## ⚙️ CI/CD Workflows
+
+### Active Workflows
+- **`tests.yml`** - Run tests on all PRs (Python 3.9-3.12)
+- **`release.yml`** - Automatic releases on merge to main
+- **`publish-github-packages.yml`** - Publish to GitHub Packages
+
+### Test Coverage
+- **Current:** 79.70%
+- **Threshold:** 79%
+- **Measured on:** Python 3.11
+
+## 🤖 Automation Scripts
+
+Located in [`workflows/scripts/`](workflows/scripts/):
 
 ```bash
-# List open issues
-python3 .github/workflows/scripts/read_issues.py --list --state open
+# Check CI status
+python3 .github/workflows/scripts/check_ci.py --pr 5
 
-# Read specific issue
-python3 .github/workflows/scripts/read_issues.py <issue_number>
+# Create Pull Request
+python3 .github/workflows/scripts/create_pr.py \
+  --title "feat(storage): add Redis" \
+  --closes 42
 
-# Read with details
-python3 .github/workflows/scripts/read_issues.py <issue_number> --json
+# Create Issue
+python3 .github/workflows/scripts/create_issue.py \
+  --title "Bug: Fix tests" \
+  --file issue.md
+
+# Read Issues
+python3 .github/workflows/scripts/read_issues.py --list
 ```
 
-### Create New Issue
+See [docs/scripts.md](docs/scripts.md) for complete reference.
 
-```bash
-# 1. Create issue content
-cat > /tmp/issue_N.md << 'EOF'
-## Issue content here
-EOF
+## 📊 Project Status
 
-# 2. Use PyGithub (see HOW_TO_CREATE_ISSUES.md)
-python3 /tmp/create_issue.py
-```
+**Current Phase:** Phase 0.3 - Validation & Documentation
+**Status:** In Progress
+**Details:** See [PROJECT_STATUS.md](PROJECT_STATUS.md)
 
-### Check CI/CD Status
+## 🔗 Quick Links
 
-```bash
-# View workflow runs
-gh run list --limit 5
+- **[Project Status](PROJECT_STATUS.md)** - Current phase and metrics
+- **[All Documentation](docs/)** - Complete docs index
+- **[Issue Templates](ISSUE_TEMPLATE/)** - Bug reports & feature requests
+- **[PR Template](pull_request_template.md)** - Pull request template
+- **[CI Workflows](workflows/)** - GitHub Actions configurations
 
-# View specific run
-gh run view <run_id>
-```
+## 💡 Tips
 
-## 📊 Automation Features
-
-### GitHub Actions Workflows
-
-**tests.yml** - Comprehensive testing:
-
-- Runs on: push, pull_request
-- Python versions: 3.9, 3.10, 3.11, 3.12
-- Steps: tests, linting, type checking, coverage
-- Coverage threshold: 80%
-
-**cloud-agent.yml** - Issue automation:
-
-- Auto-labeling based on content
-- Command execution (/breakdown, /accept, etc.)
-- Context analysis
-
-### Scripts
-
-See `workflows/scripts/README.md` for detailed documentation.
-
-**Key scripts:**
-
-- `read_issues.py` - Read and format issues
-- `auto_label.py` - Automatic issue labeling
-- `generate_subtasks.py` - Break down large tasks
-
-## 🔗 Related Documentation
-
-- **Project Plan:** `../PACKAGE_CONVERSION_PLAN_RU.md`
-- **Main README:** `../README.md`
-- **Agent Rules:** `../.cursorrules`
-- **Development:** `../DEVELOPMENT.md`
-
-## 💡 Best Practices
-
-1. **Always check** `PROJECT_STATUS.md` first
-2. **Use PyGithub** for issue creation (not `gh` CLI)
-3. **Read issues programmatically** via `read_issues.py`
-4. **Check CI/CD** status before starting work
-5. **Update PROJECT_STATUS.md** when phases complete
+- **Documentation:** All docs use consistent structure and cross-link
+- **Automation:** Scripts auto-install dependencies (PyGithub, etc.)
+- **Token:** Required for scripts - see [token setup](docs/setup/token-setup.md)
+- **Coverage:** Automation scripts excluded from coverage
 
 ---
 
-**For complete project workflow, see:** `PROJECT_STATUS.md`
+**Need help?** Check [docs/](docs/) for complete guides!

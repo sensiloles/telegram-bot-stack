@@ -6,37 +6,41 @@ The telegram-bot-stack project follows a clear separation between **reusable fra
 
 ```
 telegram-bot-stack/
-├── src/
-│   ├── core/              # 🎯 Reusable Framework (future PyPI package)
-│   │   ├── bot_base.py    # Base bot class with common patterns
-│   │   ├── storage.py     # Storage abstraction layer (JSON)
-│   │   ├── user_manager.py    # User registration and management
-│   │   └── admin_manager.py   # Admin system with protection
-│   │
-│   └── quit_smoking/      # 📱 Example Bot Implementation
-│       ├── bot.py         # QuitSmokingBot (inherits BotBase)
-│       ├── status_manager.py  # Quit smoking tracking logic
-│       └── quotes_manager.py  # Motivational quotes
+├── telegram_bot_stack/         # 🎯 PyPI Package (published framework)
+│   ├── bot_base.py            # Base bot class with common patterns
+│   ├── storage/               # Storage abstraction layer
+│   │   ├── json.py           # JSON backend
+│   │   └── memory.py         # In-memory backend
+│   ├── user_manager.py        # User registration and management
+│   └── admin_manager.py       # Admin system with protection
+│
+├── examples/                   # 📱 Example Bot Implementations
+│   ├── echo_bot/              # Simple echo bot
+│   ├── counter_bot/           # Counter with persistence
+│   └── quit_smoking_bot/      # Complete quit smoking tracker
+│       ├── bot.py            # QuitSmokingBot (inherits BotBase)
+│       ├── status_manager.py # Quit smoking tracking logic
+│       └── quotes_manager.py # Motivational quotes
 │
 ├── tests/
-│   ├── core/              # Framework component tests
-│   └── integration/       # End-to-end tests
+│   ├── core/                  # Framework component tests
+│   └── integration/           # End-to-end tests
 │
-└── data/                  # Runtime data storage (JSON files)
+└── docs/                      # Documentation
 ```
 
 ## 🎯 Design Philosophy
 
 ### Separation of Concerns
 
-**Framework Layer (`src/core/`):**
+**Framework Layer (`telegram_bot_stack/`):**
 
 - Generic, reusable components
 - No bot-specific logic
-- Fully tested (100% coverage for storage/managers)
-- Ready for extraction into standalone package
+- Fully tested (80% coverage)
+- Published as PyPI package
 
-**Application Layer (`src/quit_smoking/`):**
+**Application Layer (`examples/`):**
 
 - Bot-specific business logic
 - Inherits from framework
@@ -84,11 +88,11 @@ class BotBase:
 **Usage Example:**
 
 ```python
-from src.core import BotBase, Storage
+from telegram_bot_stack import BotBase, JSONStorage
 
 class MyBot(BotBase):
     def __init__(self):
-        storage = Storage("./data")
+        storage = JSONStorage("./data")
         super().__init__(
             storage=storage,
             bot_name="My Custom Bot",
@@ -323,11 +327,11 @@ Operation complete
 **Step 1:** Create bot class inheriting from BotBase
 
 ```python
-from src.core import BotBase, Storage
+from telegram_bot_stack import BotBase, JSONStorage
 
 class MyCustomBot(BotBase):
     def __init__(self):
-        storage = Storage("./data")
+        storage = JSONStorage("./data")
         super().__init__(
             storage=storage,
             bot_name="My Bot",
@@ -493,12 +497,12 @@ bot = MyBot(storage)
 
 ## 📚 References
 
-- **Master Plan:** `PACKAGE_CONVERSION_PLAN_RU.md`
+- **Master Plan:** `archive/PACKAGE_CONVERSION_PLAN_RU.md` (archived)
 - **Project Status:** `.github/PROJECT_STATUS.md`
 - **Testing Guide:** `README.md` (Testing section)
-- **API Documentation:** Inline docstrings in source code
+- **API Documentation:** `docs/api_reference.md`
 
 ---
 
-**Last Updated:** 2024-11-16
-**Version:** Phase 0.3 (Validation)
+**Last Updated:** 2024-11-17
+**Version:** Phase 1 Complete (PyPI Package Ready)
