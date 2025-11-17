@@ -279,7 +279,7 @@ telegram-bot-stack/
 │       ├── status_manager.py
 │       └── quotes_manager.py
 ├── tests/
-│   ├── core/            # Framework tests (81% coverage)
+│   ├── core/            # Framework tests
 │   └── integration/     # End-to-end tests
 ├── scripts/             # Management scripts
 ├── docker/              # Docker configuration

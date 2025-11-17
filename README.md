@@ -52,7 +52,7 @@ python3 .github/workflows/scripts/read_issues.py --list --state open
 - 💾 **Storage Abstraction**: Multiple backends (JSON, Memory) with unified API
 - 📅 **Scheduler Integration**: APScheduler for periodic tasks
 - 🎯 **Hook Pattern**: Override methods for custom behavior
-- 🧪 **Comprehensive Tests**: 131 tests with 80% coverage
+- 🧪 **Comprehensive Tests**: Full test suite with high code coverage
 - 📦 **PyPI Package**: Install via `pip install telegram-bot-stack` (coming soon)
 
 ### 🛡️ Production-Grade Infrastructure
@@ -162,7 +162,7 @@ For development setup, VS Code configuration, and detailed build instructions, s
 
 ## 🧪 Testing
 
-The project includes comprehensive test coverage for all core components with 80%+ code coverage.
+The project includes comprehensive test coverage for all core components.
 
 ### Running Tests
 
@@ -187,29 +187,17 @@ tests/
 ├── __init__.py
 ├── conftest.py                    # Shared fixtures
 ├── core/                          # Core component tests
-│   ├── test_storage.py           # Storage abstraction tests (100+ tests)
-│   ├── test_user_manager.py      # User management tests (100% coverage)
-│   ├── test_admin_manager.py     # Admin management tests (100% coverage)
-│   └── test_bot_base.py          # Bot base class tests (68% coverage)
+│   ├── test_storage.py           # Storage abstraction tests
+│   ├── test_user_manager.py      # User management tests
+│   ├── test_admin_manager.py     # Admin management tests
+│   └── test_bot_base.py          # Bot base class tests
 └── integration/                   # Integration tests
     └── test_full_flow.py         # End-to-end workflow tests
 ```
 
-### Coverage Report
-
-| Component             | Coverage | Status                     |
-| --------------------- | -------- | -------------------------- |
-| `storage/json.py`     | 83%      | ✅ Excellent               |
-| `storage/memory.py`   | 80%      | ✅ Excellent               |
-| `storage/__init__.py` | 100%     | ✅ Excellent               |
-| `user_manager.py`     | 100%     | ✅ Excellent               |
-| `admin_manager.py`    | 100%     | ✅ Excellent               |
-| `bot_base.py`         | 68%      | ⚠️ Good                    |
-| **Overall Package**   | **80%**  | ✅ **Meets 80% threshold** |
-
 ### Test Features
 
-- ✅ **131 tests** covering core functionality
+- ✅ **Comprehensive test suite** covering core functionality
 - ✅ **Async test support** with pytest-asyncio
 - ✅ **Integration tests** for complete workflows
 - ✅ **Error handling tests** for robustness
@@ -224,8 +212,7 @@ Tests run automatically on every push and pull request via GitHub Actions:
 - ✅ Tests on Python 3.9, 3.10, 3.11, 3.12
 - ✅ Code linting with Ruff
 - ✅ Type checking with mypy
-- ✅ Coverage reporting
-- ✅ Automated coverage threshold checks
+- ✅ Coverage reporting with automated threshold checks
 
 See [`.github/workflows/tests.yml`](.github/workflows/tests.yml) for CI/CD configuration.
 
@@ -235,7 +222,7 @@ See [`.github/workflows/tests.yml`](.github/workflows/tests.yml) for CI/CD confi
 2. Import fixtures from `conftest.py`
 3. Use descriptive test names: `test_<feature>_<scenario>`
 4. Run tests locally before committing
-5. Ensure coverage remains above 80%
+5. Ensure high test coverage is maintained
 
 ## 🏗️ Architecture Overview
 
@@ -263,7 +250,7 @@ telegram-bot-stack/
 │   └── quit_smoking_bot/       # Real-world application
 │
 ├── tests/                       # 🧪 Test Suite
-│   ├── core/                   # Unit tests (131 tests)
+│   ├── core/                   # Unit tests
 │   └── integration/            # End-to-end tests
 │
 └── src/                         # 🎯 Legacy Application Layer
@@ -295,14 +282,14 @@ telegram-bot-stack/
 - User registration and removal
 - User existence checks
 - Data persistence via Storage
-- **100% test coverage**
+- **Comprehensive test coverage**
 
 **AdminManager** (`telegram_bot_stack.admin_manager.AdminManager`)
 
 - Admin assignment and removal
 - Auto-assign first user as admin
 - Last admin protection (can't remove last admin)
-- **100% test coverage**
+- **Comprehensive test coverage**
 
 ### Example Bots
 
