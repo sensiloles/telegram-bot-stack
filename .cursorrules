@@ -93,6 +93,7 @@ git push origin feature/<name>
 - Tell user PR needs to be created
 - Provide branch name
 - Mention what was done
+- **Include issue reference if working on an issue** (e.g., "Closes #42")
 - Don't try to create PR via API (user should review)
 
 ### Conventional Commits (REQUIRED!)
@@ -285,10 +286,12 @@ tests/
 ✅ Changes committed to branch `feature/xyz`
 📝 Pushed to origin/feature/xyz
 🔄 Next: Create Pull Request on GitHub
-- Branch: feature/xyz → main
-- All CI checks will run automatically
-- Requires 1 approval before merge
-- Automatic release after merge
+   - Branch: feature/xyz → main
+   - In PR description: Add "Closes #N" (if working on issue)
+   - All CI checks will run automatically
+   - Requires 1 approval before merge
+   - Automatic release after merge
+   - Issue #N will auto-close on merge
 ```
 
 ### Emergency: If on main branch
