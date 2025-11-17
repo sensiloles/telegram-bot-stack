@@ -137,10 +137,9 @@ def check_pr_status(repo, pr_number: int, json_output: bool = False):
             else:
                 print(f"{icon} {check.name}")
                 print(f"   Status: {check.status}")
-                print(f"   Conclusion: {check.conclusion}")
+                print(f"   Conclusion: {check.conclusion or 'in_progress'}")
                 print(f"   Duration: {duration}")
-                if check.conclusion == "failure":
-                    print(f"   URL: {check.html_url}")
+                print(f"   URL: {check.html_url}")
                 print()
 
         if json_output:
@@ -230,6 +229,8 @@ def check_commit_status(repo, commit_sha: str, json_output: bool = False):
                 running += 1
                 icon = "⏳"
 
+            duration = format_duration(check.started_at, check.completed_at)
+
             if json_output:
                 result["checks"].append(
                     {
@@ -237,10 +238,24 @@ def check_commit_status(repo, commit_sha: str, json_output: bool = False):
                         "status": check.status,
                         "conclusion": check.conclusion,
                         "url": check.html_url,
+                        "duration": duration,
+                        "started_at": (
+                            check.started_at.isoformat() if check.started_at else None
+                        ),
+                        "completed_at": (
+                            check.completed_at.isoformat()
+                            if check.completed_at
+                            else None
+                        ),
                     }
                 )
             else:
-                print(f"{icon} {check.name}: {check.conclusion or check.status}")
+                print(f"{icon} {check.name}")
+                print(f"   Status: {check.status}")
+                print(f"   Conclusion: {check.conclusion or 'in_progress'}")
+                print(f"   Duration: {duration}")
+                print(f"   URL: {check.html_url}")
+                print()
 
         if json_output:
             result["summary"] = {
