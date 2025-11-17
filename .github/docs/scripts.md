@@ -245,6 +245,26 @@ Check GitHub Actions CI status:
 - JSON output for automation
 - Shows check duration and details
 
+### `pr_ready.py`
+
+Check if PR is ready to merge:
+
+- Verify all CI checks passed
+- Check for merge conflicts
+- Verify PR approvals
+- Check mergeable state
+- Exit code for scripting (0 = ready, 1 = not ready)
+
+### `project_overview.py`
+
+Quick project status snapshot:
+
+- Git status and branch info
+- Test coverage summary
+- Open PRs with CI status
+- Open issues
+- Quick command reference
+
 ## 🎯 Common Patterns
 
 ### For Cursor Agent
@@ -291,6 +311,12 @@ python3 .github/workflows/scripts/create_pr.py \
 ```bash
 # Check if PR is ready to merge
 python3 .github/workflows/scripts/check_ci.py --pr 5
+
+# Check PR readiness (all checks)
+python3 .github/workflows/scripts/pr_ready.py --pr 5
+
+# Project overview
+python3 .github/workflows/scripts/project_overview.py
 ```
 
 ### For Automation
