@@ -1,0 +1,93 @@
+name: Publish to PyPI
+
+# Trigger on new releases or manual dispatch
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Publish to"
+        required: true
+        default: "testpypi"
+        type: choice
+        options:
+          - testpypi
+          - pypi
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    name: Build and Publish
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.event_name == 'workflow_dispatch' && inputs.environment || 'pypi' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install build dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install build twine
+
+      - name: Run tests
+        run: |
+          pip install -e ".[dev]"
+          pytest --cov=telegram_bot_stack --cov-report=term
+
+      - name: Build package
+        run: |
+          python -m build
+          twine check dist/*
+
+      - name: Publish to Test PyPI
+        if: github.event_name == 'workflow_dispatch' && inputs.environment == 'testpypi'
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+          password: ${{ secrets.TEST_PYPI_API_TOKEN }}
+          skip-existing: true
+
+      - name: Publish to PyPI
+        if: github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.environment == 'pypi')
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          password: ${{ secrets.PYPI_API_TOKEN }}
+          skip-existing: true
+
+      - name: Publication Summary
+        if: always()
+        run: |
+          echo "## 📦 PyPI Publication Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ job.status }}" == "success" ]; then
+            PACKAGE_VERSION=$(grep '^version = ' pyproject.toml | sed 's/version = "\(.*\)"/\1/')
+
+            if [ "${{ github.event_name }}" == "workflow_dispatch" ] && [ "${{ inputs.environment }}" == "testpypi" ]; then
+              echo "✅ **Published to Test PyPI**" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "- **Version:** \`$PACKAGE_VERSION\`" >> $GITHUB_STEP_SUMMARY
+              echo "- **Test Installation:** \`pip install --index-url https://test.pypi.org/simple/ telegram-bot-stack\`" >> $GITHUB_STEP_SUMMARY
+              echo "- **Check:** [Test PyPI Page](https://test.pypi.org/project/telegram-bot-stack/)" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "✅ **Published to Production PyPI**" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "- **Version:** \`$PACKAGE_VERSION\`" >> $GITHUB_STEP_SUMMARY
+              echo "- **Installation:** \`pip install telegram-bot-stack\`" >> $GITHUB_STEP_SUMMARY
+              echo "- **Check:** [PyPI Page](https://pypi.org/project/telegram-bot-stack/)" >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            echo "❌ **Publication failed**" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Check logs for details." >> $GITHUB_STEP_SUMMARY
+          fi

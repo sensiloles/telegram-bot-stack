@@ -1,5 +1,12 @@
 # Telegram Bot Stack
 
+[![PyPI version](https://img.shields.io/pypi/v/telegram-bot-stack?color=blue)](https://pypi.org/project/telegram-bot-stack/)
+[![Python](https://img.shields.io/pypi/pyversions/telegram-bot-stack)](https://pypi.org/project/telegram-bot-stack/)
+[![License](https://img.shields.io/github/license/sensiloles/telegram-bot-stack)](https://github.com/sensiloles/telegram-bot-stack/blob/main/LICENSE)
+[![Tests](https://img.shields.io/github/actions/workflow/status/sensiloles/telegram-bot-stack/tests.yml?branch=main&label=tests)](https://github.com/sensiloles/telegram-bot-stack/actions/workflows/tests.yml)
+[![Coverage](https://img.shields.io/badge/coverage-84%25-brightgreen)](https://github.com/sensiloles/telegram-bot-stack)
+[![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
+
 A reusable Python framework for building production-ready Telegram bots with minimal code. Includes user management, admin system, storage abstraction, and comprehensive testing infrastructure.
 
 > 🎯 **Example:** The `examples/quit_smoking_bot/` directory contains a complete quit-smoking tracking bot built with this framework.
@@ -71,30 +78,34 @@ python3 .github/workflows/scripts/read_issues.py --list --state open
 
 ### Installation
 
-#### Option 1: Install from GitHub (Recommended)
+#### Option 1: Install from PyPI (Recommended)
 
 ```bash
-# Install latest version directly from GitHub
-pip install git+https://github.com/sensiloles/telegram-bot-stack.git
+# Install the latest stable version
+pip install telegram-bot-stack
 
-# Install specific version
-pip install git+https://github.com/sensiloles/telegram-bot-stack.git@v0.1.0
+# Install with optional dependencies
+pip install telegram-bot-stack[database]  # For future SQL storage
+pip install telegram-bot-stack[all]       # All optional features
 ```
 
-#### Option 2: Install from Source
+#### Option 2: Install from GitHub
+
+```bash
+# Install latest development version
+pip install git+https://github.com/sensiloles/telegram-bot-stack.git
+
+# Install specific version/tag
+pip install git+https://github.com/sensiloles/telegram-bot-stack.git@v1.1.1
+```
+
+#### Option 3: Install from Source (Development)
 
 ```bash
 # Clone and install in development mode
 git clone https://github.com/sensiloles/telegram-bot-stack.git
 cd telegram-bot-stack
-pip install -e .
-```
-
-#### Option 3: PyPI (Coming Soon)
-
-```bash
-# Will be available after public release
-pip install telegram-bot-stack
+pip install -e ".[dev]"
 ```
 
 > 📝 **Note:** For private/internal use, see [Private Installation Guide](docs/private_installation.md)
