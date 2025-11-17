@@ -502,6 +502,8 @@ node = find_node(graph, 'telegram_bot_stack.storage.base')
 
 ## 📈 Future Enhancements
 
+> 📋 **See:** [`future-improvements.md`](future-improvements.md) for detailed prioritized roadmap with implementation plans, ROI analysis, and concrete examples.
+
 ### Planned Features
 
 1. **Visualization** (Next Phase):
