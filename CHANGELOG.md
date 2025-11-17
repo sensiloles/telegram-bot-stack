@@ -2,6 +2,19 @@
 
 <!-- version list -->
 
+## v1.1.0 (2025-11-17)
+
+### Features
+
+- **workflow**: Simplify PR merge process with one-command automation
+  ([`b8ea2db`](https://github.com/sensiloles/telegram-bot-stack/commit/b8ea2db8df61f4c01f05fa24f4857dd3f537fe1d))
+
+### Testing
+
+- **storage**: Enable all skipped tests and increase coverage to 83.91%
+  ([`3acecfb`](https://github.com/sensiloles/telegram-bot-stack/commit/3acecfbaaf7a8ba361d67b0cab1890a6d34c0805))
+
+
 ## v1.0.0 (2025-11-17)
 
 ### Bug Fixes
