@@ -85,6 +85,43 @@ python3 .github/workflows/scripts/create_pr.py \
 - ✅ Supports draft PRs
 - ✅ Dry-run mode for preview
 
+### Check CI Status
+
+```bash
+# Check PR CI status
+python3 .github/workflows/scripts/check_ci.py --pr 5
+
+# Check specific commit
+python3 .github/workflows/scripts/check_ci.py --commit abc123
+
+# Check latest commit on branch
+python3 .github/workflows/scripts/check_ci.py --branch main
+
+# List recent open PRs with CI status
+python3 .github/workflows/scripts/check_ci.py --list-prs
+
+# List all PRs (open and closed)
+python3 .github/workflows/scripts/check_ci.py --list-prs --state all
+
+# JSON output (for automation)
+python3 .github/workflows/scripts/check_ci.py --pr 5 --json
+```
+
+**Features:**
+
+- ✅ Check CI status for PRs
+- ✅ Check CI status for commits
+- ✅ Check CI status for branches
+- ✅ List recent PRs with status
+- ✅ JSON output for automation
+- ✅ Shows check duration
+- ✅ Exit code 1 if checks failing
+
+**Requirements:**
+
+- Classic token with `repo` scope (for check runs access)
+- Or fine-grained token with `Commit statuses: Read` permission
+
 ## 📚 Module: `github_helper.py`
 
 Unified GitHub API helper for all scripts.
@@ -197,6 +234,17 @@ Create GitHub Pull Requests:
 - Supports draft PRs
 - Custom base branch support
 
+### `check_ci.py`
+
+Check GitHub Actions CI status:
+
+- Check CI status for Pull Requests
+- Check CI status for specific commits
+- Check CI status for branches
+- List recent PRs with CI status
+- JSON output for automation
+- Shows check duration and details
+
 ## 🎯 Common Patterns
 
 ### For Cursor Agent
@@ -234,8 +282,15 @@ python3 .github/workflows/scripts/create_issue.py \
 ```bash
 # After committing and pushing feature branch
 python3 .github/workflows/scripts/create_pr.py \
-    --title "feat(storage): add Redis backend" \
-    --closes 42
+--title "feat(storage): add Redis backend" \
+--closes 42
+```
+
+**Check CI Status:**
+
+```bash
+# Check if PR is ready to merge
+python3 .github/workflows/scripts/check_ci.py --pr 5
 ```
 
 ### For Automation

@@ -184,6 +184,7 @@ omit = [
 "*/__pycache__/*",
 "*/site-packages/*",
 "*/examples/*",
+"*/.github/*",
 ]
 
 [tool.coverage.report]
@@ -196,6 +197,8 @@ exclude_lines = [
 "if TYPE_CHECKING:",
 "@abstractmethod",
 ]
+fail_under = 79
+precision = 2
 
 [tool.commitizen]
 name = "cz_conventional_commits"
