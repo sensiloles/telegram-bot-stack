@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.1.1 (2025-11-17)
+
+### Bug Fixes
+
+- **scripts**: Correct PR auto-assignment to use proper GitHub client
+  ([`1e9de4a`](https://github.com/sensiloles/telegram-bot-stack/commit/1e9de4aadfc4bbec2b9f66a6e9e29a002675a97e))
+
+
 ## v1.1.0 (2025-11-17)
 
 ### Features
