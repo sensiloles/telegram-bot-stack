@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.4.0 (2025-11-17)
+
+### Features
+
+- **scripts**: Auto-delete remote branch on merge with --cleanup
+  ([`0c0fd7e`](https://github.com/sensiloles/telegram-bot-stack/commit/0c0fd7efc7254bad71252e75787f6d6feca12a6e))
+
+
 ## v1.3.0 (2025-11-17)
 
 ### Features
