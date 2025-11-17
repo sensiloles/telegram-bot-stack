@@ -43,6 +43,48 @@ python3 .github/workflows/scripts/create_issue.py --title "New feature"
 python3 .github/workflows/scripts/create_issue.py --title "Test" --file issue.md --dry-run
 ```
 
+### Create Pull Request
+
+```bash
+# Auto-detect branch, auto-generate description from commits
+python3 .github/workflows/scripts/create_pr.py \
+    --title "feat(storage): add Redis backend"
+
+# Link to issue (adds "Closes #42" automatically)
+python3 .github/workflows/scripts/create_pr.py \
+    --title "fix(auth): resolve token validation" \
+    --closes 42
+
+# Custom description from file
+python3 .github/workflows/scripts/create_pr.py \
+    --title "feat(bot): add webhooks" \
+    --file pr_description.md
+
+# Draft PR (for work in progress)
+python3 .github/workflows/scripts/create_pr.py \
+    --title "feat(api): WIP new endpoint" \
+    --draft
+
+# Custom base branch (default is 'main')
+python3 .github/workflows/scripts/create_pr.py \
+    --title "feat: feature" \
+    --base develop
+
+# Dry run (preview PR without creating)
+python3 .github/workflows/scripts/create_pr.py \
+    --title "feat: test" \
+    --dry-run
+```
+
+**Features:**
+
+- ✅ Auto-detects current branch
+- ✅ Validates conventional commit format
+- ✅ Auto-generates description from commits
+- ✅ Links issues with `--closes N`
+- ✅ Supports draft PRs
+- ✅ Dry-run mode for preview
+
 ## 📚 Module: `github_helper.py`
 
 Unified GitHub API helper for all scripts.
@@ -144,6 +186,17 @@ Create GitHub issues:
 - Dry-run mode to preview
 - Interactive mode
 
+### `create_pr.py`
+
+Create GitHub Pull Requests:
+
+- Auto-detects current branch
+- Validates conventional commit format
+- Auto-generates description from commits
+- Links to issues automatically
+- Supports draft PRs
+- Custom base branch support
+
 ## 🎯 Common Patterns
 
 ### For Cursor Agent
@@ -174,6 +227,15 @@ python3 .github/workflows/scripts/create_issue.py \
     --title "[Phase] Phase 1.1: Component Name" \
     --file /tmp/issue_content.md \
     --labels "phase-1,enhancement"
+```
+
+**Create Pull Request:**
+
+```bash
+# After committing and pushing feature branch
+python3 .github/workflows/scripts/create_pr.py \
+    --title "feat(storage): add Redis backend" \
+    --closes 42
 ```
 
 ### For Automation

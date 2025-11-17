@@ -89,12 +89,25 @@ git checkout -b docs/<doc-name>
 git push origin feature/<name>
 ```
 
-**Rule 6: Inform user about PR**
-- Tell user PR needs to be created
-- Provide branch name
-- Mention what was done
-- **Include issue reference if working on an issue** (e.g., "Closes #42")
-- Don't try to create PR via API (user should review)
+**Rule 6: Create PR automatically (PREFERRED)**
+
+**Method:** Use automation script after push
+```bash
+# Push changes first
+git push origin feature/<name>
+
+# Then create PR automatically
+python3 .github/workflows/scripts/create_pr.py \
+--title "type(scope): description" \
+--closes N                                       # if working on issue
+```
+
+**Benefits:**
+- ✅ Validates conventional format automatically
+- ✅ Auto-generates description from commits
+- ✅ Links to issue with --closes N
+- ✅ Creates PR instantly (no manual steps)
+- ✅ Notifies user with PR URL
 
 ### Conventional Commits (REQUIRED!)
 
@@ -139,10 +152,12 @@ Is this maintenance/chores?
 ├─ YES → Use `chore:` commit type → No bump
 ├─ NO → Use best judgment
 ↓
-COMMIT → PUSH → INFORM USER ABOUT PR
+COMMIT → PUSH → CREATE PR AUTOMATICALLY
 ```
 
-### GitHub Issues (Use Scripts)
+### GitHub Issues & PRs (Use Scripts)
+
+**Issues:**
 ```bash
 # List open issues
 python3 .github/workflows/scripts/read_issues.py --list
@@ -155,14 +170,27 @@ python3 .github/workflows/scripts/create_issue.py \
 --title "Bug: Fix issue" \
 --file /tmp/issue.md \
 --labels bug,priority:high
-
-# Programmatic (Python)
-from github_helper import get_repo
-repo = get_repo()                                                # Auto-detects from git
-issue = repo.create_issue(title="...", body="...", labels=[...])
 ```
 
-**See:** `.github/workflows/scripts/README.md` for complete guide.
+**Pull Requests (AUTOMATED! 🎉):**
+```bash
+# Auto-create PR (preferred method)
+python3 .github/workflows/scripts/create_pr.py \
+--title "feat(storage): add Redis backend" \
+--closes 42
+
+# Draft PR (WIP)
+python3 .github/workflows/scripts/create_pr.py \
+--title "feat: WIP feature" \
+--draft
+
+# Preview before creating
+python3 .github/workflows/scripts/create_pr.py \
+--title "feat: feature" \
+--dry-run
+```
+
+**See:** `.github/workflows/scripts/README.md` and `.github/PR_AUTOMATION.md` for complete guides.
 
 ### Testing
 ```bash
@@ -273,28 +301,39 @@ tests/
 - "Should I commit feature A before starting feature B?"
 - "Should I create separate branches for each feature?"
 
-### When to Push and Inform
+### When to Push and Create PR
 
-**Push after:**
+**Push and auto-create PR after:**
 - Completing a logical unit of work
 - User asks to "commit" or "save"
 - Completing issue checklist item
 - Before switching to different task
 
-**Inform user that PR is needed:**
+**Workflow:**
+```bash
+# 1. Push changes
+git push origin feature/xyz
+
+# 2. Auto-create PR with script
+python3 .github/workflows/scripts/create_pr.py \
+--title "type(scope): description" \
+--closes N                                       # if working on issue
+```
+
+**Notify user with success message:**
 ```
 ✅ Changes committed to branch `feature/xyz`
 📝 Pushed to origin/feature/xyz
-🔄 Next: Create Pull Request on GitHub
-- Branch: feature/xyz → main
-- PR Title: Use conventional format "type(scope): description"
-Example: "feat(storage): add Redis backend"
-Example: "docs(workflow): add Git Flow rules"
-- In PR description: Add "Closes #N" (if working on issue)
-- All CI checks will run automatically
-- Requires 1 approval before merge
-- Automatic release after merge
-- Issue                                                        #N will auto-close on merge
+🤖 Pull Request created automatically!
+Number:                                       #10
+URL: https://github.com/owner/repo/pull/10
+
+Details:
+- Title: type(scope): description
+- Issue:                            #N (auto-closes on merge)
+- CI checks: Running automatically
+- Status: Ready for review
+- Release: Will trigger after merge
 ```
 
 ### Emergency: If on main branch
@@ -322,7 +361,7 @@ git push origin feature/emergency-branch-name
 1. **NEVER `git push origin main`** - Will fail due to branch protection
 2. **ALWAYS check branch** before making changes
 3. **ALWAYS use conventional commits** - Enables auto-versioning
-4. **INFORM user about PR** - Don't auto-create PRs
+4. **AUTO-CREATE PRs** - Use `create_pr.py` script (preferred method)
 5. **BATCH commits** - One commit per logical unit, not per file
 6. **UPDATE docs** before committing code changes
 7. **RUN tests** before pushing (if applicable)
