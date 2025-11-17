@@ -124,7 +124,7 @@ python3 .github/workflows/scripts/create_pr.py \
 # One-command merge (auto-detects PR, merges, switches to main, pulls)
 python3 .github/workflows/scripts/merge_pr.py
 
-# With cleanup (also deletes local feature branch)
+# With cleanup (deletes both local and remote feature branches)
 python3 .github/workflows/scripts/merge_pr.py --cleanup
 ```
 
@@ -133,7 +133,7 @@ python3 .github/workflows/scripts/merge_pr.py --cleanup
 2. ✅ Merges PR with squash (clean history)
 3. ✅ Switches to main branch
 4. ✅ Pulls latest changes
-5. ✅ Optionally deletes feature branch (with --cleanup)
+5. ✅ Optionally deletes local AND remote branches (with --cleanup)
 6. ✅ Shows release status info
 
 **Other options:**
@@ -416,11 +416,12 @@ python3 .github/workflows/scripts/merge_pr.py
 2. Merges with squash method
 3. Switches to main branch
 4. Pulls latest changes
-5. Shows release status
+5. Optionally deletes branches (with --cleanup)
+6. Shows release status
 
 **With cleanup:**
 ```bash
-# Also deletes local feature branch
+# Deletes both local and remote feature branches
 python3 .github/workflows/scripts/merge_pr.py --cleanup
 ```
 

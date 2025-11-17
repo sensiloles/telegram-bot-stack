@@ -5,7 +5,7 @@ Features:
 - Auto-detect PR from current branch
 - Merge with squash strategy by default
 - Auto-switch to main and pull after merge
-- Optionally delete local feature branch
+- Optionally delete local AND remote feature branches
 - Show release status
 
 Usage:
@@ -15,7 +15,7 @@ Usage:
     # Merge specific PR
     python merge_pr.py --pr 42
 
-    # Merge and cleanup local branch
+    # Merge and cleanup both local and remote branches
     python merge_pr.py --cleanup
 
     # Dry run
@@ -81,10 +81,57 @@ def delete_local_branch(branch: str) -> bool:
     try:
         print(f"\n🗑️  Deleting local branch '{branch}'...")
         subprocess.run(["git", "branch", "-D", branch], check=True, capture_output=True)
-        print(f"✅ Branch '{branch}' deleted")
+        print(f"✅ Local branch '{branch}' deleted")
         return True
     except subprocess.CalledProcessError as e:
-        print(f"⚠️  Could not delete branch: {e}")
+        print(f"⚠️  Could not delete local branch: {e}")
+        return False
+
+
+def delete_remote_branch(repo, branch: str) -> bool:
+    """Delete remote branch on GitHub.
+
+    Args:
+        repo: GitHub repository object
+        branch: Branch name to delete (without 'refs/heads/' prefix)
+
+    Returns:
+        True if deleted successfully or already deleted, False on error
+    """
+    try:
+        print(f"🗑️  Deleting remote branch 'origin/{branch}'...")
+
+        # Try to get the ref - if it doesn't exist, it's already deleted
+        try:
+            ref = repo.get_git_ref(f"heads/{branch}")
+            ref.delete()
+            print(f"✅ Remote branch 'origin/{branch}' deleted")
+
+            # Clean up local references to deleted remote branch
+            try:
+                subprocess.run(
+                    ["git", "remote", "prune", "origin"],
+                    check=True,
+                    capture_output=True,
+                )
+                print("✅ Cleaned up remote references")
+            except subprocess.CalledProcessError:
+                pass  # Not critical if this fails
+
+            return True
+        except GithubException as e:
+            if e.status == 404:
+                print("ℹ️  Remote branch already deleted (not found)")
+                return True
+            raise
+
+    except GithubException as e:
+        print(
+            f"⚠️  Could not delete remote branch: {e.status} {e.data.get('message', '')}"
+        )
+        return False
+    except Exception as e:
+        print(f"⚠️  Unexpected error deleting remote branch: {e}")
         return False
 
 
@@ -184,7 +231,7 @@ Examples:
   # Merge current branch's PR (auto-detect everything)
   python merge_pr.py
 
-  # Merge and cleanup local branch
+  # Merge and cleanup both local and remote branches
   python merge_pr.py --cleanup
 
   # Merge specific PR number
@@ -220,7 +267,7 @@ Examples:
     parser.add_argument(
         "--cleanup",
         action="store_true",
-        help="Delete local feature branch after merge",
+        help="Delete both local and remote feature branches after merge",
     )
     parser.add_argument(
         "--no-switch",
@@ -293,8 +340,11 @@ Examples:
             if not git_checkout_and_pull("main"):
                 print("⚠️  Warning: Could not switch to main, but PR was merged")
 
-        # Cleanup local branch
+        # Cleanup branches
         if args.cleanup and feature_branch:
+            # Delete remote branch on GitHub
+            delete_remote_branch(repo, feature_branch)
+            # Delete local branch
             delete_local_branch(feature_branch)
 
         print("\n" + "=" * 60)
