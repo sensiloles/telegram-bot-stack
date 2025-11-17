@@ -1,0 +1,109 @@
+name: Auto Merge PR
+
+# Automatically merge PR after CI passes
+on:
+  pull_request:
+    types:
+      - labeled
+      - unlabeled
+      - synchronize
+      - opened
+      - edited
+      - ready_for_review
+      - reopened
+  pull_request_review:
+    types:
+      - submitted
+  check_suite:
+    types:
+      - completed
+  status: {}
+
+permissions:
+  contents: write
+  pull-requests: write
+  checks: read
+
+jobs:
+  auto-merge:
+    name: Auto Merge PR
+    runs-on: ubuntu-latest
+
+    # Only run on PRs, not on direct pushes
+    if: github.event_name == 'pull_request' || github.event_name == 'pull_request_review'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install PyGithub
+
+      - name: Check if auto-merge enabled
+        id: check_automerge
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python3 .github/workflows/scripts/check_automerge.py \
+            --pr ${{ github.event.pull_request.number }}
+
+      - name: Wait for CI checks
+        if: steps.check_automerge.outputs.automerge_enabled == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "⏳ Waiting for CI checks to complete..."
+          python3 .github/workflows/scripts/wait_for_checks.py \
+            --pr ${{ github.event.pull_request.number }} \
+            --timeout 1800
+
+      - name: Analyze PR type
+        if: steps.check_automerge.outputs.automerge_enabled == 'true'
+        id: analyze_pr
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python3 .github/workflows/scripts/analyze_pr.py \
+            --pr ${{ github.event.pull_request.number }}
+
+      - name: Merge PR
+        if: steps.check_automerge.outputs.automerge_enabled == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_TYPE: ${{ steps.analyze_pr.outputs.pr_type }}
+          WILL_RELEASE: ${{ steps.analyze_pr.outputs.will_release }}
+        run: |
+          python3 .github/workflows/scripts/merge_pr.py \
+            --pr $PR_NUMBER \
+            --type $PR_TYPE \
+            --release $WILL_RELEASE
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## 🔀 Auto-Merge Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ steps.check_automerge.outputs.automerge_enabled }}" == "true" ]; then
+            echo "✅ **Auto-merge enabled**" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "- **PR Type:** ${{ steps.analyze_pr.outputs.pr_type }}" >> $GITHUB_STEP_SUMMARY
+            echo "- **Will Trigger Release:** ${{ steps.analyze_pr.outputs.will_release }}" >> $GITHUB_STEP_SUMMARY
+            echo "- **Merge Strategy:** ${{ steps.analyze_pr.outputs.merge_strategy }}" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "ℹ️ **Auto-merge not enabled**" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Add \`automerge\` label to enable automatic merge." >> $GITHUB_STEP_SUMMARY
+          fi
