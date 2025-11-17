@@ -1,10 +1,91 @@
 #!/usr/bin/env python3
-"""Merge a PR with appropriate strategy."""
+"""Merge a PR with appropriate strategy and auto-cleanup.
+
+Features:
+- Auto-detect PR from current branch
+- Merge with squash strategy by default
+- Auto-switch to main and pull after merge
+- Optionally delete local feature branch
+- Show release status
+
+Usage:
+    # Merge current branch's PR (auto-detect)
+    python merge_pr.py
+
+    # Merge specific PR
+    python merge_pr.py --pr 42
+
+    # Merge and cleanup local branch
+    python merge_pr.py --cleanup
+
+    # Dry run
+    python merge_pr.py --dry-run
+"""
 
 import argparse
+import subprocess
 import sys
+from typing import Optional
 
 from github_helper import GithubException, get_repo
+
+
+def get_current_branch() -> Optional[str]:
+    """Get current git branch name."""
+    try:
+        result = subprocess.run(
+            ["git", "branch", "--show-current"],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        branch = result.stdout.strip()
+        return branch if branch else None
+    except subprocess.CalledProcessError:
+        return None
+
+
+def find_pr_by_branch(repo, branch: str) -> Optional[int]:
+    """Find open PR for given branch."""
+    try:
+        # Get repository owner from repo full_name
+        owner = repo.full_name.split("/")[0]
+        pulls = repo.get_pulls(state="open", head=f"{owner}:{branch}")
+        pulls_list = list(pulls)
+        if pulls_list:
+            return pulls_list[0].number
+        return None
+    except Exception as e:
+        print(f"⚠️  Warning: Could not find PR for branch '{branch}': {e}")
+        return None
+
+
+def git_checkout_and_pull(branch: str = "main") -> bool:
+    """Checkout branch and pull latest changes."""
+    try:
+        print(f"\n🔄 Switching to {branch} branch...")
+        subprocess.run(["git", "checkout", branch], check=True, capture_output=True)
+
+        print("📥 Pulling latest changes...")
+        subprocess.run(["git", "pull"], check=True, capture_output=True)
+
+        print(f"✅ Now on {branch} branch with latest changes")
+        return True
+    except subprocess.CalledProcessError as e:
+        print(f"❌ Git operation failed: {e}")
+        return False
+
+
+def delete_local_branch(branch: str) -> bool:
+    """Delete local git branch."""
+    try:
+        print(f"\n🗑️  Deleting local branch '{branch}'...")
+        subprocess.run(["git", "branch", "-D", branch], check=True, capture_output=True)
+        print(f"✅ Branch '{branch}' deleted")
+        return True
+    except subprocess.CalledProcessError as e:
+        print(f"⚠️  Could not delete branch: {e}")
+        return False
 
 
 def merge_pr(
@@ -96,24 +177,55 @@ def merge_pr(
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Merge a PR")
-    parser.add_argument("--pr", type=int, required=True, help="PR number")
+    parser = argparse.ArgumentParser(
+        description="Merge a PR with auto-detection and cleanup",
+        epilog="""
+Examples:
+  # Merge current branch's PR (auto-detect everything)
+  python merge_pr.py
+
+  # Merge and cleanup local branch
+  python merge_pr.py --cleanup
+
+  # Merge specific PR number
+  python merge_pr.py --pr 42
+
+  # Dry run to see what would happen
+  python merge_pr.py --dry-run
+        """,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    parser.add_argument(
+        "--pr",
+        type=int,
+        help="PR number (auto-detected from current branch if not specified)",
+    )
     parser.add_argument(
         "--type",
         choices=["release", "non-release"],
         default="release",
-        help="PR type",
+        help="PR type (default: release)",
     )
     parser.add_argument(
         "--release",
         type=lambda x: x.lower() == "true",
         default=True,
-        help="Will trigger release (true/false)",
+        help="Will trigger release (true/false, default: true)",
     )
     parser.add_argument(
         "--method",
         choices=["merge", "squash", "rebase"],
-        help="Force specific merge method",
+        help="Force specific merge method (default: squash)",
+    )
+    parser.add_argument(
+        "--cleanup",
+        action="store_true",
+        help="Delete local feature branch after merge",
+    )
+    parser.add_argument(
+        "--no-switch",
+        action="store_true",
+        help="Don't switch to main after merge",
     )
     parser.add_argument(
         "--dry-run",
@@ -122,25 +234,88 @@ def main():
     )
     args = parser.parse_args()
 
-    if args.dry_run:
-        print("🔍 DRY RUN MODE - No actual merge will occur\n")
-        # Still analyze but don't merge
-        repo = get_repo()
-        pr = repo.get_pull(args.pr)
-        print(f"Would merge PR #{args.pr}: {pr.title}")
-        print(f"Method: {args.method or ('squash' if args.release else 'merge')}")
-        sys.exit(0)
-
     try:
+        repo = get_repo()
+        current_branch = get_current_branch()
+
+        # Auto-detect PR number if not provided
+        if args.pr is None:
+            if not current_branch:
+                print("❌ Error: Could not detect current branch")
+                print("Please specify PR number with --pr")
+                sys.exit(1)
+
+            if current_branch == "main":
+                print("❌ Error: Already on main branch")
+                print("Please specify PR number with --pr or checkout a feature branch")
+                sys.exit(1)
+
+            print(f"🔍 Auto-detecting PR for branch: {current_branch}")
+            pr_number = find_pr_by_branch(repo, current_branch)
+
+            if pr_number is None:
+                print(f"❌ Error: No open PR found for branch '{current_branch}'")
+                print("Please specify PR number with --pr")
+                sys.exit(1)
+
+            print(f"✅ Found PR #{pr_number}")
+        else:
+            pr_number = args.pr
+
+        # Get PR details
+        pr = repo.get_pull(pr_number)
+        feature_branch = pr.head.ref
+
+        if args.dry_run:
+            print("\n🔍 DRY RUN MODE - No actual changes will be made\n")
+            print(f"Would merge PR #{pr_number}: {pr.title}")
+            print(f"Method: {args.method or 'squash'}")
+            print(f"Feature branch: {feature_branch}")
+            if not args.no_switch:
+                print("Would switch to main and pull")
+            if args.cleanup:
+                print(f"Would delete local branch: {feature_branch}")
+            sys.exit(0)
+
+        # Merge PR
         success = merge_pr(
-            args.pr,
+            pr_number,
             pr_type=args.type,
             will_release=args.release,
             merge_method=args.method,
         )
-        sys.exit(0 if success else 1)
+
+        if not success:
+            sys.exit(1)
+
+        # Auto-switch to main and pull
+        if not args.no_switch:
+            if not git_checkout_and_pull("main"):
+                print("⚠️  Warning: Could not switch to main, but PR was merged")
+
+        # Cleanup local branch
+        if args.cleanup and feature_branch:
+            delete_local_branch(feature_branch)
+
+        print("\n" + "=" * 60)
+        print("✅ Merge completed successfully!")
+        print("=" * 60)
+
+        if args.release:
+            print("\n💡 Tip: Check release status at:")
+            print(f"   {repo.html_url}/actions")
+            print("   New version will be tagged automatically")
+
+        sys.exit(0)
+
+    except KeyboardInterrupt:
+        print("\n⚠️  Interrupted by user")
+        sys.exit(130)
     except Exception as e:
         print(f"❌ Error: {e}", file=sys.stderr)
+        import traceback
+
+        traceback.print_exc()
         sys.exit(1)
 
 

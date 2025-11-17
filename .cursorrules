@@ -112,6 +112,47 @@ python3 .github/workflows/scripts/create_pr.py \
 - ✅ Links to issue with --closes N
 - ✅ Creates PR instantly (no manual steps)
 - ✅ Notifies user with PR URL
+- ✅ Auto-assigns PR to you
+
+**Rule 7: Merge PR (ONE COMMAND!)**
+
+**⚡ SIMPLIFIED MERGE - Use this method!**
+
+```bash
+# One-command merge (auto-detects PR, merges, switches to main, pulls)
+python3 .github/workflows/scripts/merge_pr.py
+
+# With cleanup (also deletes local feature branch)
+python3 .github/workflows/scripts/merge_pr.py --cleanup
+```
+
+**What it does automatically:**
+1. ✅ Detects PR number from current branch
+2. ✅ Merges PR with squash (clean history)
+3. ✅ Switches to main branch
+4. ✅ Pulls latest changes
+5. ✅ Optionally deletes feature branch (with --cleanup)
+6. ✅ Shows release status info
+
+**Other options:**
+```bash
+# Merge specific PR number
+python3 .github/workflows/scripts/merge_pr.py --pr 42
+
+# Dry run (preview what would happen)
+python3 .github/workflows/scripts/merge_pr.py --dry-run
+
+# Merge without switching to main
+python3 .github/workflows/scripts/merge_pr.py --no-switch
+```
+
+**OLD COMPLEX WAY (DON'T USE):**
+- ❌ Finding PR number manually
+- ❌ Multiple git commands
+- ❌ Checking release status separately
+- ⚠️ Too many steps, error-prone
+
+**USE THE NEW WAY:** Just run `merge_pr.py` and everything happens automatically! 🎉
 
 ### Conventional Commits (REQUIRED!)
 
@@ -340,8 +381,51 @@ Details:
 - Issue:                            #N (auto-closes on merge)
 - CI checks: Running automatically
 - Status: Ready for review
+- Assignee: Auto-assigned to you
 - Release: Will trigger after merge
 ```
+
+### When to Merge PR (SIMPLIFIED!)
+
+**Merge PR when:**
+- User says "merge", "давай мерджить", "merge it"
+- Work is complete and ready for release
+- All CI checks passed (script will check)
+
+**⚡ ONE COMMAND MERGE:**
+```bash
+# Just run this (auto-detects everything)
+python3 .github/workflows/scripts/merge_pr.py
+```
+
+**What happens automatically:**
+1. Finds PR for current branch
+2. Merges with squash method
+3. Switches to main branch
+4. Pulls latest changes
+5. Shows release status
+
+**With cleanup:**
+```bash
+# Also deletes local feature branch
+python3 .github/workflows/scripts/merge_pr.py --cleanup
+```
+
+**Notify user with:**
+```
+✅ PR                                             #X merged successfully!
+🔄 Switched to main branch
+📥 Pulled latest changes
+🚀 Release workflow started automatically
+💡 Tip: New version will be tagged automatically
+```
+
+**DON'T:**
+- ❌ Manually find PR number
+- ❌ Use multiple git commands
+- ❌ Manually switch branches
+- ❌ Check release status with API calls
+- ⚠️ The script does all of this automatically!
 
 ### Emergency: If on main branch
 
@@ -368,10 +452,17 @@ git push -u origin feature/emergency-branch-name
 1. **NEVER push to `main`** - Will fail due to branch protection
 2. **ALWAYS check branch** before making changes
 3. **ALWAYS use conventional commits** - Enables auto-versioning
-4. **AUTO-CREATE PRs** - Use `create_pr.py` script (preferred method)
-5. **BATCH commits** - One commit per logical unit, not per file
-6. **UPDATE docs** before committing code changes
-7. **RUN tests** before pushing (if applicable)
+4. **AUTO-CREATE PRs** - Use `create_pr.py` script (auto-assigns to you)
+5. **ONE-COMMAND MERGE** - Use `merge_pr.py` (auto-detects PR, switches to main)
+6. **BATCH commits** - One commit per logical unit, not per file
+7. **UPDATE docs** before committing code changes
+8. **RUN tests** before pushing (if applicable)
+
+**Quick Merge Command:**
+```bash
+python3 .github/workflows/scripts/merge_pr.py
+```
+This ONE command does everything: find PR, merge, switch to main, pull!
 
 ## 📋 Detailed Rules (Reference)
 
