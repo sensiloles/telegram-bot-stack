@@ -26,16 +26,16 @@ class TestStorage:
         assert storage_dir.is_dir()
         assert storage.base_dir == storage_dir
 
-    @pytest.mark.skip(reason="File system specific test")
-    def test_save_creates_file(self, temp_storage: MemoryStorage):
+    def test_save_creates_file(self, tmp_path: Path):
         """Test that save() creates a new file."""
+        storage = JSONStorage(tmp_path)
         key = "test_data"
         data = {"name": "test", "value": 42}
 
-        result = temp_storage.save(key, data)
+        result = storage.save(key, data)
 
         assert result is True
-        filepath = temp_storage._get_filepath(key)
+        filepath = storage._get_filepath(key)
         assert filepath.exists()
 
     def test_save_and_load(self, temp_storage: MemoryStorage):
@@ -103,16 +103,16 @@ class TestStorage:
         result = temp_storage.delete("nonexistent")
         assert result is False
 
-    @pytest.mark.skip(reason="File system specific test")
-    def test_get_filepath_adds_json_extension(self, temp_storage: MemoryStorage):
+    def test_get_filepath_adds_json_extension(self, tmp_path: Path):
         """Test that _get_filepath adds .json extension if missing."""
-        filepath = temp_storage._get_filepath("test_key")
+        storage = JSONStorage(tmp_path)
+        filepath = storage._get_filepath("test_key")
         assert filepath.name == "test_key.json"
 
-    @pytest.mark.skip(reason="File system specific test")
-    def test_get_filepath_preserves_json_extension(self, temp_storage: MemoryStorage):
+    def test_get_filepath_preserves_json_extension(self, tmp_path: Path):
         """Test that _get_filepath doesn't double-add .json extension."""
-        filepath = temp_storage._get_filepath("test_key.json")
+        storage = JSONStorage(tmp_path)
+        filepath = storage._get_filepath("test_key.json")
         assert filepath.name == "test_key.json"
         assert not filepath.name.endswith(".json.json")
 
@@ -179,19 +179,19 @@ class TestStorage:
         assert temp_storage.load("key2") == data2
         assert temp_storage.load("key3") == data3
 
-    @pytest.mark.skip(reason="File system specific test")
-    def test_filepath_in_base_dir(self, temp_storage: MemoryStorage):
+    def test_filepath_in_base_dir(self, tmp_path: Path):
         """Test that generated filepath is within base directory."""
-        filepath = temp_storage._get_filepath("test")
-        assert filepath.parent == temp_storage.base_dir
+        storage = JSONStorage(tmp_path)
+        filepath = storage._get_filepath("test")
+        assert filepath.parent == storage.base_dir
 
-    @pytest.mark.skip(reason="File system specific test")
-    def test_json_formatting(self, temp_storage: MemoryStorage):
+    def test_json_formatting(self, tmp_path: Path):
         """Test that saved JSON is properly formatted."""
+        storage = JSONStorage(tmp_path)
         data = {"a": 1, "b": 2}
-        temp_storage.save("formatted", data)
+        storage.save("formatted", data)
 
-        filepath = temp_storage._get_filepath("formatted")
+        filepath = storage._get_filepath("formatted")
         with open(filepath) as f:
             content = f.read()
 
@@ -199,18 +199,17 @@ class TestStorage:
         assert "\n" in content
         assert "  " in content  # Check for indentation
 
-    @pytest.mark.skip(reason="File system specific test")
     def test_persistence_across_instances(self, tmp_path: Path):
         """Test that data persists across Storage instances."""
         key = "persistent"
         data = {"persist": True}
 
         # First instance - save data
-        storage1 = MemoryStorage()
+        storage1 = JSONStorage(tmp_path)
         storage1.save(key, data)
 
         # Second instance - load data
-        storage2 = MemoryStorage()
+        storage2 = JSONStorage(tmp_path)
         loaded = storage2.load(key)
 
         assert loaded == data
@@ -226,9 +225,9 @@ class TestStorage:
         assert temp_storage.exists("key2") is True
         assert temp_storage.load("key2") == {"value": 2}
 
-    @pytest.mark.skip(reason="File system specific test")
-    def test_save_with_permission_error(self, temp_storage: MemoryStorage, monkeypatch):
+    def test_save_with_permission_error(self, tmp_path: Path, monkeypatch):
         """Test save handles permission errors gracefully."""
+        storage = JSONStorage(tmp_path)
         import builtins
 
         original_open = builtins.open
@@ -240,29 +239,27 @@ class TestStorage:
 
         monkeypatch.setattr("builtins.open", mock_open)
 
-        result = temp_storage.save("test", {"data": "value"})
+        result = storage.save("test", {"data": "value"})
         assert result is False
 
-    @pytest.mark.skip(reason="File system specific test")
-    def test_load_with_json_decode_error(self, temp_storage: MemoryStorage):
+    def test_load_with_json_decode_error(self, tmp_path: Path):
         """Test load handles corrupted JSON files."""
+        storage = JSONStorage(tmp_path)
         key = "corrupted"
-        filepath = temp_storage._get_filepath(key)
+        filepath = storage._get_filepath(key)
 
         # Create corrupted JSON file
         with open(filepath, "w") as f:
             f.write("{ invalid json }")
 
-        result = temp_storage.load(key, default={"default": True})
+        result = storage.load(key, default={"default": True})
         assert result == {"default": True}
 
-    @pytest.mark.skip(reason="File system specific test")
-    def test_delete_with_permission_error(
-        self, temp_storage: MemoryStorage, monkeypatch
-    ):
+    def test_delete_with_permission_error(self, tmp_path: Path, monkeypatch):
         """Test delete handles permission errors."""
+        storage = JSONStorage(tmp_path)
         key = "test_delete"
-        temp_storage.save(key, {"data": "value"})
+        storage.save(key, {"data": "value"})
 
         import pathlib
 
@@ -273,7 +270,7 @@ class TestStorage:
 
         monkeypatch.setattr(pathlib.Path, "unlink", mock_unlink)
 
-        result = temp_storage.delete(key)
+        result = storage.delete(key)
         assert result is False
 
 
@@ -372,6 +369,64 @@ class TestMemoryStorageBackend:
         assert storage.delete("key") is True
         assert storage.exists("key") is False
         assert storage.load("key") == []
+
+    def test_memory_storage_clear(self):
+        """Test clear method removes all data."""
+        storage = MemoryStorage()
+
+        # Add some data
+        storage.save("key1", {"value": 1})
+        storage.save("key2", {"value": 2})
+        storage.save("key3", {"value": 3})
+
+        assert storage.exists("key1") is True
+        assert storage.exists("key2") is True
+        assert storage.exists("key3") is True
+
+        # Clear all data
+        storage.clear()
+
+        # Verify all data is gone
+        assert storage.exists("key1") is False
+        assert storage.exists("key2") is False
+        assert storage.exists("key3") is False
+
+    def test_memory_storage_save_error_handling(self, monkeypatch):
+        """Test save handles deepcopy errors gracefully."""
+        storage = MemoryStorage()
+
+        # Mock deepcopy to raise an exception
+        def mock_deepcopy(obj):
+            raise RuntimeError("Deepcopy failed")
+
+        import telegram_bot_stack.storage.memory
+
+        monkeypatch.setattr(
+            telegram_bot_stack.storage.memory, "deepcopy", mock_deepcopy
+        )
+
+        result = storage.save("key", {"data": "value"})
+        assert result is False
+
+    def test_memory_storage_load_error_handling(self, monkeypatch):
+        """Test load handles deepcopy errors gracefully."""
+        storage = MemoryStorage()
+
+        # First save some data normally
+        storage._data["key"] = {"data": "value"}
+
+        # Then mock deepcopy to raise an exception
+        def mock_deepcopy(obj):
+            raise RuntimeError("Deepcopy failed")
+
+        import telegram_bot_stack.storage.memory
+
+        monkeypatch.setattr(
+            telegram_bot_stack.storage.memory, "deepcopy", mock_deepcopy
+        )
+
+        result = storage.load("key", default={"fallback": True})
+        assert result == {"fallback": True}
 
 
 class TestJSONStorageBackend:
