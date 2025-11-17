@@ -5,7 +5,7 @@
 ### On Every New Context:
 1. **Read:** `.github/PROJECT_STATUS.md` (current phase, open issues)
 2. **Check:** `python3 .github/workflows/scripts/read_issues.py --list --state open`
-3. **Understand:** Read relevant section of `PACKAGE_CONVERSION_PLAN_RU.md`
+3. **Understand:** Read relevant section of `archive/PACKAGE_CONVERSION_PLAN_RU.md` (if needed)
 4. **Check Git Branch:** Verify not on `main` branch (see Git Workflow below)
 5. **Act:** Follow issue checklist or user request
 
@@ -24,15 +24,16 @@
 ## 🎯 Project Context (Quick Facts)
 
 **Project:** telegram-bot-stack (reusable Telegram bot framework)
-**Current Phase:** Phase 0.3 - Validation & Documentation
+**Current Phase:** Phase 2 - PyPI Publication (Next)
 **Repository:** https://github.com/sensiloles/telegram-bot-stack
-**Master Plan:** `PACKAGE_CONVERSION_PLAN_RU.md` (lines 761-1928)
+**Master Plan:** `archive/PACKAGE_CONVERSION_PLAN_RU.md` (archived)
 
 **Progress:**
-- ✅ Phase 0.1: Extract framework → src/core/
+- ✅ Phase 0.1: Extract framework → telegram_bot_stack/
 - ✅ Phase 0.2: Tests (111 tests, 81% coverage)
-- 🔄 Phase 0.3: Validation & docs (current)
-- ⏳ Phase 1: PyPI package release (next)
+- ✅ Phase 0.3: Validation & docs
+- ✅ Phase 1: PyPI package structure (131 tests, 80% coverage)
+- ⏳ Phase 2: PyPI publication (next)
 
 ## 📚 Quick Navigation
 
@@ -40,7 +41,7 @@
 |------|------|-------|
 | Project status | `.github/PROJECT_STATUS.md` | All |
 | GitHub automation | `.github/workflows/scripts/README.md` | All |
-| Current phase plan | `PACKAGE_CONVERSION_PLAN_RU.md` | 804-847 |
+| Master plan (archived) | `archive/PACKAGE_CONVERSION_PLAN_RU.md` | All |
 | Architecture | `README.md` | 155-250 |
 | Testing guide | `README.md` | 80-154 |
 | Git workflow | This file | 50-80 |
@@ -226,25 +227,28 @@ python3 -m pytest --cov=src/core --cov-report=term
 - Verify instructions work "out of the box"
 
 ### Testing
-- Maintain ≥80% coverage for `src/core/`
+- Maintain ≥79% coverage for `telegram_bot_stack/`
 - Write tests for all new features
 - Use fixtures from `tests/conftest.py`
 
 ## 🗂️ Project Structure
 
 ```
-src/
-├── core/                # Reusable framework (test coverage 81%)
-│ ├── bot_base.py      # Base class with hooks
-│ ├── storage.py       # JSON storage abstraction
+telegram-bot-stack/
+├── telegram_bot_stack/   # PyPI package (coverage 80%)
+│ ├── bot_base.py       # Base class with hooks
+│ ├── storage/          # Storage abstraction layer
+│ │ ├── json.py       # JSON backend
+│ │ └── memory.py     # Memory backend
 │ ├── user_manager.py
 │ └── admin_manager.py
-├── quit_smoking/        # Bot-specific logic
-│ ├── bot.py           # Inherits BotBase
-│ └── ...
+├── examples/             # Example bots
+│ ├── echo_bot/
+│ ├── counter_bot/
+│ └── quit_smoking_bot/
 tests/
-├── core/                # Unit tests (100% for storage/managers)
-└── integration/         # E2E tests
+├── core/                 # Unit tests
+└── integration/          # E2E tests
 ```
 
 ## 💡 Tips for Token Efficiency
