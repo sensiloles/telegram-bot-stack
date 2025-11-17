@@ -296,7 +296,7 @@ telegram-bot-stack/
 **Framework Layer (`telegram_bot_stack/`):**
 
 - Generic, reusable components
-- 100% test coverage for storage/managers
+- Comprehensive test coverage
 - Ready for extraction into PyPI package
 
 **Application Layer (`examples/quit_smoking_bot/`):**
