@@ -40,6 +40,8 @@
 | Need | File | Lines |
 |------|------|-------|
 | Project status | `.github/PROJECT_STATUS.md` | All |
+| Dependency graph | `.project-graph/dependency-graph.json` | All |
+| Graph utilities | `.project-graph/graph_utils.py` | All |
 | GitHub automation | `.github/workflows/scripts/README.md` | All |
 | Master plan (archived) | `archive/PACKAGE_CONVERSION_PLAN_RU.md` | All |
 | Architecture | `README.md` | 155-250 |
@@ -267,6 +269,7 @@ python3 -m pytest --cov=src/core --cov-report=term
 - Describe work in chat, not in documents
 - Keep chat descriptions concise and clear
 - Update docs **BEFORE** committing code
+- **UPDATE dependency graph** when changing `telegram_bot_stack/` structure (see Graph Maintenance below)
 - Keep examples executable
 - Verify instructions work "out of the box"
 
@@ -301,9 +304,11 @@ tests/
 - Use `codebase_search` for understanding
 - Use `grep` for finding specific code
 - Read specific line ranges: `read_file` with offset/limit
+- **Use dependency graph** for understanding module relationships
 
 **DO read these on start:**
 - `.github/PROJECT_STATUS.md` (compact status)
+- `.project-graph/dependency-graph.json` (if working on architecture/refactoring)
 - Current issue via script (structured output)
 - Relevant plan section only (not entire file)
 - `git branch --show-current` (verify branch)
@@ -311,9 +316,17 @@ tests/
 **Prioritize:**
 1. Check git branch → ensure on feature branch
 2. Status file (20 lines) → context
-3. Issue details (50-100 lines) → task
-4. Plan section (50-100 lines) → why
-5. Code only when needed → implementation
+3. Dependency graph (if architecture work) → relationships
+4. Issue details (50-100 lines) → task
+5. Plan section (50-100 lines) → why
+6. Code only when needed → implementation
+
+**Use Dependency Graph for:**
+- Understanding module dependencies before refactoring
+- Finding impact of changes (check `dependents` field)
+- Locating functionality (check `ai_agent_hints.common_tasks`)
+- Understanding design patterns used
+- Finding extension points
 
 ## 🎯 Agent Optimization Strategies
 
@@ -456,13 +469,205 @@ git push -u origin feature/emergency-branch-name
 5. **ONE-COMMAND MERGE** - Use `merge_pr.py` (auto-detects PR, switches to main)
 6. **BATCH commits** - One commit per logical unit, not per file
 7. **UPDATE docs** before committing code changes
-8. **RUN tests** before pushing (if applicable)
+8. **UPDATE dependency graph** before committing code changes (if needed)
+9. **RUN tests** before pushing (if applicable)
 
 **Quick Merge Command:**
 ```bash
 python3 .github/workflows/scripts/merge_pr.py
 ```
 This ONE command does everything: find PR, merge, switch to main, pull!
+
+## 📊 Dependency Graph Maintenance
+
+### When to Update the Graph
+
+**ALWAYS update `.project-graph/dependency-graph.json` when:**
+- ✅ Adding new modules to `telegram_bot_stack/`
+- ✅ Removing modules from `telegram_bot_stack/`
+- ✅ Changing module dependencies (imports)
+- ✅ Adding/removing public API (exports in `__init__.py`)
+- ✅ Refactoring module structure
+- ✅ Changing design patterns implementation
+
+**NO need to update for:**
+- ❌ Changes in tests/ directory
+- ❌ Changes in examples/ directory
+- ❌ Documentation-only changes
+- ❌ Changes in .github/ directory
+- ❌ Bug fixes that don't change dependencies
+
+### How to Update the Graph
+
+**Step 1: Identify changes**
+```bash
+# Check what files changed
+git status
+git diff --name-only
+
+# If telegram_bot_stack/ files changed, update graph
+```
+
+**Step 2: Update graph structure**
+```bash
+# Edit .project-graph/dependency-graph.json
+
+# Key sections to update:
+# 1. nodes[] - add/remove/modify node entries
+# 2. edges[] - add/remove dependency edges
+# 3. metadata.generated_at - update date
+# 4. metadata.node_count - if nodes changed
+# 5. metadata.edge_count - if edges changed
+# 6. statistics - recalculate if major changes
+```
+
+**Step 3: Validate graph**
+```bash
+cd .project-graph
+python3 graph_utils.py     # Should show "✅ Graph is valid!"
+
+# Or run validation only
+python3 -c "from graph_utils import load_graph, validate_graph; g=load_graph(); print(validate_graph(g))"
+```
+
+**Step 4: Test graph utilities**
+```bash
+# Quick test
+cd .project-graph
+python3 examples.py | head -50
+```
+
+### Update Examples
+
+**Example 1: Added new storage backend `redis.py`**
+```json
+// 1. Add node
+{
+"id": "telegram_bot_stack.storage.redis",
+"name": "storage.redis",
+"type": "module",
+"category": "implementation",
+"path": "telegram_bot_stack/storage/redis.py",
+"description": "Redis-based storage backend",
+"lines_of_code": 150, // Count lines
+"complexity_score": 5, // Estimate 1-10
+"exports": ["RedisStorage"],
+"imports": {
+"internal": ["storage.base.StorageBackend"],
+"external": ["redis", "logging"]
+},
+"dependencies": ["telegram_bot_stack.storage.base"],
+"dependents": ["telegram_bot_stack.storage"],
+"tags": ["implementation", "storage-backend", "redis"],
+"role": "Redis storage backend for distributed bots",
+"criticality": "medium"
+}
+
+// 2. Add edges
+{
+"id": "edge_15",
+"source": "telegram_bot_stack.storage.redis",
+"target": "telegram_bot_stack.storage.base",
+"type": "implements",
+"strength": 5,
+"description": "Implements StorageBackend interface",
+"relationship": "inheritance",
+"bidirectional": false
+}
+
+// 3. Update storage/__init__.py node
+// Add "telegram_bot_stack.storage.redis" to its dependencies
+
+// 4. Update metadata
+{
+"metadata": {
+"node_count": 9, // was 8
+"edge_count": 16, // was 14
+"generated_at": "2025-11-17" // today
+}
+}
+```
+
+**Example 2: Refactored BotBase to use new component**
+```json
+// Update BotBase node:
+{
+"id": "telegram_bot_stack.bot_base",
+// ... existing fields ...
+"dependencies": [
+"telegram_bot_stack.admin_manager",
+"telegram_bot_stack.user_manager",
+"telegram_bot_stack.storage.base",
+"telegram_bot_stack.new_component" // ADD THIS
+],
+"complexity_score": 9 // was 8, increased
+}
+
+// Add new edge
+{
+"source": "telegram_bot_stack.bot_base",
+"target": "telegram_bot_stack.new_component",
+"type": "uses",
+"strength": 3,
+"description": "Uses NewComponent for X functionality"
+}
+```
+
+### Pre-Commit Checklist
+
+Before committing changes to `telegram_bot_stack/`:
+
+```bash
+# 1. Check branch
+git branch --show-current # Should NOT be main
+
+# 2. Check what changed
+git status
+git diff telegram_bot_stack/
+
+# 3. If telegram_bot_stack/ changed → update graph
+# Edit .project-graph/dependency-graph.json
+
+# 4. Validate graph
+cd .project-graph && python3 graph_utils.py
+
+# 5. Stage all changes
+git add telegram_bot_stack/ .project-graph/
+
+# 6. Commit
+git commit -m "type(scope): description"
+
+# Include graph update in commit message if significant:
+# git commit -m "feat(storage): add Redis backend
+#
+# - Implemented RedisStorage class
+# - Updated dependency graph with new module"
+```
+
+### Quick Reference: Graph Node Template
+
+```json
+{
+"id": "telegram_bot_stack.module_name",
+"name": "module_name",
+"type": "module",
+"category": "core|implementation|public_api",
+"path": "telegram_bot_stack/module_name.py",
+"description": "Brief description",
+"lines_of_code": 0, // Run: wc -l file.py
+"complexity_score": 5, // 1=simple, 10=complex
+"exports": ["ClassName", "function_name"],
+"imports": {
+"internal": ["internal.Module"],
+"external": ["external_lib"]
+},
+"dependencies": ["telegram_bot_stack.dependency"],
+"dependents": [], // Will be filled by others
+"tags": ["tag1", "tag2"],
+"role": "What this module does",
+"criticality": "low|medium|high|critical"
+}
+```
 
 ## 📋 Detailed Rules (Reference)
 
@@ -479,4 +684,7 @@ This ONE command does everything: find PR, merge, switch to main, pull!
 
 ---
 
-**Remember:** Read `.github/PROJECT_STATUS.md` first on every new context! 🎯
+**Remember:**
+- 📋 Read `.github/PROJECT_STATUS.md` first on every new context!
+- 🔗 Update `.project-graph/dependency-graph.json` when changing `telegram_bot_stack/` structure!
+- ✅ Validate graph before committing: `cd .project-graph && python3 graph_utils.py`
