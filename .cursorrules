@@ -287,11 +287,14 @@ tests/
 📝 Pushed to origin/feature/xyz
 🔄 Next: Create Pull Request on GitHub
 - Branch: feature/xyz → main
+- PR Title: Use conventional format "type(scope): description"
+Example: "feat(storage): add Redis backend"
+Example: "docs(workflow): add Git Flow rules"
 - In PR description: Add "Closes #N" (if working on issue)
 - All CI checks will run automatically
 - Requires 1 approval before merge
 - Automatic release after merge
-- Issue                                                    #N will auto-close on merge
+- Issue                                                        #N will auto-close on merge
 ```
 
 ### Emergency: If on main branch

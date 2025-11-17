@@ -36,6 +36,19 @@ docs:  Documentation  → No version bump
 chore: Maintenance    → No version bump
 ```
 
+## 🏷️ PR Title Format
+
+**Same as commits:** `type(scope): description`
+
+```bash
+# PR Title examples:
+feat(storage): add Redis backend
+fix(auth): resolve token validation
+docs(api): update API reference
+```
+
+**See:** [PR Naming Guide](.github/PR_NAMING_GUIDE.md)
+
 ### Examples
 
 ```bash
@@ -127,6 +140,7 @@ After merging to `main`:
 6. **Publishes release**
 
 Install specific version:
+
 ```bash
 pip install git+https://github.com/sensiloles/telegram-bot-stack.git@v0.2.0
 ```
