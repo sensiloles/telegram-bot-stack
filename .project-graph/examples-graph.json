@@ -1,0 +1,471 @@
+{
+  "metadata": {
+    "version": "2.0.0",
+    "generated_at": "2025-11-17",
+    "graph_id": "examples",
+    "graph_name": "Example Bots & Patterns",
+    "graph_type": "specialized",
+    "project_name": "telegram-bot-stack",
+    "description": "Example bot implementations demonstrating framework usage patterns",
+    "scope": "Example bots in examples/ directory",
+    "router_file": "graph-router.json",
+    "related_graphs": [
+      "bot-framework-graph.json - for framework API used in examples"
+    ]
+  },
+  "statistics": {
+    "total_examples": 3,
+    "complexity_range": "simple to complex",
+    "total_lines": 850,
+    "learning_path": "echo_bot → counter_bot → quit_smoking_bot"
+  },
+  "examples": {
+    "echo_bot": {
+      "path": "examples/echo_bot/",
+      "difficulty": "beginner",
+      "complexity": "minimal",
+      "lines_of_code": 45,
+      "description": "Simplest possible bot - echoes back user messages",
+      "learning_focus": [
+        "Basic bot setup",
+        "Minimal configuration",
+        "Command handlers",
+        "Message handling"
+      ],
+      "files": {
+        "bot.py": {
+          "lines": 38,
+          "description": "Complete echo bot implementation",
+          "key_code": [
+            "Inherits from BotBase",
+            "Uses MemoryStorage for simplicity",
+            "Overrides message handler"
+          ]
+        },
+        "README.md": {
+          "description": "Quick start guide and usage"
+        }
+      },
+      "framework_features_used": [
+        "BotBase inheritance",
+        "MemoryStorage",
+        "Basic command handlers (/start, /my_id)"
+      ],
+      "not_used": [
+        "Custom storage",
+        "State management",
+        "Custom hooks",
+        "Complex commands"
+      ],
+      "usage": {
+        "install": "pip install telegram-bot-stack",
+        "run": "python examples/echo_bot/bot.py",
+        "requires": "TELEGRAM_TOKEN in .env"
+      },
+      "typical_use_case": "Learning framework basics, testing setup",
+      "next_step": "counter_bot for state management"
+    },
+    "counter_bot": {
+      "path": "examples/counter_bot/",
+      "difficulty": "intermediate",
+      "complexity": "moderate",
+      "lines_of_code": 120,
+      "description": "Bot with per-user counters demonstrating state management",
+      "learning_focus": [
+        "State management",
+        "Storage usage",
+        "Custom commands",
+        "Per-user data"
+      ],
+      "files": {
+        "bot.py": {
+          "lines": 98,
+          "description": "Counter bot with state management",
+          "key_code": [
+            "Inherits from BotBase",
+            "Uses JSONStorage for persistence",
+            "Custom commands: /increment, /decrement, /reset",
+            "Per-user counter storage",
+            "State persistence across restarts"
+          ]
+        },
+        "README.md": {
+          "description": "Usage guide with examples"
+        }
+      },
+      "framework_features_used": [
+        "BotBase inheritance",
+        "JSONStorage with file persistence",
+        "Custom command handlers",
+        "Storage API (save/load)",
+        "register_handlers override"
+      ],
+      "demonstrates": [
+        "How to store per-user data",
+        "How to add custom commands",
+        "How to use Storage API",
+        "State persistence pattern"
+      ],
+      "commands": {
+        "/increment": "Increase user's counter",
+        "/decrement": "Decrease user's counter",
+        "/reset": "Reset counter to zero",
+        "/count": "Show current counter value"
+      },
+      "storage_pattern": {
+        "key": "counter_{user_id}",
+        "value": "integer",
+        "persistence": "JSON file"
+      },
+      "usage": {
+        "install": "pip install telegram-bot-stack",
+        "run": "python examples/counter_bot/bot.py",
+        "requires": "TELEGRAM_TOKEN in .env"
+      },
+      "typical_use_case": "Learning state management, building stateful bots",
+      "next_step": "quit_smoking_bot for real-world complexity"
+    },
+    "quit_smoking_bot": {
+      "path": "examples/quit_smoking_bot/",
+      "difficulty": "advanced",
+      "complexity": "full-featured",
+      "lines_of_code": 685,
+      "description": "Real-world bot helping users track smoke-free progress",
+      "learning_focus": [
+        "Complex state management",
+        "Multiple custom managers",
+        "Scheduled tasks",
+        "Rich user interactions",
+        "Real-world bot architecture"
+      ],
+      "files": {
+        "bot.py": {
+          "lines": 245,
+          "description": "Main bot implementation with multiple features",
+          "key_code": [
+            "Inherits from BotBase",
+            "Multiple custom managers",
+            "Scheduled reminders",
+            "Rich command set",
+            "Statistics tracking"
+          ]
+        },
+        "status_manager.py": {
+          "lines": 180,
+          "description": "Manages user quit smoking status",
+          "responsibilities": [
+            "Track quit date",
+            "Calculate progress",
+            "Save/load user status",
+            "Calculate statistics (days, money saved, cigarettes avoided)"
+          ]
+        },
+        "quotes_manager.py": {
+          "lines": 120,
+          "description": "Manages motivational quotes",
+          "responsibilities": [
+            "Load quotes from JSON",
+            "Get random quote",
+            "Category-based quotes"
+          ]
+        },
+        "utils.py": {
+          "lines": 85,
+          "description": "Helper utilities",
+          "functions": [
+            "Format currency",
+            "Format time durations",
+            "Calculate savings"
+          ]
+        },
+        "config.py": {
+          "lines": 35,
+          "description": "Bot configuration",
+          "settings": [
+            "Quote file path",
+            "Default cigarette price",
+            "Reminder intervals"
+          ]
+        },
+        "data/quotes.json": {
+          "description": "Motivational quotes database",
+          "structure": "Array of {text, category}"
+        },
+        "README.md": {
+          "description": "Complete documentation and setup guide"
+        }
+      },
+      "framework_features_used": [
+        "BotBase inheritance",
+        "JSONStorage for user data",
+        "Custom hooks (get_welcome_message, on_user_registered)",
+        "register_handlers override",
+        "APScheduler integration for reminders",
+        "Admin system",
+        "User management"
+      ],
+      "demonstrates": [
+        "How to structure complex bot",
+        "Separation of concerns (managers pattern)",
+        "Scheduled tasks integration",
+        "External data loading (JSON)",
+        "Complex state management",
+        "Real-world user experience",
+        "Configuration management"
+      ],
+      "commands": {
+        "/start_quit": "Begin tracking quit smoking journey",
+        "/status": "Show current progress and statistics",
+        "/quote": "Get motivational quote",
+        "/reset_quit": "Reset quit smoking tracking",
+        "/stats": "Detailed statistics",
+        "/reminders": "Configure reminder settings"
+      },
+      "statistics_tracked": [
+        "Days smoke-free",
+        "Cigarettes not smoked",
+        "Money saved",
+        "Health improvements timeline"
+      ],
+      "data_model": {
+        "user_status": {
+          "quit_date": "ISO timestamp",
+          "cigarettes_per_day": "integer",
+          "price_per_pack": "float",
+          "reminders_enabled": "boolean"
+        }
+      },
+      "usage": {
+        "install": "pip install telegram-bot-stack",
+        "setup": [
+          "1. Set TELEGRAM_TOKEN in .env",
+          "2. Customize config.py if needed",
+          "3. Ensure data/quotes.json exists"
+        ],
+        "run": "python examples/quit_smoking_bot/bot.py",
+        "requires": "TELEGRAM_TOKEN in .env"
+      },
+      "typical_use_case": "Reference for building production-ready bot",
+      "architecture_lessons": [
+        "Manager pattern for separation of concerns",
+        "External data loading",
+        "Scheduled tasks integration",
+        "Rich user interactions",
+        "Configuration management"
+      ]
+    }
+  },
+  "learning_path": {
+    "step_1_basics": {
+      "example": "echo_bot",
+      "goal": "Understand minimal bot setup",
+      "time": "15 minutes",
+      "outcome": "Can create simple bot"
+    },
+    "step_2_state": {
+      "example": "counter_bot",
+      "goal": "Learn state management and storage",
+      "time": "30 minutes",
+      "outcome": "Can build stateful bots"
+    },
+    "step_3_production": {
+      "example": "quit_smoking_bot",
+      "goal": "Understand complex bot architecture",
+      "time": "1-2 hours",
+      "outcome": "Can design production-ready bots"
+    }
+  },
+  "common_patterns": {
+    "inheritance_pattern": {
+      "pattern": "class MyBot(BotBase)",
+      "used_in": "All examples",
+      "purpose": "Inherit framework functionality",
+      "override": "Optional: hooks and handlers"
+    },
+    "storage_selection": {
+      "memory": {
+        "used_in": "echo_bot",
+        "use_case": "Testing, no persistence needed",
+        "pros": [
+          "Fast",
+          "Simple"
+        ],
+        "cons": [
+          "Data lost on restart"
+        ]
+      },
+      "json": {
+        "used_in": "counter_bot, quit_smoking_bot",
+        "use_case": "Production with persistence",
+        "pros": [
+          "Simple",
+          "Human-readable",
+          "Persistent"
+        ],
+        "cons": [
+          "Not for high concurrency"
+        ]
+      }
+    },
+    "custom_commands": {
+      "pattern": "Override register_handlers()",
+      "used_in": "counter_bot, quit_smoking_bot",
+      "steps": [
+        "1. Override register_handlers()",
+        "2. Call super().register_handlers()",
+        "3. Add custom CommandHandler",
+        "4. self.application.add_handler(...)"
+      ]
+    },
+    "manager_pattern": {
+      "pattern": "Separate managers for different concerns",
+      "used_in": "quit_smoking_bot",
+      "example": "StatusManager, QuotesManager",
+      "benefits": [
+        "Separation of concerns",
+        "Easier testing",
+        "Reusable components",
+        "Clear responsibilities"
+      ]
+    }
+  },
+  "framework_api_usage": {
+    "bot_base_hooks": {
+      "on_user_registered": {
+        "used_in": "quit_smoking_bot",
+        "purpose": "Initialize user data on first registration"
+      },
+      "get_welcome_message": {
+        "used_in": "quit_smoking_bot",
+        "purpose": "Customize welcome message"
+      },
+      "get_user_status": {
+        "used_in": "None yet",
+        "purpose": "Provide custom status information"
+      },
+      "register_handlers": {
+        "used_in": "counter_bot, quit_smoking_bot",
+        "purpose": "Add custom command handlers"
+      }
+    },
+    "storage_api": {
+      "save": {
+        "used_in": "counter_bot, quit_smoking_bot",
+        "pattern": "storage.save(key, data)"
+      },
+      "load": {
+        "used_in": "counter_bot, quit_smoking_bot",
+        "pattern": "storage.load(key, default=None)"
+      },
+      "exists": {
+        "used_in": "quit_smoking_bot",
+        "pattern": "storage.exists(key)"
+      }
+    }
+  },
+  "ai_agent_hints": {
+    "creating_new_example": {
+      "steps": [
+        "1. Choose complexity level (simple/medium/complex)",
+        "2. Create directory in examples/",
+        "3. Start with bot.py inheriting BotBase",
+        "4. Choose storage (Memory for simple, JSON for complex)",
+        "5. Add custom commands if needed",
+        "6. Write README.md with setup instructions",
+        "7. Test thoroughly",
+        "8. Update examples-graph.json"
+      ],
+      "template": "Use counter_bot as template for medium complexity"
+    },
+    "understanding_example": {
+      "quick_overview": "Read README.md first",
+      "code_entry_point": "Start with bot.py main block",
+      "understand_flow": "Trace from __main__ → BotBase.__init__ → register_handlers",
+      "focus_on": "Custom commands and how they use Storage API"
+    },
+    "common_questions": [
+      {
+        "question": "How to add custom command?",
+        "answer": "See counter_bot/bot.py register_handlers() method",
+        "example_file": "examples/counter_bot/bot.py",
+        "pattern": "Override register_handlers, call super(), add handler"
+      },
+      {
+        "question": "How to store user data?",
+        "answer": "Use storage.save(key, data) and storage.load(key)",
+        "example_file": "examples/counter_bot/bot.py",
+        "pattern": "storage.save(f'counter_{user_id}', value)"
+      },
+      {
+        "question": "How to use hooks?",
+        "answer": "Override hook methods like on_user_registered",
+        "example_file": "examples/quit_smoking_bot/bot.py",
+        "pattern": "async def on_user_registered(self, user_id): ..."
+      },
+      {
+        "question": "How to structure complex bot?",
+        "answer": "Use manager pattern - separate concerns into different classes",
+        "example_file": "examples/quit_smoking_bot/",
+        "pattern": "StatusManager, QuotesManager, separate utilities"
+      }
+    ]
+  },
+  "comparison_matrix": {
+    "features": {
+      "difficulty": {
+        "echo_bot": "Beginner",
+        "counter_bot": "Intermediate",
+        "quit_smoking_bot": "Advanced"
+      },
+      "lines_of_code": {
+        "echo_bot": 45,
+        "counter_bot": 120,
+        "quit_smoking_bot": 685
+      },
+      "storage_used": {
+        "echo_bot": "Memory",
+        "counter_bot": "JSON",
+        "quit_smoking_bot": "JSON"
+      },
+      "custom_commands": {
+        "echo_bot": 0,
+        "counter_bot": 4,
+        "quit_smoking_bot": 10
+      },
+      "state_management": {
+        "echo_bot": "None",
+        "counter_bot": "Simple (counter)",
+        "quit_smoking_bot": "Complex (multiple states)"
+      },
+      "scheduled_tasks": {
+        "echo_bot": false,
+        "counter_bot": false,
+        "quit_smoking_bot": true
+      },
+      "external_data": {
+        "echo_bot": false,
+        "counter_bot": false,
+        "quit_smoking_bot": true
+      }
+    }
+  },
+  "getting_started_guide": {
+    "prerequisites": [
+      "Python 3.9+",
+      "telegram-bot-stack installed",
+      "Telegram Bot Token"
+    ],
+    "quick_start": [
+      "1. Choose example based on needs",
+      "2. Copy .env.example to .env",
+      "3. Add TELEGRAM_TOKEN to .env",
+      "4. Run: python examples/<bot_name>/bot.py",
+      "5. Open Telegram and interact with bot"
+    ],
+    "troubleshooting": {
+      "token_error": "Check TELEGRAM_TOKEN in .env file",
+      "import_error": "Install: pip install telegram-bot-stack",
+      "permission_error": "Ensure bot has necessary Telegram permissions"
+    }
+  }
+}

@@ -1,0 +1,500 @@
+{
+  "version": "2.0.0",
+  "generated_at": "2025-11-17",
+  "description": "Router for selecting appropriate dependency graph based on task type",
+  "architecture": "Multi-graph system for efficient AI agent navigation",
+  "quick_start": {
+    "step_1": "Read this file (graph-router.json) - ~150 lines",
+    "step_2": "Identify your task type using 'decision_tree'",
+    "step_3": "Load ONLY the relevant graph(s) from 'graphs' section",
+    "step_4": "Work with focused graph instead of reading everything",
+    "benefit": "Read 200-400 lines instead of 2000+ lines (80-90% token savings)"
+  },
+  "graphs": {
+    "bot-framework-graph.json": {
+      "id": "bot_framework",
+      "name": "🤖 Bot Framework Core",
+      "file": "bot-framework-graph.json",
+      "description": "Core telegram bot framework implementation (telegram_bot_stack/)",
+      "coverage": {
+        "directories": [
+          "telegram_bot_stack/"
+        ],
+        "file_patterns": [
+          "telegram_bot_stack/**/*.py"
+        ],
+        "modules": 8,
+        "lines_of_code": 1233,
+        "key_components": [
+          "BotBase",
+          "UserManager",
+          "AdminManager",
+          "StorageBackend",
+          "JSONStorage",
+          "MemoryStorage"
+        ]
+      },
+      "when_to_use": [
+        "Adding new storage backend",
+        "Modifying BotBase functionality",
+        "Extending framework core features",
+        "Understanding bot architecture",
+        "Refactoring telegram_bot_stack modules",
+        "Implementing custom hooks",
+        "Working with user/admin management"
+      ],
+      "typical_queries": [
+        "How to add Redis storage backend?",
+        "Where is user registration handled?",
+        "How to customize bot welcome message?",
+        "What hooks can I override in BotBase?",
+        "How to implement new StorageBackend?",
+        "Where are admin commands defined?"
+      ],
+      "complexity": "medium",
+      "criticality": "critical",
+      "update_frequency": "high"
+    },
+    "infrastructure-graph.json": {
+      "id": "infrastructure",
+      "name": "🔧 Infrastructure & Automation",
+      "file": "infrastructure-graph.json",
+      "description": "CI/CD pipelines, GitHub workflows, automation scripts",
+      "coverage": {
+        "directories": [
+          ".github/",
+          "scripts/"
+        ],
+        "file_patterns": [
+          ".github/**/*",
+          "scripts/**/*.py",
+          "*.yml"
+        ],
+        "scripts": 16,
+        "workflows": 3,
+        "key_components": [
+          "merge_pr.py",
+          "create_pr.py",
+          "create_issue.py",
+          "read_issues.py",
+          "tests.yml",
+          "release.yml",
+          "github_helper.py"
+        ]
+      },
+      "when_to_use": [
+        "Modifying CI/CD pipeline",
+        "Adding GitHub automation",
+        "Updating release process",
+        "Working with PR/Issue scripts",
+        "Configuring workflows",
+        "Debugging automation",
+        "Understanding GitHub integration"
+      ],
+      "typical_queries": [
+        "How to modify merge_pr.py script?",
+        "Where is release automation configured?",
+        "How to add new workflow?",
+        "How does PR auto-creation work?",
+        "Where are GitHub actions defined?",
+        "How to debug CI/CD failure?"
+      ],
+      "complexity": "medium",
+      "criticality": "high",
+      "update_frequency": "medium"
+    },
+    "testing-graph.json": {
+      "id": "testing",
+      "name": "🧪 Testing Infrastructure",
+      "file": "testing-graph.json",
+      "description": "Test structure, patterns, fixtures, and coverage",
+      "coverage": {
+        "directories": [
+          "tests/"
+        ],
+        "file_patterns": [
+          "tests/**/*.py",
+          "conftest.py"
+        ],
+        "tests": 131,
+        "coverage_percentage": 80,
+        "test_files": 5,
+        "key_components": [
+          "test_bot_base.py",
+          "test_storage.py",
+          "test_user_manager.py",
+          "test_admin_manager.py",
+          "test_full_flow.py",
+          "conftest.py"
+        ]
+      },
+      "when_to_use": [
+        "Adding new tests",
+        "Understanding test structure",
+        "Improving test coverage",
+        "Using test fixtures",
+        "Debugging test failures",
+        "Writing integration tests",
+        "Understanding test patterns"
+      ],
+      "typical_queries": [
+        "How to test new storage backend?",
+        "Where are bot command tests?",
+        "How to use test fixtures?",
+        "What fixtures are available?",
+        "How to write integration test?",
+        "Where to add tests for new feature?"
+      ],
+      "complexity": "medium",
+      "criticality": "high",
+      "update_frequency": "high"
+    },
+    "examples-graph.json": {
+      "id": "examples",
+      "name": "📚 Example Bots & Patterns",
+      "file": "examples-graph.json",
+      "description": "Example bot implementations and usage patterns",
+      "coverage": {
+        "directories": [
+          "examples/"
+        ],
+        "file_patterns": [
+          "examples/**/*.py"
+        ],
+        "example_bots": 3,
+        "key_components": [
+          "echo_bot",
+          "counter_bot",
+          "quit_smoking_bot"
+        ]
+      },
+      "when_to_use": [
+        "Learning how to use framework",
+        "Finding usage examples",
+        "Understanding best practices",
+        "Creating new example bot",
+        "Seeing real-world implementations",
+        "Learning framework patterns"
+      ],
+      "typical_queries": [
+        "How to create a simple bot?",
+        "Example of custom storage usage?",
+        "Real-world bot implementation?",
+        "How to use BotBase hooks?",
+        "Pattern for state management?",
+        "Example bot with custom commands?"
+      ],
+      "complexity": "low",
+      "criticality": "medium",
+      "update_frequency": "low"
+    },
+    "project-meta-graph.json": {
+      "id": "project_meta",
+      "name": "🌐 Project Meta & Architecture",
+      "file": "project-meta-graph.json",
+      "description": "Cross-graph relationships, project structure, and architecture overview",
+      "coverage": {
+        "directories": [
+          "./"
+        ],
+        "scope": "project-wide connections",
+        "key_components": [
+          "Inter-graph relationships",
+          "Project structure",
+          "Architecture layers",
+          "Component interactions",
+          "Build system",
+          "Package structure"
+        ]
+      },
+      "when_to_use": [
+        "Understanding overall architecture",
+        "Cross-component refactoring",
+        "Major architectural changes",
+        "Onboarding to project",
+        "Project-wide impact analysis",
+        "Understanding build system",
+        "Package structure overview"
+      ],
+      "typical_queries": [
+        "How does everything connect?",
+        "Project-wide impact of change?",
+        "Overall architecture overview?",
+        "What are the main components?",
+        "How are graphs related?",
+        "Project structure explanation?"
+      ],
+      "complexity": "high",
+      "criticality": "high",
+      "update_frequency": "low"
+    }
+  },
+  "decision_tree": {
+    "description": "Use this tree to quickly select the right graph(s)",
+    "by_keywords": {
+      "bot_framework": {
+        "keywords": [
+          "BotBase",
+          "storage",
+          "UserManager",
+          "AdminManager",
+          "hooks",
+          "commands",
+          "bot implementation",
+          "framework",
+          "telegram_bot_stack",
+          "backend",
+          "core"
+        ],
+        "graphs": [
+          "bot-framework-graph.json"
+        ]
+      },
+      "infrastructure": {
+        "keywords": [
+          "CI/CD",
+          "workflow",
+          "release",
+          "merge",
+          "PR",
+          "issue",
+          "automation",
+          "github actions",
+          "pipeline",
+          "deploy",
+          "pre-commit",
+          "lint",
+          "format"
+        ],
+        "graphs": [
+          "infrastructure-graph.json"
+        ]
+      },
+      "testing": {
+        "keywords": [
+          "test",
+          "pytest",
+          "coverage",
+          "fixture",
+          "mock",
+          "integration test",
+          "unit test",
+          "conftest",
+          "assert",
+          "test_*",
+          "debugging tests"
+        ],
+        "graphs": [
+          "testing-graph.json"
+        ]
+      },
+      "examples": {
+        "keywords": [
+          "example",
+          "echo_bot",
+          "counter_bot",
+          "quit_smoking",
+          "demo",
+          "tutorial",
+          "how to use",
+          "sample",
+          "getting started",
+          "quickstart"
+        ],
+        "graphs": [
+          "examples-graph.json"
+        ]
+      },
+      "architecture": {
+        "keywords": [
+          "architecture",
+          "structure",
+          "overview",
+          "onboarding",
+          "how everything works",
+          "big picture",
+          "design",
+          "cross-component",
+          "system design"
+        ],
+        "graphs": [
+          "project-meta-graph.json"
+        ]
+      }
+    },
+    "by_file_path": {
+      "telegram_bot_stack/": "bot-framework-graph.json",
+      ".github/workflows/": "infrastructure-graph.json",
+      ".github/workflows/scripts/": "infrastructure-graph.json",
+      "scripts/": "infrastructure-graph.json",
+      "tests/": "testing-graph.json",
+      "examples/": "examples-graph.json",
+      "README.md": "project-meta-graph.json",
+      "pyproject.toml": "project-meta-graph.json",
+      ".cursorrules": "project-meta-graph.json"
+    },
+    "by_task_type": {
+      "feature_development": {
+        "description": "Adding new feature to framework",
+        "primary": [
+          "bot-framework-graph.json"
+        ],
+        "secondary": [
+          "testing-graph.json"
+        ],
+        "workflow": "1. Bot framework for implementation → 2. Testing for tests"
+      },
+      "bug_fix": {
+        "description": "Fixing a bug in code",
+        "primary": [
+          "bot-framework-graph.json"
+        ],
+        "secondary": [
+          "testing-graph.json"
+        ],
+        "workflow": "1. Bot framework to find bug → 2. Testing to verify fix"
+      },
+      "ci_cd_work": {
+        "description": "Working with CI/CD or automation",
+        "primary": [
+          "infrastructure-graph.json"
+        ],
+        "secondary": [],
+        "workflow": "Infrastructure graph only"
+      },
+      "test_writing": {
+        "description": "Writing or improving tests",
+        "primary": [
+          "testing-graph.json"
+        ],
+        "secondary": [
+          "bot-framework-graph.json"
+        ],
+        "workflow": "1. Testing for structure → 2. Bot framework for implementation details"
+      },
+      "documentation": {
+        "description": "Writing documentation or examples",
+        "primary": [
+          "examples-graph.json"
+        ],
+        "secondary": [
+          "bot-framework-graph.json",
+          "project-meta-graph.json"
+        ],
+        "workflow": "1. Examples for patterns → 2. Bot framework for API → 3. Meta for architecture"
+      },
+      "architecture_review": {
+        "description": "Understanding or changing architecture",
+        "primary": [
+          "project-meta-graph.json"
+        ],
+        "secondary": [
+          "bot-framework-graph.json"
+        ],
+        "workflow": "1. Meta for overview → 2. Bot framework for details"
+      },
+      "new_example": {
+        "description": "Creating new example bot",
+        "primary": [
+          "examples-graph.json",
+          "bot-framework-graph.json"
+        ],
+        "secondary": [],
+        "workflow": "1. Examples for patterns → 2. Bot framework for API"
+      },
+      "refactoring": {
+        "description": "Major refactoring across components",
+        "primary": [
+          "project-meta-graph.json",
+          "bot-framework-graph.json"
+        ],
+        "secondary": [
+          "testing-graph.json"
+        ],
+        "workflow": "1. Meta for impact → 2. Bot framework for changes → 3. Testing for validation"
+      }
+    }
+  },
+  "usage_examples": {
+    "example_1": {
+      "query": "How to add Redis storage backend?",
+      "analysis": "Contains keyword 'storage' and 'backend'",
+      "selected_graph": "bot-framework-graph.json",
+      "reasoning": "Storage backends are part of bot framework core",
+      "token_savings": "80% (read 250 lines instead of 1200)"
+    },
+    "example_2": {
+      "query": "How to modify merge_pr.py to delete branches?",
+      "analysis": "Contains 'merge_pr.py' which is in .github/workflows/scripts/",
+      "selected_graph": "infrastructure-graph.json",
+      "reasoning": "merge_pr.py is automation script",
+      "token_savings": "85% (read 200 lines instead of 1200)"
+    },
+    "example_3": {
+      "query": "Where are the tests for BotBase?",
+      "analysis": "Contains 'tests' and 'BotBase'",
+      "selected_graphs": [
+        "testing-graph.json",
+        "bot-framework-graph.json"
+      ],
+      "reasoning": "Need testing graph for test location, bot framework for BotBase details",
+      "token_savings": "60% (read 500 lines instead of 1200)"
+    },
+    "example_4": {
+      "query": "Show me example of simple bot",
+      "analysis": "Contains 'example' and 'simple bot'",
+      "selected_graph": "examples-graph.json",
+      "reasoning": "Looking for example implementations",
+      "token_savings": "90% (read 150 lines instead of 1200)"
+    },
+    "example_5": {
+      "query": "Explain overall project architecture",
+      "analysis": "Contains 'overall' and 'architecture'",
+      "selected_graph": "project-meta-graph.json",
+      "reasoning": "High-level architecture overview",
+      "token_savings": "70% (read 400 lines instead of 1200)"
+    }
+  },
+  "ai_agent_workflow": {
+    "recommended_flow": [
+      "Step 1: Read graph-router.json (this file) - ~200 lines",
+      "Step 2: Parse user query to extract keywords/file paths/task type",
+      "Step 3: Use decision_tree to select appropriate graph(s)",
+      "Step 4: Load ONLY selected graph(s) - typically 200-400 lines",
+      "Step 5: Work with focused, relevant information",
+      "Step 6: If need more context, load secondary graph"
+    ],
+    "fallback": "If unsure, start with project-meta-graph.json for overview",
+    "multiple_graphs": "Load primary graph first, then secondary only if needed"
+  },
+  "statistics": {
+    "total_graphs": 5,
+    "avg_graph_size": "250-400 lines",
+    "router_size": "~200 lines",
+    "combined_old_size": "~1200 lines",
+    "typical_usage": "router (200) + one graph (300) = 500 lines",
+    "token_savings": "500 vs 1200 = 58% savings minimum",
+    "best_case_savings": "router (200) + examples (150) = 350 vs 1200 = 71% savings"
+  },
+  "maintenance": {
+    "update_triggers": [
+      "When adding/removing modules in telegram_bot_stack/",
+      "When adding/removing automation scripts",
+      "When restructuring tests",
+      "When adding new example bots",
+      "When changing project structure"
+    ],
+    "update_procedure": [
+      "1. Update specific graph (bot-framework, infrastructure, etc.)",
+      "2. Update project-meta-graph if cross-graph relationships changed",
+      "3. Update router statistics if graph sizes changed significantly",
+      "4. Validate all graphs with graph_utils.py"
+    ]
+  },
+  "notes": {
+    "design_rationale": "Specialized graphs reduce cognitive load and token usage",
+    "scalability": "Can add more graphs as project grows (e.g., docs-graph, config-graph)",
+    "backward_compatibility": "Old dependency-graph.json renamed to bot-framework-graph.json",
+    "future_plans": "Potential for auto-generation and graph visualization"
+  }
+}

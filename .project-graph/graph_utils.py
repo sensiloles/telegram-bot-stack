@@ -1,13 +1,23 @@
-"""Utility functions for working with the dependency graph.
+"""Utility functions for working with the dependency graphs.
 
 This module provides helper functions for querying and analyzing the
-project dependency graph.
+project dependency graphs. The project uses a multi-graph system with
+a router to help AI agents quickly find relevant information.
 
-Example:
-    >>> from graph_utils import load_graph, find_node, find_dependents
-    >>> graph = load_graph()
+Examples:
+    # Load specific graph by type
+    >>> from graph_utils import load_graph_by_type
+    >>> graph = load_graph_by_type('bot_framework')
+
+    # Load router to understand all graphs
+    >>> from graph_utils import load_router, get_recommended_graph
+    >>> router = load_router()
+    >>> graph_name = get_recommended_graph(router, "Add new storage backend")
+    >>> graph = load_graph(graph_name)
+
+    # Traditional usage (works with any graph)
+    >>> graph = load_graph('bot-framework-graph.json')
     >>> node = find_node(graph, 'telegram_bot_stack.bot_base')
-    >>> print(node['description'])
 """
 
 import json
@@ -15,11 +25,135 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Set, Tuple
 
 
+def load_router() -> Dict[str, Any]:
+    """Load the graph router.
+
+    Returns:
+        Dictionary containing graph router metadata and recommendations
+
+    Raises:
+        FileNotFoundError: If router file doesn't exist
+        json.JSONDecodeError: If router file is not valid JSON
+    """
+    router_path = Path(__file__).parent / "graph-router.json"
+    with open(router_path, encoding="utf-8") as f:
+        return json.load(f)
+
+
+def load_graph_by_type(graph_type: str) -> Dict[str, Any]:
+    """Load a specific graph by its type.
+
+    Args:
+        graph_type: Type of graph to load. Options:
+            - 'bot_framework': Core framework code
+            - 'infrastructure': CI/CD and automation
+            - 'testing': Test infrastructure
+            - 'examples': Example bots
+            - 'project_meta': Project overview
+
+    Returns:
+        Dictionary containing the requested graph
+
+    Raises:
+        ValueError: If graph_type is unknown
+        FileNotFoundError: If graph file doesn't exist
+    """
+    router = load_router()
+
+    # Try to find by ID first
+    for graph_file, graph_info in router["graphs"].items():
+        if graph_info["id"] == graph_type or graph_file == graph_type:
+            return load_graph(graph_info["file"])
+
+    # Not found
+    available_ids = [info["id"] for info in router["graphs"].values()]
+    raise ValueError(
+        f"Unknown graph type '{graph_type}'. Available IDs: {available_ids}"
+    )
+
+
+def get_recommended_graph(router: Dict[str, Any], task_description: str) -> str:
+    """Get recommended graph file based on task description.
+
+    This uses keyword matching against when_to_use and typical_queries.
+
+    Args:
+        router: Graph router dictionary
+        task_description: Description of the task (case-insensitive)
+
+    Returns:
+        Recommended graph filename
+    """
+    task_lower = task_description.lower()
+    task_words = set(task_lower.split())
+
+    best_match = None
+    best_score = 0
+
+    # Check each graph's when_to_use and typical_queries
+    for _graph_file, graph_info in router["graphs"].items():
+        score = 0
+
+        # Check when_to_use
+        for use_case in graph_info.get("when_to_use", []):
+            use_case_lower = use_case.lower()
+            use_case_words = set(use_case_lower.split())
+
+            # Count matching words
+            common_words = task_words & use_case_words
+            if common_words:
+                score += len(common_words) * 2  # Higher weight for when_to_use
+
+        # Check typical_queries
+        for query in graph_info.get("typical_queries", []):
+            query_lower = query.lower()
+            query_words = set(query_lower.split())
+
+            # Count matching words
+            common_words = task_words & query_words
+            if common_words:
+                score += len(common_words)
+
+        if score > best_score:
+            best_score = score
+            best_match = graph_info["file"]
+
+    # If we found a match, return it
+    if best_match and best_score >= 2:  # At least 2 matching words
+        return best_match
+
+    # Default to project meta for overview
+    return "project-meta-graph.json"
+
+
+def list_available_graphs() -> None:
+    """Print all available graphs with descriptions."""
+    router = load_router()
+
+    print("\n📊 Available Dependency Graphs:")
+    print("=" * 60)
+
+    for _graph_file, graph_info in router["graphs"].items():
+        print(f"\n🔹 {graph_info['name']}")
+        print(f"   ID: {graph_info['id']}")
+        print(f"   File: {graph_info['file']}")
+        print(f"   Description: {graph_info['description']}")
+        print(
+            f"   Modules/Components: {graph_info['coverage'].get('modules', graph_info['coverage'].get('scripts', 'N/A'))}"
+        )
+
+    print("\n" + "=" * 60)
+    print("Use load_graph_by_type('<id>') to load a specific graph")
+    print("Example: load_graph_by_type('bot_framework')")
+    print("=" * 60 + "\n")
+
+
 def load_graph(graph_path: Optional[str] = None) -> Dict[str, Any]:
     """Load dependency graph from JSON file.
 
     Args:
-        graph_path: Path to graph JSON file. If None, uses default location.
+        graph_path: Path to graph JSON file. If None, loads bot-framework-graph.json.
+                   Can be just filename (e.g., 'testing-graph.json') or full path.
 
     Returns:
         Dictionary containing the full dependency graph
@@ -29,9 +163,13 @@ def load_graph(graph_path: Optional[str] = None) -> Dict[str, Any]:
         json.JSONDecodeError: If graph file is not valid JSON
     """
     if graph_path is None:
-        graph_path = Path(__file__).parent / "dependency-graph.json"
+        # Default to bot framework graph
+        graph_path = Path(__file__).parent / "bot-framework-graph.json"
     else:
         graph_path = Path(graph_path)
+        # If just filename provided, look in .project-graph directory
+        if not graph_path.is_absolute() and not graph_path.exists():
+            graph_path = Path(__file__).parent / graph_path
 
     with open(graph_path, encoding="utf-8") as f:
         return json.load(f)
@@ -42,12 +180,16 @@ def save_graph(graph: Dict[str, Any], graph_path: Optional[str] = None) -> None:
 
     Args:
         graph: Dictionary containing the full dependency graph
-        graph_path: Path to graph JSON file. If None, uses default location.
+        graph_path: Path to graph JSON file. If None, tries to infer from graph metadata.
     """
     if graph_path is None:
-        graph_path = Path(__file__).parent / "dependency-graph.json"
+        # Try to infer from graph metadata
+        graph_id = graph.get("metadata", {}).get("graph_id", "bot_framework")
+        graph_path = Path(__file__).parent / f"{graph_id}-graph.json"
     else:
         graph_path = Path(graph_path)
+        if not graph_path.is_absolute():
+            graph_path = Path(__file__).parent / graph_path
 
     with open(graph_path, "w", encoding="utf-8") as f:
         json.dump(graph, f, ensure_ascii=False, indent=2)
@@ -492,37 +634,46 @@ def print_impact_analysis(graph: Dict[str, Any], node_id: str) -> None:
 
 # Example usage
 if __name__ == "__main__":
-    # Load graph
-    graph = load_graph()
-
-    print("🔗 Dependency Graph Analysis")
-    print(f"Version: {graph['metadata']['version']}")
-    print(f"Modules: {graph['metadata']['node_count']}")
-    print(f"Dependencies: {graph['metadata']['edge_count']}\n")
-
-    # Find critical modules
-    print("🔴 Critical Modules:")
-    critical = find_critical_modules(graph)
-    for mod in critical:
-        print(f"  • {mod}")
-
-    # Find bottlenecks
-    print("\n🔥 Bottleneck Modules (3+ dependents):")
-    bottlenecks = find_bottlenecks(graph, threshold=3)
-    for mod, count in sorted(bottlenecks, key=lambda x: x[1], reverse=True):
-        print(f"  • {mod}: {count} dependents")
-
-    # Example: Impact analysis for storage.base
     print("\n" + "=" * 60)
-    print("Example: Impact Analysis")
+    print("🔗 Multi-Graph Dependency System")
     print("=" * 60)
-    print_impact_analysis(graph, "telegram_bot_stack.storage.base")
 
-    # Example: Module info
-    print_module_info(graph, "telegram_bot_stack.bot_base")
+    # Show available graphs
+    list_available_graphs()
 
-    # Validate graph
-    print("\n🔍 Graph Validation:")
+    # Example: Load bot framework graph
+    print("\n📦 Loading Bot Framework Graph...")
+    graph = load_graph_by_type("bot_framework")
+
+    print(f"Version: {graph['metadata']['version']}")
+    print(f"Graph: {graph['metadata']['graph_name']}")
+    print(f"Modules: {graph['metadata'].get('node_count', 'N/A')}")
+    print(f"Dependencies: {graph['metadata'].get('edge_count', 'N/A')}\n")
+
+    # Find critical modules (only for bot_framework graph)
+    if "nodes" in graph:
+        print("🔴 Critical Modules:")
+        critical = find_critical_modules(graph)
+        for mod in critical:
+            print(f"  • {mod}")
+
+        # Find bottlenecks
+        print("\n🔥 Bottleneck Modules (3+ dependents):")
+        bottlenecks = find_bottlenecks(graph, threshold=3)
+        for mod, count in sorted(bottlenecks, key=lambda x: x[1], reverse=True):
+            print(f"  • {mod}: {count} dependents")
+
+        # Example: Impact analysis for storage.base
+        print("\n" + "=" * 60)
+        print("Example: Impact Analysis")
+        print("=" * 60)
+        print_impact_analysis(graph, "telegram_bot_stack.storage.base")
+
+        # Example: Module info
+        print_module_info(graph, "telegram_bot_stack.bot_base")
+
+    # Validate graph (works for bot_framework graph)
+    print("\n🔍 Bot Framework Graph Validation:")
     errors = validate_graph(graph)
     if errors:
         print("❌ Validation errors found:")
@@ -530,3 +681,21 @@ if __name__ == "__main__":
             print(f"  • {error}")
     else:
         print("✅ Graph is valid!")
+
+    # Example: Recommend graph based on task
+    print("\n" + "=" * 60)
+    print("🎯 Graph Recommendation Examples")
+    print("=" * 60)
+
+    router = load_router()
+    tasks = [
+        "Add new storage backend",
+        "Fix CI pipeline",
+        "Add test for user manager",
+        "Create new example bot",
+    ]
+
+    for task in tasks:
+        recommended = get_recommended_graph(router, task)
+        print(f"\nTask: {task}")
+        print(f"  → Recommended graph: {recommended}")

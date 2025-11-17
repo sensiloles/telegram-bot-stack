@@ -1,0 +1,539 @@
+{
+  "metadata": {
+    "version": "2.0.0",
+    "generated_at": "2025-11-17",
+    "graph_id": "testing",
+    "graph_name": "Testing Infrastructure",
+    "graph_type": "specialized",
+    "project_name": "telegram-bot-stack",
+    "description": "Test structure, patterns, fixtures, and coverage for telegram-bot-stack",
+    "scope": "All test files and testing infrastructure",
+    "router_file": "graph-router.json",
+    "related_graphs": [
+      "bot-framework-graph.json - for code being tested",
+      "infrastructure-graph.json - for CI/CD test automation"
+    ]
+  },
+  "statistics": {
+    "total_tests": 131,
+    "total_test_files": 5,
+    "coverage_percentage": 80,
+    "coverage_threshold": 79,
+    "lines_of_test_code": 1449,
+    "test_frameworks": [
+      "pytest",
+      "pytest-asyncio",
+      "pytest-cov",
+      "pytest-mock"
+    ]
+  },
+  "test_structure": {
+    "tests/": {
+      "description": "Root test directory",
+      "subdirectories": {
+        "core/": {
+          "description": "Unit tests for core framework modules",
+          "test_files": 4,
+          "total_tests": 110,
+          "coverage": "High - detailed unit tests",
+          "focus": "Individual module testing in isolation"
+        },
+        "integration/": {
+          "description": "Integration tests for complete workflows",
+          "test_files": 1,
+          "total_tests": 21,
+          "coverage": "End-to-end scenarios",
+          "focus": "Cross-module interactions and real workflows"
+        }
+      },
+      "configuration": {
+        "conftest.py": {
+          "path": "tests/conftest.py",
+          "description": "Shared test fixtures and configuration",
+          "lines": 111,
+          "fixtures": [
+            "memory_storage",
+            "json_storage",
+            "temp_dir",
+            "mock_update",
+            "mock_context",
+            "bot_instance"
+          ],
+          "purpose": "Provide reusable test fixtures for all tests"
+        }
+      }
+    }
+  },
+  "test_files": {
+    "tests/core/test_storage.py": {
+      "path": "tests/core/test_storage.py",
+      "description": "Tests for storage backends and abstraction layer",
+      "lines": 537,
+      "test_count": 47,
+      "test_classes": [
+        "TestStorageBackend",
+        "TestMemoryStorage",
+        "TestJSONStorage",
+        "TestStorageFactory"
+      ],
+      "coverage_target": "telegram_bot_stack/storage/",
+      "modules_tested": [
+        "storage/base.py - StorageBackend interface",
+        "storage/memory.py - MemoryStorage implementation",
+        "storage/json.py - JSONStorage implementation",
+        "storage/__init__.py - Factory function"
+      ],
+      "key_scenarios": [
+        "Save and load operations",
+        "Exists and delete operations",
+        "Error handling (invalid data, missing keys)",
+        "Edge cases (empty strings, None values)",
+        "File system operations (JSON)",
+        "Memory isolation (Memory)",
+        "Factory function with different backends",
+        "Concurrent access patterns"
+      ],
+      "fixtures_used": [
+        "memory_storage",
+        "json_storage",
+        "temp_dir"
+      ],
+      "criticality": "high",
+      "complexity": "medium"
+    },
+    "tests/core/test_bot_base.py": {
+      "path": "tests/core/test_bot_base.py",
+      "description": "Tests for BotBase class and command handlers",
+      "lines": 401,
+      "test_count": 35,
+      "test_classes": [
+        "TestBotBase",
+        "TestCommandHandlers",
+        "TestAdminCommands",
+        "TestHooks"
+      ],
+      "coverage_target": "telegram_bot_stack/bot_base.py",
+      "modules_tested": [
+        "bot_base.py - BotBase class and all command handlers"
+      ],
+      "key_scenarios": [
+        "Bot initialization",
+        "/start command - user registration",
+        "/start command - first user becomes admin",
+        "/my_id command",
+        "/list_users command (admin only)",
+        "/list_admins command (admin only)",
+        "/add_admin command with validation",
+        "/remove_admin command with protection",
+        "/decline_admin command",
+        "Hook execution (on_user_registered, get_welcome_message)",
+        "Permission checks for admin commands",
+        "Callback query handling",
+        "Command registration",
+        "Shutdown handling"
+      ],
+      "fixtures_used": [
+        "bot_instance",
+        "mock_update",
+        "mock_context",
+        "memory_storage"
+      ],
+      "async_tests": true,
+      "criticality": "critical",
+      "complexity": "high"
+    },
+    "tests/core/test_user_manager.py": {
+      "path": "tests/core/test_user_manager.py",
+      "description": "Tests for UserManager functionality",
+      "lines": 228,
+      "test_count": 15,
+      "test_classes": [
+        "TestUserManager"
+      ],
+      "coverage_target": "telegram_bot_stack/user_manager.py",
+      "modules_tested": [
+        "user_manager.py - UserManager class"
+      ],
+      "key_scenarios": [
+        "Add user (new and duplicate)",
+        "Remove user (existing and non-existing)",
+        "Check user existence",
+        "Get all users",
+        "Get user count",
+        "User persistence through storage",
+        "Empty user list handling"
+      ],
+      "fixtures_used": [
+        "memory_storage"
+      ],
+      "criticality": "high",
+      "complexity": "low"
+    },
+    "tests/core/test_admin_manager.py": {
+      "path": "tests/core/test_admin_manager.py",
+      "description": "Tests for AdminManager functionality",
+      "lines": 284,
+      "test_count": 18,
+      "test_classes": [
+        "TestAdminManager"
+      ],
+      "coverage_target": "telegram_bot_stack/admin_manager.py",
+      "modules_tested": [
+        "admin_manager.py - AdminManager class"
+      ],
+      "key_scenarios": [
+        "Add admin (new and duplicate)",
+        "Remove admin (with last admin protection)",
+        "Check admin status",
+        "Get all admins",
+        "Get admin count",
+        "Check if has admins",
+        "Admin persistence through storage",
+        "Last admin protection (cannot remove)",
+        "Empty admin list handling",
+        "First user initialization"
+      ],
+      "fixtures_used": [
+        "memory_storage"
+      ],
+      "criticality": "high",
+      "complexity": "medium"
+    },
+    "tests/integration/test_full_flow.py": {
+      "path": "tests/integration/test_full_flow.py",
+      "description": "End-to-end integration tests for complete bot workflows",
+      "lines": 312,
+      "test_count": 16,
+      "test_classes": [
+        "TestBotLifecycle",
+        "TestUserWorkflow",
+        "TestAdminWorkflow",
+        "TestStoragePersistence"
+      ],
+      "coverage_target": "Multiple modules working together",
+      "modules_tested": [
+        "bot_base.py + user_manager.py + admin_manager.py",
+        "bot_base.py + storage (JSON and Memory)",
+        "Complete command workflows"
+      ],
+      "key_scenarios": [
+        "Complete bot lifecycle (init → commands → shutdown)",
+        "User registration and management flow",
+        "Admin management workflow",
+        "First user becomes admin scenario",
+        "Admin cannot remove last admin",
+        "User data persistence across restarts",
+        "Admin data persistence across restarts",
+        "Multiple storage backend compatibility",
+        "Command execution in sequence",
+        "Error recovery scenarios"
+      ],
+      "fixtures_used": [
+        "bot_instance",
+        "json_storage",
+        "memory_storage",
+        "temp_dir"
+      ],
+      "async_tests": true,
+      "criticality": "critical",
+      "complexity": "high"
+    }
+  },
+  "test_fixtures": {
+    "memory_storage": {
+      "defined_in": "tests/conftest.py",
+      "type": "MemoryStorage",
+      "scope": "function",
+      "description": "Provides clean MemoryStorage instance for each test",
+      "use_case": "Fast unit tests without file I/O",
+      "cleanup": "Automatic (new instance per test)"
+    },
+    "json_storage": {
+      "defined_in": "tests/conftest.py",
+      "type": "JSONStorage",
+      "scope": "function",
+      "description": "Provides JSONStorage with temporary directory",
+      "use_case": "Testing file-based persistence",
+      "cleanup": "Temporary directory auto-deleted",
+      "depends_on": [
+        "temp_dir"
+      ]
+    },
+    "temp_dir": {
+      "defined_in": "tests/conftest.py",
+      "type": "Path",
+      "scope": "function",
+      "description": "Temporary directory for file-based tests",
+      "use_case": "Testing file operations",
+      "cleanup": "Auto-deleted after test"
+    },
+    "mock_update": {
+      "defined_in": "tests/conftest.py",
+      "type": "Mock",
+      "scope": "function",
+      "description": "Mock Telegram Update object",
+      "use_case": "Testing command handlers without Telegram API",
+      "attributes": [
+        "effective_user.id",
+        "effective_user.first_name",
+        "message"
+      ]
+    },
+    "mock_context": {
+      "defined_in": "tests/conftest.py",
+      "type": "Mock",
+      "scope": "function",
+      "description": "Mock Telegram Context object",
+      "use_case": "Testing command handlers without Telegram API",
+      "attributes": [
+        "args",
+        "bot"
+      ]
+    },
+    "bot_instance": {
+      "defined_in": "tests/conftest.py",
+      "type": "BotBase",
+      "scope": "function",
+      "description": "Initialized BotBase instance with MemoryStorage",
+      "use_case": "Testing bot functionality",
+      "cleanup": "New instance per test"
+    }
+  },
+  "testing_patterns": {
+    "unit_tests": {
+      "location": "tests/core/",
+      "pattern": "Test individual modules in isolation",
+      "fixtures": [
+        "memory_storage",
+        "json_storage"
+      ],
+      "focus": "Single module functionality",
+      "mocking": "Minimal - test actual implementations",
+      "speed": "Fast (no Telegram API calls)"
+    },
+    "integration_tests": {
+      "location": "tests/integration/",
+      "pattern": "Test multiple modules working together",
+      "fixtures": [
+        "bot_instance",
+        "json_storage",
+        "temp_dir"
+      ],
+      "focus": "Cross-module interactions",
+      "mocking": "Telegram API only",
+      "speed": "Moderate (includes file I/O)"
+    },
+    "async_testing": {
+      "framework": "pytest-asyncio",
+      "decorator": "@pytest.mark.asyncio",
+      "used_in": [
+        "test_bot_base.py",
+        "test_full_flow.py"
+      ],
+      "pattern": "async def test_* for async functions"
+    },
+    "parametrized_tests": {
+      "framework": "@pytest.mark.parametrize",
+      "usage": "Test multiple scenarios with same logic",
+      "example": "test_storage.py - multiple backends"
+    }
+  },
+  "coverage": {
+    "overall": {
+      "target": 79,
+      "current": 80,
+      "status": "✅ Above threshold"
+    },
+    "by_module": {
+      "bot_base.py": {
+        "coverage": 87,
+        "lines": 562,
+        "missing": "Error handling edge cases",
+        "status": "High"
+      },
+      "storage/base.py": {
+        "coverage": 100,
+        "lines": 62,
+        "missing": "None",
+        "status": "Complete"
+      },
+      "storage/json.py": {
+        "coverage": 95,
+        "lines": 124,
+        "missing": "Some error recovery paths",
+        "status": "Excellent"
+      },
+      "storage/memory.py": {
+        "coverage": 98,
+        "lines": 110,
+        "missing": "Minimal",
+        "status": "Excellent"
+      },
+      "user_manager.py": {
+        "coverage": 100,
+        "lines": 112,
+        "missing": "None",
+        "status": "Complete"
+      },
+      "admin_manager.py": {
+        "coverage": 100,
+        "lines": 131,
+        "missing": "None",
+        "status": "Complete"
+      }
+    },
+    "report_commands": {
+      "terminal": "pytest --cov=telegram_bot_stack --cov-report=term",
+      "html": "pytest --cov=telegram_bot_stack --cov-report=html",
+      "missing_lines": "pytest --cov=telegram_bot_stack --cov-report=term-missing"
+    }
+  },
+  "running_tests": {
+    "all_tests": {
+      "command": "pytest",
+      "description": "Run all tests",
+      "duration": "~5 seconds"
+    },
+    "with_coverage": {
+      "command": "pytest --cov=telegram_bot_stack --cov-report=term",
+      "description": "Run tests with coverage report",
+      "duration": "~7 seconds"
+    },
+    "specific_file": {
+      "command": "pytest tests/core/test_storage.py",
+      "description": "Run tests from specific file",
+      "duration": "~2 seconds"
+    },
+    "specific_test": {
+      "command": "pytest tests/core/test_storage.py::TestMemoryStorage::test_save",
+      "description": "Run single test",
+      "duration": "~0.5 seconds"
+    },
+    "verbose": {
+      "command": "pytest -v",
+      "description": "Run with verbose output",
+      "use_case": "Debugging test failures"
+    },
+    "last_failed": {
+      "command": "pytest --lf",
+      "description": "Run only last failed tests",
+      "use_case": "Quick iteration on failures"
+    },
+    "markers": {
+      "command": "pytest -m asyncio",
+      "description": "Run tests with specific marker",
+      "available_markers": [
+        "asyncio",
+        "slow",
+        "integration"
+      ]
+    }
+  },
+  "ai_agent_hints": {
+    "adding_tests": {
+      "for_new_feature": [
+        "1. Determine if unit or integration test",
+        "2. Create test in appropriate directory (core/ or integration/)",
+        "3. Import necessary fixtures from conftest",
+        "4. Follow existing test patterns",
+        "5. Run pytest to verify",
+        "6. Check coverage: pytest --cov"
+      ],
+      "for_storage_backend": [
+        "1. Add test class to tests/core/test_storage.py",
+        "2. Test all StorageBackend methods",
+        "3. Test error cases",
+        "4. Use both memory_storage and json_storage fixtures as examples"
+      ],
+      "for_bot_command": [
+        "1. Add test to tests/core/test_bot_base.py",
+        "2. Use mock_update and mock_context fixtures",
+        "3. Mark as @pytest.mark.asyncio if async",
+        "4. Test both success and error cases",
+        "5. Test permission checks if admin command"
+      ]
+    },
+    "debugging_tests": {
+      "test_failure": [
+        "1. Run with -v for verbose output",
+        "2. Run single failing test: pytest path/to/test.py::test_name",
+        "3. Add print statements or use pytest -s",
+        "4. Check fixtures are working correctly",
+        "5. Verify mocks are configured properly"
+      ],
+      "coverage_too_low": [
+        "1. Run: pytest --cov-report=html",
+        "2. Open htmlcov/index.html in browser",
+        "3. Find uncovered lines (red)",
+        "4. Add tests for missing scenarios",
+        "5. Verify new coverage meets threshold"
+      ]
+    },
+    "common_tasks": [
+      {
+        "task": "Add test for new storage backend",
+        "file": "tests/core/test_storage.py",
+        "pattern": "Follow TestJSONStorage or TestMemoryStorage",
+        "fixtures": [
+          "memory_storage",
+          "temp_dir"
+        ]
+      },
+      {
+        "task": "Test new bot command",
+        "file": "tests/core/test_bot_base.py",
+        "pattern": "Follow existing command tests",
+        "fixtures": [
+          "bot_instance",
+          "mock_update",
+          "mock_context"
+        ],
+        "async": true
+      },
+      {
+        "task": "Add integration test",
+        "file": "tests/integration/test_full_flow.py",
+        "pattern": "Test complete workflow",
+        "fixtures": [
+          "bot_instance",
+          "json_storage",
+          "temp_dir"
+        ]
+      }
+    ]
+  },
+  "test_configuration": {
+    "pytest.ini": {
+      "location": "pyproject.toml [tool.pytest.ini_options]",
+      "settings": {
+        "testpaths": [
+          "tests"
+        ],
+        "python_files": [
+          "test_*.py"
+        ],
+        "python_classes": [
+          "Test*"
+        ],
+        "python_functions": [
+          "test_*"
+        ],
+        "asyncio_mode": "auto",
+        "addopts": "--strict-markers"
+      }
+    },
+    "coverage_config": {
+      "location": "pyproject.toml [tool.coverage]",
+      "settings": {
+        "source": [
+          "telegram_bot_stack"
+        ],
+        "omit": [
+          "*/tests/*",
+          "*/__pycache__/*"
+        ],
+        "fail_under": 79
+      }
+    }
+  }
+}
