@@ -6,7 +6,8 @@
 1. **Read:** `.github/PROJECT_STATUS.md` (current phase, open issues)
 2. **Check:** `python3 .github/workflows/scripts/read_issues.py --list --state open`
 3. **Understand:** Read relevant section of `PACKAGE_CONVERSION_PLAN_RU.md`
-4. **Act:** Follow issue checklist or user request
+4. **Check Git Branch:** Verify not on `main` branch (see Git Workflow below)
+5. **Act:** Follow issue checklist or user request
 
 ### When User Says "Continue Work":
 ```bash
@@ -15,7 +16,9 @@
 2. List open issues → identify active issue
 3. Read issue details → understand task
 4. Check plan context → understand why
-5. Implement → follow issue acceptance criteria
+5. Check current branch → ensure on feature branch
+6. Implement → follow issue acceptance criteria
+7. Commit → use conventional commits format
 ```
 
 ## 🎯 Project Context (Quick Facts)
@@ -44,22 +47,99 @@
 
 ## 🔄 Essential Workflows
 
-### Git Commits (Conventional Commits)
+### Git Workflow (IMPORTANT!)
+
+**⚠️ CRITICAL: We use GitHub Flow with branch protection!**
+
+#### For Agent: Optimal Git Workflow
+
+**Rule 1: NEVER push directly to `main`**
+- `main` branch is protected
+- Direct pushes will be rejected
+- Always work in feature branches
+
+**Rule 2: Always check current branch**
 ```bash
-# Always:
-1. git status && git diff --stat
-2. git log --oneline -10                     # Check style
-3. Update docs BEFORE commit
-4. git add .
-5. git commit -m "type(scope): description"
-6. Format: feat/fix/docs/refactor/test/chore
+# Before making changes:
+git branch --show-current
 ```
 
+**Rule 3: Create feature branch if needed**
+```bash
+# If on main or need new feature:
+git checkout -b feature/<descriptive-name>
+# Or:
+git checkout -b fix/<bug-name>
+git checkout -b docs/<doc-name>
+```
+
+**Rule 4: Make changes and commit**
+```bash
+# Standard workflow:
+1. git status && git diff --stat
+2. git log --oneline -5                     # Check commit style
+3. Update docs BEFORE commit (if needed)
+4. git add .
+5. git commit -m "type(scope): description" # Conventional commits!
+```
+
+**Rule 5: Push to feature branch**
+```bash
+# Push feature branch (NOT main):
+git push origin feature/<name>
+```
+
+**Rule 6: Inform user about PR**
+- Tell user PR needs to be created
+- Provide branch name
+- Mention what was done
+- Don't try to create PR via API (user should review)
+
+### Conventional Commits (REQUIRED!)
+
+**Format:** `type(scope): description`
+
+**Version Impact:**
+- `feat:` → MINOR version bump (0.1.0 → 0.2.0)
+- `fix:` → PATCH version bump (0.1.0 → 0.1.1)
+- `docs:` → No version bump
+- `chore:` → No version bump
+- `test:` → No version bump
+- `refactor:` → No version bump
+- `perf:` → PATCH version bump
+- `feat!:` or `BREAKING CHANGE:` → MAJOR version bump (0.x.x → 1.0.0)
+
 **Examples:**
-- `feat(core): add new storage backend`
-- `fix(tests): resolve coverage calculation`
-- `docs(readme): update architecture section`
-- `test(storage): add edge case tests`
+- `feat(storage): add Redis backend support`
+- `fix(auth): resolve token validation issue`
+- `docs(readme): update installation instructions`
+- `test(storage): add integration tests`
+- `chore(deps): update dependencies`
+- `refactor(bot): simplify command handling`
+
+### Agent Decision Tree for Git Operations
+
+```
+START
+↓
+Is this documentation-only change?
+├─ YES → Use `docs:` commit type → No version bump
+├─ NO → Continue
+↓
+Is this a new feature?
+├─ YES → Use `feat:` commit type → MINOR bump
+├─ NO → Continue
+↓
+Is this a bug fix?
+├─ YES → Use `fix:` commit type → PATCH bump
+├─ NO → Continue
+↓
+Is this maintenance/chores?
+├─ YES → Use `chore:` commit type → No bump
+├─ NO → Use best judgment
+↓
+COMMIT → PUSH → INFORM USER ABOUT PR
+```
 
 ### GitHub Issues (Use Scripts)
 ```bash
@@ -149,12 +229,97 @@ tests/
 - `.github/PROJECT_STATUS.md` (compact status)
 - Current issue via script (structured output)
 - Relevant plan section only (not entire file)
+- `git branch --show-current` (verify branch)
 
 **Prioritize:**
-1. Status file (20 lines) → context
-2. Issue details (50-100 lines) → task
-3. Plan section (50-100 lines) → why
-4. Code only when needed → implementation
+1. Check git branch → ensure on feature branch
+2. Status file (20 lines) → context
+3. Issue details (50-100 lines) → task
+4. Plan section (50-100 lines) → why
+5. Code only when needed → implementation
+
+## 🎯 Agent Optimization Strategies
+
+### When to Create Feature Branch
+
+**Create new branch IF:**
+- Currently on `main` branch
+- Starting work on new issue/feature
+- User says "continue work" and no feature branch exists
+
+**Stay on current branch IF:**
+- Already on a feature branch
+- Continuing work on same feature
+- Branch name matches the work being done
+
+**Branch Naming:**
+- `feature/<issue-number>-<short-description>` (e.g., `feature/5-add-redis`)
+- `fix/<issue-number>-<short-description>` (e.g., `fix/23-auth-bug`)
+- `docs/<description>` (e.g., `docs/update-api-reference`)
+
+### Optimal Commit Strategy
+
+**Single logical change:**
+- Make one commit per logical unit of work
+- Example: "Add Redis storage backend" (not "Add Redis" + "Add tests" as separate commits)
+
+**Batch related changes:**
+- Group related file changes in one commit
+- Example: Update README + add example + update docs → one `docs:` commit
+
+**Multiple features in session:**
+- If working on multiple unrelated things, ask user:
+- "Should I commit feature A before starting feature B?"
+- "Should I create separate branches for each feature?"
+
+### When to Push and Inform
+
+**Push after:**
+- Completing a logical unit of work
+- User asks to "commit" or "save"
+- Completing issue checklist item
+- Before switching to different task
+
+**Inform user that PR is needed:**
+```
+✅ Changes committed to branch `feature/xyz`
+📝 Pushed to origin/feature/xyz
+🔄 Next: Create Pull Request on GitHub
+- Branch: feature/xyz → main
+- All CI checks will run automatically
+- Requires 1 approval before merge
+- Automatic release after merge
+```
+
+### Emergency: If on main branch
+
+**If you accidentally made changes on main:**
+```bash
+# 1. Check current state
+git status
+
+# 2. Create feature branch (takes changes with it)
+git checkout -b feature/emergency-branch-name
+
+# 3. Commit on feature branch
+git add .
+git commit -m "type: description"
+
+# 4. Push feature branch
+git push origin feature/emergency-branch-name
+
+# 5. Inform user
+```
+
+## 🚨 Critical Git Rules for Agent
+
+1. **NEVER `git push origin main`** - Will fail due to branch protection
+2. **ALWAYS check branch** before making changes
+3. **ALWAYS use conventional commits** - Enables auto-versioning
+4. **INFORM user about PR** - Don't auto-create PRs
+5. **BATCH commits** - One commit per logical unit, not per file
+6. **UPDATE docs** before committing code changes
+7. **RUN tests** before pushing (if applicable)
 
 ## 📋 Detailed Rules (Reference)
 
