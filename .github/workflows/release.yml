@@ -59,29 +59,29 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Publish to GitHub Packages (optional)
-        if: steps.semantic_release.outputs.released == 'true'
-        env:
-          TWINE_USERNAME: __token__
-          TWINE_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build Package (optional)
+        if: steps.check_release.outputs.release_needed == 'true'
         run: |
-          pip install build twine
+          pip install build
           python -m build
           echo "📦 Package built successfully"
-          # Uncomment to publish to GitHub Packages:
-          # twine upload --repository-url https://upload.pypi.org/legacy/ dist/*
+          # Uncomment to publish to PyPI:
+          # pip install twine
+          # twine upload dist/*
 
       - name: Release Summary
         if: always()
         run: |
           echo "## 📊 Release Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          if [ "${{ steps.semantic_release.outputs.released }}" == "true" ]; then
-            echo "✅ **New Release Created!**" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.check_release.outputs.release_needed }}" == "true" ]; then
+            # Get latest tag
+            LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "none")
+            echo "✅ **Release Process Completed**" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
-            echo "- **Version:** ${{ steps.semantic_release.outputs.version }}" >> $GITHUB_STEP_SUMMARY
-            echo "- **Tag:** ${{ steps.semantic_release.outputs.tag }}" >> $GITHUB_STEP_SUMMARY
-            echo "- **Install:** \`pip install git+https://github.com/${{ github.repository }}.git@${{ steps.semantic_release.outputs.tag }}\`" >> $GITHUB_STEP_SUMMARY
+            echo "- **Latest Tag:** \`$LATEST_TAG\`" >> $GITHUB_STEP_SUMMARY
+            echo "- **Install:** \`pip install git+https://github.com/${{ github.repository }}.git@$LATEST_TAG\`" >> $GITHUB_STEP_SUMMARY
+            echo "- **Check:** [Releases](https://github.com/${{ github.repository }}/releases)" >> $GITHUB_STEP_SUMMARY
           elif [ "${{ steps.check_release.outputs.release_needed }}" == "false" ]; then
             echo "ℹ️ **No release needed**" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
