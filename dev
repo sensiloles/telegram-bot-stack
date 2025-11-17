@@ -105,18 +105,8 @@ For more commands: ./dev help
     )
     merge_analyze.add_argument("pr_number", type=int, help="PR number")
 
-    merge_auto = merge_subparsers.add_parser(
-        "auto", help="Enable auto-merge (add automerge label)"
-    )
-    merge_auto.add_argument("pr_number", type=int, help="PR number")
-
-    merge_now = merge_subparsers.add_parser("now", help="Merge PR now")
+    merge_now = merge_subparsers.add_parser("now", help="Merge PR with squash")
     merge_now.add_argument("pr_number", type=int, help="PR number")
-    merge_now.add_argument(
-        "--method",
-        choices=["merge", "squash", "rebase"],
-        help="Merge method",
-    )
     merge_now.add_argument(
         "--dry-run", action="store_true", help="Dry run (don't merge)"
     )
@@ -238,19 +228,6 @@ For more commands: ./dev help
                     str(args.pr_number),
                 ]
             )
-        elif args.merge_command == "auto":
-            # Add automerge label to enable auto-merge
-            print(f"🏷️ Adding 'automerge' label to PR #{args.pr_number}...")
-            run_command(
-                [
-                    "python3",
-                    "-c",
-                    f"from github_helper import get_repo; "
-                    f"pr = get_repo().get_pull({args.pr_number}); "
-                    f"pr.add_to_labels('automerge'); "
-                    f"print(f'✅ Auto-merge enabled for PR #{args.pr_number}')",
-                ]
-            )
         elif args.merge_command == "now":
             cmd = [
                 "python3",
@@ -258,8 +235,6 @@ For more commands: ./dev help
                 "--pr",
                 str(args.pr_number),
             ]
-            if hasattr(args, "method") and args.method:
-                cmd.extend(["--method", args.method])
             if args.dry_run:
                 cmd.append("--dry-run")
             run_command(cmd)
