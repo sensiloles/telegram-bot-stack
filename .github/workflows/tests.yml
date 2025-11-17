@@ -35,7 +35,7 @@ jobs:
         id: pytest
         continue-on-error: true
         run: |
-          pytest --cov=src/core \
+          pytest --cov=telegram_bot_stack \
                  --cov-report=xml \
                  --cov-report=term-missing \
                  --cov-report=html \
@@ -138,7 +138,7 @@ jobs:
         # TODO: Fix type errors and remove this flag
         continue-on-error: true
         run: |
-          mypy src/core --ignore-missing-imports
+          mypy telegram_bot_stack --ignore-missing-imports
 
   summary:
     name: Test Summary
