@@ -45,7 +45,7 @@ import sys
 from pathlib import Path
 from typing import Optional
 
-from github_helper import GithubException, get_repo
+from github_helper import GithubException, get_github_client, get_repo
 
 
 def get_current_branch() -> str:
@@ -245,14 +245,12 @@ def create_pull_request(
         # Assign to user
         if auto_assign or assignee:
             try:
-                # Get GitHub client from repo
-                gh = repo._requester._Github
-
                 # Get user to assign
                 if assignee:
                     user_to_assign = assignee
                 else:
                     # Get current authenticated user
+                    gh = get_github_client()
                     current_user = gh.get_user()
                     user_to_assign = current_user.login
 
