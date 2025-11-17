@@ -439,8 +439,6 @@ python3 -m pytest
 python3 -m pytest --cov=telegram_bot_stack --cov-report=term
 ```
 
-**Coverage threshold:** 79% for `telegram_bot_stack/` (currently at 80%)
-
 ---
 
 **🎉 Happy coding!** Your development environment should now be fully configured and ready to use.

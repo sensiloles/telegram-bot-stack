@@ -37,7 +37,6 @@ telegram-bot-stack/
 
 - Generic, reusable components
 - No bot-specific logic
-- Fully tested (80% coverage)
 - Published as PyPI package
 
 **Application Layer (`examples/`):**
@@ -395,13 +394,6 @@ bot = MyBot(storage)
 ### Unit Tests
 
 **Location:** `tests/core/`
-
-**Coverage:**
-
-- Storage: 100% coverage
-- UserManager: 100% coverage
-- AdminManager: 100% coverage
-- BotBase: 68% coverage (async handlers)
 
 **Strategy:**
 
