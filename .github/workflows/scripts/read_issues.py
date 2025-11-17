@@ -69,8 +69,13 @@ def list_issues(
     """
     try:
         issues = repo.get_issues(state=state, labels=labels or [])
-        # Convert to list and limit
-        return list(issues[:limit])
+        # Convert to list with limit using iterator (handles empty lists correctly)
+        result = []
+        for i, issue in enumerate(issues):
+            if i >= limit:
+                break
+            result.append(issue)
+        return result
     except GithubException as e:
         print(f"❌ Error: Failed to list issues: {e}", file=sys.stderr)
         sys.exit(1)
