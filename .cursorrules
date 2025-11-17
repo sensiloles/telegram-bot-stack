@@ -286,12 +286,12 @@ tests/
 ✅ Changes committed to branch `feature/xyz`
 📝 Pushed to origin/feature/xyz
 🔄 Next: Create Pull Request on GitHub
-   - Branch: feature/xyz → main
-   - In PR description: Add "Closes #N" (if working on issue)
-   - All CI checks will run automatically
-   - Requires 1 approval before merge
-   - Automatic release after merge
-   - Issue #N will auto-close on merge
+- Branch: feature/xyz → main
+- In PR description: Add "Closes #N" (if working on issue)
+- All CI checks will run automatically
+- Requires 1 approval before merge
+- Automatic release after merge
+- Issue                                                    #N will auto-close on merge
 ```
 
 ### Emergency: If on main branch
