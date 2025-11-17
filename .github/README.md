@@ -32,6 +32,7 @@ Automation, workflows, and documentation for telegram-bot-stack.
 See [`.cursorrules`](../.cursorrules) for complete workflow rules.
 
 **On every new context:**
+
 1. Read `PROJECT_STATUS.md` - current phase
 2. Check open issues: `python3 .github/workflows/scripts/read_issues.py --list`
 3. Follow issue checklist or user request
@@ -39,6 +40,7 @@ See [`.cursorrules`](../.cursorrules) for complete workflow rules.
 ## 📚 Documentation
 
 ### Workflow Guides
+
 - **[Git Flow](docs/workflow/git-flow.md)** - Complete Git workflow with semantic releases
 - **[PR Automation](docs/workflow/pr-automation.md)** - Automated Pull Request creation
 - **[PR Naming](docs/workflow/pr-naming.md)** - Naming conventions for PRs
@@ -46,24 +48,28 @@ See [`.cursorrules`](../.cursorrules) for complete workflow rules.
 - **[Branch Protection](docs/workflow/branch-protection.md)** - Setup branch protection
 
 ### Setup Guides
+
 - **[Getting Started](docs/setup/getting-started.md)** - Complete setup instructions
 - **[Token Setup](docs/setup/token-setup.md)** - Configure GitHub token
 
 ### Automation
+
 - **[Scripts Documentation](docs/scripts.md)** - All automation scripts
 - **Scripts Location:** `workflows/scripts/` - Python automation scripts
 
 ## ⚙️ CI/CD Workflows
 
 ### Active Workflows
+
 - **`tests.yml`** - Run tests on all PRs (Python 3.9-3.12)
 - **`release.yml`** - Automatic releases on merge to main
 - **`publish-github-packages.yml`** - Publish to GitHub Packages
 
 ### Test Coverage
-- **Current:** 79.70%
-- **Threshold:** 79%
-- **Measured on:** Python 3.11
+
+- High test coverage maintained across all components
+- Automated coverage reporting in CI/CD
+- Coverage thresholds enforced automatically
 
 ## 🤖 Automation Scripts
 
@@ -91,9 +97,8 @@ See [docs/scripts.md](docs/scripts.md) for complete reference.
 
 ## 📊 Project Status
 
-**Current Phase:** Phase 0.3 - Validation & Documentation
-**Status:** In Progress
-**Details:** See [PROJECT_STATUS.md](PROJECT_STATUS.md)
+**Current Phase:** See [PROJECT_STATUS.md](PROJECT_STATUS.md) for up-to-date status
+**Details:** Phase information, metrics, and next steps
 
 ## 🔗 Quick Links
 
