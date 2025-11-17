@@ -405,11 +405,43 @@ export GITHUB_TOKEN=your_token_here
 
 ### Token Permissions
 
-Token needs `repo` scope:
+**Required Scopes:**
 
-- Full repository access
-- Create/edit pull requests
-- Read/write issues
+For full automation, token needs `repo` scope:
+
+- ✅ Full repository access
+- ✅ Create/edit pull requests
+- ✅ Read/write issues
+
+**Fine-grained token permissions:**
+
+- Contents: Read & Write
+- Pull requests: Read & Write
+- Issues: Read & Write
+- Metadata: Read
+
+**Note:** Personal access tokens (classic) with `repo` scope work best.
+
+### If Token Lacks PR Permissions
+
+If you see `403 Forbidden` error:
+
+```bash
+❌ Error: Resource not accessible by personal access token
+```
+
+**Solution 1:** Update token with `repo` scope (recommended)
+
+**Solution 2:** Create PR manually (fallback)
+
+```bash
+# Script shows what would be created in dry-run:
+python3 .github/workflows/scripts/create_pr.py \
+--title "..." \
+--dry-run
+
+# Then create manually on GitHub
+```
 
 ## 🐛 Troubleshooting
 
