@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.3.0 (2025-11-17)
+
+### Features
+
+- **tooling**: Add comprehensive dependency graph for AI agent navigation
+  ([`4a194c8`](https://github.com/sensiloles/telegram-bot-stack/commit/4a194c8c74586e19ac0b87520f56ed416675daf0))
+
+
 ## v1.2.1 (2025-11-17)
 
 ### Bug Fixes
