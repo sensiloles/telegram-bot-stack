@@ -70,8 +70,8 @@ echo "# Test PR" >> TEST.md
 git add TEST.md
 git commit -m "test: verify branch protection and CI"
 
-# 3. Push and create PR
-git push origin test/workflow-setup
+# 3. Push and create PR (set upstream)
+git push -u origin test/workflow-setup
 
 # 4. On GitHub: Create Pull Request
 # - Fill out PR template
@@ -158,7 +158,7 @@ See [GIT_WORKFLOW.md](.github/GIT_WORKFLOW.md) for our development workflow.
 2. Create feature branch: `git checkout -b feature/my-feature`
 3. Make changes
 4. Commit: `git commit -m "feat(scope): description"`
-5. Push: `git push origin feature/my-feature`
+5. Push: `git push -u origin feature/my-feature` (first push sets upstream)
 6. Create Pull Request
 
 All PRs require:
@@ -191,7 +191,7 @@ Send them:
 Our workflow:
 1. 🌿 Create feature branch: `git checkout -b feature/my-feature`
 2. 💻 Make changes and commit: `git commit -m "feat: add feature"`
-3. 🚀 Push and create PR: `git push origin feature/my-feature`
+3. 🚀 Push and create PR: `git push -u origin feature/my-feature`
 4. ✅ Wait for CI and approval
 5. 🎉 Merge → automatic release!
 

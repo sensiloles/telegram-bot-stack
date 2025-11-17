@@ -90,6 +90,7 @@ Interactive command-line interface:
 Located in `.github/workflows/scripts/`:
 
 #### Issue Management
+
 ```bash
 # List issues
 python3 .github/workflows/scripts/read_issues.py --list
@@ -105,6 +106,7 @@ python3 .github/workflows/scripts/create_issue.py \
 ```
 
 #### Pull Requests
+
 ```bash
 # Create PR
 python3 .github/workflows/scripts/create_pr.py \
@@ -122,6 +124,7 @@ python3 .github/workflows/scripts/check_ci.py --list-prs
 ```
 
 #### Project Status
+
 ```bash
 # Quick overview
 python3 .github/workflows/scripts/project_overview.py
@@ -154,7 +157,7 @@ git checkout -b feature/my-feature
 # 6. Commit and push
 git add .
 git commit -m "feat(scope): description"
-git push origin feature/my-feature
+git push -u origin feature/my-feature
 
 # 7. Create PR
 ./dev pr create --title "feat(scope): description" --closes 42
@@ -219,14 +222,15 @@ make ci
 
 ## 🎨 Tool Comparison
 
-| Task | Make | ./dev | Direct Script |
-|------|------|-------|---------------|
-| Run tests | `make test` | `./dev test` | `pytest` |
-| Check CI | `make pr-check PR=5` | `./dev pr check 5` | `python3 .github/workflows/scripts/check_ci.py --pr 5` |
-| Create PR | `make pr-create TITLE="..."` | `./dev pr create --title "..."` | `python3 .github/workflows/scripts/create_pr.py --title "..."` |
-| Project status | `make status` | `./dev status` | `python3 .github/workflows/scripts/project_overview.py` |
+| Task           | Make                         | ./dev                           | Direct Script                                                  |
+| -------------- | ---------------------------- | ------------------------------- | -------------------------------------------------------------- |
+| Run tests      | `make test`                  | `./dev test`                    | `pytest`                                                       |
+| Check CI       | `make pr-check PR=5`         | `./dev pr check 5`              | `python3 .github/workflows/scripts/check_ci.py --pr 5`         |
+| Create PR      | `make pr-create TITLE="..."` | `./dev pr create --title "..."` | `python3 .github/workflows/scripts/create_pr.py --title "..."` |
+| Project status | `make status`                | `./dev status`                  | `python3 .github/workflows/scripts/project_overview.py`        |
 
 **When to use what:**
+
 - **Make:** Traditional, fast, great for CI/CD
 - **./dev:** Interactive, modern, user-friendly
 - **Direct scripts:** Maximum control, automation, scripting
@@ -287,12 +291,14 @@ make test-watch
 ## 🤖 For AI Agents
 
 **Priority tools to use:**
+
 1. `make status` - Quick project overview
 2. `python3 .github/workflows/scripts/read_issues.py --list` - See open issues
 3. `python3 .github/workflows/scripts/check_ci.py --pr N` - Check CI
 4. `python3 .github/workflows/scripts/create_pr.py` - Create PRs
 
 **Workflow:**
+
 ```bash
 # 1. Check status
 make status
@@ -312,15 +318,19 @@ python3 .github/workflows/scripts/create_pr.py \
 ## 🔧 Troubleshooting
 
 ### "Command not found: make"
+
 Install make: `brew install make` (macOS) or use `./dev` instead
 
 ### "./dev: Permission denied"
+
 Run: `chmod +x dev`
 
 ### "GITHUB_TOKEN not found"
+
 Set token: See [Token Setup Guide](setup/token-setup.md)
 
 ### Scripts fail with import errors
+
 Install dependencies: `make setup` or `pip install -e ".[dev,github-actions]"`
 
 ## 🎯 Summary

@@ -13,8 +13,8 @@ git checkout -b feature/my-feature
 git add .
 git commit -m "feat(bot): add cool feature"
 
-# 3. Push & create PR
-git push origin feature/my-feature
+# 3. Push & create PR (set upstream on first push)
+git push -u origin feature/my-feature
 # → Go to GitHub → Create Pull Request
 
 # 4. Wait for:
@@ -85,8 +85,8 @@ git push --force
 # ✅ Create branches
 git checkout -b feature/anything
 
-# ✅ Push to your branch
-git push origin feature/anything
+# ✅ Push to your branch (with upstream on first push)
+git push -u origin feature/anything
 
 # ✅ Create PRs
 # (on GitHub)

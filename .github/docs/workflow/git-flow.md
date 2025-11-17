@@ -103,8 +103,8 @@ git commit -m "feat(storage): add Redis backend support"
 ### 2. Push and Create PR
 
 ```bash
-# Push branch
-git push origin feature/my-awesome-feature
+# Push branch (set upstream on first push)
+git push -u origin feature/my-awesome-feature
 
 # Create PR on GitHub
 # GitHub will suggest creating PR automatically

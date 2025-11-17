@@ -84,18 +84,21 @@ git checkout -b docs/<doc-name>
 5. git commit -m "type(scope): description" # Conventional commits!
 ```
 
-**Rule 5: Push to feature branch**
+**Rule 5: Push to feature branch with upstream**
 ```bash
-# Push feature branch (NOT main):
-git push origin feature/<name>
+# First push - set upstream tracking:
+git push -u origin feature/<name>
+
+# Subsequent pushes (upstream already set):
+git push
 ```
 
 **Rule 6: Create PR automatically (PREFERRED)**
 
 **Method:** Use automation script after push
 ```bash
-# Push changes first
-git push origin feature/<name>
+# Push changes first (with upstream tracking)
+git push -u origin feature/<name>
 
 # Then create PR automatically
 python3 .github/workflows/scripts/create_pr.py \
@@ -315,8 +318,8 @@ tests/
 
 **Workflow:**
 ```bash
-# 1. Push changes
-git push origin feature/xyz
+# 1. Push changes (set upstream on first push)
+git push -u origin feature/xyz
 
 # 2. Auto-create PR with script
 python3 .github/workflows/scripts/create_pr.py \
@@ -354,15 +357,15 @@ git checkout -b feature/emergency-branch-name
 git add .
 git commit -m "type: description"
 
-# 4. Push feature branch
-git push origin feature/emergency-branch-name
+# 4. Push feature branch (set upstream)
+git push -u origin feature/emergency-branch-name
 
 # 5. Inform user
 ```
 
 ## 🚨 Critical Git Rules for Agent
 
-1. **NEVER `git push origin main`** - Will fail due to branch protection
+1. **NEVER push to `main`** - Will fail due to branch protection
 2. **ALWAYS check branch** before making changes
 3. **ALWAYS use conventional commits** - Enables auto-versioning
 4. **AUTO-CREATE PRs** - Use `create_pr.py` script (preferred method)
