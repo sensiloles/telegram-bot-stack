@@ -2,6 +2,22 @@
 
 <!-- version list -->
 
+## v1.1.2 (2025-11-17)
+
+### Bug Fixes
+
+- **scripts**: Handle empty issue list in read_issues.py
+  ([`0912858`](https://github.com/sensiloles/telegram-bot-stack/commit/091285850f2837e433e9e5370e9cc3a9e70283a6))
+
+### Documentation
+
+- Remove hardcoded coverage metrics from .github/README.md
+  ([`4867611`](https://github.com/sensiloles/telegram-bot-stack/commit/48676115bcb54e005d1e6b2af4f14d8587d6823f))
+
+- Remove last hardcoded coverage metric from development-archive
+  ([`2fb668e`](https://github.com/sensiloles/telegram-bot-stack/commit/2fb668e15829768d9a22531d7ec7f2c7a35a7340))
+
+
 ## v1.1.1 (2025-11-17)
 
 ### Bug Fixes
