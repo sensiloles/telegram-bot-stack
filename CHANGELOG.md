@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.2.1 (2025-11-17)
+
+### Bug Fixes
+
+- **ci**: Ensure release only runs after tests pass
+  ([`038d5ac`](https://github.com/sensiloles/telegram-bot-stack/commit/038d5accaae3266e727ad5a40e57493998eee77f))
+
+
 ## v1.2.0 (2025-11-17)
 
 ### Features
