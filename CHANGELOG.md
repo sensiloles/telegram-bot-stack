@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.5.0 (2025-11-17)
+
+### Features
+
+- **graphs**: Implement multi-graph dependency system
+  ([`3b61520`](https://github.com/sensiloles/telegram-bot-stack/commit/3b61520482184a3bea2100bab90415ef7665d2a8))
+
+
 ## v1.4.0 (2025-11-17)
 
 ### Features
