@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.9.0 (2025-11-18)
+
+### Features
+
+- **scripts**: Add issue management scripts for labels and dependencies
+  ([`9a350de`](https://github.com/sensiloles/telegram-bot-stack/commit/9a350de0e9e4abf616b3d41ad0d6ecfd3c62970c))
+
+
 ## v1.8.1 (2025-11-18)
 
 ### Bug Fixes
