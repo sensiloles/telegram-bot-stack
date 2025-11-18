@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.7.1 (2025-11-18)
+
+### Bug Fixes
+
+- **docs**: Remove .github/README.md to fix main page display
+  ([`2a27a48`](https://github.com/sensiloles/telegram-bot-stack/commit/2a27a484f8369aa8f6456585cef267d0fde466ca))
+
+
 ## v1.7.0 (2025-11-18)
 
 ### Features
