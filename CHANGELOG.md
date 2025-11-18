@@ -2,6 +2,28 @@
 
 <!-- version list -->
 
+## v1.8.1 (2025-11-18)
+
+### Bug Fixes
+
+- **vscode**: Remove comments from settings.recommended.json
+  ([`e7b706a`](https://github.com/sensiloles/telegram-bot-stack/commit/e7b706acabdf562985b4ba710c9568646b3d53f2))
+
+### Documentation
+
+- **examples**: Add reminder_bot and menu_bot examples
+  ([`61f00f2`](https://github.com/sensiloles/telegram-bot-stack/commit/61f00f23d5b9872f2a600175c38f22b1edf89373))
+
+- **github**: Optimize and consolidate .github folder
+  ([`be5bd23`](https://github.com/sensiloles/telegram-bot-stack/commit/be5bd23555b8e4e26bb710ca51597324316deac2))
+
+- **status**: Add VPS deployment issues #27, #28, #29
+  ([`bb9e086`](https://github.com/sensiloles/telegram-bot-stack/commit/bb9e0860216eb1f7e74c670ee7a5161e86d40db4))
+
+- **vscode**: Add recommended settings with type checking
+  ([`14e4eea`](https://github.com/sensiloles/telegram-bot-stack/commit/14e4eea2f82e51952745bc332f55f66c4dfd70fd))
+
+
 ## v1.8.0 (2025-11-18)
 
 ### Features
