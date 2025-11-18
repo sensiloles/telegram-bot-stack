@@ -2,8 +2,8 @@
 
 **Project:** telegram-bot-stack - Reusable Telegram Bot Framework
 **Repository:** https://github.com/sensiloles/telegram-bot-stack
-**Current Phase:** Phase 2 - PyPI Publication (Next)
-**Last Updated:** 2025-11-17
+**Current Phase:** Phase 2+ - Feature Expansion & Refinement
+**Last Updated:** 2025-11-18
 
 ## 🎯 Quick Start for Agent
 
@@ -78,11 +78,43 @@ issue = repo.create_issue(title="...", body="...", labels=[...])
 - Full documentation (quickstart, API reference, migration guide)
 - Ready for PyPI publication
 
+### ✅ Phase 2: PyPI Publication
+
+- **Issue #12, #13:** CLOSED
+- **Status:** Completed (v1.1.1 published)
+- Package published to PyPI
+- Release automation configured
+- Multi-graph dependency system implemented (#15, #16)
+- Git workflow improvements (#5-11, #14)
+
+### 🚧 Phase 2+: Feature Expansion & Refinement (Current)
+
+**Active Issues:**
+
+- **Issue #17** [Priority: HIGH]: feat(storage): Implement SQL storage backend
+  - Complete Storage Abstraction Layer from original plan
+  - Add SQLite and PostgreSQL support
+  - Migration tool JSON → SQL
+  - Key differentiator for framework
+- **Issue #18** [Priority: MEDIUM]: feat(decorators): Add rate limiting decorator
+  - Protection against spam and abuse
+  - Built-in `@rate_limit` decorator
+  - Storage-backed rate tracking
+- **Issue #19** [Priority: MEDIUM]: feat(webhooks): Add webhook support
+  - Alternative to polling for production
+  - Lower latency and resource usage
+  - SSL certificate handling
+- **Issue #20** [Priority: MEDIUM]: docs(examples): Add more real-world examples
+  - Reminder bot (scheduler demo)
+  - Poll bot (SQL storage demo)
+  - Menu bot (inline keyboards)
+  - Media bot (file handling)
+
 ## 📁 Project Structure
 
 ```
 telegram-bot-stack/
-├── telegram_bot_stack/    # ✅ PyPI Package (v0.1.0)
+├── telegram_bot_stack/    # ✅ PyPI Package (v1.1.1)
 │   ├── __init__.py        # Public API
 │   ├── bot_base.py        # Base class with common patterns
 │   ├── user_manager.py    # User management
@@ -90,25 +122,38 @@ telegram-bot-stack/
 │   └── storage/           # Storage abstraction layer
 │       ├── base.py        # StorageBackend interface
 │       ├── json.py        # JSONStorage (file-based)
-│       └── memory.py      # MemoryStorage (in-memory)
-├── examples/              # ✅ 3 example bots
+│       ├── memory.py      # MemoryStorage (in-memory)
+│       └── sql.py         # 🚧 SQLStorage (Issue #17)
+├── examples/              # ✅ 3 example bots (+4 planned)
 │   ├── echo_bot/          # Simplest example
 │   ├── counter_bot/       # State management
-│   └── quit_smoking_bot/  # Real-world app
+│   ├── quit_smoking_bot/  # Real-world app
+│   ├── reminder_bot/      # 🚧 Scheduler demo (Issue #20)
+│   ├── poll_bot/          # 🚧 SQL storage demo (Issue #20)
+│   └── menu_bot/          # 🚧 Inline keyboards (Issue #20)
 ├── tests/                 # ✅ 131 tests, 80% coverage
 │   ├── core/              # Framework tests
 │   └── integration/       # E2E tests
 ├── docs/                  # ✅ Comprehensive documentation
 │   ├── quickstart.md      # Getting started guide
 │   ├── api_reference.md   # Full API documentation
-│   └── migration_guide.md # Migration from Phase 0
+│   ├── migration_guide.md # Migration from Phase 0
+│   └── storage_guide.md   # 🚧 Storage backends guide (Issue #17)
 ├── .github/
 │   ├── PROJECT_STATUS.md  # 👈 THIS FILE (project state)
 │   └── workflows/
 │       ├── tests.yml      # ✅ CI/CD pipeline
-│       └── scripts/       # Automation scripts
+│       ├── release.yml    # ✅ Release automation
+│       └── scripts/       # ✅ 16 automation scripts
+├── .project-graph/        # ✅ Multi-graph system
+│   ├── graph-router.json  # Central navigation hub
+│   ├── bot-framework-graph.json
+│   ├── infrastructure-graph.json
+│   ├── testing-graph.json
+│   ├── examples-graph.json
+│   └── project-meta-graph.json
 ├── LICENSE                # MIT License
-└── archive/                     # 📖 Archived plans
+└── archive/               # 📖 Archived plans
     └── PACKAGE_CONVERSION_PLAN_RU.md
 ```
 
@@ -135,14 +180,33 @@ telegram-bot-stack/
 # 1. Check status
 python3 .github/workflows/scripts/read_issues.py --list --state open
 
-# 2. Read current issue
-python3 .github/workflows/scripts/read_issues.py <issue_number>
+# 2. Read current issue (start with #17 - highest priority)
+python3 .github/workflows/scripts/read_issues.py 17
 
-# 3. Check plan context (if needed)
-# Read archive/PACKAGE_CONVERSION_PLAN_RU.md
+# 3. Check context
+# - Graph system: .project-graph/graph-router.json
+# - Original plan: archive/PACKAGE_CONVERSION_PLAN_RU.md (if needed)
 
 # 4. Start implementation
 # Follow issue checklist
+```
+
+### Current Recommended Workflow
+
+**Priority 1: Issue #17 (SQL Storage)**
+
+```bash
+# Read issue
+python3 .github/workflows/scripts/read_issues.py 17
+
+# Check current storage implementation
+cat telegram_bot_stack/storage/base.py
+cat telegram_bot_stack/storage/json.py
+
+# Create feature branch
+git checkout -b feature/17-sql-storage
+
+# Start implementation (see issue for full checklist)
 ```
 
 ### Creating New Phase Issue
@@ -185,7 +249,8 @@ python3 -m pytest tests/core/test_storage.py -v
 - Total Tests: 131
 - CI/CD: ✅ Passing
 - Linter: ✅ No errors
-- Package Version: v0.1.0
+- Package Version: v1.1.1 (PyPI)
+- Multi-Graph System: ✅ Active (80-90% token savings)
 
 **Progress:**
 
@@ -193,8 +258,11 @@ python3 -m pytest tests/core/test_storage.py -v
 - Phase 0.2: ✅ 100% Complete
 - Phase 0.3: ✅ 100% Complete
 - Phase 1: ✅ 100% Complete
-- **Overall Progress: ✅ Phase 1 Complete**
-- Phase 2: ⏳ Ready to start (PyPI Publication)
+- Phase 2: ✅ 100% Complete (v1.1.1 on PyPI)
+- **Phase 2+: 🚧 In Progress** (4 active issues)
+  - Storage completion (Issue #17)
+  - Framework enhancements (Issues #18, #19)
+  - Documentation expansion (Issue #20)
 
 ## 🔗 Quick Links
 
