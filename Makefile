@@ -232,7 +232,6 @@ issue-read: ## Read specific issue (usage: make issue-read ISSUE=4)
 		exit 1; \
 	fi
 	@python3 .github/workflows/scripts/read_issues.py $(ISSUE)
-
 ##@ Development
 
 dev-shell: ## Start development Python shell with imports
