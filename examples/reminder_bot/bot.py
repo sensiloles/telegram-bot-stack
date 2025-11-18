@@ -20,7 +20,7 @@ import re
 import signal
 import sys
 from datetime import datetime, timedelta
-from typing import Dict
+from typing import Dict, Optional
 
 from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes
@@ -109,7 +109,7 @@ class ReminderBot(BotBase):
         self.reminder_counter += 1
         return f"r{self.reminder_counter}"
 
-    def _parse_time(self, time_str: str) -> datetime | None:
+    def _parse_time(self, time_str: str) -> Optional[datetime]:
         """Parse time string to datetime.
 
         Supported formats:
