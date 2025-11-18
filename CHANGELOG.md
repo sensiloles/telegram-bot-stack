@@ -2,6 +2,19 @@
 
 <!-- version list -->
 
+## v1.6.0 (2025-11-18)
+
+### Documentation
+
+- **status**: Update PROJECT_STATUS with Phase 2+ roadmap
+  ([`16cab76`](https://github.com/sensiloles/telegram-bot-stack/commit/16cab768cae1696d57b1f0b77698b8091f38e51a))
+
+### Features
+
+- **storage**: Implement SQL storage backend
+  ([`4ef47ad`](https://github.com/sensiloles/telegram-bot-stack/commit/4ef47ade8dfe688f15c6942ef342b5827eba198a))
+
+
 ## v1.5.0 (2025-11-17)
 
 ### Features
