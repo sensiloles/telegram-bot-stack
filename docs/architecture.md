@@ -1,5 +1,7 @@
 # Architecture Overview
 
+> 📚 **Documentation Index:** See [Documentation Index](README.md) for all available guides.
+
 ## 🏗️ Project Structure
 
 The telegram-bot-stack project follows a clear separation between **reusable framework components** and **bot-specific application logic**.
@@ -492,7 +494,7 @@ bot = MyBot(storage)
 - **Master Plan:** `archive/PACKAGE_CONVERSION_PLAN_RU.md` (archived)
 - **Project Status:** `.github/PROJECT_STATUS.md`
 - **Testing Guide:** `README.md` (Testing section)
-- **API Documentation:** `docs/api_reference.md`
+- **API Documentation:** [API Reference](api_reference.md)
 
 ---
 

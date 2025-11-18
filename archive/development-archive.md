@@ -287,7 +287,7 @@ telegram-bot-stack/
 ├── .github/             # GitHub Actions and project docs
 ├── Makefile             # Build commands
 ├── pyproject.toml       # Python dependencies
-├── ARCHITECTURE.md      # Architecture documentation
+├── docs/architecture.md      # Architecture documentation
 └── .env.example         # Environment template
 ```
 
@@ -392,7 +392,7 @@ make code-check
 
 ### Understanding the Architecture
 
-See [`ARCHITECTURE.md`](ARCHITECTURE.md) for detailed documentation on:
+See [Architecture Guide](../docs/architecture.md) for detailed documentation on:
 
 - Framework design and components
 - Data flow and patterns

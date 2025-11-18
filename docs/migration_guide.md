@@ -1,5 +1,7 @@
 # Migration Guide
 
+> 📚 **Documentation Index:** See [Documentation Index](README.md) for all available guides.
+
 Guide for migrating to `telegram-bot-stack` v0.1.0 from previous versions.
 
 ## Table of Contents

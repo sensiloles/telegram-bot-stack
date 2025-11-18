@@ -1,5 +1,7 @@
 # 📦 Installation Instructions
 
+> 📚 **Documentation Index:** See [Documentation Index](README.md) for all available guides.
+
 `telegram-bot-stack` v0.1.0 - Reusable Telegram Bot Framework
 
 ## ✅ Quick Install (Recommended)
@@ -44,6 +46,7 @@ telegram-bot-stack @ git+https://github.com/sensiloles/telegram-bot-stack.git
 ```
 
 Then install:
+
 ```bash
 pip install -r requirements.txt
 ```
@@ -73,6 +76,7 @@ pip install git+ssh://git@github.com/sensiloles/telegram-bot-stack.git
 ```
 
 **Requirements:**
+
 - SSH key configured for GitHub
 - Access to the repository
 
@@ -98,9 +102,9 @@ print("✅ telegram-bot-stack installed successfully!")
 
 After installation:
 
-1. **Read Quick Start:** [docs/quickstart.md](docs/quickstart.md)
-2. **Check Examples:** [examples/](examples/)
-3. **API Reference:** [docs/api_reference.md](docs/api_reference.md)
+1. **Read Quick Start:** [Quick Start Guide](quickstart.md)
+2. **Check Examples:** [examples/](../examples/)
+3. **API Reference:** [API Reference](api_reference.md)
 
 ---
 
@@ -125,6 +129,7 @@ pip install --upgrade git+https://github.com/sensiloles/telegram-bot-stack.git
 ### Issue: "No module named 'telegram_bot_stack'"
 
 **Solution:** Install the package:
+
 ```bash
 pip install git+https://github.com/sensiloles/telegram-bot-stack.git@v0.1.0
 ```
@@ -132,6 +137,7 @@ pip install git+https://github.com/sensiloles/telegram-bot-stack.git@v0.1.0
 ### Issue: "fatal: could not read from remote repository"
 
 **For private repos:**
+
 ```bash
 # Use SSH instead
 pip install git+ssh://git@github.com/sensiloles/telegram-bot-stack.git@v0.1.0
@@ -140,6 +146,7 @@ pip install git+ssh://git@github.com/sensiloles/telegram-bot-stack.git@v0.1.0
 ### Issue: "Permission denied (publickey)"
 
 **Solution:** Configure SSH key for GitHub:
+
 ```bash
 ssh-keygen -t ed25519 -C "your_email@example.com"
 # Add key to GitHub: Settings → SSH and GPG keys
@@ -149,11 +156,11 @@ ssh-keygen -t ed25519 -C "your_email@example.com"
 
 ## 📖 More Information
 
-- **Full Documentation:** [README.md](README.md)
-- **Private Installation Options:** [docs/private_installation.md](docs/private_installation.md)
-- **Migration Guide:** [docs/migration_guide.md](docs/migration_guide.md)
+- **Full Documentation:** [Main README](../README.md)
+- **Private Installation Options:** [Private Installation Guide](private_installation.md)
+- **Migration Guide:** [Migration Guide](migration_guide.md)
 - **GitHub Repository:** https://github.com/sensiloles/telegram-bot-stack
 
 ---
 
-**Ready to build your bot?** Start with the [Quick Start Guide](docs/quickstart.md)! 🤖✨
+**Ready to build your bot?** Start with the [Quick Start Guide](quickstart.md)! 🤖✨

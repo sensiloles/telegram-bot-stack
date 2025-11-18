@@ -1,5 +1,7 @@
 # API Reference
 
+> 📚 **Documentation Index:** See [Documentation Index](README.md) for all available guides.
+
 Complete API documentation for `telegram-bot-stack` framework.
 
 ## Table of Contents
@@ -792,7 +794,7 @@ storage.save("analytics", {"user_count": 100})
 
 - [Quick Start Guide](quickstart.md) - Get started in minutes
 - [Migration Guide](migration_guide.md) - Upgrade from older versions
-- [Architecture](../ARCHITECTURE.md) - Design patterns and principles
+- [Architecture Guide](architecture.md) - Design patterns and principles
 - [Examples](../examples/) - Complete example bots
 
 ## Support
