@@ -1,10 +1,10 @@
 """Utilities for graph navigation and manipulation."""
 
 from .graph_utils import (
-    analyze_impact,
+    find_dependencies,
+    find_dependents,
     find_node,
-    get_dependencies,
-    get_dependents,
+    get_impact_analysis,
     get_recommended_graph,
     get_recommended_sub_graph,
     is_hierarchical_graph,
@@ -23,9 +23,9 @@ __all__ = [
     "load_graph_by_type",
     "get_recommended_graph",
     "find_node",
-    "get_dependencies",
-    "get_dependents",
-    "analyze_impact",
+    "find_dependencies",
+    "find_dependents",
+    "get_impact_analysis",
     # Hierarchical v3.0
     "is_hierarchical_graph",
     "load_domain_router",

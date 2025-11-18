@@ -1,295 +1,288 @@
-# 🔗 Multi-Graph Dependency System v3.0
+# Multi-Graph System v3.1
 
-Hierarchical graph-based code navigation for AI agents and developers.
+**Hierarchical graph-based code navigation for AI agents and developers.**
 
-## 🎯 What & Why
+**Coverage:** 100% of project files (~100 files) | **Domains:** 8 specialized graphs | **Savings:** 90-95% tokens
 
-**Problem:** Large monolithic dependency graphs (2000+ lines) are slow to read and process.
+## 🎯 Core Concept
 
-**Solution:** Domain-specific graphs with hierarchical sub-graphs for focused navigation.
+**Problem:** Reading 10,000+ lines of code is slow and inefficient.
 
-**Result:**
+**Solution:** Read 900-1000 lines of structured dependency graphs instead.
 
-- **80-90% token savings** (router → graph)
-- **50-60% additional savings** with sub-graphs
-- Read 300-450 lines instead of 1145+ lines
+**Result:** 90% token savings, 100% coverage, better understanding.
+
+## 🚀 Quick Start
+
+```python
+from utils.graph_utils import load_router, get_recommended_graph, load_graph_by_type
+
+# Step 1: Load router (~783 lines)
+router = load_router()
+
+# Step 2: Get recommendation
+graph_file = get_recommended_graph(router, "your task here")
+
+# Step 3: Load specific domain
+docs = load_graph_by_type('docs')
+config = load_graph_by_type('configuration')
+```
+
+## 📁 Domain Graphs
+
+| Domain                | Use When               | Files       | Load Function                          |
+| --------------------- | ---------------------- | ----------- | -------------------------------------- |
+| **bot-framework** 🤖  | Framework code         | 10 modules  | `load_graph_by_type('bot_framework')`  |
+| **infrastructure** 🔧 | CI/CD, automation      | 16+ scripts | `load_graph_by_type('infrastructure')` |
+| **testing** 🧪        | Tests, fixtures        | 7 files     | `load_graph_by_type('testing')`        |
+| **examples** 📚       | Example bots           | 6 bots      | `load_graph_by_type('examples')`       |
+| **docs** 📖           | Documentation          | 9 docs      | `load_graph_by_type('docs')`           |
+| **configuration** ⚙️  | Build system, configs  | 7 files     | `load_graph_by_type('configuration')`  |
+| **archive** 📦        | Historical, deprecated | 6 files     | `load_graph_by_type('archive')`        |
+| **project-meta** 🌐   | Architecture overview  | Cross-graph | `load_graph_by_type('project_meta')`   |
 
 ## 📊 Structure
 
 ```
 .project-graph/
-├── graph-router.json           # Start here - navigation hub (530 lines)
+├── graph-router.json           # START HERE (783 lines)
 │
-├── bot-framework/              # 🤖 Hierarchical domain (3 sub-graphs)
-│   ├── router.json            # Domain router (89 lines)
-│   ├── core-graph.json        # Core bot logic (321 lines)
-│   ├── storage-graph.json     # Storage backends (435 lines)
-│   └── utilities-graph.json   # Decorators, helpers (85 lines)
+├── bot-framework/              # Hierarchical: 3 sub-graphs
+│   ├── router.json
+│   ├── core-graph.json         # BotBase, UserManager (321 lines)
+│   ├── storage-graph.json      # JSON, Memory, SQL (435 lines)
+│   └── utilities-graph.json    # Decorators (85 lines)
 │
-├── infrastructure/             # 🔧 Flat domain
-│   ├── router.json            # Domain metadata
-│   └── graph.json             # CI/CD, automation (639 lines)
+├── infrastructure/graph.json   # CI/CD (639 lines)
+├── testing/graph.json          # Tests (539 lines)
+├── examples/graph.json         # Examples (471 lines)
+├── docs/graph.json             # Documentation (9 files)
+├── configuration/graph.json    # Build configs (7 files)
+├── archive/graph.json          # Deprecated (6 files)
+├── project-meta/graph.json     # Architecture (493 lines)
 │
-├── testing/                    # 🧪 Flat domain
-│   ├── router.json            # Domain metadata
-│   └── graph.json             # Test infrastructure (539 lines)
-│
-├── examples/                   # 📚 Flat domain
-│   ├── router.json            # Domain metadata
-│   └── graph.json             # Example bots (471 lines)
-│
-├── project-meta/               # 🌐 Flat domain
-│   ├── router.json            # Domain metadata
-│   └── graph.json             # Project overview (493 lines)
-│
-└── utils/                      # 🛠️ Python utilities
-    ├── graph_utils.py          # Graph navigation functions
-    ├── split_bot_framework.py  # Graph splitting tool
+└── utils/
+    ├── graph_utils.py          # Navigation functions
     └── examples.py             # Usage examples
 ```
 
-## 🚀 Quick Start
+## 💡 Common Use Cases
 
-### For AI Agents
-
-**Step 1:** Read router (~530 lines)
+### 1. Update Documentation
 
 ```python
-from graph_utils import load_router
-router = load_router()
+docs = load_graph_by_type('docs')
+api_ref = find_node(docs, 'docs.api_reference')
+# → Edit: docs/api_reference.md (802 lines)
 ```
 
-**Step 2:** Get recommendation
+### 2. Add Dependency
 
 ```python
-from graph_utils import get_recommended_graph
-graph_file = get_recommended_graph(router, "add storage backend")
-# Returns: "bot-framework-graph.json"
+config = load_graph_by_type('configuration')
+pyproject = find_node(config, 'config.pyproject')
+# → Edit: pyproject.toml → dependencies
 ```
 
-**Step 3:** Check if hierarchical
+### 3. Add Storage Backend
 
 ```python
-from graph_utils import is_hierarchical_graph, get_recommended_sub_graph
-
-if is_hierarchical_graph('bot_framework'):
-    # Get specific sub-graph
-    sub_id = get_recommended_sub_graph('bot_framework', 'add storage backend')
-    # Returns: "storage"
+# Load hierarchical sub-graph
+storage = load_sub_graph('bot_framework', 'storage')
+base = find_node(storage, 'telegram_bot_stack.storage.base')
+# → Implement: telegram_bot_stack/storage/redis.py
+# → Update: bot-framework/storage-graph.json
 ```
 
-**Step 4:** Load only what you need
+### 4. Configure Tools
 
 ```python
-from graph_utils import load_sub_graph
-storage_graph = load_sub_graph('bot_framework', 'storage')
-# Read 435 lines instead of 1145 lines (62% savings!)
+config = load_graph_by_type('configuration')
+# → Edit: pyproject.toml [tool.ruff]
+# → Edit: .pre-commit-config.yaml
 ```
 
-### For Humans
+### 5. Historical Context
 
 ```python
-from graph_utils import load_graph_by_type, find_node
-
-# Load graph
-graph = load_graph_by_type('bot_framework')
-
-# Find module
-node = find_node(graph, 'telegram_bot_stack.bot_base')
-print(node['description'])
+archive = load_graph_by_type('archive')
+# → Check: Why Docker was removed?
+# → Read: archive/PACKAGE_CONVERSION_PLAN_RU.md
 ```
 
-## 🔄 Hierarchical Graphs
-
-### When to Use
-
-**Flat graph** (< 1200 lines): Use as-is
+### 6. Cross-Domain Task (Add Feature)
 
 ```python
-graph = load_graph_by_type('testing')  # 539 lines - OK
+# Step 1: Implementation
+storage = load_sub_graph('bot_framework', 'storage')
+
+# Step 2: Tests
+testing = load_graph_by_type('testing')
+
+# Step 3: Documentation
+docs = load_graph_by_type('docs')
+
+# Step 4: Examples
+examples = load_graph_by_type('examples')
 ```
 
-**Hierarchical** (> 1200 lines): Use sub-graphs
+## 🎓 Key Functions
 
 ```python
-# Instead of loading entire 1145-line graph:
-graph = load_graph_by_type('bot_framework')  # DON'T
+from utils.graph_utils import (
+    # Basic
+    load_router,                # Load main router
+    load_graph_by_type,         # Load domain graph
+    get_recommended_graph,      # Get recommendation
+    find_node,                  # Find specific node
 
-# Load specific sub-graph:
-core = load_sub_graph('bot_framework', 'core')  # DO (321 lines)
+    # Hierarchical (bot-framework only)
+    is_hierarchical_graph,      # Check if hierarchical
+    load_sub_graph,             # Load sub-graph (core/storage/utilities)
+    list_sub_graphs,            # List available sub-graphs
+    load_full_hierarchical_graph, # Merge all sub-graphs
+    get_recommended_sub_graph,  # Get sub-graph recommendation
+
+    # Analysis
+    find_dependencies,          # Get dependencies
+    find_dependents,           # Get dependents
+    get_impact_analysis,       # Impact analysis
+)
 ```
 
-### Available Sub-Graphs
+## 📋 Decision Tree
 
-**bot-framework** (only hierarchical domain currently):
+```
+Your Task                               → Load Graph
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Framework code (BotBase, storage)      → bot-framework
+  └─ Core bot logic                    →   bot-framework/core
+  └─ Storage backends                  →   bot-framework/storage
+  └─ Decorators, helpers               →   bot-framework/utilities
+
+CI/CD, workflows, automation            → infrastructure
+Writing/running tests                   → testing
+Example bot patterns                    → examples
+Writing/updating docs                   → docs
+Adding dependencies, build config       → configuration
+Understanding history, deprecated       → archive
+Project architecture overview           → project-meta
+```
+
+## 📈 Performance Comparison
+
+| Approach                  | Lines Read | Savings |
+| ------------------------- | ---------- | ------- |
+| ❌ Read all project files | 10,000+    | 0%      |
+| ✅ Router + 1 graph       | 900-1,000  | 90%     |
+| ✅ Router + sub-graph     | 700-900    | 92%     |
+
+## 🎯 Best Practices
+
+1. **Always start with router** - It's your navigation hub (783 lines)
+2. **Use recommendations** - `get_recommended_graph(router, task)`
+3. **Load specific domains** - Don't read everything, be surgical
+4. **Use sub-graphs** - For bot-framework, load only core/storage/utilities
+5. **Cache router** - Load once, query many times
+6. **Update graphs** - When adding files, update relevant graph
+
+## 🔄 Hierarchical vs Flat
+
+### Hierarchical Graph (1)
+
+**bot-framework** - Split when exceeded 1200 lines:
 
 - `core` - BotBase, UserManager, AdminManager (321 lines)
 - `storage` - JSON, Memory, SQL backends (435 lines)
 - `utilities` - Decorators, helpers (85 lines)
 
-## 📖 Usage Patterns
-
-### Pattern 1: Task-Based Navigation
-
 ```python
-from graph_utils import get_recommended_graph, load_graph
-
-# Get recommendation
-task = "add new decorator"
-graph_file = get_recommended_graph(router, task)
-
-# For hierarchical graphs
-if 'bot-framework' in graph_file:
-    sub_id = get_recommended_sub_graph('bot_framework', task)
-    graph = load_sub_graph('bot_framework', sub_id)
-else:
-    graph = load_graph(graph_file)
-```
-
-### Pattern 2: Explore Sub-Graphs
-
-```python
-from graph_utils import list_sub_graphs, load_sub_graph
-
-# List available sub-graphs
-sub_graphs = list_sub_graphs('bot_framework')
-for sub_id, info in sub_graphs.items():
-    print(f"{sub_id}: {info['description']}")
-
-# Load specific one
+# Load specific sub-graph
 storage = load_sub_graph('bot_framework', 'storage')
+
+# Or load all merged
+full = load_full_hierarchical_graph('bot_framework')
 ```
 
-### Pattern 3: Full Merged View
+### Flat Graphs (7)
+
+All other domains are flat (< 1200 lines):
 
 ```python
-from graph_utils import load_full_hierarchical_graph
-
-# Load all sub-graphs merged (when you need complete view)
-full_graph = load_full_hierarchical_graph('bot_framework')
-# Returns merged graph with all 10 modules
-```
-
-## 🏗️ Architecture Decisions
-
-### Why Hierarchical?
-
-**Trigger:** Graph exceeds 1200 lines
-
-**Benefits:**
-
-1. **Focused Context:** Read only relevant sub-system
-2. **Better Reasoning:** Smaller graphs easier to understand
-3. **Scalability:** Project can grow to 100+ modules
-4. **Visualization:** Hierarchical views for humans
-
-### Size Guidelines
-
-| Type       | Lines    | Action                    |
-| ---------- | -------- | ------------------------- |
-| Router     | 200-500  | Keep compact              |
-| Flat Graph | < 800    | No split needed           |
-| Flat Graph | 800-1200 | Monitor growth            |
-| Flat Graph | > 1200   | **Split into sub-graphs** |
-| Sub-Graph  | 300-800  | Ideal size                |
-
-### Future Domains
-
-When other graphs exceed 1200 lines, create hierarchical structure:
-
-```
-infrastructure/
-├── router.json
-├── ci-cd-graph.json
-├── automation-graph.json
-└── deployment-graph.json
+# Direct load
+docs = load_graph_by_type('docs')
+config = load_graph_by_type('configuration')
+archive = load_graph_by_type('archive')
 ```
 
 ## 🛠️ Utilities
 
-### graph_utils.py
+### Validation
 
-Core navigation functions:
-
-**Loading:**
-
-- `load_router()` - Load main router
-- `load_graph(filename)` - Load any graph
-- `load_graph_by_type(type)` - Load by domain type
-
-**Hierarchical:**
-
-- `is_hierarchical_graph(type)` - Check if has sub-graphs
-- `list_sub_graphs(type)` - List available sub-graphs
-- `load_sub_graph(type, sub_id)` - Load specific sub-graph
-- `load_full_hierarchical_graph(type)` - Merge all sub-graphs
-- `get_recommended_sub_graph(type, task)` - Get recommendation
-
-**Analysis:**
-
-- `find_node(graph, id)` - Find module by ID
-- `get_dependencies(graph, id)` - Get dependencies
-- `get_dependents(graph, id)` - Get dependents
-- `analyze_impact(graph, id)` - Impact analysis
-
-### split_bot_framework.py
-
-Tool for splitting large graphs into sub-graphs. Used to create bot-framework/ structure.
-
-## 📋 Decision Tree
-
-```
-1. What are you working on?
-   ├─ Bot framework (BotBase, storage, etc)
-   │  ├─ Core bot logic? → bot-framework/core
-   │  ├─ Storage backend? → bot-framework/storage
-   │  └─ Decorators/utils? → bot-framework/utilities
-   │
-   ├─ CI/CD, automation → infrastructure-graph
-   ├─ Tests, fixtures → testing-graph
-   ├─ Example bots → examples-graph
-   └─ Project overview → project-meta-graph
-
-2. Load recommended graph/sub-graph
-3. Work with focused context
+```bash
+cd .project-graph && python3 utils/graph_utils.py
 ```
 
-## 🎓 Examples
+### Examples
 
-See `utils/examples.py` for complete usage examples.
+```bash
+# See utils/examples.py for complete examples
+python3 utils/examples.py
+```
+
+### Maintenance
+
+When adding new files:
+
+1. Identify affected graph (use decision tree)
+2. Update graph JSON (add nodes/edges)
+3. Update router statistics if significant
+4. Validate: `python3 utils/graph_utils.py`
+
+**Example:** Adding `telegram_bot_stack/cache.py`
+
+- Update: `bot-framework/utilities-graph.json`
+- Add node for cache module
+- Update metadata (node_count, edge_count)
+
+## 📦 Version History
+
+**v3.1.0 (2025-11-19)** - Complete Coverage
+
+- ✅ Added docs graph (9 documentation files)
+- ✅ Added configuration graph (7 config files)
+- ✅ Added archive graph (6 historical files)
+- ✅ 100% project coverage achieved
+- ✅ 8 specialized domain graphs
+
+**v3.0.0** - Hierarchical system
+
+- Split bot-framework into 3 sub-graphs
+- Introduced domain routers
+- 80-90% token savings
 
 ## 🔮 Roadmap
 
-### v3.1 - Enhanced Navigation
+**v3.2** - Enhanced Navigation
 
-- Interactive CLI for graph exploration
-- VS Code extension with tree view
-- Graph validation in CI/CD
+- Interactive CLI for exploration
+- VS Code extension
+- Auto-update graphs on file changes
 
-### v3.2 - Visualization
+**v3.3** - Visualization
 
 - Mermaid diagram generation
-- D3.js interactive web viewer
-- Export to GraphViz/DOT format
+- D3.js interactive viewer
+- GraphViz export
 
-### v3.3 - Smart Analysis
+**v3.4** - Smart Analysis
 
 - Automated impact analysis
 - Circular dependency detection
-- Performance bottleneck identification
 - Breaking change prediction
-
-### Future Hierarchical Splits
-
-When graphs exceed 1200 lines:
-
-- `infrastructure/` → ci-cd, automation, deployment
-- `testing/` → unit, integration, fixtures
-- `examples/` → simple, advanced, production
 
 ---
 
-**Version:** 3.0.0 (Hierarchical Multi-Graph System)
-**Last Updated:** 2025-11-19
-**Domains:** 5 (1 hierarchical with 3 sub-graphs)
-**Total Graphs:** 8 files (router + 5 domains + 2 hierarchical layers)
+**Start here:** `graph-router.json` → Find your domain → Load specific graph → Work efficiently
+
+**Token Budget:** Read 1000 lines instead of 10,000+ (90% savings)

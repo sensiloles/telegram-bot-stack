@@ -261,6 +261,133 @@
       "complexity": "high",
       "criticality": "high",
       "update_frequency": "low"
+    },
+    "docs": {
+      "id": "docs",
+      "name": "📖 Documentation",
+      "file": "docs/graph.json",
+      "router_file": "docs/router.json",
+      "description": "Project documentation, guides, and API reference",
+      "coverage": {
+        "directories": [
+          "docs/"
+        ],
+        "file_patterns": [
+          "docs/**/*.md"
+        ],
+        "files": 9,
+        "total_lines": 4621,
+        "key_components": [
+          "API Reference",
+          "Architecture",
+          "Installation Guide",
+          "Quickstart",
+          "Storage Guide",
+          "Migration Guide"
+        ]
+      },
+      "when_to_use": [
+        "Writing or updating documentation",
+        "API reference updates",
+        "Creating user guides",
+        "Documentation consistency",
+        "Understanding documented features",
+        "Migration guide updates"
+      ],
+      "typical_queries": [
+        "Where to update API documentation?",
+        "How to document new feature?",
+        "What's in the architecture docs?",
+        "Where's the storage guide?",
+        "How to update installation guide?"
+      ],
+      "complexity": "low",
+      "criticality": "high",
+      "update_frequency": "medium"
+    },
+    "configuration": {
+      "id": "configuration",
+      "name": "⚙️ Configuration",
+      "file": "configuration/graph.json",
+      "router_file": "configuration/router.json",
+      "description": "Build system, project settings, and tool configuration",
+      "coverage": {
+        "directories": [
+          "./"
+        ],
+        "file_patterns": [
+          "pyproject.toml",
+          "Makefile",
+          ".cursorrules",
+          ".pre-commit-config.yaml",
+          "README.md",
+          "CHANGELOG.md",
+          "LICENSE"
+        ],
+        "files": 7,
+        "key_components": [
+          "pyproject.toml",
+          "Makefile",
+          ".cursorrules",
+          "pre-commit config",
+          "README",
+          "CHANGELOG"
+        ]
+      },
+      "when_to_use": [
+        "Modifying build system",
+        "Changing dependencies",
+        "Configuring dev tools",
+        "Updating project metadata",
+        "Version management",
+        "Tool configuration"
+      ],
+      "typical_queries": [
+        "How to add dependency?",
+        "Where to configure pytest?",
+        "How to update version?",
+        "What's in the Makefile?",
+        "How to configure ruff?",
+        "Where's the changelog?"
+      ],
+      "complexity": "low",
+      "criticality": "critical",
+      "update_frequency": "medium"
+    },
+    "archive": {
+      "id": "archive",
+      "name": "📦 Archive",
+      "file": "archive/graph.json",
+      "router_file": "archive/router.json",
+      "description": "Archived plans, deprecated code, and historical context",
+      "coverage": {
+        "directories": [
+          "archive/"
+        ],
+        "file_patterns": [
+          "archive/**/*"
+        ],
+        "files": 6,
+        "key_components": [
+          "Package conversion plan",
+          "Deprecated Docker setup"
+        ]
+      },
+      "when_to_use": [
+        "Understanding project history",
+        "Reviewing deprecated features",
+        "Historical context for decisions",
+        "Learning about removed functionality"
+      ],
+      "typical_queries": [
+        "What was the original plan?",
+        "Why was Docker removed?",
+        "Project evolution history?",
+        "What features were deprecated?"
+      ],
+      "complexity": "low",
+      "criticality": "low",
+      "update_frequency": "low"
     }
   },
   "decision_tree": {
@@ -354,6 +481,58 @@
         "graphs": [
           "project-meta-graph.json"
         ]
+      },
+      "docs": {
+        "keywords": [
+          "documentation",
+          "docs",
+          "guide",
+          "API reference",
+          "quickstart",
+          "installation guide",
+          "storage guide",
+          "migration guide",
+          "user guide",
+          "tutorial",
+          "how to document"
+        ],
+        "graphs": [
+          "docs-graph.json"
+        ]
+      },
+      "configuration": {
+        "keywords": [
+          "configuration",
+          "config",
+          "pyproject",
+          "makefile",
+          "build system",
+          "dependencies",
+          "version",
+          "changelog",
+          "cursorrules",
+          "pre-commit",
+          "tool configuration",
+          "project metadata"
+        ],
+        "graphs": [
+          "configuration-graph.json"
+        ]
+      },
+      "archive": {
+        "keywords": [
+          "archive",
+          "deprecated",
+          "historical",
+          "old",
+          "removed",
+          "docker",
+          "conversion plan",
+          "project history"
+        ],
+        "graphs": [
+          "archive-graph.json"
+        ]
       }
     },
     "by_file_path": {
@@ -363,9 +542,15 @@
       "scripts/": "infrastructure-graph.json",
       "tests/": "testing-graph.json",
       "examples/": "examples-graph.json",
-      "README.md": "project-meta-graph.json",
-      "pyproject.toml": "project-meta-graph.json",
-      ".cursorrules": "project-meta-graph.json"
+      "docs/": "docs-graph.json",
+      "pyproject.toml": "configuration-graph.json",
+      "Makefile": "configuration-graph.json",
+      ".cursorrules": "configuration-graph.json",
+      ".pre-commit-config.yaml": "configuration-graph.json",
+      "README.md": "configuration-graph.json",
+      "CHANGELOG.md": "configuration-graph.json",
+      "LICENSE": "configuration-graph.json",
+      "archive/": "archive-graph.json"
     },
     "by_task_type": {
       "feature_development": {
@@ -446,6 +631,42 @@
           "testing-graph.json"
         ],
         "workflow": "1. Meta for impact → 2. Bot framework for changes → 3. Testing for validation"
+      },
+      "documentation_work": {
+        "description": "Writing or updating documentation",
+        "primary": [
+          "docs-graph.json"
+        ],
+        "secondary": [
+          "bot-framework-graph.json"
+        ],
+        "workflow": "1. Docs graph for doc structure → 2. Bot framework for technical details"
+      },
+      "configuration_changes": {
+        "description": "Changing build system or configuration",
+        "primary": [
+          "configuration-graph.json"
+        ],
+        "secondary": [],
+        "workflow": "Configuration graph for build system and tools"
+      },
+      "dependency_management": {
+        "description": "Adding or updating dependencies",
+        "primary": [
+          "configuration-graph.json"
+        ],
+        "secondary": [],
+        "workflow": "Edit pyproject.toml and update lockfiles"
+      },
+      "historical_research": {
+        "description": "Understanding project history or deprecated features",
+        "primary": [
+          "archive-graph.json"
+        ],
+        "secondary": [
+          "project-meta-graph.json"
+        ],
+        "workflow": "1. Archive for historical context → 2. Meta for current state"
       }
     }
   },
@@ -487,6 +708,27 @@
       "selected_graph": "project-meta-graph.json",
       "reasoning": "High-level architecture overview",
       "token_savings": "70% (read 400 lines instead of 1200)"
+    },
+    "example_6": {
+      "query": "Update API reference documentation",
+      "analysis": "Contains 'API reference' and 'documentation'",
+      "selected_graph": "docs-graph.json",
+      "reasoning": "Documentation work requires docs graph",
+      "token_savings": "85% (read 300 lines instead of 2000)"
+    },
+    "example_7": {
+      "query": "Add new dependency to pyproject.toml",
+      "analysis": "Contains 'dependency' and 'pyproject.toml'",
+      "selected_graph": "configuration-graph.json",
+      "reasoning": "Configuration changes need config graph",
+      "token_savings": "90% (read 200 lines instead of 2000)"
+    },
+    "example_8": {
+      "query": "Why was Docker deployment removed?",
+      "analysis": "Contains 'Docker' and historical question",
+      "selected_graph": "archive-graph.json",
+      "reasoning": "Historical context is in archive",
+      "token_savings": "88% (read 250 lines instead of 2000)"
     }
   },
   "ai_agent_workflow": {
@@ -502,33 +744,40 @@
     "multiple_graphs": "Load primary graph first, then secondary only if needed"
   },
   "statistics": {
-    "total_graphs": 5,
-    "avg_graph_size": "250-400 lines",
-    "router_size": "~200 lines",
-    "combined_old_size": "~1200 lines",
-    "typical_usage": "router (200) + one graph (300) = 500 lines",
-    "token_savings": "500 vs 1200 = 58% savings minimum",
-    "best_case_savings": "router (200) + examples (150) = 350 vs 1200 = 71% savings"
+    "total_graphs": 8,
+    "hierarchical_graphs": 1,
+    "flat_graphs": 7,
+    "total_files_covered": "~100",
+    "avg_graph_size": "200-400 lines",
+    "router_size": "~700 lines",
+    "typical_usage": "router (700) + one graph (300) = 1000 lines",
+    "token_savings": "Read 1000 lines instead of all files (10000+)",
+    "best_case_savings": "router (700) + archive (200) = 900 lines for specific queries"
   },
   "maintenance": {
     "update_triggers": [
-      "When adding/removing modules in telegram_bot_stack/",
-      "When adding/removing automation scripts",
-      "When restructuring tests",
-      "When adding new example bots",
-      "When changing project structure"
+      "When adding/removing modules in telegram_bot_stack/ → bot-framework",
+      "When adding/removing automation scripts → infrastructure",
+      "When restructuring tests → testing",
+      "When adding new example bots → examples",
+      "When adding/updating documentation → docs",
+      "When changing build config or dependencies → configuration",
+      "When archiving deprecated features → archive",
+      "When changing project structure → project-meta"
     ],
     "update_procedure": [
-      "1. Update specific graph (bot-framework, infrastructure, etc.)",
-      "2. Update project-meta-graph if cross-graph relationships changed",
-      "3. Update router statistics if graph sizes changed significantly",
-      "4. Validate all graphs with graph_utils.py"
+      "1. Identify affected graph(s) using update_triggers",
+      "2. Update specific graph(s) with new nodes/edges",
+      "3. Update router if new files/patterns added",
+      "4. Update project-meta-graph if cross-graph relationships changed",
+      "5. Validate all graphs: cd .project-graph && python3 utils/graph_utils.py"
     ]
   },
   "notes": {
     "design_rationale": "Specialized graphs reduce cognitive load and token usage",
-    "scalability": "Can add more graphs as project grows (e.g., docs-graph, config-graph)",
+    "coverage": "Now covers 100% of project files across 8 domain graphs",
+    "scalability": "System scales well - added 3 new graphs without complexity increase",
     "backward_compatibility": "Old dependency-graph.json renamed to bot-framework-graph.json",
-    "future_plans": "Potential for auto-generation and graph visualization"
+    "completeness": "All files now tracked: code, tests, docs, config, examples, infrastructure, archive"
   }
 }

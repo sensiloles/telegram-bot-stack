@@ -49,6 +49,9 @@ def load_graph_by_type(graph_type: str) -> Dict[str, Any]:
             - 'infrastructure': CI/CD and automation
             - 'testing': Test infrastructure
             - 'examples': Example bots
+            - 'docs': Documentation files
+            - 'configuration': Build system and configs
+            - 'archive': Deprecated and historical
             - 'project_meta': Project overview
 
     Returns:

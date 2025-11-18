@@ -1,0 +1,476 @@
+{
+  "metadata": {
+    "version": "3.0.0",
+    "generated_at": "2025-11-19",
+    "graph_id": "docs",
+    "graph_name": "Documentation",
+    "graph_type": "flat_graph",
+    "project_name": "telegram-bot-stack",
+    "project_version": "1.6.0",
+    "description": "Project documentation files and user guides",
+    "scope": "All documentation in docs/ directory",
+    "node_count": 9,
+    "edge_count": 12
+  },
+  "nodes": [
+    {
+      "id": "docs.api_reference",
+      "name": "api_reference.md",
+      "type": "documentation",
+      "category": "api_docs",
+      "path": "docs/api_reference.md",
+      "description": "Complete API reference for all framework classes and methods",
+      "lines": 802,
+      "sections": [
+        "BotBase API",
+        "Storage Backends API",
+        "User and Admin Management",
+        "Decorators",
+        "Type Definitions"
+      ],
+      "covers": [
+        "telegram_bot_stack.BotBase",
+        "telegram_bot_stack.storage",
+        "telegram_bot_stack.UserManager",
+        "telegram_bot_stack.AdminManager",
+        "telegram_bot_stack.decorators"
+      ],
+      "references": [],
+      "referenced_by": [
+        "docs.quickstart",
+        "docs.architecture"
+      ],
+      "tags": [
+        "api",
+        "reference",
+        "complete"
+      ],
+      "audience": "developers",
+      "criticality": "high"
+    },
+    {
+      "id": "docs.architecture",
+      "name": "architecture.md",
+      "type": "documentation",
+      "category": "design",
+      "path": "docs/architecture.md",
+      "description": "System architecture and design decisions",
+      "lines": 500,
+      "sections": [
+        "Overall Architecture",
+        "Component Design",
+        "Storage Layer",
+        "Extension Points",
+        "Design Patterns"
+      ],
+      "covers": [
+        "System architecture",
+        "Design decisions",
+        "Component interactions",
+        "Extension mechanisms"
+      ],
+      "references": [
+        "docs.api_reference",
+        "docs.storage_guide"
+      ],
+      "referenced_by": [
+        "docs.quickstart"
+      ],
+      "tags": [
+        "architecture",
+        "design",
+        "advanced"
+      ],
+      "audience": "developers",
+      "criticality": "high"
+    },
+    {
+      "id": "docs.cli_specification",
+      "name": "cli-specification.md",
+      "type": "documentation",
+      "category": "specification",
+      "path": "docs/cli-specification.md",
+      "description": "CLI tool specification for bot management",
+      "lines": 933,
+      "sections": [
+        "CLI Overview",
+        "Commands",
+        "Configuration",
+        "Usage Examples"
+      ],
+      "covers": [
+        "CLI commands",
+        "Command line tools",
+        "Bot management"
+      ],
+      "references": [],
+      "referenced_by": [],
+      "tags": [
+        "cli",
+        "tools",
+        "specification"
+      ],
+      "audience": "users",
+      "criticality": "medium"
+    },
+    {
+      "id": "docs.development_archive",
+      "name": "development-archive.md",
+      "type": "documentation",
+      "category": "archive",
+      "path": "docs/development-archive.md",
+      "description": "Archived development notes and historical decisions",
+      "lines": 444,
+      "sections": [
+        "Historical Changes",
+        "Deprecated Features",
+        "Migration Notes"
+      ],
+      "covers": [
+        "Development history",
+        "Deprecated features"
+      ],
+      "references": [],
+      "referenced_by": [],
+      "tags": [
+        "archive",
+        "history",
+        "deprecated"
+      ],
+      "audience": "maintainers",
+      "criticality": "low"
+    },
+    {
+      "id": "docs.installation",
+      "name": "installation.md",
+      "type": "documentation",
+      "category": "getting_started",
+      "path": "docs/installation.md",
+      "description": "Installation instructions for the framework",
+      "lines": 159,
+      "sections": [
+        "Requirements",
+        "Installation from PyPI",
+        "Installation from Source",
+        "Verification"
+      ],
+      "covers": [
+        "Installation steps",
+        "Requirements",
+        "Setup"
+      ],
+      "references": [],
+      "referenced_by": [
+        "docs.quickstart"
+      ],
+      "tags": [
+        "installation",
+        "setup",
+        "getting-started"
+      ],
+      "audience": "users",
+      "criticality": "critical"
+    },
+    {
+      "id": "docs.migration_guide",
+      "name": "migration_guide.md",
+      "type": "documentation",
+      "category": "guide",
+      "path": "docs/migration_guide.md",
+      "description": "Guide for migrating between versions and storage backends",
+      "lines": 597,
+      "sections": [
+        "Version Migration",
+        "Storage Migration",
+        "Breaking Changes",
+        "Migration Tools"
+      ],
+      "covers": [
+        "Version upgrades",
+        "Storage backend migration",
+        "Breaking changes handling"
+      ],
+      "references": [
+        "docs.storage_guide"
+      ],
+      "referenced_by": [],
+      "tags": [
+        "migration",
+        "upgrade",
+        "breaking-changes"
+      ],
+      "audience": "users",
+      "criticality": "high"
+    },
+    {
+      "id": "docs.private_installation",
+      "name": "private_installation.md",
+      "type": "documentation",
+      "category": "guide",
+      "path": "docs/private_installation.md",
+      "description": "Guide for installing from private repositories or local sources",
+      "lines": 368,
+      "sections": [
+        "Private PyPI",
+        "GitHub Installation",
+        "Local Development",
+        "Authentication"
+      ],
+      "covers": [
+        "Private installation",
+        "Development setup",
+        "Authentication"
+      ],
+      "references": [
+        "docs.installation"
+      ],
+      "referenced_by": [],
+      "tags": [
+        "installation",
+        "private",
+        "development"
+      ],
+      "audience": "developers",
+      "criticality": "medium"
+    },
+    {
+      "id": "docs.quickstart",
+      "name": "quickstart.md",
+      "type": "documentation",
+      "category": "getting_started",
+      "path": "docs/quickstart.md",
+      "description": "Quick start guide for building first bot",
+      "lines": 288,
+      "sections": [
+        "Prerequisites",
+        "First Bot",
+        "Running the Bot",
+        "Next Steps"
+      ],
+      "covers": [
+        "Getting started",
+        "First bot example",
+        "Basic usage"
+      ],
+      "references": [
+        "docs.installation",
+        "docs.api_reference",
+        "docs.architecture"
+      ],
+      "referenced_by": [],
+      "tags": [
+        "quickstart",
+        "tutorial",
+        "getting-started"
+      ],
+      "audience": "users",
+      "criticality": "critical"
+    },
+    {
+      "id": "docs.storage_guide",
+      "name": "storage_guide.md",
+      "type": "documentation",
+      "category": "guide",
+      "path": "docs/storage_guide.md",
+      "description": "Comprehensive guide for storage backends and data persistence",
+      "lines": 530,
+      "sections": [
+        "Storage Overview",
+        "Built-in Backends",
+        "Custom Backends",
+        "Migration",
+        "Best Practices"
+      ],
+      "covers": [
+        "Storage backends",
+        "Data persistence",
+        "Custom storage implementation"
+      ],
+      "references": [
+        "docs.api_reference"
+      ],
+      "referenced_by": [
+        "docs.architecture",
+        "docs.migration_guide"
+      ],
+      "tags": [
+        "storage",
+        "persistence",
+        "backends"
+      ],
+      "audience": "developers",
+      "criticality": "high"
+    }
+  ],
+  "edges": [
+    {
+      "id": "docs_edge_1",
+      "source": "docs.quickstart",
+      "target": "docs.installation",
+      "type": "references",
+      "description": "Quickstart references installation guide",
+      "bidirectional": false
+    },
+    {
+      "id": "docs_edge_2",
+      "source": "docs.quickstart",
+      "target": "docs.api_reference",
+      "type": "references",
+      "description": "Quickstart references API docs for details",
+      "bidirectional": false
+    },
+    {
+      "id": "docs_edge_3",
+      "source": "docs.quickstart",
+      "target": "docs.architecture",
+      "type": "references",
+      "description": "Quickstart points to architecture for advanced topics",
+      "bidirectional": false
+    },
+    {
+      "id": "docs_edge_4",
+      "source": "docs.architecture",
+      "target": "docs.api_reference",
+      "type": "references",
+      "description": "Architecture explains components from API reference",
+      "bidirectional": false
+    },
+    {
+      "id": "docs_edge_5",
+      "source": "docs.architecture",
+      "target": "docs.storage_guide",
+      "type": "references",
+      "description": "Architecture references storage layer guide",
+      "bidirectional": false
+    },
+    {
+      "id": "docs_edge_6",
+      "source": "docs.migration_guide",
+      "target": "docs.storage_guide",
+      "type": "references",
+      "description": "Migration guide uses storage guide for backend migration",
+      "bidirectional": false
+    },
+    {
+      "id": "docs_edge_7",
+      "source": "docs.storage_guide",
+      "target": "docs.api_reference",
+      "type": "references",
+      "description": "Storage guide references API for implementation details",
+      "bidirectional": false
+    },
+    {
+      "id": "docs_edge_8",
+      "source": "docs.private_installation",
+      "target": "docs.installation",
+      "type": "extends",
+      "description": "Private installation extends standard installation",
+      "bidirectional": false
+    },
+    {
+      "id": "docs_edge_9",
+      "source": "docs.api_reference",
+      "target": "docs.quickstart",
+      "type": "referenced_by",
+      "description": "API reference is used by quickstart",
+      "bidirectional": false
+    },
+    {
+      "id": "docs_edge_10",
+      "source": "docs.api_reference",
+      "target": "docs.architecture",
+      "type": "referenced_by",
+      "description": "API reference is explained in architecture",
+      "bidirectional": false
+    },
+    {
+      "id": "docs_edge_11",
+      "source": "docs.storage_guide",
+      "target": "docs.architecture",
+      "type": "referenced_by",
+      "description": "Storage guide is referenced in architecture",
+      "bidirectional": false
+    },
+    {
+      "id": "docs_edge_12",
+      "source": "docs.storage_guide",
+      "target": "docs.migration_guide",
+      "type": "referenced_by",
+      "description": "Storage guide is used in migration guide",
+      "bidirectional": false
+    }
+  ],
+  "groups": {
+    "getting_started": {
+      "name": "Getting Started",
+      "description": "Documentation for new users",
+      "nodes": [
+        "docs.installation",
+        "docs.quickstart"
+      ],
+      "priority": "critical"
+    },
+    "guides": {
+      "name": "Guides",
+      "description": "In-depth guides for specific topics",
+      "nodes": [
+        "docs.storage_guide",
+        "docs.migration_guide",
+        "docs.private_installation"
+      ],
+      "priority": "high"
+    },
+    "reference": {
+      "name": "Reference",
+      "description": "Technical reference documentation",
+      "nodes": [
+        "docs.api_reference",
+        "docs.architecture",
+        "docs.cli_specification"
+      ],
+      "priority": "high"
+    },
+    "archive": {
+      "name": "Archive",
+      "description": "Historical and deprecated documentation",
+      "nodes": [
+        "docs.development_archive"
+      ],
+      "priority": "low"
+    }
+  },
+  "statistics": {
+    "total_files": 9,
+    "total_lines": 4621,
+    "by_category": {
+      "getting_started": 2,
+      "guide": 3,
+      "reference": 3,
+      "archive": 1
+    },
+    "by_audience": {
+      "users": 4,
+      "developers": 4,
+      "maintainers": 1
+    },
+    "by_criticality": {
+      "critical": 2,
+      "high": 4,
+      "medium": 2,
+      "low": 1
+    }
+  },
+  "ai_agent_hints": {
+    "common_tasks": {
+      "update_api_docs": "Edit docs.api_reference after changing public API",
+      "add_feature_guide": "Create new guide or extend existing guides group",
+      "update_architecture": "Edit docs.architecture for design changes",
+      "migration_instructions": "Update docs.migration_guide for breaking changes"
+    },
+    "navigation": {
+      "start_here": "docs.quickstart for overview, docs.api_reference for details",
+      "for_users": "installation → quickstart → guides",
+      "for_developers": "architecture → api_reference → storage_guide"
+    }
+  }
+}
