@@ -9,6 +9,7 @@ Complete API documentation for `telegram-bot-stack` framework.
   - [StorageBackend](#storagebackend)
   - [JSONStorage](#jsonstorage)
   - [MemoryStorage](#memorystorage)
+  - [SQLStorage](#sqlstorage)
   - [create_storage()](#create_storage)
 - [UserManager](#usermanager)
 - [AdminManager](#adminmanager)
@@ -247,6 +248,101 @@ All methods inherited from [StorageBackend](#storagebackend).
 - Temporary data that doesn't need persistence
 - Development and debugging
 
+### SQLStorage
+
+SQL database storage backend using SQLAlchemy. Supports SQLite and PostgreSQL. Ideal for production deployments.
+
+#### Constructor
+
+```python
+SQLStorage(
+    database_url: str,
+    echo: bool = False,
+    pool_size: int = 5,
+    max_overflow: int = 10
+)
+```
+
+**Parameters:**
+
+- `database_url` (str): SQLAlchemy database URL (required)
+  - SQLite: `"sqlite:///path/to/database.db"` or `"sqlite:///:memory:"`
+  - PostgreSQL: `"postgresql://user:password@host:port/database"`
+- `echo` (bool): Enable SQL query logging (default: False)
+- `pool_size` (int): Connection pool size for PostgreSQL (default: 5)
+- `max_overflow` (int): Max overflow connections for PostgreSQL (default: 10)
+
+**Installation:**
+
+```bash
+# SQLite support
+pip install telegram-bot-stack[database]
+
+# PostgreSQL support
+pip install telegram-bot-stack[database,postgres]
+```
+
+**Example:**
+
+```python
+from telegram_bot_stack.storage import SQLStorage
+
+# SQLite (file-based)
+storage = SQLStorage(database_url="sqlite:///bot.db")
+
+# SQLite (in-memory, for testing)
+storage = SQLStorage(database_url="sqlite:///:memory:")
+
+# PostgreSQL (production)
+storage = SQLStorage(
+    database_url="postgresql://user:pass@localhost/bot_db",
+    pool_size=10,
+    max_overflow=20
+)
+```
+
+#### Methods
+
+All methods inherited from [StorageBackend](#storagebackend), plus:
+
+```python
+def close(self) -> None:
+    """Close database connections. Call when storage is no longer needed."""
+```
+
+**Example Usage:**
+
+```python
+# Create storage
+storage = SQLStorage(database_url="sqlite:///bot.db")
+
+# Use storage
+storage.save("users", {"user1": {"name": "John"}})
+users = storage.load("users", default={})
+
+# Close when done (important for long-running apps)
+storage.close()
+```
+
+**Use Cases:**
+
+- Production deployments
+- Large bots (>10k users)
+- High concurrency requirements
+- Need for transactions and data integrity
+- Distributed deployments (PostgreSQL)
+
+**Database Schema:**
+
+```sql
+CREATE TABLE storage (
+    key VARCHAR(255) PRIMARY KEY,
+    data TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
 ### create_storage()
 
 Factory function to create storage backend instances.
@@ -257,12 +353,18 @@ create_storage(backend: str = "json", **kwargs) -> StorageBackend
 
 **Parameters:**
 
-- `backend` (str): Backend type - "json" or "memory" (default: "json")
+- `backend` (str): Backend type - "json", "memory", "sqlite", or "postgres" (default: "json")
 - `**kwargs`: Backend-specific options
   - For JSONStorage: `base_dir` (directory path)
   - For MemoryStorage: no options
+  - For SQLStorage: `database_url`, `echo`, `pool_size`, `max_overflow`
 
 **Returns:** StorageBackend instance
+
+**Raises:**
+
+- `ValueError`: If backend type is not supported
+- `ImportError`: If SQL backend is requested but dependencies not installed
 
 **Example:**
 
@@ -274,6 +376,18 @@ storage = create_storage("json", base_dir="data")
 
 # Memory storage
 storage = create_storage("memory")
+
+# SQLite storage
+storage = create_storage("sqlite", database_url="sqlite:///bot.db")
+
+# SQLite with default URL
+storage = create_storage("sqlite")  # Creates bot.db
+
+# PostgreSQL storage
+storage = create_storage(
+    "postgres",
+    database_url="postgresql://user:pass@localhost/bot_db"
+)
 
 # Default (JSON)
 storage = create_storage(base_dir="data")

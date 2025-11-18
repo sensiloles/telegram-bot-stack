@@ -39,6 +39,11 @@ ENV/
 data/
 logs/
 
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
 # Testing
 .coverage
 coverage.xml
