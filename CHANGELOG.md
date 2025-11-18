@@ -2,6 +2,35 @@
 
 <!-- version list -->
 
+## v1.10.0 (2025-11-18)
+
+### Chores
+
+- **config**: Simplify .env.example to GitHub token only
+  ([`7691ae6`](https://github.com/sensiloles/telegram-bot-stack/commit/7691ae611628628063d1b0526cc7df1337d24059))
+
+- **makefile**: Add GitHub flow commands and remove outdated docs
+  ([`eeee909`](https://github.com/sensiloles/telegram-bot-stack/commit/eeee9096dfa557543664153e206395f73b4ee439))
+
+- **makefile**: Add GitHub flow commands and remove outdated docs
+  ([`2958469`](https://github.com/sensiloles/telegram-bot-stack/commit/29584694105b5987236bed24dd93e9f3bb62b12e))
+
+### Documentation
+
+- **graphs**: Add complete project coverage with 3 new domains
+  ([`6769dcc`](https://github.com/sensiloles/telegram-bot-stack/commit/6769dcc8020184fad4ca28fa56ad6d06ea79ac27))
+
+### Features
+
+- **scripts**: Add pr-ready command to mark draft PRs as ready
+  ([`9dec8f1`](https://github.com/sensiloles/telegram-bot-stack/commit/9dec8f1d8854e9781b59be4b441c25be0cc71e84))
+
+### Refactoring
+
+- **docs**: Restructure documentation and remove dev CLI wrapper
+  ([`eeee909`](https://github.com/sensiloles/telegram-bot-stack/commit/eeee9096dfa557543664153e206395f73b4ee439))
+
+
 ## v1.9.0 (2025-11-18)
 
 ### Features
