@@ -1,14 +1,8 @@
 {
-  // Python interpreter from virtual environment
   "python.defaultInterpreterPath": "./venv/bin/python3",
-  // ===== Type Checking Configuration =====
-  // Use Pylance for type checking
   "python.languageServer": "Pylance",
-  // Strict type checking mode (shows all type errors)
   "python.analysis.typeCheckingMode": "strict",
-  // Analyze entire workspace (not just open files)
   "python.analysis.diagnosticMode": "workspace",
-  // Type checking severity overrides
   "python.analysis.diagnosticSeverityOverrides": {
     "reportGeneralTypeIssues": "error",
     "reportOptionalSubscript": "error",
@@ -25,24 +19,17 @@
     "reportUnnecessaryIsInstance": "warning",
     "reportUnnecessaryCast": "warning"
   },
-  // Inlay hints (shows types inline in editor)
   "python.analysis.inlayHints.functionReturnTypes": true,
   "python.analysis.inlayHints.variableTypes": true,
   "python.analysis.inlayHints.callArgumentNames": true,
-  // Auto-import suggestions
   "python.analysis.autoImportCompletions": true,
-  // Use library code for better type inference
   "python.analysis.useLibraryCodeForTypes": true,
-  // Index symbols for better autocomplete
   "python.analysis.indexing": true,
-  // ===== Formatting and Linting =====
-  // Format on save
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
     "source.organizeImports": "explicit",
     "source.fixAll.ruff": "explicit"
   },
-  // Python-specific formatting
   "[python]": {
     "editor.defaultFormatter": "charliermarsh.ruff",
     "editor.formatOnSave": true,
@@ -51,26 +38,20 @@
       "source.fixAll.ruff": "explicit"
     }
   },
-  // Ruff configuration
   "ruff.nativeServer": "on",
   "ruff.importStrategy": "fromEnvironment",
   "ruff.path": [
     "./venv/bin/ruff"
   ],
-  // ===== Other Formatters =====
-  // Docker file formatting with shell-format
   "[dockerfile]": {
     "editor.defaultFormatter": "foxundermoon.shell-format",
     "editor.formatOnSave": true
   },
-  // Shell script formatting
   "[shellscript]": {
     "editor.defaultFormatter": "foxundermoon.shell-format",
     "editor.formatOnSave": true
   },
-  // Shell-format configuration
   "shellformat.flag": "-i=2 -ci",
-  // ===== File Associations =====
   "files.associations": {
     "*.py": "python",
     ".cursorrules": "plaintext",
@@ -78,14 +59,9 @@
     "Dockerfile": "dockerfile",
     "Dockerfile.*": "dockerfile"
   },
-  // ===== Terminal Configuration =====
   "python.terminal.activateEnvironment": true,
   "python.terminal.activateEnvInCurrentTerminal": true,
-  // ===== Editor Configuration =====
-  // Show problems in files
   "problems.showCurrentInStatus": true,
-  // Breadcrumbs show symbols
   "breadcrumbs.symbolPath": "on",
-  // Show parameter hints
   "editor.parameterHints.enabled": true
 }
