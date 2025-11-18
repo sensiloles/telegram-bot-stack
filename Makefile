@@ -1,4 +1,4 @@
-.PHONY: help setup install test test-fast test-cov lint format type-check ci clean clean-all status pr-check pr-create pr-list pr-merge pr-merge-analyze pr-merge-now pr-merge-cleanup branch-check branch-create commit push issue-list issue-read flow dev-shell
+.PHONY: help setup install test test-fast test-cov lint format type-check ci clean clean-all status pr-check pr-create pr-list pr-ready pr-merge pr-merge-analyze pr-merge-now pr-merge-cleanup branch-check branch-create commit push issue-list issue-read flow dev-shell
 
 # Default target
 .DEFAULT_GOAL := help
@@ -192,6 +192,15 @@ pr-create: ## Create Pull Request (usage: make pr-create TITLE='type(scope): des
 pr-list: ## List recent Pull Requests
 	@echo "$(GREEN)Listing recent PRs...$(NC)"
 	@python3 .github/workflows/scripts/check_ci.py --list-prs
+
+pr-ready: ## Mark draft PR as ready for review (usage: make pr-ready PR=36)
+	@if [ -z "$(PR)" ]; then \
+		echo "$(RED)Error: Please specify PR number$(NC)"; \
+		echo "Usage: make pr-ready PR=36"; \
+		exit 1; \
+	fi
+	@echo "$(GREEN)Marking PR #$(PR) as ready...$(NC)"
+	@python3 .github/workflows/scripts/pr_ready_mark.py --pr $(PR)
 
 pr-merge-analyze: ## Analyze PR for release type (usage: make pr-merge-analyze PR=5)
 	@if [ -z "$(PR)" ]; then \
