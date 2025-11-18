@@ -1,0 +1,239 @@
+{
+  "metadata": {
+    "version": "3.0.0",
+    "generated_at": "2025-11-19",
+    "graph_id": "archive",
+    "graph_name": "Archive",
+    "graph_type": "flat_graph",
+    "project_name": "telegram-bot-stack",
+    "project_version": "1.6.0",
+    "description": "Archived documentation, deprecated features, and historical files",
+    "scope": "archive/ directory and deprecated functionality",
+    "node_count": 6,
+    "edge_count": 4
+  },
+  "nodes": [
+    {
+      "id": "archive.conversion_plan",
+      "name": "PACKAGE_CONVERSION_PLAN_RU.md",
+      "type": "documentation",
+      "category": "historical_plan",
+      "path": "archive/PACKAGE_CONVERSION_PLAN_RU.md",
+      "description": "Master plan for converting bot to reusable framework (archived - completed)",
+      "language": "russian",
+      "status": "completed",
+      "phases": [
+        "Phase 0.1: Extract framework",
+        "Phase 0.2: Tests",
+        "Phase 0.3: Validation",
+        "Phase 1: PyPI structure",
+        "Phase 2: Publication"
+      ],
+      "references": [],
+      "referenced_by": [],
+      "tags": [
+        "plan",
+        "historical",
+        "completed",
+        "russian"
+      ],
+      "audience": "maintainers",
+      "criticality": "low",
+      "archived_date": "2025-11-19",
+      "reason": "Project completed Phase 2, plan archived for historical reference"
+    },
+    {
+      "id": "archive.docker_compose",
+      "name": "docker-compose.yml",
+      "type": "configuration",
+      "category": "docker",
+      "path": "archive/docker/docker-compose.yml",
+      "description": "Docker Compose configuration for running bot (deprecated)",
+      "status": "deprecated",
+      "format": "yaml",
+      "services": [
+        "bot"
+      ],
+      "references": [
+        "archive.dockerfile",
+        "archive.entrypoint"
+      ],
+      "tags": [
+        "docker",
+        "deprecated",
+        "deployment"
+      ],
+      "criticality": "low",
+      "archived_date": "2025-11-19",
+      "reason": "Framework users implement their own deployment"
+    },
+    {
+      "id": "archive.dockerfile",
+      "name": "Dockerfile",
+      "type": "configuration",
+      "category": "docker",
+      "path": "archive/docker/Dockerfile",
+      "description": "Docker image definition for bot (deprecated)",
+      "status": "deprecated",
+      "format": "dockerfile",
+      "base_image": "python:3.13-slim",
+      "references": [
+        "archive.entrypoint"
+      ],
+      "tags": [
+        "docker",
+        "deprecated",
+        "deployment"
+      ],
+      "criticality": "low",
+      "archived_date": "2025-11-19",
+      "reason": "Framework users implement their own deployment"
+    },
+    {
+      "id": "archive.entrypoint",
+      "name": "entrypoint.py",
+      "type": "script",
+      "category": "docker",
+      "path": "archive/docker/entrypoint.py",
+      "description": "Docker container entrypoint script (deprecated)",
+      "status": "deprecated",
+      "language": "python",
+      "purpose": "Start bot in Docker container",
+      "tags": [
+        "docker",
+        "deprecated",
+        "script"
+      ],
+      "criticality": "low",
+      "archived_date": "2025-11-19",
+      "reason": "Framework users implement their own deployment"
+    },
+    {
+      "id": "archive.docker_makefile",
+      "name": "Makefile (Docker)",
+      "type": "configuration",
+      "category": "docker",
+      "path": "archive/docker/Makefile",
+      "description": "Make targets for Docker operations (deprecated)",
+      "status": "deprecated",
+      "format": "makefile",
+      "targets": [
+        "build",
+        "run",
+        "stop",
+        "logs"
+      ],
+      "references": [
+        "archive.docker_compose",
+        "archive.dockerfile"
+      ],
+      "tags": [
+        "docker",
+        "deprecated",
+        "automation"
+      ],
+      "criticality": "low",
+      "archived_date": "2025-11-19",
+      "reason": "Framework users implement their own deployment"
+    },
+    {
+      "id": "archive.docker_docs",
+      "name": "Docker Documentation",
+      "type": "documentation",
+      "category": "docker",
+      "path": "archive/docker/",
+      "description": "Documentation for Docker deployment (README.md, ENTRYPOINT.md)",
+      "status": "deprecated",
+      "files": [
+        "README.md",
+        "ENTRYPOINT.md"
+      ],
+      "tags": [
+        "docker",
+        "deprecated",
+        "documentation"
+      ],
+      "criticality": "low",
+      "archived_date": "2025-11-19",
+      "reason": "Framework users implement their own deployment"
+    }
+  ],
+  "edges": [
+    {
+      "id": "archive_edge_1",
+      "source": "archive.docker_compose",
+      "target": "archive.dockerfile",
+      "type": "uses",
+      "description": "Docker Compose uses Dockerfile to build image",
+      "bidirectional": false
+    },
+    {
+      "id": "archive_edge_2",
+      "source": "archive.dockerfile",
+      "target": "archive.entrypoint",
+      "type": "uses",
+      "description": "Dockerfile uses entrypoint.py as container entrypoint",
+      "bidirectional": false
+    },
+    {
+      "id": "archive_edge_3",
+      "source": "archive.docker_makefile",
+      "target": "archive.docker_compose",
+      "type": "uses",
+      "description": "Makefile uses docker-compose commands",
+      "bidirectional": false
+    },
+    {
+      "id": "archive_edge_4",
+      "source": "archive.docker_docs",
+      "target": "archive.docker_compose",
+      "type": "documents",
+      "description": "Documentation explains Docker setup",
+      "bidirectional": false
+    }
+  ],
+  "groups": {
+    "historical_plans": {
+      "name": "Historical Plans",
+      "description": "Completed project plans and roadmaps",
+      "nodes": [
+        "archive.conversion_plan"
+      ],
+      "priority": "low"
+    },
+    "deprecated_docker": {
+      "name": "Deprecated Docker Setup",
+      "description": "Old Docker deployment (no longer needed for framework)",
+      "nodes": [
+        "archive.docker_compose",
+        "archive.dockerfile",
+        "archive.entrypoint",
+        "archive.docker_makefile",
+        "archive.docker_docs"
+      ],
+      "priority": "low"
+    }
+  },
+  "statistics": {
+    "total_files": 6,
+    "by_category": {
+      "historical_plan": 1,
+      "docker": 5
+    },
+    "by_status": {
+      "completed": 1,
+      "deprecated": 5
+    }
+  },
+  "ai_agent_hints": {
+    "when_to_use": {
+      "historical_context": "Use archive.conversion_plan to understand project evolution",
+      "deprecated_features": "Reference archived Docker setup if user asks about deployment"
+    },
+    "important_notes": {
+      "do_not_use": "These files are archived. Do not suggest using them in new code.",
+      "reference_only": "Use only for historical context and understanding decisions.",
+      "framework_note": "Project is now a framework. Users implement their own deployment."
+    }
+  }
+}

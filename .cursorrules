@@ -1,692 +1,376 @@
-# Cursor Agent Quick Reference
+# Cursor Agent Rules - telegram-bot-stack
 
-## ⚠️ CRITICAL: Always Check Existing Tools First
+## CRITICAL WORKFLOW (Always Follow This Order)
 
-Before writing ANY new code or script:
-1. Check .github/workflows/scripts/ for existing automation
-2. List available scripts: ls .github/workflows/scripts/
-3. Check script help: python script.py --help
-4. Use existing tools instead of writing new code
+### 1. GitHub Flow - NEVER Push to Main
+```bash
+git branch --show-current # MUST NOT be 'main'
+```
 
-Available automation scripts:
-- check_ci.py - Check GitHub Actions CI status
-- create_pr.py - Create pull requests
-- merge_pr.py - Merge pull requests
-- read_issues.py - Read GitHub issues
-- create_issue.py - Create GitHub issues
-- update_issue.py - Update issue labels, priority, state
-- link_issues.py - Link issues with dependencies
-- And 12+ more - ALWAYS check before implementing!
+If on main → create feature branch:
+```bash
+git checkout -b feature/<issue>-<name> # or fix/, docs/
+```
 
-## START HERE - Agent Orientation
+main branch is **protected** - direct pushes will fail.
 
-### On Every New Context:
-1. Read .github/PROJECT_STATUS.md (current phase, open issues)
-2. Check: python3 .github/workflows/scripts/read_issues.py --list --state open
-3. Read relevant section of archive/PACKAGE_CONVERSION_PLAN_RU.md (if needed)
-4. Verify not on main branch: git branch --show-current
-5. Act: Follow issue checklist or user request
+### 2. Graph Analysis - BEFORE Any Implementation
 
-### When User Says "Continue Work":
-Auto-workflow:
-1. Check PROJECT_STATUS.md (current phase)
-2. List open issues (identify active issue)
-3. Read issue details (understand task)
-4. Check plan context (understand why)
-5. Check current branch (ensure on feature branch)
-6. Implement (follow issue acceptance criteria)
-7. Commit (use conventional commits format)
+**ALWAYS load graphs before coding:**
+
+```python
+from utils.graph_utils import load_router, get_recommended_graph, load_graph_by_type
+
+# Step 1: Load router
+router = load_router() # 783 lines
+
+# Step 2: Get recommendation for task
+graph_file = get_recommended_graph(router, "your task")
+
+# Step 3: Load specific domain
+graph = load_graph_by_type('docs') # or 'bot_framework', 'testing', etc.
+```
+
+**Decision tree:**
+- Framework code → `load_graph_by_type('bot_framework')` → `load_sub_graph('bot_framework', 'storage')`
+- CI/CD, automation → `load_graph_by_type('infrastructure')`
+- Tests → `load_graph_by_type('testing')`
+- Documentation → `load_graph_by_type('docs')`
+- Build/config → `load_graph_by_type('configuration')`
+- History → `load_graph_by_type('archive')`
+- Examples → `load_graph_by_type('examples')`
+
+**Why:** 90-95% token savings. Read 900 lines instead of 10,000+.
+
+See: `.project-graph/README.md` for complete guide.
+
+### 3. Implementation
+
+After loading relevant graph:
+- Check dependencies/dependents in graph
+- Understand impact (use `get_impact_analysis()`)
+- Implement changes
+- Write tests (>=80% coverage for `telegram_bot_stack/`)
+
+### 4. Graph Update - AFTER Code Changes (If Needed)
+
+**When to update:**
+- `telegram_bot_stack/` → update `bot-framework/` graph
+- `.github/workflows/` → update `infrastructure/graph.json`
+- `tests/` → update `testing/graph.json`
+- `examples/` → update `examples/graph.json`
+- `docs/` → update `docs/graph.json`
+
+**Skip update for:**
+- Documentation-only changes
+- Bug fixes without structure changes
+- Minor refactoring within same module
+
+**How to update:**
+```bash
+# Edit relevant graph in .project-graph/
+# Update metadata.generated_at to current date
+# Update node_count, edge_count if changed
+
+# Validate
+cd .project-graph && python3 utils/graph_utils.py
+```
+
+See: `.project-graph/README.md` → "Maintenance" section for examples.
+
+### 5. Commit & Push
+
+```bash
+git status
+git add .
+git commit -m "type(scope): description" # See Conventional Commits below
+git push -u origin feature/<name>
+```
+
+### 6. Create PR (Automated)
+
+```bash
+python3 .github/workflows/scripts/create_pr.py --title "type(scope): description" --closes <issue>
+```
+
+### 7. Merge PR (One Command)
+
+```bash
+python3 .github/workflows/scripts/merge_pr.py --cleanup
+```
+
+---
 
 ## Project Context
 
-Project: telegram-bot-stack (reusable Telegram bot framework)
-Current Phase: Phase 2 - PyPI Publication
-Repository: https://github.com/sensiloles/telegram-bot-stack
-Master Plan: archive/PACKAGE_CONVERSION_PLAN_RU.md (archived)
+**Name:** telegram-bot-stack
+**Type:** Reusable Telegram bot framework (PyPI package)
+**Repository:** https://github.com/sensiloles/telegram-bot-stack
+**Phase:** Phase 2 - PyPI Publication
+**Coverage:** 131 tests, 80% coverage
 
-Progress:
-- Phase 0.1: Extract framework (completed)
-- Phase 0.2: Tests 111 tests, 81% coverage (completed)
-- Phase 0.3: Validation and docs (completed)
-- Phase 1: PyPI package structure 131 tests, 80% coverage (completed)
-- Phase 2: PyPI publication (next)
+**Key Files:**
+- Status: `.github/PROJECT_STATUS.md`
+- Graphs: `.project-graph/` (8 domains, 100% coverage)
+- Automation: `.github/workflows/scripts/` (16+ scripts)
+- Plan: `archive/PACKAGE_CONVERSION_PLAN_RU.md` (archived)
 
-## Quick Navigation
+---
 
-| Need | File | Lines |
-|------|------|-------|
-| Project status | .github/PROJECT_STATUS.md | All |
-| Graph router (start here) | .project-graph/graph-router.json | 500 |
-| Bot framework graph | .project-graph/bot-framework-graph.json | 950 |
-| Infrastructure graph | .project-graph/infrastructure-graph.json | 850 |
-| Testing graph | .project-graph/testing-graph.json | 750 |
-| Examples graph | .project-graph/examples-graph.json | 650 |
-| Project meta graph | .project-graph/project-meta-graph.json | 800 |
-| Graph utilities | .project-graph/graph_utils.py | All |
-| Graph documentation | .project-graph/README.md | All |
-| GitHub automation | .github/workflows/scripts/README.md | All |
-| Master plan (archived) | archive/PACKAGE_CONVERSION_PLAN_RU.md | All |
-| Architecture | README.md | 155-250 |
-| Testing guide | README.md | 80-154 |
-| Git workflow | This file | Below |
-
-Multi-Graph System Benefits:
-- 80-90% token savings - read only what you need
-- graph-router.json - central navigation hub (500 lines)
-- 5 specialized graphs - Bot, Infrastructure, Testing, Examples, Meta
-- Smart recommendations - get_recommended_graph(router, "your task")
-
-## Essential Workflows
-
-### Git Workflow
-
-CRITICAL: We use GitHub Flow with branch protection
-
-Rule 1: NEVER push directly to main
-- main branch is protected
-- Direct pushes will be rejected
-- Always work in feature branches
-
-Rule 2: Always check current branch
-git branch --show-current
-
-Rule 3: Create feature branch if needed
-git checkout -b feature/<descriptive-name>
-git checkout -b fix/<bug-name>
-git checkout -b docs/<doc-name>
-
-Rule 4: Make changes and commit
-git status && git diff --stat
-git log --oneline -5
-Update docs BEFORE commit (if needed)
-git add .
-git commit -m "type(scope): description"
-
-Rule 5: Push to feature branch with upstream
-git push -u origin feature/<name>            # First push
-git push                                     # Subsequent pushes
-
-Rule 6: Create PR automatically (PREFERRED)
-git push -u origin feature/<name>
-python3 .github/workflows/scripts/create_pr.py --title "type(scope): description" --closes N
-
-Benefits:
-- Validates conventional format automatically
-- Auto-generates description from commits
-- Links to issue with --closes N
-- Creates PR instantly
-- Auto-assigns PR to you
-
-Rule 7: Merge PR (ONE COMMAND)
-python3 .github/workflows/scripts/merge_pr.py
-python3 .github/workflows/scripts/merge_pr.py --cleanup # Deletes local and remote branches
-
-What it does automatically:
-1. Detects PR number from current branch
-2. Merges PR with squash
-3. Switches to main branch
-4. Pulls latest changes
-5. Optionally deletes local AND remote branches (with --cleanup)
-6. Shows release status info
-
-Other options:
-python3 .github/workflows/scripts/merge_pr.py --pr 42
-python3 .github/workflows/scripts/merge_pr.py --dry-run
-python3 .github/workflows/scripts/merge_pr.py --no-switch
+## Essential Commands
 
 ### Conventional Commits (REQUIRED)
 
-Format: type(scope): description
+Format: `type(scope): description`
 
-Version Impact:
-- feat: MINOR version bump (0.1.0 to 0.2.0)
-- fix: PATCH version bump (0.1.0 to 0.1.1)
-- docs: No version bump
-- chore: No version bump
-- test: No version bump
-- refactor: No version bump
-- perf: PATCH version bump
-- feat! or BREAKING CHANGE: MAJOR version bump (0.x.x to 1.0.0)
+**Version impact:**
+- `feat:` → MINOR bump (0.1.0 → 0.2.0)
+- `fix:` → PATCH bump (0.1.0 → 0.1.1)
+- `feat!` or `BREAKING CHANGE:` → MAJOR bump (0.x → 1.0.0)
+- `docs:`, `chore:`, `test:`, `refactor:` → No bump
 
-Examples:
-feat(storage): add Redis backend support
-fix(auth): resolve token validation issue
-docs(readme): update installation instructions
-test(storage): add integration tests
-chore(deps): update dependencies
-refactor(bot): simplify command handling
+**Examples:**
+```
+feat(storage): add Redis backend
+fix(auth): resolve token validation
+docs(readme): update quickstart
+```
 
-### Agent Decision Tree for Git Operations
+### GitHub Automation Scripts
 
-Is this documentation-only change?
-- YES: Use docs: commit type (no version bump)
-- NO: Continue
+**Issues:**
+```bash
+python3 .github/workflows/scripts/read_issues.py --list --state open
+python3 .github/workflows/scripts/create_issue.py --title "Bug: X" --labels bug
+python3 .github/workflows/scripts/update_issue.py <N> --set-priority high
+```
 
-Is this a new feature?
-- YES: Use feat: commit type (MINOR bump)
-- NO: Continue
+**PRs:**
+```bash
+python3 .github/workflows/scripts/create_pr.py --title "feat: X" --closes <N>
+python3 .github/workflows/scripts/merge_pr.py --cleanup
+```
 
-Is this a bug fix?
-- YES: Use fix: commit type (PATCH bump)
-- NO: Continue
-
-Is this maintenance/chores?
-- YES: Use chore: commit type (no bump)
-- NO: Use best judgment
-
-COMMIT, PUSH, CREATE PR AUTOMATICALLY
-
-### GitHub Issues and PRs (Use Scripts)
-
-Issues:
-python3 .github/workflows/scripts/read_issues.py --list
-python3 .github/workflows/scripts/read_issues.py 4
-python3 .github/workflows/scripts/create_issue.py --title "Bug: Fix issue" --file /tmp/issue.md --labels bug,priority:high
-python3 .github/workflows/scripts/update_issue.py 31 --set-priority low --add-labels blocked
-python3 .github/workflows/scripts/link_issues.py 31 --blocked-by 27,28,29
-
-Pull Requests (AUTOMATED):
-python3 .github/workflows/scripts/create_pr.py --title "feat(storage): add Redis backend" --closes 42
-python3 .github/workflows/scripts/create_pr.py --title "feat: WIP feature" --draft
-python3 .github/workflows/scripts/create_pr.py --title "feat: feature" --dry-run
-
-See: .github/workflows/scripts/README.md and .github/PR_AUTOMATION.md for complete guides.
+See: `.github/workflows/scripts/README.md` for all 16+ scripts.
 
 ### Testing
-python3 -m pytest
-python3 -m pytest --cov=src/core --cov-report=term # Coverage threshold: 80%
-CI/CD: .github/workflows/tests.yml
 
-## Critical Rules
+```bash
+python3 -m pytest
+python3 -m pytest --cov=telegram_bot_stack --cov-report=term
+```
+
+Threshold: >=80% for `telegram_bot_stack/`
+
+---
+
+## Code Quality Rules
 
 ### Security
 - NEVER commit tokens/passwords
-- Use .env (must be in .gitignore)
-- Validate tokens at startup
+- Use `.env` (in `.gitignore`)
 
-### Code Quality
+### Code Style
 - All comments/docstrings in English
-- Use type hints for all new code
-- Follow ruff linting rules
-- Remove unused imports/code immediately
+- Type hints for all new code
+- Follow ruff linting (see `pyproject.toml`)
+- Remove unused imports immediately
 
 ### Documentation
-- UPDATE existing docs, don't create new ones
-- NEVER create .md files unless critically necessary
-- Describe work in chat, not in documents
-- Keep chat descriptions concise and clear
+- UPDATE existing docs, don't create new `.md` files
 - Update docs BEFORE committing code
-- UPDATE dependency graph when changing telegram_bot_stack/ structure (see Graph Maintenance below)
 - Keep examples executable
-- Verify instructions work "out of the box"
+- Test instructions work "out of the box"
 
 ### Testing
-- Maintain >=79% coverage for telegram_bot_stack/
+- >=80% coverage for `telegram_bot_stack/`
 - Write tests for all new features
-- Use fixtures from tests/conftest.py
-
-## Project Structure
-
-telegram-bot-stack/
-├── telegram_bot_stack/   # PyPI package (coverage 80%)
-│ ├── bot_base.py       # Base class with hooks
-│ ├── storage/          # Storage abstraction layer
-│ │ ├── json.py       # JSON backend
-│ │ └── memory.py     # Memory backend
-│ ├── user_manager.py
-│ └── admin_manager.py
-├── examples/             # Example bots
-│ ├── echo_bot/
-│ ├── counter_bot/
-│ └── quit_smoking_bot/
-├── tests/
-│ ├── core/             # Unit tests
-│ └── integration/      # E2E tests
-
-## Tips for Token Efficiency
-
-⚠️ CRITICAL: Token Budget Management
-- Claude Sonnet 4.5: 1M tokens context window
-- Current usage tracked in system warnings
-- Monitor: "Token usage: X/1000000" messages
-- Keep usage under 200K for complex tasks (reserve for context)
-
-DON'T read entire files unnecessarily:
-- Use codebase_search for understanding
-- Use grep for finding specific code
-- Read specific line ranges: read_file with offset/limit
-- Use multi-graph system for focused navigation (80-90% token savings)
-- NEVER read files >500 lines without offset/limit
-- Check file size first: wc -l filename
-
-Multi-Graph System:
-1. ALWAYS start with graph-router.json (500 lines)
-2. Identify relevant graph based on task:
-- bot-framework-graph.json - Core framework code
-- infrastructure-graph.json - CI/CD and automation
-- testing-graph.json - Tests and fixtures
-- examples-graph.json - Example bots
-- project-meta-graph.json - Project overview
-3. Load ONLY the relevant graph - save 80-90% tokens
-4. Use graph_utils.py for smart recommendations:
-from graph_utils import load_router, get_recommended_graph, load_graph
-router = load_router()
-graph_file = get_recommended_graph(router, "your task here")
-graph = load_graph(graph_file)
-
-DO read these on start:
-- .github/PROJECT_STATUS.md (compact status - 20 lines)
-- .project-graph/graph-router.json (navigation hub - 500 lines)
-- Load specialized graph based on task (200-900 lines vs 2000+ before)
-- Current issue via script (structured output)
-- Relevant plan section only (not entire file)
-- git branch --show-current (verify branch)
-
-Prioritize:
-1. Check git branch (ensure on feature branch)
-2. Status file 20 lines (context)
-3. Graph router 500 lines (identify relevant domain)
-4. Specialized graph 200-900 lines (focused info)
-5. Issue details 50-100 lines (task)
-6. Code only when needed (implementation)
-
-Token Optimization Rules:
-1. Use existing scripts instead of PyGithub ad-hoc code
-2. Batch operations - read multiple files in parallel, not sequentially
-3. Use grep with --head_limit for large results
-4. Avoid re-reading same files - track what's already loaded
-5. Use terminal commands for file info (ls, wc) before reading
-6. Prefer targeted searches over full file reads
-
-Graph Selection Guide:
-
-| Your Task | Read Graph | Token Cost | Old Cost | Savings |
-|-----------|------------|------------|----------|---------|
-| Add storage backend | bot-framework-graph.json | 900 | 2000+ | 55% |
-| Fix CI pipeline | infrastructure-graph.json | 950 | 2000+ | 52% |
-| Add tests | testing-graph.json | 850 | 2000+ | 57% |
-| Create example | examples-graph.json | 750 | 2000+ | 62% |
-| Project overview | project-meta-graph.json | 900 | 2000+ | 55% |
-
-Use Specialized Graphs for:
-- Bot Framework Graph: Module dependencies before refactoring, impact analysis (check dependents field), design patterns and extension points, common tasks via ai_agent_hints
-- Infrastructure Graph: CI/CD pipeline understanding, automation script dependencies, workflow troubleshooting
-- Testing Graph: Test patterns and fixtures, coverage analysis, adding new tests
-- Examples Graph: Learning bot patterns, understanding framework usage, creating new examples
-- Project Meta Graph: Cross-component understanding, architecture decisions, technology stack overview
-
-## Agent Optimization Strategies
-
-### When to Create Feature Branch
-
-Create new branch IF:
-- Currently on main branch
-- Starting work on new issue/feature
-- User says "continue work" and no feature branch exists
-
-Stay on current branch IF:
-- Already on a feature branch
-- Continuing work on same feature
-- Branch name matches the work being done
-
-Branch Naming:
-feature/<issue-number>-<short-description> (e.g., feature/5-add-redis)
-fix/<issue-number>-<short-description> (e.g., fix/23-auth-bug)
-docs/<description> (e.g., docs/update-api-reference)
-
-### Optimal Commit Strategy
-
-Single logical change:
-- Make one commit per logical unit of work
-- Example: "Add Redis storage backend" (not "Add Redis" + "Add tests" as separate commits)
-
-Batch related changes:
-- Group related file changes in one commit
-- Example: Update README + add example + update docs in one docs: commit
-
-Multiple features in session:
-- If working on multiple unrelated things, ask user:
-- "Should I commit feature A before starting feature B?"
-- "Should I create separate branches for each feature?"
-
-### When to Push and Create PR
-
-Push and auto-create PR after:
-- Completing a logical unit of work
-- User asks to "commit" or "save"
-- Completing issue checklist item
-- Before switching to different task
-
-Workflow:
-git push -u origin feature/xyz
-python3 .github/workflows/scripts/create_pr.py --title "type(scope): description" --closes N
-
-Notify user with success message:
-Changes committed to branch feature/xyz
-Pushed to origin/feature/xyz
-Pull Request created automatically
-Number:                                                                                                                                                        #10
-URL: https://github.com/owner/repo/pull/10
-Details: Title, Issue auto-closes on merge, CI checks running automatically, Status ready for review, Assignee auto-assigned, Release will trigger after merge
-
-### When to Merge PR
-
-Merge PR when:
-- User says "merge", "давай мерджить", "merge it"
-- Work is complete and ready for release
-- All CI checks passed (script will check)
-
-ONE COMMAND MERGE:
-python3 .github/workflows/scripts/merge_pr.py
-
-What happens automatically:
-1. Finds PR for current branch
-2. Merges with squash method
-3. Switches to main branch
-4. Pulls latest changes
-5. Optionally deletes branches (with --cleanup)
-6. Shows release status
-
-With cleanup:
-python3 .github/workflows/scripts/merge_pr.py --cleanup
-
-Notify user:
-PR                                            #X merged successfully
-Switched to main branch
-Pulled latest changes
-Release workflow started automatically
-Tip: New version will be tagged automatically
-
-### Emergency: If on main branch
-
-If you accidentally made changes on main:
-git status
-git checkout -b feature/emergency-branch-name
-git add .
-git commit -m "type: description"
-git push -u origin feature/emergency-branch-name
-Inform user
-
-## Critical Git Rules for Agent
-
-1. NEVER push to main - Will fail due to branch protection
-2. ALWAYS check branch before making changes
-3. ALWAYS use conventional commits - Enables auto-versioning
-4. AUTO-CREATE PRs - Use create_pr.py script (auto-assigns to you)
-5. ONE-COMMAND MERGE - Use merge_pr.py (auto-detects PR, switches to main)
-6. BATCH commits - One commit per logical unit, not per file
-7. UPDATE docs before committing code changes
-8. UPDATE dependency graph before committing code changes (if needed)
-9. RUN tests before pushing (if applicable)
-
-Quick Merge Command:
-python3 .github/workflows/scripts/merge_pr.py
-
-This ONE command does everything: find PR, merge, switch to main, pull
-
-## Multi-Graph Maintenance
-
-### Which Graph to Update?
-
-Update bot-framework-graph.json when:
-- Adding/removing modules in telegram_bot_stack/
-- Changing module dependencies (imports)
-- Adding/removing public API (exports in __init__.py)
-- Refactoring module structure
-- Changing design patterns implementation
-
-Update infrastructure-graph.json when:
-- Adding/modifying automation scripts in .github/workflows/scripts/
-- Changing workflows in .github/workflows/
-- Updating CI/CD pipeline configuration
-- Adding new GitHub automation
-
-Update testing-graph.json when:
-- Adding new test files
-- Adding test fixtures to conftest.py
-- Changing test patterns or structure
-- Coverage changes significantly
-
-Update examples-graph.json when:
-- Adding new example bot
-- Significantly updating existing example
-- Adding new pattern demonstrations
-
-Update project-meta-graph.json when:
-- Major architectural changes
-- Adding new technology to stack
-- Documenting design decisions (ADRs)
-- Changing inter-graph relationships
-
-NO need to update for:
-- Documentation-only changes (unless architectural)
-- Bug fixes that don't change structure
-- Minor code refactoring within same module
-
-### How to Update Graphs
-
-Step 1: Identify changes and relevant graph
-git status
-git diff --name-only
-
-Determine which graph(s) to update:
-- telegram_bot_stack/ to bot-framework-graph.json
-- .github/workflows/ to infrastructure-graph.json
-- tests/ to testing-graph.json
-- examples/ to examples-graph.json
-- Architecture changes to project-meta-graph.json
-
-Step 2: Update specific graph
-Edit the relevant .json file in .project-graph/
-Update metadata.generated_at to current date
-
-For bot-framework-graph.json:
-- Update nodes[] array
-- Update edges[] array
-- Update metadata.node_count and edge_count
-- Update statistics if significant changes
-
-For other graphs:
-- Update relevant sections (components, test_files, examples, etc.)
-- Update statistics/counts
-- Update descriptions if needed
-
-Step 3: Validate graph
-cd .project-graph
-python3 graph_utils.py # Should show "Graph is valid"
-
-Test specific graph:
-python3 -c "from graph_utils import load_graph_by_type; g = load_graph_by_type('bot_framework'); print('Loaded successfully')"
-
-Step 4: Update router if needed
-If you added a completely new domain, update graph-router.json
-Otherwise, router stays the same
-
-### Update Examples
-
-Example 1: Added new storage backend redis.py
-
-Add node:
-{
-"id": "telegram_bot_stack.storage.redis",
-"name": "storage.redis",
-"type": "module",
-"category": "implementation",
-"path": "telegram_bot_stack/storage/redis.py",
-"description": "Redis-based storage backend",
-"lines_of_code": 150,
-"complexity_score": 5,
-"exports": ["RedisStorage"],
-"imports": {
-"internal": ["storage.base.StorageBackend"],
-"external": ["redis", "logging"]
-},
-"dependencies": ["telegram_bot_stack.storage.base"],
-"dependents": ["telegram_bot_stack.storage"],
-"tags": ["implementation", "storage-backend", "redis"],
-"role": "Redis storage backend for distributed bots",
-"criticality": "medium"
-}
-
-Add edges:
-{
-"id": "edge_15",
-"source": "telegram_bot_stack.storage.redis",
-"target": "telegram_bot_stack.storage.base",
-"type": "implements",
-"strength": 5,
-"description": "Implements StorageBackend interface",
-"relationship": "inheritance",
-"bidirectional": false
-}
-
-Update storage/__init__.py node:
-Add "telegram_bot_stack.storage.redis" to its dependencies
-
-Update metadata:
-{
-"metadata": {
-"node_count": 9,             # was 8
-"edge_count": 16,            # was 14
-"generated_at": "2025-11-17"
-}
-}
-
-Example 2: Refactored BotBase to use new component
-
-Update BotBase node:
-{
-"id": "telegram_bot_stack.bot_base",
-"dependencies": [
-"telegram_bot_stack.admin_manager",
-"telegram_bot_stack.user_manager",
-"telegram_bot_stack.storage.base",
-"telegram_bot_stack.new_component"
-],
-"complexity_score": 9                # was 8, increased
-}
-
-Add new edge:
-{
-"source": "telegram_bot_stack.bot_base",
-"target": "telegram_bot_stack.new_component",
-"type": "uses",
-"strength": 3,
-"description": "Uses NewComponent for X functionality"
-}
-
-### Pre-Commit Checklist
-
-Before committing changes:
-
-git branch --show-current # Should NOT be main
-git status
-git diff --name-only
-
-Identify which graph(s) to update:
-- telegram_bot_stack/ to bot-framework-graph.json
-- .github/workflows/ to infrastructure-graph.json
-- tests/ to testing-graph.json
-- examples/ to examples-graph.json
-
-Update relevant graph(s):
-Edit .project-graph/<relevant-graph>.json
-Update metadata.generated_at
-
-Validate graphs:
-cd .project-graph && python3 graph_utils.py
-
-Stage all changes:
-git add <changed-code> .project-graph/
-
-Commit:
-git commit -m "type(scope): description"
-
-Include graph updates in commit message if significant:
-git commit -m "feat(storage): add Redis backend
-
-- Implemented RedisStorage class
-- Updated bot-framework-graph.json with new module"
-
-### Quick Reference: Graph Node Template
-
-{
-"id": "telegram_bot_stack.module_name",
-"name": "module_name",
-"type": "module",
-"category": "core|implementation|public_api",
-"path": "telegram_bot_stack/module_name.py",
-"description": "Brief description",
-"lines_of_code": 0,
-"complexity_score": 5,
-"exports": ["ClassName", "function_name"],
-"imports": {
-"internal": ["internal.Module"],
-"external": ["external_lib"]
-},
-"dependencies": ["telegram_bot_stack.dependency"],
-"dependents": [],
-"tags": ["tag1", "tag2"],
-"role": "What this module does",
-"criticality": "low|medium|high|critical"
-}
-
-## Detailed Rules (Reference)
-
-For complete rules, see archived version:
-- Git workflow details: internal knowledge
-- Cleanup procedures: internal knowledge
-- Documentation validation: internal knowledge
-- Code standards: internal knowledge
-
-When needed, reference:
+- Use fixtures from `tests/conftest.py`
+
+---
+
+## Token Efficiency
+
+**Multi-Graph System: 90-95% savings**
+
+| Your Task | Load Graph | Tokens | Savings |
+|--------------------|-------------------------|--------|---------|
+| Add storage | bot-framework/storage | 435 | 96% |
+| Fix CI | infrastructure/graph | 639 | 94% |
+| Add tests | testing/graph | 539 | 95% |
+| Update docs | docs/graph | 300 | 97% |
+| Add dependency | configuration/graph | 200 | 98% |
+| History | archive/graph | 250 | 98% |
+
+**Always:**
+1. Start with `graph-router.json` (783 lines)
+2. Load ONLY relevant graph (200-900 lines)
+3. Never read entire codebase (10,000+ lines)
+
+---
+
+## Agent Decision Tree
+
+### On New Context:
+1. Read `.github/PROJECT_STATUS.md` (20 lines)
+2. Check open issues: `read_issues.py --list --state open`
+3. Verify branch: `git branch --show-current` (NOT main)
+4. Load relevant graph from `.project-graph/`
+5. Implement following workflow above
+
+### On "Continue Work":
+1. Check `PROJECT_STATUS.md`
+2. List open issues → identify active
+3. Read issue details
+4. Check current branch
+5. Load relevant graph
+6. Implement → test → commit → push → PR
+
+### Branch Strategy:
+- On main? → Create `feature/<issue>-<name>`
+- On feature branch? → Continue work
+- Multiple features? → Ask user about separate branches
+
+### Commit Strategy:
+- One commit per logical unit
+- Batch related changes (docs + tests together)
+- Update graphs in same commit as code changes
+
+---
+
+## Reference Links
+
+**Detailed guides:**
+- Multi-Graph System: `.project-graph/README.md`
+- GitHub Automation: `.github/workflows/scripts/README.md`
+- PR Automation: `.github/PR_AUTOMATION.md`
+- Architecture: `README.md` (lines 155-250)
+- Testing: `README.md` (lines 80-154)
+
+**Configuration:**
 - Conventional Commits: https://www.conventionalcommits.org/
-- Pre-commit config: .pre-commit-config.yaml
-- Test config: pyproject.toml [tool.pytest.ini_options]
+- Pre-commit hooks: `.pre-commit-config.yaml`
+- Pytest config: `pyproject.toml` → `[tool.pytest.ini_options]`
+- Ruff config: `pyproject.toml` → `[tool.ruff]`
 
-Remember:
-- Read .github/PROJECT_STATUS.md first on every new context
-- Use multi-graph system - Start with graph-router.json, then load only relevant graph
-- Update relevant graph(s) when changing code structure:
-- telegram_bot_stack/ to bot-framework-graph.json
-- .github/workflows/ to infrastructure-graph.json
-- tests/ to testing-graph.json
-- examples/ to examples-graph.json
-- Validate graphs before committing: cd .project-graph && python3 graph_utils.py
-- 80-90% token savings with specialized graphs
+**Project files:**
+- Status: `.github/PROJECT_STATUS.md`
+- Plan (archived): `archive/PACKAGE_CONVERSION_PLAN_RU.md`
+- Changelog: `CHANGELOG.md`
 
-## .cursorrules Maintenance Policy
+---
 
-This file (.cursorrules) provides essential instructions for AI agents working on this project.
+## Quick Examples
 
-MUST follow when updating this file:
-1. Keep file under 500 lines (current target: 350-450 lines)
-2. No emojis - they consume 3-4 bytes each without adding information
-3. No marketing language - "NEW", "Amazing", exclamation marks
-4. No visual separators - ASCII art, long lines of dashes/equals
-5. Minimal examples - 1 clear example instead of 3 similar ones
-6. Facts only - no explanations of "why" unless critical
-7. Compressed tables - only essential columns
-8. Commands without verbose output examples
+### Example 1: Add new storage backend
 
-SHOULD add when:
-- New critical workflows introduced (e.g., new automation scripts)
-- Project structure changes significantly
-- New graphs added to multi-graph system
-- Git workflow rules change
+```python
+# 1. Load storage sub-graph
+storage = load_sub_graph('bot_framework', 'storage')
+base = find_node(storage, 'telegram_bot_stack.storage.base')
 
-SHOULD NOT add:
-- Motivational text or reminders
-- Detailed explanations available in other docs
-- Multiple examples of same pattern
-- Historical context or reasoning
-- Duplicate information from graph files
+# 2. Implement: telegram_bot_stack/storage/redis.py
+
+# 3. Update graph: bot-framework/storage-graph.json
+# Add node, edges, update metadata
+
+# 4. Validate
+cd .project-graph && python3 utils/graph_utils.py
+
+# 5. Commit
+git add telegram_bot_stack/storage/redis.py .project-graph/
+git commit -m "feat(storage): add Redis backend"
+```
+
+### Example 2: Update documentation
+
+```python
+# 1. Load docs graph
+docs = load_graph_by_type('docs')
+api_ref = find_node(docs, 'docs.api_reference')
+
+# 2. Edit: docs/api_reference.md
+
+# 3. No graph update needed (docs only)
+
+# 4. Commit
+git commit -m "docs(api): update storage backend examples"
+```
+
+### Example 3: Fix CI pipeline
+
+```python
+# 1. Load infrastructure graph
+infra = load_graph_by_type('infrastructure')
+
+# 2. Find relevant workflow/script
+# Edit: .github/workflows/tests.yml
+
+# 3. Update graph if structure changed
+# Edit: infrastructure/graph.json
+
+# 4. Commit
+git commit -m "fix(ci): resolve test timeout issue"
+```
+
+---
+
+## Maintenance
+
+### Check Before Writing Code:
+```bash
+ls .github/workflows/scripts/ # 16+ automation scripts exist
+```
+
+Use existing tools instead of ad-hoc PyGithub code.
+
+### File Size Policy:
+This file (.cursorrules) target: <400 lines
+Current: ~350 lines ✓
 
 When updating:
-1. Add new rule/workflow
-2. Check if something can be removed to compensate
-3. Verify file size: wc -l .cursorrules (target: <500 lines)
-4. Test clarity: Can AI agent understand without examples?
-5. Commit with: docs(cursorrules): <what changed>
+1. Add new critical rule
+2. Remove compensating verbose content
+3. Verify: `wc -l .cursorrules`
+4. Reference external docs instead of duplicating
 
-Goal: Maximum information density, minimum token cost, zero ambiguity.
+Goal: Maximum density, minimum tokens, zero ambiguity.
+
+---
+
+## Summary Checklist
+
+Before EVERY implementation:
+- [ ] Check branch (not main)
+- [ ] Load graph-router.json
+- [ ] Load relevant domain graph
+- [ ] Understand dependencies/impact
+
+After implementation:
+- [ ] Update graph if structure changed
+- [ ] Validate: `python3 utils/graph_utils.py`
+- [ ] Write/update tests (>=80% coverage)
+- [ ] Update docs if needed
+- [ ] Commit with conventional format
+- [ ] Push + auto-create PR
+
+On merge:
+- [ ] Run `merge_pr.py --cleanup`
+- [ ] Verify release triggered
+- [ ] Check CI passed
+
+**Remember:** GitHub Flow → Graph Analysis → Implementation → Graph Update → Commit → PR → Merge
+
+---
+
+## Documentation Style Rules
+
+### Emoji Usage
+- Use emoji in documentation ONLY when necessary for visual navigation
+- Maximum 1 emoji per section header in README files
+- NO emoji in code comments, docstrings, or commit messages
+- NO emoji in .cursorrules or technical configuration files
+- Acceptable: Section markers in user-facing docs (📖 Documentation, 🚀 Quick Start)
+- Not acceptable: Decorative emoji, multiple emoji per line, emoji in explanations
+
+**Rationale:** Emoji consume 3-4 bytes each, reduce readability in terminals, and add no semantic value to technical content.
