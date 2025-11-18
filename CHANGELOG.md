@@ -2,6 +2,17 @@
 
 <!-- version list -->
 
+## v1.7.0 (2025-11-18)
+
+### Features
+
+- **decorators**: Add rate limiting decorator
+  ([`917a9a5`](https://github.com/sensiloles/telegram-bot-stack/commit/917a9a5607922c7eab62ae547d3c4edb0d35c47d))
+
+- **decorators**: Add rate limiting decorator for spam protection
+  ([`917a9a5`](https://github.com/sensiloles/telegram-bot-stack/commit/917a9a5607922c7eab62ae547d3c4edb0d35c47d))
+
+
 ## v1.6.0 (2025-11-18)
 
 ### Documentation
