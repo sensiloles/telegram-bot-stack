@@ -1,39 +1,33 @@
-# 🔀 Merge PR Guide
+# Merge PR Guide
 
-Simple guide for merging Pull Requests via CLI.
+> **🚀 Quick Method:** Use `merge_pr.py` script for automated merging. See [PR Automation Guide](../../PR_AUTOMATION.md) for details.
 
-## 📋 Overview
+## Quick Start
 
-Merge PRs with intelligent release detection:
-
-- ✅ Analyzes commits (feat/fix vs docs/chore)
-- ✅ Detects if PR will trigger release
-- ✅ Uses squash merge for clean history
-- ✅ Validates CI checks before merge
-
-## 🚀 Quick Start
-
-### 1. Check PR Status
+### One-Command Merge
 
 ```bash
-# Check if CI passed
-./dev pr check 5
+# Merge current branch's PR (auto-detect)
+python3 .github/workflows/scripts/merge_pr.py
 
-# Analyze PR type
-./dev merge analyze 5
+# Merge and delete branches
+python3 .github/workflows/scripts/merge_pr.py --cleanup
+
+# Merge specific PR
+python3 .github/workflows/scripts/merge_pr.py --pr 42
 ```
 
-### 2. Merge PR
+### What It Does Automatically
 
-```bash
-# Merge PR (squash merge)
-./dev merge now 5
+1. ✅ Finds PR number from current branch
+2. ✅ Checks CI status
+3. ✅ Merges with squash method
+4. ✅ Switches to main branch
+5. ✅ Pulls latest changes
+6. ✅ Optionally deletes local AND remote branches
+7. ✅ Shows release status
 
-# Dry run (preview)
-./dev merge now 5 --dry-run
-```
-
-## 📊 PR Types
+## PR Types & Release Detection
 
 ### Release PR
 
@@ -42,23 +36,16 @@ Merge PRs with intelligent release detection:
 **Result:**
 
 - ✅ Merged with squash
-- 🚀 Triggers semantic release
+- 🚀 Triggers semantic release workflow
 - 📦 Creates new version tag
 - 📝 Generates changelog
 
-**Example:**
+**Version Impact:**
 
-```bash
-./dev merge analyze 5
-# Output:
-# PR Type: RELEASE
-# Will Trigger Release: ✅ YES
-# Version Bump: MINOR
-# Merge Strategy: squash
-
-./dev merge now 5
-# PR #5 merged → Release v0.2.0 created
-```
+- `feat:` → MINOR bump (0.1.0 → 0.2.0)
+- `fix:` → PATCH bump (0.1.0 → 0.1.1)
+- `perf:` → PATCH bump
+- `feat!` or `BREAKING CHANGE:` → MAJOR bump (0.x.x → 1.0.0)
 
 ### Non-Release PR
 
@@ -70,194 +57,210 @@ Merge PRs with intelligent release detection:
 - ℹ️ No version bump
 - ℹ️ No release created
 
-**Example:**
+## Complete Workflow
+
+### 1. Check PR Status
 
 ```bash
-./dev merge analyze 7
-# Output:
-# PR Type: NON-RELEASE
-# Will Trigger Release: ❌ NO
-# Version Bump: NONE
+# Check CI status
+python3 .github/workflows/scripts/check_ci.py --pr 5
 
-./dev merge now 7
-# PR #7 merged (no release)
+# Check if ready to merge
+python3 .github/workflows/scripts/pr_ready.py --pr 5
 ```
 
-## 🛠️ CLI Commands
-
-### Analyze PR
-
-Check if PR will trigger a release:
+### 2. Merge PR
 
 ```bash
-./dev merge analyze <pr_number>
+# Simple merge (keeps branches)
+python3 .github/workflows/scripts/merge_pr.py --pr 5
+
+# Merge with cleanup (deletes branches)
+python3 .github/workflows/scripts/merge_pr.py --pr 5 --cleanup
 ```
 
-**Output:**
-
-```
-============================================================
-📊 PR Analysis for #5
-============================================================
-
-PR Type: RELEASE
-Will Trigger Release: ✅ YES
-Version Bump: MINOR
-Merge Strategy: squash
-
-Commit Types Found:
-  - feat: 3
-  - fix: 1
-  - docs: 2
-```
-
-### Merge PR
-
-Merge PR with squash:
+### 3. Verify Release
 
 ```bash
-# Merge now
-./dev merge now <pr_number>
-
-# Preview (dry run)
-./dev merge now <pr_number> --dry-run
+# Check GitHub Actions for release workflow
+# View releases: https://github.com/owner/repo/releases
 ```
 
-**Output (successful merge):**
+## Merge Options
 
-```
-============================================================
-🔀 Merging PR #5
-============================================================
-
-Title: feat(workflow): add PR automation
-Base: main
-Head: feature/automation
-PR Type: release
-Will Release: ✅ YES
-Merge Method: squash
-
-⏳ Attempting to merge...
-
-✅ PR #5 merged successfully!
-Merge commit: abc1234
-
-🚀 Release workflow will start automatically
-Monitor at: https://github.com/owner/repo/actions
-```
-
-## ⚠️ Prerequisites
-
-### Before Merging
-
-1. **CI checks must pass:**
-
-   ```bash
-   ./dev pr check 5
-   # All checks should be ✅
-   ```
-
-2. **No merge conflicts:**
-
-   ```bash
-   # PR must be mergeable
-   ```
-
-3. **Required reviews (if configured):**
-   ```bash
-   # Get approvals from team
-   ```
-
-## 🎯 Workflow
-
-### For AI Agent
+### Script Options
 
 ```bash
-# 1. Check current work
-./dev status
-
-# 2. List PRs
-./dev pr list
-
-# 3. Check specific PR
-./dev pr check 5
-
-# 4. Analyze PR type
-./dev merge analyze 5
-
-# 5. Merge if ready
-./dev merge now 5
-
-# Agent will notify user:
-# ✅ PR #5 merged successfully!
-# 🚀 Release v0.2.0 will be created automatically
+--pr NUMBER           # Specific PR number (default: auto-detect)
+--cleanup             # Delete local and remote branches after merge
+--no-switch           # Don't switch to main after merge
+--dry-run             # Preview without merging
 ```
 
-### For Developer
+### Examples
 
 ```bash
-# Quick merge after CI passes
-./dev pr check 5 && ./dev merge now 5
+# Auto-detect and merge
+python3 .github/workflows/scripts/merge_pr.py
 
-# Or with analysis
-./dev merge analyze 5 && ./dev merge now 5
+# Merge and cleanup
+python3 .github/workflows/scripts/merge_pr.py --cleanup
+
+# Merge specific PR
+python3 .github/workflows/scripts/merge_pr.py --pr 42
+
+# Preview merge
+python3 .github/workflows/scripts/merge_pr.py --dry-run
 ```
 
-## 🔧 Troubleshooting
+## Conventional Commits
 
-### CI Checks Not Passing
+PR titles determine version bump:
+
+| Type     | Version Impact        | Example                            |
+| -------- | --------------------- | ---------------------------------- |
+| `feat:`  | MINOR (0.1.0 → 0.2.0) | `feat(storage): add Redis backend` |
+| `fix:`   | PATCH (0.1.0 → 0.1.1) | `fix(auth): token validation`      |
+| `perf:`  | PATCH (0.1.0 → 0.1.1) | `perf(query): optimize search`     |
+| `docs:`  | No bump               | `docs(readme): update install`     |
+| `chore:` | No bump               | `chore(deps): update libs`         |
+| `feat!:` | MAJOR (0.x.x → 1.0.0) | `feat!: breaking change`           |
+
+## Troubleshooting
+
+### "Could not find PR for branch"
+
+**Cause:** No PR exists for current branch.
+
+**Solution:** Create PR first:
 
 ```bash
-./dev pr check 5
-# ⚠️ 1 check(s) failing!
-
-# Wait for checks or fix issues
-# Then try again
+python3 .github/workflows/scripts/create_pr.py --title "feat: description"
 ```
 
-### Merge Conflicts
+### "CI checks failed"
+
+**Cause:** Tests or linting failed.
+
+**Solution:**
 
 ```bash
-# Output: ❌ PR has conflicts and cannot be merged
+# Check what failed
+python3 .github/workflows/scripts/check_ci.py --pr 5
 
-# Resolve conflicts in branch
-git pull origin main
-# ... resolve conflicts ...
+# Fix issues, commit, push
+git add .
+git commit -m "fix: resolve CI issues"
 git push
 
-# Then merge
-./dev merge now 5
+# Wait for CI to pass
+python3 .github/workflows/scripts/check_ci.py --pr 5
 ```
 
-### API Errors
+### "Merge conflict detected"
+
+**Cause:** Branch has conflicts with main.
+
+**Solution:**
 
 ```bash
-# 403 Forbidden: Check token permissions
-# 405 Method Not Allowed: Required reviews not satisfied
-# 422 Validation Failed: Branch not up to date
-
-# See .github/TOKEN_SETUP_GUIDE.md for token setup
+# Update your branch
+git checkout feature/my-feature
+git fetch origin
+git merge origin/main
+# Resolve conflicts
+git commit
+git push
 ```
 
-## 📈 Version Bumps
+### "Not on feature branch"
 
-Based on conventional commits:
+**Cause:** Trying to merge from main branch.
 
-| Commits                        | Version Bump | Example       |
-| ------------------------------ | ------------ | ------------- |
-| `feat:`                        | MINOR        | 0.1.0 → 0.2.0 |
-| `fix:`                         | PATCH        | 0.1.0 → 0.1.1 |
-| `perf:`                        | PATCH        | 0.1.0 → 0.1.1 |
-| `docs:`, `chore:`, etc         | NONE         | No release    |
-| `feat!:` or `BREAKING CHANGE:` | MAJOR        | 0.x.x → 1.0.0 |
+**Solution:**
 
-## 📚 See Also
+```bash
+# Check current branch
+git branch --show-current
 
-- [PR Naming Guide](../PR_NAMING_GUIDE.md)
-- [Conventional Commits](https://www.conventionalcommits.org/)
-- [Git Workflow](../workflow/git-flow.md)
-- [Token Setup](../TOKEN_SETUP_GUIDE.md)
+# Switch to feature branch
+git checkout feature/my-feature
+
+# Then merge
+python3 .github/workflows/scripts/merge_pr.py
+```
+
+## Release Workflow
+
+After merging a release PR:
+
+1. **Release workflow starts automatically** (GitHub Actions)
+2. **Semantic-release analyzes commits** (determines version bump)
+3. **New version tag created** (e.g., v0.2.0)
+4. **Changelog generated** (from commit messages)
+5. **GitHub Release created** (with release notes)
+6. **Package built** (optional: publish to PyPI)
+
+**View releases:**
+
+- GitHub: https://github.com/owner/repo/releases
+- Tags: https://github.com/owner/repo/tags
+
+## Best Practices
+
+### 1. Check CI Before Merge
+
+```bash
+python3 .github/workflows/scripts/pr_ready.py --pr 5
+```
+
+### 2. Use Cleanup Flag
+
+```bash
+# Automatically delete branches after merge
+python3 .github/workflows/scripts/merge_pr.py --cleanup
+```
+
+### 3. Verify Release Type
+
+```bash
+# Check PR commits to know if release will trigger
+git log main..feature/my-feature --oneline | grep -E "^[a-f0-9]+ (feat|fix|perf)"
+```
+
+### 4. Follow Conventional Commits
+
+Always use proper commit format:
+
+- `feat:` for new features
+- `fix:` for bug fixes
+- `docs:` for documentation only
+
+## For AI Agents
+
+**Recommended workflow:**
+
+```bash
+# 1. Verify PR is ready
+python3 .github/workflows/scripts/check_ci.py --pr N
+
+# 2. Merge with cleanup
+python3 .github/workflows/scripts/merge_pr.py --cleanup
+
+# 3. Notify user
+# - PR merged successfully
+# - Switched to main branch
+# - Branches deleted
+# - Release workflow started (if applicable)
+```
+
+## Related Documentation
+
+- **[PR Automation Guide](../../PR_AUTOMATION.md)** - Complete PR automation
+- **[Git Flow](../workflow/git-flow.md)** - Full Git workflow
+- **[Scripts README](../../workflows/scripts/README.md)** - All scripts
+- **[Issue Linking](../workflow/issue-linking.md)** - Link PRs to issues
 
 ---
 
-**Last Updated:** 2024-11-17
+**💡 Tip:** Use `merge_pr.py --cleanup` for fastest workflow - it does everything automatically!
