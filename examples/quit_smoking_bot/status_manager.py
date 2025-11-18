@@ -3,16 +3,29 @@
 import datetime
 import logging
 
-from .config import (
-    BOT_TIMEZONE,
-    NOTIFICATION_DAY,
-    NOTIFICATION_HOUR,
-    NOTIFICATION_MINUTE,
-    START_DATE,
-    STATUS_MESSAGE,
-)
-from .quotes_manager import QuotesManager
-from .utils import calculate_period, calculate_prize_fund
+# Handle both package and direct execution imports
+try:
+    from config import (
+        BOT_TIMEZONE,
+        NOTIFICATION_DAY,
+        NOTIFICATION_HOUR,
+        NOTIFICATION_MINUTE,
+        START_DATE,
+        STATUS_MESSAGE,
+    )
+    from quotes_manager import QuotesManager
+    from utils import calculate_period, calculate_prize_fund
+except ImportError:
+    from .config import (
+        BOT_TIMEZONE,
+        NOTIFICATION_DAY,
+        NOTIFICATION_HOUR,
+        NOTIFICATION_MINUTE,
+        START_DATE,
+        STATUS_MESSAGE,
+    )
+    from .quotes_manager import QuotesManager
+    from .utils import calculate_period, calculate_prize_fund
 
 logger = logging.getLogger(__name__)
 

@@ -6,6 +6,7 @@ minimal code required to build a functional bot with the framework.
 
 import logging
 import os
+import signal
 from pathlib import Path
 
 from telegram import Update
@@ -61,11 +62,11 @@ class EchoBot(BotBase):
 def main():
     """Run the bot."""
     # Get bot token from environment
-    bot_token = os.getenv("TELEGRAM_BOT_TOKEN")
+    bot_token = os.getenv("BOT_TOKEN")
     if not bot_token:
         raise ValueError(
-            "TELEGRAM_BOT_TOKEN environment variable is required.\n"
-            "Set it in .env file or export it: export TELEGRAM_BOT_TOKEN='your_token'"
+            "BOT_TOKEN environment variable is required.\n"
+            "Set it in .env file or export it: export BOT_TOKEN='your_token'"
         )
 
     # Create storage (data will be saved in examples/echo_bot/data/)
@@ -84,9 +85,21 @@ def main():
     bot.register_handlers()
 
     # Set bot commands in Telegram UI
-    application.post_init = bot.set_bot_commands
+    async def post_init_wrapper(app):
+        await bot.set_bot_commands()
+
+    application.post_init = post_init_wrapper
+
+    # Setup signal handlers for graceful shutdown
+    def signal_handler(signum, frame):
+        logger.info(f"Received signal {signum}, initiating graceful shutdown...")
+        application.stop_running()
+
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
 
     # Run the bot
+    logger.info("Press Ctrl+C to stop")
     logger.info("Starting Echo Bot...")
     application.run_polling(allowed_updates=Update.ALL_TYPES)
 

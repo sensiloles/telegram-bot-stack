@@ -2,7 +2,11 @@
 
 import datetime
 
-from .config import MAX_PRIZE_FUND, MONTHLY_AMOUNT, PRIZE_FUND_INCREASE
+# Handle both package and direct execution imports
+try:
+    from config import MAX_PRIZE_FUND, MONTHLY_AMOUNT, PRIZE_FUND_INCREASE
+except ImportError:
+    from .config import MAX_PRIZE_FUND, MONTHLY_AMOUNT, PRIZE_FUND_INCREASE
 
 
 def calculate_period(

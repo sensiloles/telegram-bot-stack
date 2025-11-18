@@ -326,7 +326,7 @@
     ".env": {
       "purpose": "Environment variables (not in repo)",
       "variables": [
-        "TELEGRAM_TOKEN - Bot token",
+        "BOT_TOKEN - Bot token",
         "GITHUB_TOKEN - For automation scripts"
       ],
       "criticality": "critical",

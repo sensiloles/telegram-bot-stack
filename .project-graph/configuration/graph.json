@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "version": "3.0.0",
-    "generated_at": "2025-11-19",
+    "version": "3.0.1",
+    "generated_at": "2025-11-18",
     "graph_id": "configuration",
     "graph_name": "Configuration",
     "graph_type": "flat_graph",
@@ -69,7 +69,24 @@
         "format",
         "build",
         "publish",
-        "clean"
+        "clean",
+        "run-counter",
+        "run-echo",
+        "run-menu",
+        "run-poll",
+        "run-quit-smoking",
+        "run-reminder",
+        "stop-counter",
+        "stop-echo",
+        "stop-menu",
+        "stop-poll",
+        "stop-quit-smoking",
+        "stop-reminder",
+        "stop-all-bots",
+        "list-bots",
+        "list-running-bots",
+        "test-examples",
+        "test-bot"
       ],
       "dependencies": [
         "config.pyproject"
@@ -78,7 +95,8 @@
         "Development workflow",
         "Build process",
         "Testing",
-        "Publishing"
+        "Publishing",
+        "Example bot management"
       ],
       "tags": [
         "automation",
