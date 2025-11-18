@@ -2,6 +2,17 @@
 
 <!-- version list -->
 
+## v1.8.0 (2025-11-18)
+
+### Features
+
+- **graphs**: Hierarchical multi-graph system v3.0
+  ([`e894dd9`](https://github.com/sensiloles/telegram-bot-stack/commit/e894dd95e8a19d5e3257836057b66e15edf374ba))
+
+- **graphs**: Implement hierarchical multi-graph system v3.0
+  ([`e894dd9`](https://github.com/sensiloles/telegram-bot-stack/commit/e894dd95e8a19d5e3257836057b66e15edf374ba))
+
+
 ## v1.7.1 (2025-11-18)
 
 ### Bug Fixes
