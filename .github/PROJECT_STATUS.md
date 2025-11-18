@@ -4,6 +4,7 @@
 **Repository:** https://github.com/sensiloles/telegram-bot-stack
 **Current Phase:** Phase 2+ - Feature Expansion & Refinement
 **Last Updated:** 2025-11-18
+**Focus:** VPS Deployment (Issues #27, #28, #29) - The killer feature!
 
 ## 🎯 Quick Start for Agent
 
@@ -91,24 +92,30 @@ issue = repo.create_issue(title="...", body="...", labels=[...])
 
 **Active Issues:**
 
-- **Issue #17** [Priority: HIGH]: feat(storage): Implement SQL storage backend
-  - Complete Storage Abstraction Layer from original plan
-  - Add SQLite and PostgreSQL support
-  - Migration tool JSON → SQL
-  - Key differentiator for framework
-- **Issue #18** [Priority: MEDIUM]: feat(decorators): Add rate limiting decorator
-  - Protection against spam and abuse
-  - Built-in `@rate_limit` decorator
-  - Storage-backed rate tracking
+- **Issue #27** [Priority: CRITICAL]: feat(deploy): VPS deployment CLI
+  - **One-command deployment to VPS** - KILLER FEATURE
+  - CLI tool: `python -m telegram_bot_stack deploy up`
+  - Interactive setup wizard
+  - Support all major VPS providers (DigitalOcean, AWS, Hetzner)
+  - Zero DevOps knowledge required
+  - Production-ready in < 10 minutes
+
+- **Issue #28** [Priority: HIGH]: feat(docker): Production Docker templates
+  - Adapt battle-tested Docker setup from archive
+  - Universal templates for any bot
+  - Framework-aware health checks
+  - Keep all production features (monitoring, security, etc.)
+
+- **Issue #29** [Priority: HIGH]: docs(deployment): Deployment documentation
+  - Comprehensive deployment guides
+  - Provider-specific tutorials (DigitalOcean, AWS, Hetzner)
+  - Troubleshooting guide
+  - Best practices for production
+
 - **Issue #19** [Priority: MEDIUM]: feat(webhooks): Add webhook support
   - Alternative to polling for production
   - Lower latency and resource usage
   - SSL certificate handling
-- **Issue #20** [Priority: MEDIUM]: docs(examples): Add more real-world examples
-  - Reminder bot (scheduler demo)
-  - Poll bot (SQL storage demo)
-  - Menu bot (inline keyboards)
-  - Media bot (file handling)
 
 ## 📁 Project Structure
 
