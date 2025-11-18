@@ -1,5 +1,21 @@
 # Cursor Agent Quick Reference
 
+## ⚠️ CRITICAL: Always Check Existing Tools First
+
+Before writing ANY new code or script:
+1. Check .github/workflows/scripts/ for existing automation
+2. List available scripts: ls .github/workflows/scripts/
+3. Check script help: python script.py --help
+4. Use existing tools instead of writing new code
+
+Available automation scripts:
+- check_ci.py - Check GitHub Actions CI status
+- create_pr.py - Create pull requests
+- merge_pr.py - Merge pull requests
+- read_issues.py - Read GitHub issues
+- create_issue.py - Create GitHub issues
+- And 10+ more - ALWAYS check before implementing!
+
 ## START HERE - Agent Orientation
 
 ### On Every New Context:
@@ -225,11 +241,19 @@ telegram-bot-stack/
 
 ## Tips for Token Efficiency
 
+⚠️ CRITICAL: Token Budget Management
+- Claude Sonnet 4.5: 1M tokens context window
+- Current usage tracked in system warnings
+- Monitor: "Token usage: X/1000000" messages
+- Keep usage under 200K for complex tasks (reserve for context)
+
 DON'T read entire files unnecessarily:
 - Use codebase_search for understanding
 - Use grep for finding specific code
 - Read specific line ranges: read_file with offset/limit
 - Use multi-graph system for focused navigation (80-90% token savings)
+- NEVER read files >500 lines without offset/limit
+- Check file size first: wc -l filename
 
 Multi-Graph System:
 1. ALWAYS start with graph-router.json (500 lines)
@@ -261,6 +285,14 @@ Prioritize:
 4. Specialized graph 200-900 lines (focused info)
 5. Issue details 50-100 lines (task)
 6. Code only when needed (implementation)
+
+Token Optimization Rules:
+1. Use existing scripts instead of PyGithub ad-hoc code
+2. Batch operations - read multiple files in parallel, not sequentially
+3. Use grep with --head_limit for large results
+4. Avoid re-reading same files - track what's already loaded
+5. Use terminal commands for file info (ls, wc) before reading
+6. Prefer targeted searches over full file reads
 
 Graph Selection Guide:
 
