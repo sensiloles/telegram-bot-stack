@@ -1,4 +1,4 @@
-.PHONY: help setup install test test-fast test-cov lint format type-check ci clean status pr-check pr-create issue-list dev-shell
+.PHONY: help setup install test test-fast test-cov lint format type-check ci clean status pr-check pr-create pr-merge pr-merge-cleanup branch-check branch-create commit push issue-list issue-read flow dev-shell
 
 # Default target
 .DEFAULT_GOAL := help
@@ -121,18 +121,55 @@ status: ## Show project status (open issues, current phase)
 	@echo "$(GREEN)Current branch:$(NC) $$(git branch --show-current)"
 	@echo "$(GREEN)Last commit:$(NC) $$(git log -1 --oneline)"
 
-issue-list: ## List open issues
-	@python3 .github/workflows/scripts/read_issues.py --list --state open
+branch-check: ## Check if current branch is not main (required before commits)
+	@CURRENT_BRANCH=$$(git branch --show-current); \
+	if [ "$$CURRENT_BRANCH" = "main" ]; then \
+		echo "$(RED)Error: Cannot commit directly to main branch$(NC)"; \
+		echo "$(YELLOW)Create a feature branch first:$(NC) make branch-create BRANCH=feature/name"; \
+		exit 1; \
+	else \
+		echo "$(GREEN)✓ On branch: $$CURRENT_BRANCH$(NC)"; \
+	fi
 
-issue-read: ## Read specific issue (usage: make issue-read ISSUE=4)
-	@if [ -z "$(ISSUE)" ]; then \
-		echo "$(RED)Error: Please specify issue number$(NC)"; \
-		echo "Usage: make issue-read ISSUE=4"; \
+branch-create: ## Create feature branch (usage: make branch-create BRANCH=feature/name)
+	@if [ -z "$(BRANCH)" ]; then \
+		echo "$(RED)Error: Please specify branch name$(NC)"; \
+		echo "Usage: make branch-create BRANCH=feature/name"; \
+		echo "Examples: feature/add-storage, fix/auth-bug, docs/update-readme"; \
 		exit 1; \
 	fi
-	@python3 .github/workflows/scripts/read_issues.py $(ISSUE)
+	@CURRENT_BRANCH=$$(git branch --show-current); \
+	if [ "$$CURRENT_BRANCH" != "main" ]; then \
+		echo "$(YELLOW)Warning: Not on main branch (current: $$CURRENT_BRANCH)$(NC)"; \
+		echo "$(YELLOW)Creating branch from current branch...$(NC)"; \
+	fi
+	@git checkout -b $(BRANCH)
+	@echo "$(GREEN)✓ Created and switched to branch: $(BRANCH)$(NC)"
 
-pr-create: ## Create Pull Request (auto-detects branch, validates title)
+commit: branch-check ## Commit changes with conventional commit format (usage: make commit MSG='type(scope): description')
+	@if [ -z "$(MSG)" ]; then \
+		echo "$(RED)Error: Please specify commit message$(NC)"; \
+		echo "Usage: make commit MSG='type(scope): description'"; \
+		echo "Examples:"; \
+		echo "  make commit MSG='feat(storage): add Redis backend'"; \
+		echo "  make commit MSG='fix(auth): resolve token validation'"; \
+		echo "  make commit MSG='docs(readme): update quickstart'"; \
+		exit 1; \
+	fi
+	@git add .
+	@git commit -m "$(MSG)"
+	@echo "$(GREEN)✓ Committed: $(MSG)$(NC)"
+
+push: ## Push current branch to remote
+	@CURRENT_BRANCH=$$(git branch --show-current); \
+	if [ "$$CURRENT_BRANCH" = "main" ]; then \
+		echo "$(RED)Error: Cannot push directly to main$(NC)"; \
+		exit 1; \
+	fi
+	@git push -u origin $$(git branch --show-current)
+	@echo "$(GREEN)✓ Pushed branch to remote$(NC)"
+
+pr-create: ## Create Pull Request (usage: make pr-create TITLE='type(scope): description' [CLOSES=42])
 	@if [ -z "$(TITLE)" ]; then \
 		echo "$(RED)Error: Please specify PR title$(NC)"; \
 		echo "Usage: make pr-create TITLE='feat(scope): description' [CLOSES=42]"; \
@@ -143,6 +180,23 @@ pr-create: ## Create Pull Request (auto-detects branch, validates title)
 	else \
 		python3 .github/workflows/scripts/create_pr.py --title "$(TITLE)"; \
 	fi
+
+pr-merge: ## Merge current branch's PR (auto-detects PR)
+	@python3 .github/workflows/scripts/merge_pr.py
+
+pr-merge-cleanup: ## Merge PR and cleanup branches (local + remote)
+	@python3 .github/workflows/scripts/merge_pr.py --cleanup
+
+issue-list: ## List open issues
+	@python3 .github/workflows/scripts/read_issues.py --list --state open
+
+issue-read: ## Read specific issue (usage: make issue-read ISSUE=4)
+	@if [ -z "$(ISSUE)" ]; then \
+		echo "$(RED)Error: Please specify issue number$(NC)"; \
+		echo "Usage: make issue-read ISSUE=4"; \
+		exit 1; \
+	fi
+	@python3 .github/workflows/scripts/read_issues.py $(ISSUE)
 
 ##@ Development
 
@@ -168,10 +222,24 @@ clean-all: clean ## Clean everything including venv
 	rm -rf venv/
 	@echo "$(GREEN)✓ Everything cleaned!$(NC)"
 
-##@ Documentation
+##@ GitHub Flow (Complete Workflow)
 
-docs-serve: ## Serve documentation locally (if using mkdocs)
-	@echo "$(YELLOW)Documentation server not configured yet$(NC)"
+flow: ## Show GitHub Flow workflow steps
+	@echo "$(GREEN)GitHub Flow Workflow:$(NC)"
+	@echo ""
+	@echo "1. $(BLUE)Check branch:$(NC) make branch-check"
+	@echo "2. $(BLUE)Create branch:$(NC) make branch-create BRANCH=feature/name"
+	@echo "3. $(BLUE)Make changes:$(NC) edit files..."
+	@echo "4. $(BLUE)Commit:$(NC) make commit MSG='type(scope): description'"
+	@echo "5. $(BLUE)Push:$(NC) make push"
+	@echo "6. $(BLUE)Create PR:$(NC) make pr-create TITLE='type(scope): description'"
+	@echo "7. $(BLUE)Merge:$(NC) make pr-merge-cleanup"
+	@echo ""
+	@echo "$(YELLOW)Conventional Commits:$(NC)"
+	@echo "  feat: → MINOR version bump"
+	@echo "  fix: → PATCH version bump"
+	@echo "  feat! or BREAKING CHANGE: → MAJOR version bump"
+	@echo "  docs:, chore:, test:, refactor: → No version bump"
 
 ##@ Shortcuts
 
