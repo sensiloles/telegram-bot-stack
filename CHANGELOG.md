@@ -2,6 +2,19 @@
 
 <!-- version list -->
 
+## v1.11.0 (2025-11-18)
+
+### Bug Fixes
+
+- **ci**: Resolve Python 3.9 compatibility and formatting issues
+  ([`f7c38aa`](https://github.com/sensiloles/telegram-bot-stack/commit/f7c38aa1b37518f88c93761e3b522eea6f2e2ee8))
+
+### Features
+
+- **examples**: Add tests, graceful shutdown, and Makefile commands
+  ([`14700bc`](https://github.com/sensiloles/telegram-bot-stack/commit/14700bc94945f51a3d27dc7167653947d710a643))
+
+
 ## v1.10.0 (2025-11-18)
 
 ### Chores
