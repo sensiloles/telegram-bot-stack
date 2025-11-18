@@ -1,7 +1,7 @@
 {
   "metadata": {
     "version": "2.0.0",
-    "generated_at": "2025-11-17",
+    "generated_at": "2025-11-18",
     "graph_id": "examples",
     "graph_name": "Example Bots & Patterns",
     "graph_type": "specialized",
@@ -14,10 +14,10 @@
     ]
   },
   "statistics": {
-    "total_examples": 3,
+    "total_examples": 6,
     "complexity_range": "simple to complex",
-    "total_lines": 850,
-    "learning_path": "echo_bot → counter_bot → quit_smoking_bot"
+    "total_lines": 1850,
+    "learning_path": "echo_bot → counter_bot → reminder_bot → menu_bot → poll_bot → quit_smoking_bot"
   },
   "examples": {
     "echo_bot": {
@@ -123,7 +123,193 @@
         "requires": "TELEGRAM_TOKEN in .env"
       },
       "typical_use_case": "Learning state management, building stateful bots",
-      "next_step": "quit_smoking_bot for real-world complexity"
+      "next_step": "reminder_bot for scheduler integration"
+    },
+    "reminder_bot": {
+      "path": "examples/reminder_bot/",
+      "difficulty": "intermediate",
+      "complexity": "moderate",
+      "lines_of_code": 410,
+      "description": "Bot with reminders demonstrating scheduler integration",
+      "learning_focus": [
+        "APScheduler integration",
+        "Natural language time parsing",
+        "Scheduled notifications",
+        "Job queue management"
+      ],
+      "files": {
+        "bot.py": {
+          "lines": 410,
+          "description": "Reminder bot with scheduler",
+          "key_code": [
+            "Inherits from BotBase",
+            "Uses APScheduler job queue",
+            "Time parsing (in 30m, at 14:30)",
+            "Scheduled task callbacks",
+            "Reminder storage and cleanup"
+          ]
+        },
+        "README.md": {
+          "description": "Usage guide with time format examples"
+        }
+      },
+      "framework_features_used": [
+        "BotBase inheritance",
+        "JSONStorage for reminders",
+        "Job queue (APScheduler)",
+        "Custom command handlers",
+        "Callback functions"
+      ],
+      "demonstrates": [
+        "How to schedule tasks",
+        "Time parsing patterns",
+        "User-specific notifications",
+        "Job management (create, list, delete)",
+        "Automatic cleanup"
+      ],
+      "commands": {
+        "/remind": "Create reminder with natural language time",
+        "/reminders": "List active reminders",
+        "/delete_reminder": "Delete specific reminder"
+      },
+      "time_formats": [
+        "in 5m - in 5 minutes",
+        "in 2h - in 2 hours",
+        "in 1d - in 1 day",
+        "at 14:30 - at specific time"
+      ],
+      "usage": {
+        "install": "pip install telegram-bot-stack",
+        "run": "python examples/reminder_bot/bot.py",
+        "requires": "TELEGRAM_TOKEN in .env"
+      },
+      "typical_use_case": "Learning scheduler integration, building notification bots",
+      "next_step": "menu_bot for interactive keyboards"
+    },
+    "menu_bot": {
+      "path": "examples/menu_bot/",
+      "difficulty": "intermediate",
+      "complexity": "moderate",
+      "lines_of_code": 390,
+      "description": "Bot with inline keyboards demonstrating interactive menus",
+      "learning_focus": [
+        "Inline keyboard creation",
+        "Callback query handling",
+        "Menu navigation",
+        "Pagination",
+        "Toggle buttons"
+      ],
+      "files": {
+        "bot.py": {
+          "lines": 390,
+          "description": "Menu bot with inline keyboards",
+          "key_code": [
+            "Inherits from BotBase",
+            "InlineKeyboardMarkup builders",
+            "CallbackQueryHandler",
+            "Dynamic keyboard updates",
+            "Pagination logic"
+          ]
+        },
+        "README.md": {
+          "description": "Usage guide with keyboard patterns"
+        }
+      },
+      "framework_features_used": [
+        "BotBase inheritance",
+        "JSONStorage for settings",
+        "Callback query handlers",
+        "Custom command handlers",
+        "State management"
+      ],
+      "demonstrates": [
+        "How to build inline keyboards",
+        "Button navigation patterns",
+        "Settings with toggles",
+        "Pagination implementation",
+        "Confirmation dialogs"
+      ],
+      "commands": {
+        "/menu": "Show main menu",
+        "/settings": "Show settings with toggles",
+        "/items": "Browse items with pagination"
+      },
+      "keyboard_patterns": [
+        "Simple menu",
+        "Multiple buttons per row",
+        "Toggle buttons",
+        "Pagination (prev/next)",
+        "Confirmation dialogs"
+      ],
+      "usage": {
+        "install": "pip install telegram-bot-stack",
+        "run": "python examples/menu_bot/bot.py",
+        "requires": "TELEGRAM_TOKEN in .env"
+      },
+      "typical_use_case": "Learning inline keyboards, building interactive bots",
+      "next_step": "poll_bot for SQL storage"
+    },
+    "poll_bot": {
+      "path": "examples/poll_bot/",
+      "difficulty": "intermediate",
+      "complexity": "moderate",
+      "lines_of_code": 410,
+      "description": "Bot for creating polls demonstrating SQL storage",
+      "learning_focus": [
+        "SQL storage backend",
+        "Complex data structures",
+        "Multiple storage keys",
+        "Data persistence"
+      ],
+      "files": {
+        "bot.py": {
+          "lines": 410,
+          "description": "Poll bot with SQL storage",
+          "key_code": [
+            "Inherits from BotBase",
+            "Uses SQLStorage (SQLite/PostgreSQL)",
+            "Multiple storage keys (polls, votes)",
+            "Complex data queries",
+            "Admin commands"
+          ]
+        },
+        "README.md": {
+          "description": "Usage guide with SQL setup"
+        }
+      },
+      "framework_features_used": [
+        "BotBase inheritance",
+        "SQLStorage backend",
+        "Admin system",
+        "Custom command handlers",
+        "Storage API"
+      ],
+      "demonstrates": [
+        "How to use SQL storage",
+        "Multiple storage keys",
+        "Complex data structures",
+        "Admin-only commands",
+        "Storage backend switching"
+      ],
+      "commands": {
+        "/create_poll": "Create new poll",
+        "/vote": "Vote on poll",
+        "/results": "View poll results",
+        "/list_polls": "List all polls",
+        "/delete_poll": "Delete poll (admin)"
+      },
+      "storage_backends": [
+        "SQLite (default)",
+        "PostgreSQL (production)",
+        "JSON (fallback)"
+      ],
+      "usage": {
+        "install": "pip install telegram-bot-stack[database]",
+        "run": "python examples/poll_bot/bot.py",
+        "requires": "TELEGRAM_TOKEN, DATABASE_URL in .env"
+      },
+      "typical_use_case": "Learning SQL storage, building data-intensive bots",
+      "next_step": "quit_smoking_bot for production complexity"
     },
     "quit_smoking_bot": {
       "path": "examples/quit_smoking_bot/",
@@ -268,7 +454,25 @@
       "time": "30 minutes",
       "outcome": "Can build stateful bots"
     },
-    "step_3_production": {
+    "step_3_scheduler": {
+      "example": "reminder_bot",
+      "goal": "Learn scheduler integration and notifications",
+      "time": "45 minutes",
+      "outcome": "Can build bots with scheduled tasks"
+    },
+    "step_4_keyboards": {
+      "example": "menu_bot",
+      "goal": "Learn inline keyboards and navigation",
+      "time": "45 minutes",
+      "outcome": "Can build interactive menu-driven bots"
+    },
+    "step_5_sql": {
+      "example": "poll_bot",
+      "goal": "Learn SQL storage and complex data",
+      "time": "1 hour",
+      "outcome": "Can build data-intensive bots"
+    },
+    "step_6_production": {
       "example": "quit_smoking_bot",
       "goal": "Understand complex bot architecture",
       "time": "1-2 hours",
@@ -415,36 +619,65 @@
       "difficulty": {
         "echo_bot": "Beginner",
         "counter_bot": "Intermediate",
+        "reminder_bot": "Intermediate",
+        "menu_bot": "Intermediate",
+        "poll_bot": "Intermediate",
         "quit_smoking_bot": "Advanced"
       },
       "lines_of_code": {
         "echo_bot": 45,
         "counter_bot": 120,
+        "reminder_bot": 410,
+        "menu_bot": 390,
+        "poll_bot": 410,
         "quit_smoking_bot": 685
       },
       "storage_used": {
         "echo_bot": "Memory",
         "counter_bot": "JSON",
+        "reminder_bot": "JSON",
+        "menu_bot": "JSON",
+        "poll_bot": "SQL",
         "quit_smoking_bot": "JSON"
       },
       "custom_commands": {
         "echo_bot": 0,
         "counter_bot": 4,
+        "reminder_bot": 3,
+        "menu_bot": 3,
+        "poll_bot": 6,
         "quit_smoking_bot": 10
       },
       "state_management": {
         "echo_bot": "None",
         "counter_bot": "Simple (counter)",
+        "reminder_bot": "Simple (reminders)",
+        "menu_bot": "Moderate (settings)",
+        "poll_bot": "Moderate (polls/votes)",
         "quit_smoking_bot": "Complex (multiple states)"
       },
       "scheduled_tasks": {
         "echo_bot": false,
         "counter_bot": false,
+        "reminder_bot": true,
+        "menu_bot": false,
+        "poll_bot": false,
         "quit_smoking_bot": true
+      },
+      "inline_keyboards": {
+        "echo_bot": false,
+        "counter_bot": false,
+        "reminder_bot": false,
+        "menu_bot": true,
+        "poll_bot": false,
+        "quit_smoking_bot": false
       },
       "external_data": {
         "echo_bot": false,
         "counter_bot": false,
+        "reminder_bot": false,
+        "menu_bot": false,
+        "poll_bot": false,
         "quit_smoking_bot": true
       }
     }

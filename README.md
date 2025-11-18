@@ -125,6 +125,18 @@ python3 bot.py
 cd examples/counter_bot
 python3 bot.py
 
+# Run Reminder Bot (scheduler example)
+cd examples/reminder_bot
+python3 bot.py
+
+# Run Menu Bot (inline keyboards example)
+cd examples/menu_bot
+python3 bot.py
+
+# Run Poll Bot (SQL storage example)
+cd examples/poll_bot
+python3 bot.py
+
 # Run Quit Smoking Bot (real-world example)
 cd examples/quit_smoking_bot
 python3 bot.py
@@ -264,6 +276,9 @@ telegram-bot-stack/
 ├── examples/                    # 📚 Example Bots
 │   ├── echo_bot/               # Simplest example (5-10 lines)
 │   ├── counter_bot/            # State management example
+│   ├── reminder_bot/           # Scheduler and notifications
+│   ├── menu_bot/               # Inline keyboards and navigation
+│   ├── poll_bot/               # SQL storage and voting
 │   └── quit_smoking_bot/       # Real-world application
 │
 ├── tests/                       # 🧪 Test Suite
@@ -389,22 +404,42 @@ bot_graph = load_graph_by_type('bot_framework')
 
 ### Example Bots
 
-**Echo Bot** (`examples/echo_bot/`) - Simplest Example
+**Learning Path** - Start simple, progress to advanced:
 
-- 5-10 lines of code
-- Echoes back user messages
-- Demonstrates minimal framework usage
+1. **Echo Bot** (`examples/echo_bot/`) - Start Here
 
-**Counter Bot** (`examples/counter_bot/`) - State Management
+   - 5-10 lines of code
+   - Echoes back user messages
+   - Demonstrates minimal framework usage
 
-- Per-user counter with persistence
-- Demonstrates storage API usage
-- Custom commands (increment, decrement, reset)
+2. **Counter Bot** (`examples/counter_bot/`) - State Management
 
-**Quit Smoking Bot** (`examples/quit_smoking_bot/`) - Real-World Example
+   - Per-user counter with persistence
+   - Demonstrates storage API usage
+   - Custom commands (increment, decrement, reset)
 
-- Complete tracking application
-- Custom business logic (prize fund calculation)
+3. **Reminder Bot** (`examples/reminder_bot/`) - Scheduler Integration
+
+   - Create reminders with natural language
+   - APScheduler integration for notifications
+   - Time parsing and scheduled tasks
+
+4. **Menu Bot** (`examples/menu_bot/`) - Inline Keyboards
+
+   - Interactive menus with buttons
+   - Settings toggles and navigation
+   - Pagination and confirmation dialogs
+
+5. **Poll Bot** (`examples/poll_bot/`) - SQL Storage
+
+   - Create and vote on polls
+   - Demonstrates SQL backend (SQLite/PostgreSQL)
+   - Complex data structures and queries
+
+6. **Quit Smoking Bot** (`examples/quit_smoking_bot/`) - Production Example
+   - Complete tracking application
+   - Custom business logic (prize fund calculation)
+
 - Integration with custom managers
 - Demonstrates hook customization
 
