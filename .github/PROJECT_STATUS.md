@@ -2,9 +2,9 @@
 
 **Project:** telegram-bot-stack - Reusable Telegram Bot Framework
 **Repository:** https://github.com/sensiloles/telegram-bot-stack
-**Current Phase:** Phase 2+ - Feature Expansion & Refinement
-**Last Updated:** 2025-11-18
-**Focus:** VPS Deployment (Issues #27, #28, #29) - The killer feature!
+**Current Phase:** Phase 2+ - Feature Expansion & Scaling
+**Last Updated:** 2025-11-19
+**Focus:** Horizontal Scaling + Production Readiness
 
 ## 🎯 Quick Start for Agent
 
@@ -88,34 +88,72 @@ issue = repo.create_issue(title="...", body="...", labels=[...])
 - Multi-graph dependency system implemented (#15, #16)
 - Git workflow improvements (#5-11, #14)
 
-### 🚧 Phase 2+: Feature Expansion & Refinement (Current)
+### 🚧 Phase 2+: Feature Expansion & Scaling (Current)
 
-**Active Issues:**
+**🔥 HIGH PRIORITY - Production & Scaling:**
+
+- **Issue #41** [Priority: HIGH]: feat(storage): Redis storage backend
+
+  - **#1 solution for horizontal scaling** - CRITICAL
+  - Distributed state across multiple instances
+  - Handles 10-100x more users than JSON/SQL
+  - Foundation for multi-instance deployments
+  - **Status:** Ready to implement (2 weeks)
+
+- **Issue #44** [Priority: HIGH]: feat(scaling): Multi-instance coordination
+
+  - Distributed rate limiting across instances
+  - Leader election for scheduled tasks
+  - Graceful shutdown for rolling updates
+  - **Enables:** 100,000-1,000,000+ users
+  - **Status:** Requires #41 first
+
+- **Issue #40** [Priority: HIGH]: feat(cli): CLI tool implementation
+
+  - Implement spec from `docs/cli-specification.md`
+  - Commands: init, new, dev, validate
+  - Foundation for deployment CLI (#27)
+  - **Status:** Ready to implement (2-3 weeks)
+
+- **Issue #42** [Priority: HIGH]: feat(observability): Monitoring infrastructure
+
+  - Prometheus metrics + structured logging
+  - Health check endpoints
+  - Production observability
+  - **Status:** Ready to implement (3 weeks)
+
+- **Issue #43** [Priority: HIGH]: feat(security): Security helpers
+  - Input validation + sanitization
+  - Global rate limiting
+  - Protection against common attacks
+  - **Status:** Ready to implement (2-3 weeks)
+
+**📦 VPS Deployment (Original Killer Feature):**
 
 - **Issue #27** [Priority: CRITICAL]: feat(deploy): VPS deployment CLI
-  - **One-command deployment to VPS** - KILLER FEATURE
-  - CLI tool: `python -m telegram_bot_stack deploy up`
-  - Interactive setup wizard
-  - Support all major VPS providers (DigitalOcean, AWS, Hetzner)
-  - Zero DevOps knowledge required
-  - Production-ready in < 10 minutes
+
+  - One-command deployment to VPS
+  - `python -m telegram_bot_stack deploy up`
+  - Support DigitalOcean, AWS, Hetzner
+  - **Status:** Depends on #40 (CLI foundation)
 
 - **Issue #28** [Priority: HIGH]: feat(docker): Production Docker templates
-  - Adapt battle-tested Docker setup from archive
+
+  - Adapt battle-tested setup from archive
   - Universal templates for any bot
-  - Framework-aware health checks
-  - Keep all production features (monitoring, security, etc.)
+  - **Status:** Ready to implement
 
 - **Issue #29** [Priority: HIGH]: docs(deployment): Deployment documentation
   - Comprehensive deployment guides
-  - Provider-specific tutorials (DigitalOcean, AWS, Hetzner)
-  - Troubleshooting guide
-  - Best practices for production
+  - Provider-specific tutorials
+  - **Status:** Depends on #27, #28
 
-- **Issue #19** [Priority: MEDIUM]: feat(webhooks): Add webhook support
-  - Alternative to polling for production
+**⚙️ Additional Production Features:**
+
+- **Issue #19** [Priority: MEDIUM]: feat(webhooks): Webhook support
+  - Alternative to polling
   - Lower latency and resource usage
-  - SSL certificate handling
+  - Serverless-friendly
 
 ## 📁 Project Structure
 
@@ -165,20 +203,167 @@ telegram-bot-stack/
     └── PACKAGE_CONVERSION_PLAN_RU.md
 ```
 
+## 🎯 New Issues Summary (Created 2025-11-19)
+
+**Total Issues Created:** 12 new issues for comprehensive framework development
+
+**By Priority:**
+
+- 🔥 **HIGH** (5 issues): #40, #41, #42, #43, #44 - Production & scaling
+- 🟡 **MEDIUM** (5 issues): #45, #46, #47, #48, #49 - Enhancements
+- 🟢 **LOW** (3 issues): #50, #51, #52 - Future features
+
+**Key Milestones:**
+
+1. **Horizontal Scaling** (#41 Redis + #44 Multi-instance) - 100k-1M+ users
+2. **Production Readiness** (#42 Observability + #43 Security)
+3. **Developer Experience** (#40 CLI + #47 Migration tools)
+4. **VPS Deployment** (#27-29) - Original killer feature
+
 ## 🔑 Key Files to Read First
 
 **On every new context:**
 
-1. `.github/PROJECT_STATUS.md` (this file) - Current status
-2. `archive/PACKAGE_CONVERSION_PLAN_RU.md` - Master plan (archived)
-3. Open issues via: `python3 .github/workflows/scripts/read_issues.py --list`
+1. `.github/PROJECT_STATUS.md` (this file) - Current status + roadmap
+2. Open issues: `python3 .github/workflows/scripts/read_issues.py --list`
+3. `archive/PACKAGE_CONVERSION_PLAN_RU.md` - Master plan (archived)
 
 **For specific tasks:**
 
+- Scaling work → Issues #41 (Redis), #44 (Multi-instance)
+- Production features → Issues #42 (Observability), #43 (Security)
+- CLI development → Issue #40
 - GitHub automation → `.github/workflows/scripts/README.md`
-- Git workflow → `.cursorrules` (lines 12-89)
 - Testing → `README.md` (lines 80-154)
-- Architecture → `README.md` (lines 155-250)
+
+## 📅 Updated Roadmap (2025-11-19)
+
+### Phase 2.1: Horizontal Scaling Foundation (8-10 weeks)
+
+**Sprint 1-2 (Weeks 1-4): Core Scaling**
+
+- Issue #41: Redis Storage Backend (2 weeks) - **START HERE**
+- Issue #44: Multi-instance Coordination (1-2 weeks) - Requires #41
+
+**Sprint 3 (Weeks 5-7): CLI Foundation**
+
+- Issue #40: CLI Tool Implementation (2-3 weeks)
+
+**Sprint 4 (Weeks 8-10): Production Readiness**
+
+- Issue #42: Observability Infrastructure (3 weeks)
+- Issue #43: Security Helpers (2-3 weeks) - Parallel with #42
+
+**Result:** Framework can handle 100k-1M+ users with full monitoring
+
+### Phase 2.2: VPS Deployment (8-12 weeks)
+
+**Sprint 5-7 (Weeks 11-22): Killer Feature**
+
+- Issue #27: VPS Deployment CLI (4 weeks) - Requires #40
+- Issue #28: Production Docker Templates (4 weeks)
+- Issue #29: Deployment Documentation (4 weeks)
+
+**Result:** One-command deployment to production
+
+### Phase 2.3: Additional Production Features (4-6 weeks)
+
+**Sprint 8-9 (Weeks 23-28): Production Polish**
+
+- Issue #19: Webhook Support (4 weeks)
+- Issue #46: Retry & Circuit Breaker (1.5 weeks) - Parallel
+- Issue #47: Migration Tools (1.5 weeks) - Parallel
+
+**Result:** Feature-complete production framework
+
+### Phase 2.4: Enhancements (6-8 weeks)
+
+**Sprint 10-11 (Weeks 29-36): DX & Features**
+
+- Issue #45: i18n Support (2 weeks)
+- Issue #48: Benchmarking Tools (1 week)
+- Issue #49: Advanced Examples (3 weeks)
+
+**Result:** Enhanced developer experience
+
+### Phase 2.5: Future Features (Optional)
+
+**Low Priority - As Time Permits:**
+
+- Issue #50: Load Testing Framework (1.5 weeks)
+- Issue #51: Plugin System (3 weeks)
+- Issue #52: Admin Dashboard (4-6 weeks)
+
+### Phase 3: PyPI Publication & Public Release
+
+**Final Steps:**
+
+- Issue #30: MyPy Type Safety (3 weeks)
+- Issue #31: Automatic PyPI Publication (1.5 hours)
+- Issue #33: Automated Graph Generation (3-4 weeks)
+
+**Result:** 🎉 **Public v2.0.0 Release on PyPI**
+
+## 🎯 Priority Order for Implementation
+
+### **Immediate (Start Now)**
+
+1. **Issue #41** - Redis Storage (2 weeks)
+   - **Why First:** Foundation for all scaling
+   - **Impact:** 10-100x capacity increase
+   - **Blocks:** #44 (Multi-instance)
+
+### **Phase 1: Scaling (Next 2-3 months)**
+
+2. **Issue #44** - Multi-instance Coordination (1-2 weeks)
+3. **Issue #40** - CLI Implementation (2-3 weeks)
+4. **Issue #42** - Observability (3 weeks)
+5. **Issue #43** - Security (2-3 weeks)
+
+### **Phase 2: Deployment (Next 3 months)**
+
+6. **Issue #27** - VPS Deployment CLI (4 weeks)
+7. **Issue #28** - Docker Templates (4 weeks)
+8. **Issue #29** - Deployment Docs (4 weeks)
+
+### **Phase 3: Features (Next 2 months)**
+
+9. **Issue #19** - Webhooks (4 weeks)
+10. **Issue #46** - Retry & Circuit Breaker (1.5 weeks)
+11. **Issue #45** - i18n (2 weeks)
+
+### **Phase 4: Polish (As Needed)**
+
+12. Issues #47-49: Migration, Benchmarks, Examples
+13. Issue #30: Type Safety
+14. Issues #50-52: Optional features
+
+## 🎯 Success Metrics per Phase
+
+**Phase 2.1 Complete:**
+
+- ✅ Can run 10+ bot instances
+- ✅ Handles 100,000-1,000,000 users
+- ✅ Full observability (metrics, logs, health checks)
+- ✅ Production-ready security
+
+**Phase 2.2 Complete:**
+
+- ✅ One-command VPS deployment
+- ✅ Zero-DevOps deployment
+- ✅ < 10 minutes to production
+
+**Phase 2.3 Complete:**
+
+- ✅ Webhook mode for efficiency
+- ✅ Resilient under load
+- ✅ Easy migrations
+
+**Phase 3 Complete:**
+
+- ✅ Public v2.0.0 on PyPI
+- ✅ 100% type-safe codebase
+- ✅ Automated graph maintenance
 
 ## 🚀 Common Workflows
 
