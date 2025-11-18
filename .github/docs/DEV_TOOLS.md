@@ -7,7 +7,6 @@ Complete guide to all development tools and shortcuts in telegram-bot-stack.
 ```bash
 # One command to see everything
 make help           # All Make commands
-./dev help          # All CLI commands
 python3 .github/workflows/scripts/project_overview.py  # Project status
 ```
 
@@ -46,46 +45,7 @@ make f            # format
 make s            # status
 ```
 
-### 2. CLI Wrapper (`./dev`)
-
-Interactive command-line interface:
-
-```bash
-# Status
-./dev status                    # Project overview
-
-# Testing
-./dev test                      # All tests
-./dev test fast                 # Fast tests
-./dev test cov                  # With coverage
-./dev test unit                 # Unit tests only
-
-# Code Quality
-./dev lint                      # Check code
-./dev lint --fix                # Auto-fix
-./dev format                    # Format code
-./dev typecheck                 # Type check
-
-# CI/CD
-./dev ci run                    # Run CI locally
-./dev ci check                  # Check current branch
-./dev ci check main             # Check specific branch
-
-# Pull Requests
-./dev pr check 5                # Check PR #5
-./dev pr create --title "..."   # Create PR
-./dev pr list                   # List PRs
-
-# Issues
-./dev issue list                # List issues
-./dev issue read 4              # Read issue #4
-
-# Utils
-./dev clean                     # Clean artifacts
-./dev setup                     # Setup environment
-```
-
-### 3. GitHub Automation Scripts
+### 2. GitHub Automation Scripts
 
 Located in `.github/workflows/scripts/`:
 
@@ -142,17 +102,17 @@ python3 .github/workflows/scripts/project_overview.py --detailed
 git checkout -b feature/my-feature
 
 # 2. Check status
-./dev status
+make status
 
 # 3. Make changes and test
-./dev test fast
+make test-fast
 
 # 4. Lint and format
-./dev lint --fix
-./dev format
+make lint-fix
+make format
 
 # 5. Run full CI locally
-./dev ci run
+make ci
 
 # 6. Commit and push
 git add .
@@ -160,9 +120,6 @@ git commit -m "feat(scope): description"
 git push -u origin feature/my-feature
 
 # 7. Create PR
-./dev pr create --title "feat(scope): description" --closes 42
-
-# Or with make
 make pr-create TITLE="feat(scope): description" CLOSES=42
 ```
 
@@ -170,7 +127,7 @@ make pr-create TITLE="feat(scope): description" CLOSES=42
 
 ```bash
 # Quick check
-./dev pr check 5
+make pr-check PR=5
 
 # Detailed readiness check
 python3 .github/workflows/scripts/pr_ready.py --pr 5
@@ -183,7 +140,7 @@ python3 .github/workflows/scripts/check_ci.py --pr 5
 
 ```bash
 # Morning: Check project status
-./dev status
+make status
 
 # Run tests while developing
 make t              # Quick alias for test
@@ -202,7 +159,7 @@ make ci             # All CI checks
 
 ```bash
 # 1. Check what's failing
-./dev pr check 5
+make pr-check PR=5
 
 # 2. Run tests locally
 make test-cov
@@ -222,17 +179,16 @@ make ci
 
 ## 🎨 Tool Comparison
 
-| Task           | Make                         | ./dev                           | Direct Script                                                  |
-| -------------- | ---------------------------- | ------------------------------- | -------------------------------------------------------------- |
-| Run tests      | `make test`                  | `./dev test`                    | `pytest`                                                       |
-| Check CI       | `make pr-check PR=5`         | `./dev pr check 5`              | `python3 .github/workflows/scripts/check_ci.py --pr 5`         |
-| Create PR      | `make pr-create TITLE="..."` | `./dev pr create --title "..."` | `python3 .github/workflows/scripts/create_pr.py --title "..."` |
-| Project status | `make status`                | `./dev status`                  | `python3 .github/workflows/scripts/project_overview.py`        |
+| Task           | Make                         | Direct Script                                                  |
+| -------------- | ---------------------------- | -------------------------------------------------------------- |
+| Run tests      | `make test`                  | `pytest`                                                       |
+| Check CI       | `make pr-check PR=5`         | `python3 .github/workflows/scripts/check_ci.py --pr 5`         |
+| Create PR      | `make pr-create TITLE="..."` | `python3 .github/workflows/scripts/create_pr.py --title "..."` |
+| Project status | `make status`                | `python3 .github/workflows/scripts/project_overview.py`        |
 
 **When to use what:**
 
-- **Make:** Traditional, fast, great for CI/CD
-- **./dev:** Interactive, modern, user-friendly
+- **Make:** Traditional, fast, great for CI/CD (recommended)
 - **Direct scripts:** Maximum control, automation, scripting
 
 ## 💡 Tips & Tricks
@@ -319,11 +275,7 @@ python3 .github/workflows/scripts/create_pr.py \
 
 ### "Command not found: make"
 
-Install make: `brew install make` (macOS) or use `./dev` instead
-
-### "./dev: Permission denied"
-
-Run: `chmod +x dev`
+Install make: `brew install make` (macOS)
 
 ### "GITHUB_TOKEN not found"
 
@@ -335,13 +287,12 @@ Install dependencies: `make setup` or `pip install -e ".[dev,github-actions]"`
 
 ## 🎯 Summary
 
-**Three ways to do everything:**
+**Two ways to do everything:**
 
-1. **Makefile** - `make test`, `make lint`, `make status`
-2. **CLI Wrapper** - `./dev test`, `./dev lint`, `./dev status`
-3. **Direct Scripts** - Full control for automation
+1. **Makefile** - `make test`, `make lint`, `make status` (recommended)
+2. **Direct Scripts** - Full control for automation: `python3 .github/workflows/scripts/...`
 
-**Pick what works best for you!**
+**Makefile provides convenient shortcuts for all common tasks!**
 
 All tools are designed to work together and make development faster and more enjoyable.
 

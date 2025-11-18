@@ -276,7 +276,7 @@
           "docs/**/*.md"
         ],
         "files": 9,
-        "total_lines": 4621,
+        "total_lines": 4746,
         "key_components": [
           "API Reference",
           "Architecture",

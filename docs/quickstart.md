@@ -1,5 +1,7 @@
 # Quick Start Guide
 
+> 📚 **Documentation Index:** See [Documentation Index](README.md) for all available guides.
+
 Get started with `telegram-bot-stack` in minutes! This guide will walk you through creating your first bot.
 
 ## Installation
@@ -15,6 +17,7 @@ pip install git+https://github.com/sensiloles/telegram-bot-stack.git@v0.1.0
 ```
 
 **Advantages:**
+
 - ✅ No cloning needed
 - ✅ Works like normal pip package
 - ✅ Easy to specify versions via git tags
@@ -29,6 +32,7 @@ pip install -e .
 ```
 
 **Use this when:**
+
 - You want to modify the framework
 - You need editable installation for development
 
@@ -275,9 +279,9 @@ export TELEGRAM_BOT_TOKEN="your_token_here"
 ## What's Next?
 
 - 📖 Read the [API Reference](api_reference.md) for detailed documentation
-- 🏗️ Check [Architecture Guide](../ARCHITECTURE.md) for design patterns
-- 🔧 See [Development Guide](../DEVELOPMENT.md) for contributing
+- 🏗️ Check [Architecture Guide](architecture.md) for design patterns
 - 💡 Browse [examples/](../examples/) for more complex bots
+- 📚 See [Documentation Index](README.md) for all guides
 
 ## Getting Help
 

@@ -1,5 +1,7 @@
 # Private Installation Guide
 
+> 📚 **Documentation Index:** See [Documentation Index](README.md) for all available guides.
+
 Различные способы установки `telegram-bot-stack` без публикации на публичный PyPI.
 
 ## 🔐 Option 1: GitHub Packages (Recommended)
@@ -278,7 +280,7 @@ pip install git+https://github.com/sensiloles/telegram-bot-stack.git@v0.1.0
 
 ### Step 3: Add Installation Instructions
 
-Update `README.md` and `docs/quickstart.md` with Git installation method.
+Update [Main README](../README.md) and [Quick Start Guide](quickstart.md) with Git installation method.
 
 ---
 

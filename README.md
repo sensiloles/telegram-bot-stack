@@ -187,7 +187,9 @@ if __name__ == "__main__":
 
 For development setup, VS Code configuration, and detailed build instructions, see:
 
-**📚 [Development Guide](DEVELOPMENT.md)** - Complete development environment setup, IDE configuration, and troubleshooting.
+**📚 [Development Guide](archive/development-archive.md)** - Complete development environment setup, IDE configuration, and troubleshooting.
+
+> **Note:** For current development setup, see [Documentation Index](docs/README.md) for all guides.
 
 ## 🧪 Testing
 
@@ -255,7 +257,7 @@ See [`.github/workflows/tests.yml`](.github/workflows/tests.yml) for CI/CD confi
 
 ## 🏗️ Architecture Overview
 
-> 📖 **Detailed Architecture Documentation:** See [`ARCHITECTURE.md`](ARCHITECTURE.md) for comprehensive design documentation, data flow diagrams, and extension patterns.
+> 📖 **Detailed Architecture Documentation:** See [Architecture Guide](docs/architecture.md) for comprehensive design documentation, data flow diagrams, and extension patterns.
 
 ### Package Structure
 

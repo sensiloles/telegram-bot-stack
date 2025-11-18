@@ -1,7 +1,7 @@
 {
   "metadata": {
     "version": "3.0.0",
-    "generated_at": "2025-11-19",
+    "generated_at": "2025-01-31",
     "graph_id": "docs",
     "graph_name": "Documentation",
     "graph_type": "flat_graph",
@@ -10,7 +10,7 @@
     "description": "Project documentation files and user guides",
     "scope": "All documentation in docs/ directory",
     "node_count": 9,
-    "edge_count": 12
+    "edge_count": 28
   },
   "nodes": [
     {
@@ -35,10 +35,13 @@
         "telegram_bot_stack.AdminManager",
         "telegram_bot_stack.decorators"
       ],
-      "references": [],
+      "references": [
+        "docs.readme"
+      ],
       "referenced_by": [
         "docs.quickstart",
-        "docs.architecture"
+        "docs.architecture",
+        "docs.readme"
       ],
       "tags": [
         "api",
@@ -71,10 +74,12 @@
       ],
       "references": [
         "docs.api_reference",
-        "docs.storage_guide"
+        "docs.storage_guide",
+        "docs.readme"
       ],
       "referenced_by": [
-        "docs.quickstart"
+        "docs.quickstart",
+        "docs.readme"
       ],
       "tags": [
         "architecture",
@@ -103,8 +108,12 @@
         "Command line tools",
         "Bot management"
       ],
-      "references": [],
-      "referenced_by": [],
+      "references": [
+        "docs.readme"
+      ],
+      "referenced_by": [
+        "docs.readme"
+      ],
       "tags": [
         "cli",
         "tools",
@@ -114,31 +123,50 @@
       "criticality": "medium"
     },
     {
-      "id": "docs.development_archive",
-      "name": "development-archive.md",
+      "id": "docs.readme",
+      "name": "README.md",
       "type": "documentation",
-      "category": "archive",
-      "path": "docs/development-archive.md",
-      "description": "Archived development notes and historical decisions",
-      "lines": 444,
+      "category": "index",
+      "path": "docs/README.md",
+      "description": "Documentation index and navigation hub",
+      "lines": 125,
       "sections": [
-        "Historical Changes",
-        "Deprecated Features",
-        "Migration Notes"
+        "Quick Navigation",
+        "Documentation Structure",
+        "Documentation Groups",
+        "Documentation Relationships"
       ],
       "covers": [
-        "Development history",
-        "Deprecated features"
+        "Documentation navigation",
+        "Documentation structure",
+        "Documentation relationships"
       ],
-      "references": [],
-      "referenced_by": [],
+      "references": [
+        "docs.installation",
+        "docs.quickstart",
+        "docs.storage_guide",
+        "docs.migration_guide",
+        "docs.private_installation",
+        "docs.api_reference",
+        "docs.architecture",
+        "docs.cli_specification"
+      ],
+      "referenced_by": [
+        "docs.api_reference",
+        "docs.architecture",
+        "docs.quickstart",
+        "docs.storage_guide",
+        "docs.migration_guide",
+        "docs.installation",
+        "docs.private_installation"
+      ],
       "tags": [
-        "archive",
-        "history",
-        "deprecated"
+        "index",
+        "navigation",
+        "overview"
       ],
-      "audience": "maintainers",
-      "criticality": "low"
+      "audience": "all",
+      "criticality": "high"
     },
     {
       "id": "docs.installation",
@@ -159,9 +187,12 @@
         "Requirements",
         "Setup"
       ],
-      "references": [],
+      "references": [
+        "docs.readme"
+      ],
       "referenced_by": [
-        "docs.quickstart"
+        "docs.quickstart",
+        "docs.readme"
       ],
       "tags": [
         "installation",
@@ -191,9 +222,12 @@
         "Breaking changes handling"
       ],
       "references": [
-        "docs.storage_guide"
+        "docs.storage_guide",
+        "docs.readme"
       ],
-      "referenced_by": [],
+      "referenced_by": [
+        "docs.readme"
+      ],
       "tags": [
         "migration",
         "upgrade",
@@ -222,9 +256,12 @@
         "Authentication"
       ],
       "references": [
-        "docs.installation"
+        "docs.installation",
+        "docs.readme"
       ],
-      "referenced_by": [],
+      "referenced_by": [
+        "docs.readme"
+      ],
       "tags": [
         "installation",
         "private",
@@ -255,9 +292,12 @@
       "references": [
         "docs.installation",
         "docs.api_reference",
-        "docs.architecture"
+        "docs.architecture",
+        "docs.readme"
       ],
-      "referenced_by": [],
+      "referenced_by": [
+        "docs.readme"
+      ],
       "tags": [
         "quickstart",
         "tutorial",
@@ -287,11 +327,13 @@
         "Custom storage implementation"
       ],
       "references": [
-        "docs.api_reference"
+        "docs.api_reference",
+        "docs.readme"
       ],
       "referenced_by": [
         "docs.architecture",
-        "docs.migration_guide"
+        "docs.migration_guide",
+        "docs.readme"
       ],
       "tags": [
         "storage",
@@ -398,6 +440,134 @@
       "type": "referenced_by",
       "description": "Storage guide is used in migration guide",
       "bidirectional": false
+    },
+    {
+      "id": "docs_edge_13",
+      "source": "docs.readme",
+      "target": "docs.installation",
+      "type": "references",
+      "description": "README references installation guide",
+      "bidirectional": false
+    },
+    {
+      "id": "docs_edge_14",
+      "source": "docs.readme",
+      "target": "docs.quickstart",
+      "type": "references",
+      "description": "README references quickstart guide",
+      "bidirectional": false
+    },
+    {
+      "id": "docs_edge_15",
+      "source": "docs.readme",
+      "target": "docs.storage_guide",
+      "type": "references",
+      "description": "README references storage guide",
+      "bidirectional": false
+    },
+    {
+      "id": "docs_edge_16",
+      "source": "docs.readme",
+      "target": "docs.migration_guide",
+      "type": "references",
+      "description": "README references migration guide",
+      "bidirectional": false
+    },
+    {
+      "id": "docs_edge_17",
+      "source": "docs.readme",
+      "target": "docs.private_installation",
+      "type": "references",
+      "description": "README references private installation guide",
+      "bidirectional": false
+    },
+    {
+      "id": "docs_edge_18",
+      "source": "docs.readme",
+      "target": "docs.api_reference",
+      "type": "references",
+      "description": "README references API reference",
+      "bidirectional": false
+    },
+    {
+      "id": "docs_edge_19",
+      "source": "docs.readme",
+      "target": "docs.architecture",
+      "type": "references",
+      "description": "README references architecture guide",
+      "bidirectional": false
+    },
+    {
+      "id": "docs_edge_20",
+      "source": "docs.readme",
+      "target": "docs.cli_specification",
+      "type": "references",
+      "description": "README references CLI specification",
+      "bidirectional": false
+    },
+    {
+      "id": "docs_edge_21",
+      "source": "docs.api_reference",
+      "target": "docs.readme",
+      "type": "referenced_by",
+      "description": "API reference links back to README",
+      "bidirectional": false
+    },
+    {
+      "id": "docs_edge_22",
+      "source": "docs.architecture",
+      "target": "docs.readme",
+      "type": "referenced_by",
+      "description": "Architecture links back to README",
+      "bidirectional": false
+    },
+    {
+      "id": "docs_edge_23",
+      "source": "docs.quickstart",
+      "target": "docs.readme",
+      "type": "referenced_by",
+      "description": "Quickstart links back to README",
+      "bidirectional": false
+    },
+    {
+      "id": "docs_edge_24",
+      "source": "docs.storage_guide",
+      "target": "docs.readme",
+      "type": "referenced_by",
+      "description": "Storage guide links back to README",
+      "bidirectional": false
+    },
+    {
+      "id": "docs_edge_25",
+      "source": "docs.migration_guide",
+      "target": "docs.readme",
+      "type": "referenced_by",
+      "description": "Migration guide links back to README",
+      "bidirectional": false
+    },
+    {
+      "id": "docs_edge_26",
+      "source": "docs.installation",
+      "target": "docs.readme",
+      "type": "referenced_by",
+      "description": "Installation guide links back to README",
+      "bidirectional": false
+    },
+    {
+      "id": "docs_edge_27",
+      "source": "docs.private_installation",
+      "target": "docs.readme",
+      "type": "referenced_by",
+      "description": "Private installation links back to README",
+      "bidirectional": false
+    },
+    {
+      "id": "docs_edge_28",
+      "source": "docs.cli_specification",
+      "target": "docs.readme",
+      "type": "referenced_by",
+      "description": "CLI specification links back to README",
+      "bidirectional": false
     }
   ],
   "groups": {
@@ -430,34 +600,33 @@
       ],
       "priority": "high"
     },
-    "archive": {
-      "name": "Archive",
-      "description": "Historical and deprecated documentation",
+    "index": {
+      "name": "Index",
+      "description": "Documentation navigation and overview",
       "nodes": [
-        "docs.development_archive"
+        "docs.readme"
       ],
-      "priority": "low"
+      "priority": "high"
     }
   },
   "statistics": {
     "total_files": 9,
-    "total_lines": 4621,
+    "total_lines": 4746,
     "by_category": {
       "getting_started": 2,
       "guide": 3,
       "reference": 3,
-      "archive": 1
+      "index": 1
     },
     "by_audience": {
       "users": 4,
       "developers": 4,
-      "maintainers": 1
+      "all": 1
     },
     "by_criticality": {
       "critical": 2,
-      "high": 4,
-      "medium": 2,
-      "low": 1
+      "high": 5,
+      "medium": 2
     }
   },
   "ai_agent_hints": {

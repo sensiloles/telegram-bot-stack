@@ -1,5 +1,7 @@
 # Storage Guide
 
+> 📚 **Documentation Index:** See [Documentation Index](README.md) for all available guides.
+
 This guide explains the storage abstraction layer in telegram-bot-stack and how to choose and use different storage backends.
 
 ## Overview
