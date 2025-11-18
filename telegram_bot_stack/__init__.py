@@ -29,6 +29,7 @@ https://github.com/sensiloles/telegram-bot-stack
 
 from .admin_manager import AdminManager
 from .bot_base import BotBase
+from .decorators import rate_limit
 from .storage import (
     JSONStorage,
     MemoryStorage,
@@ -45,6 +46,8 @@ __all__ = [
     "BotBase",
     "UserManager",
     "AdminManager",
+    # Decorators
+    "rate_limit",
     # Storage
     "StorageBackend",
     "JSONStorage",

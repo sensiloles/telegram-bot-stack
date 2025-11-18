@@ -5,6 +5,8 @@ Complete API documentation for `telegram-bot-stack` framework.
 ## Table of Contents
 
 - [BotBase](#botbase)
+- [Decorators](#decorators)
+  - [rate_limit()](#rate_limit)
 - [Storage](#storage)
   - [StorageBackend](#storagebackend)
   - [JSONStorage](#jsonstorage)
@@ -125,6 +127,122 @@ async def on_user_registered(self, user_id: int) -> None:
 - `admin_manager` (AdminManager): Admin management instance
 - `bot_name` (str): Bot name
 - `is_running` (bool): Whether bot is currently running
+
+---
+
+## Decorators
+
+Utility decorators for bot command handlers.
+
+### rate_limit()
+
+Rate limiting decorator that restricts how often a command can be called.
+
+**Function Signature:**
+
+```python
+def rate_limit(
+    calls: int,
+    period: int,
+    scope: Literal["user", "global"] = "user",
+    message: Optional[str] = None
+) -> Callable
+```
+
+**Parameters:**
+
+- `calls` (int): Maximum number of calls allowed within the period
+- `period` (int): Time period in seconds
+- `scope` (Literal["user", "global"]): Rate limit scope
+  - `"user"`: Per-user rate limiting (default) - each user has their own limit
+  - `"global"`: Bot-wide rate limiting - limit applies to all users combined
+- `message` (Optional[str]): Custom message shown when rate limited. If None, uses default message showing cooldown time
+
+**Returns:**
+
+- `Callable`: Decorated handler function that enforces rate limits
+
+**Behavior:**
+
+- Uses bot's storage backend to track call timestamps
+- Admins automatically bypass rate limits
+- Old timestamps cleaned up automatically
+- Fails open if storage fails (allows call for availability)
+- Works with both message handlers and callback query handlers
+
+**Example - Basic Per-User Rate Limiting:**
+
+```python
+from telegram_bot_stack import BotBase, rate_limit
+
+class MyBot(BotBase):
+    @rate_limit(calls=5, period=60)
+    async def search_command(self, update, context):
+        """Users can search 5 times per minute"""
+        await update.message.reply_text("Searching...")
+        # Expensive search operation
+```
+
+**Example - Global Rate Limiting:**
+
+```python
+class MyBot(BotBase):
+    @rate_limit(calls=1, period=3600, scope="global")
+    async def broadcast_command(self, update, context):
+        """Can only be called once per hour by anyone"""
+        await update.message.reply_text("Broadcasting to all users...")
+        # Expensive broadcast operation
+```
+
+**Example - Custom Error Message:**
+
+```python
+class MyBot(BotBase):
+    @rate_limit(
+        calls=3,
+        period=600,  # 10 minutes
+        message="Please wait before requesting another report."
+    )
+    async def report_command(self, update, context):
+        """Generate report with custom rate limit message"""
+        await update.message.reply_text("Generating report...")
+```
+
+**Example - Multiple Decorators:**
+
+```python
+class MyBot(BotBase):
+    # Different limits for different commands
+    @rate_limit(calls=10, period=60)  # 10 per minute
+    async def quick_command(self, update, context):
+        await update.message.reply_text("Quick operation!")
+
+    @rate_limit(calls=1, period=300)  # 1 per 5 minutes
+    async def slow_command(self, update, context):
+        await update.message.reply_text("Slow operation...")
+```
+
+**Storage Keys:**
+
+The decorator stores timestamps using these key patterns:
+
+- Per-user: `rate_limit:user:{user_id}:{command_name}`
+- Global: `rate_limit:global:{command_name}`
+
+**Error Messages:**
+
+Default rate limit messages show remaining cooldown time:
+
+- `"Rate limit exceeded! You can use this command 5 time(s) per 1m. Try again in 45s."`
+- `"This command is globally rate limited. Try again in 2h 15m."`
+
+**Notes:**
+
+- Requires bot to have a `storage` attribute
+- Admins (via `admin_manager.is_admin()`) bypass all rate limits
+- Works seamlessly with all storage backends (JSON, Memory, SQL)
+- Thread-safe and handles concurrent calls correctly
+- Timestamps automatically cleaned up on each call
 
 ---
 
