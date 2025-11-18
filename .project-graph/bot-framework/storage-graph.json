@@ -1,0 +1,435 @@
+{
+  "metadata": {
+    "version": "3.0.0",
+    "generated_at": "2025-11-19",
+    "graph_id": "bot_framework_storage",
+    "graph_name": "Bot Framework - Storage",
+    "graph_type": "sub_graph",
+    "parent_graph": "bot_framework",
+    "project_name": "telegram-bot-stack",
+    "project_version": "1.6.0",
+    "description": "Storage abstraction layer and implementations",
+    "scope": "All storage backends (JSON, Memory, SQL)",
+    "root_package": "telegram_bot_stack.storage",
+    "node_count": 5,
+    "edge_count": 7
+  },
+  "nodes": [
+    {
+      "id": "telegram_bot_stack.storage",
+      "name": "storage",
+      "type": "module",
+      "category": "core",
+      "path": "telegram_bot_stack/storage/__init__.py",
+      "description": "Storage abstraction layer with factory function",
+      "lines_of_code": 78,
+      "complexity_score": 2,
+      "exports": [
+        "StorageBackend",
+        "JSONStorage",
+        "MemoryStorage",
+        "SQLStorage",
+        "create_storage",
+        "Storage"
+      ],
+      "imports": {
+        "internal": [
+          "storage.base.StorageBackend",
+          "storage.json.JSONStorage",
+          "storage.memory.MemoryStorage",
+          "storage.sql.SQLStorage"
+        ],
+        "external": [
+          "logging",
+          "typing.Any",
+          "typing.Optional"
+        ]
+      },
+      "dependencies": [
+        "telegram_bot_stack.storage.base",
+        "telegram_bot_stack.storage.json",
+        "telegram_bot_stack.storage.memory",
+        "telegram_bot_stack.storage.sql"
+      ],
+      "dependents": [
+        "telegram_bot_stack.__init__"
+      ],
+      "functions": [
+        {
+          "name": "create_storage",
+          "description": "Factory function to create storage backends",
+          "parameters": [
+            "backend: str",
+            "**kwargs: Any"
+          ],
+          "returns": "StorageBackend",
+          "supported_backends": [
+            "json",
+            "memory",
+            "sqlite",
+            "postgres",
+            "sql"
+          ]
+        }
+      ],
+      "tags": [
+        "core",
+        "abstraction-layer",
+        "factory",
+        "storage"
+      ],
+      "role": "Unified interface for different storage backends",
+      "criticality": "critical"
+    },
+    {
+      "id": "telegram_bot_stack.storage.base",
+      "name": "storage.base",
+      "type": "module",
+      "category": "core",
+      "path": "telegram_bot_stack/storage/base.py",
+      "description": "Abstract base class defining storage backend interface",
+      "lines_of_code": 63,
+      "complexity_score": 1,
+      "exports": [
+        "StorageBackend"
+      ],
+      "imports": {
+        "internal": [],
+        "external": [
+          "abc.ABC",
+          "abc.abstractmethod",
+          "typing.Any"
+        ]
+      },
+      "dependencies": [],
+      "dependents": [
+        "telegram_bot_stack.storage",
+        "telegram_bot_stack.storage.json",
+        "telegram_bot_stack.storage.memory",
+        "telegram_bot_stack.user_manager",
+        "telegram_bot_stack.admin_manager",
+        "telegram_bot_stack.bot_base"
+      ],
+      "classes": [
+        {
+          "name": "StorageBackend",
+          "description": "Abstract base class for storage backends",
+          "type": "abstract",
+          "abstract_methods": [
+            "save",
+            "load",
+            "exists",
+            "delete"
+          ],
+          "interface_contract": "All storage backends must implement this interface"
+        }
+      ],
+      "tags": [
+        "core",
+        "abstract",
+        "interface",
+        "contract",
+        "foundation"
+      ],
+      "role": "Defines storage contract ensuring compatibility across implementations",
+      "criticality": "critical",
+      "design_pattern": "Strategy Pattern (Interface)"
+    },
+    {
+      "id": "telegram_bot_stack.storage.json",
+      "name": "storage.json",
+      "type": "module",
+      "category": "implementation",
+      "path": "telegram_bot_stack/storage/json.py",
+      "description": "JSON file-based storage backend implementation",
+      "lines_of_code": 125,
+      "complexity_score": 4,
+      "exports": [
+        "JSONStorage"
+      ],
+      "imports": {
+        "internal": [
+          "storage.base.StorageBackend"
+        ],
+        "external": [
+          "json",
+          "logging",
+          "pathlib.Path",
+          "typing.Any",
+          "typing.Union"
+        ]
+      },
+      "dependencies": [
+        "telegram_bot_stack.storage.base"
+      ],
+      "dependents": [
+        "telegram_bot_stack.storage",
+        "telegram_bot_stack.__init__"
+      ],
+      "classes": [
+        {
+          "name": "JSONStorage",
+          "description": "JSON file-based storage backend",
+          "implements": "StorageBackend",
+          "public_methods": [
+            "save",
+            "load",
+            "exists",
+            "delete"
+          ],
+          "features": [
+            "File-based persistence",
+            "UTF-8 encoding",
+            "Auto-creates directories",
+            "Pretty-printed JSON"
+          ]
+        }
+      ],
+      "tags": [
+        "implementation",
+        "storage-backend",
+        "file-based",
+        "persistent",
+        "production-ready"
+      ],
+      "role": "Default production storage backend using JSON files",
+      "criticality": "high",
+      "design_pattern": "Strategy Pattern (Concrete Strategy)"
+    },
+    {
+      "id": "telegram_bot_stack.storage.memory",
+      "name": "storage.memory",
+      "type": "module",
+      "category": "implementation",
+      "path": "telegram_bot_stack/storage/memory.py",
+      "description": "In-memory storage backend for testing",
+      "lines_of_code": 111,
+      "complexity_score": 3,
+      "exports": [
+        "MemoryStorage"
+      ],
+      "imports": {
+        "internal": [
+          "storage.base.StorageBackend"
+        ],
+        "external": [
+          "logging",
+          "copy.deepcopy",
+          "typing.Any"
+        ]
+      },
+      "dependencies": [
+        "telegram_bot_stack.storage.base"
+      ],
+      "dependents": [
+        "telegram_bot_stack.storage",
+        "telegram_bot_stack.__init__"
+      ],
+      "classes": [
+        {
+          "name": "MemoryStorage",
+          "description": "In-memory storage backend for testing",
+          "implements": "StorageBackend",
+          "public_methods": [
+            "save",
+            "load",
+            "exists",
+            "delete",
+            "clear"
+          ],
+          "features": [
+            "In-memory dictionary storage",
+            "Deep copy for data isolation",
+            "No file I/O overhead",
+            "Clear method for testing"
+          ]
+        }
+      ],
+      "tags": [
+        "implementation",
+        "storage-backend",
+        "in-memory",
+        "testing",
+        "development"
+      ],
+      "role": "Testing and development storage backend with no persistence",
+      "criticality": "medium",
+      "design_pattern": "Strategy Pattern (Concrete Strategy)",
+      "use_cases": [
+        "Unit testing",
+        "Integration testing",
+        "Development",
+        "Temporary data"
+      ]
+    },
+    {
+      "id": "telegram_bot_stack.storage.sql",
+      "name": "storage.sql",
+      "type": "module",
+      "category": "implementation",
+      "path": "telegram_bot_stack/storage/sql.py",
+      "description": "SQL database storage backend using SQLAlchemy (SQLite/PostgreSQL)",
+      "lines_of_code": 240,
+      "complexity_score": 6,
+      "exports": [
+        "SQLStorage",
+        "StorageRecord"
+      ],
+      "imports": {
+        "internal": [
+          "storage.base.StorageBackend"
+        ],
+        "external": [
+          "json",
+          "logging",
+          "datetime.datetime",
+          "typing.Any",
+          "typing.Optional",
+          "typing.Union",
+          "sqlalchemy",
+          "sqlalchemy.orm"
+        ]
+      },
+      "dependencies": [
+        "telegram_bot_stack.storage.base"
+      ],
+      "dependents": [
+        "telegram_bot_stack.storage",
+        "telegram_bot_stack.__init__"
+      ],
+      "classes": [
+        {
+          "name": "StorageRecord",
+          "description": "SQLAlchemy model for storage records",
+          "type": "orm_model",
+          "fields": [
+            "key (primary key)",
+            "data (JSON text)",
+            "created_at (timestamp)",
+            "updated_at (timestamp)"
+          ]
+        },
+        {
+          "name": "SQLStorage",
+          "description": "SQL database storage backend",
+          "implements": "StorageBackend",
+          "public_methods": [
+            "save",
+            "load",
+            "exists",
+            "delete",
+            "close"
+          ],
+          "features": [
+            "SQLite and PostgreSQL support",
+            "Automatic table creation",
+            "Connection pooling (PostgreSQL)",
+            "Transaction support",
+            "JSON serialization",
+            "Timestamps tracking"
+          ]
+        }
+      ],
+      "tags": [
+        "implementation",
+        "storage-backend",
+        "database",
+        "production",
+        "scalable",
+        "optional-dependency"
+      ],
+      "role": "Production-grade SQL storage backend for scalable deployments",
+      "criticality": "high",
+      "design_pattern": "Strategy Pattern (Concrete Strategy)",
+      "use_cases": [
+        "Production deployments",
+        "Large bots (>10k users)",
+        "High concurrency",
+        "Data integrity requirements",
+        "Distributed systems (PostgreSQL)"
+      ],
+      "optional_dependencies": [
+        "sqlalchemy>=2.0,<3.0",
+        "alembic>=1.13,<2.0",
+        "psycopg2-binary>=2.9 (for PostgreSQL)"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge_10",
+      "source": "telegram_bot_stack.storage",
+      "target": "telegram_bot_stack.storage.base",
+      "type": "imports",
+      "strength": 1,
+      "description": "Imports StorageBackend abstract class",
+      "relationship": "aggregation",
+      "bidirectional": false
+    },
+    {
+      "id": "edge_11",
+      "source": "telegram_bot_stack.storage",
+      "target": "telegram_bot_stack.storage.json",
+      "type": "imports",
+      "strength": 2,
+      "description": "Imports JSONStorage implementation",
+      "relationship": "aggregation",
+      "bidirectional": false
+    },
+    {
+      "id": "edge_12",
+      "source": "telegram_bot_stack.storage",
+      "target": "telegram_bot_stack.storage.memory",
+      "type": "imports",
+      "strength": 2,
+      "description": "Imports MemoryStorage implementation",
+      "relationship": "aggregation",
+      "bidirectional": false
+    },
+    {
+      "id": "edge_13",
+      "source": "telegram_bot_stack.storage.json",
+      "target": "telegram_bot_stack.storage.base",
+      "type": "implements",
+      "strength": 5,
+      "description": "Implements StorageBackend interface",
+      "relationship": "inheritance",
+      "bidirectional": false
+    },
+    {
+      "id": "edge_14",
+      "source": "telegram_bot_stack.storage.memory",
+      "target": "telegram_bot_stack.storage.base",
+      "type": "implements",
+      "strength": 5,
+      "description": "Implements StorageBackend interface",
+      "relationship": "inheritance",
+      "bidirectional": false
+    },
+    {
+      "id": "edge_15",
+      "source": "telegram_bot_stack.storage",
+      "target": "telegram_bot_stack.storage.sql",
+      "type": "imports",
+      "strength": 2,
+      "description": "Imports SQLStorage implementation (optional)",
+      "relationship": "aggregation",
+      "bidirectional": false
+    },
+    {
+      "id": "edge_16",
+      "source": "telegram_bot_stack.storage.sql",
+      "target": "telegram_bot_stack.storage.base",
+      "type": "implements",
+      "strength": 5,
+      "description": "Implements StorageBackend interface",
+      "relationship": "inheritance",
+      "bidirectional": false
+    }
+  ],
+  "external_dependencies": {
+    "description": "Dependencies to modules in other sub-graphs",
+    "core": [],
+    "utilities": []
+  }
+}

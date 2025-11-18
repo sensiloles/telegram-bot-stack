@@ -1,0 +1,85 @@
+{
+  "metadata": {
+    "version": "3.0.0",
+    "generated_at": "2025-11-19",
+    "graph_id": "bot_framework_utilities",
+    "graph_name": "Bot Framework - Utilities",
+    "graph_type": "sub_graph",
+    "parent_graph": "bot_framework",
+    "project_name": "telegram-bot-stack",
+    "project_version": "1.6.0",
+    "description": "Utility decorators and helper functions",
+    "scope": "Decorators (rate_limit) and utilities",
+    "root_package": "telegram_bot_stack",
+    "node_count": 1,
+    "edge_count": 0
+  },
+  "nodes": [
+    {
+      "id": "telegram_bot_stack.decorators",
+      "name": "decorators",
+      "type": "module",
+      "category": "core",
+      "path": "telegram_bot_stack/decorators.py",
+      "description": "Rate limiting and utility decorators for bot command handlers",
+      "lines_of_code": 186,
+      "complexity_score": 5,
+      "exports": [
+        "rate_limit"
+      ],
+      "imports": {
+        "internal": [],
+        "external": [
+          "logging",
+          "time",
+          "functools.wraps",
+          "typing.Callable",
+          "typing.Literal",
+          "typing.Optional",
+          "telegram.Update",
+          "telegram.ext.ContextTypes"
+        ]
+      },
+      "dependencies": [],
+      "dependents": [
+        "telegram_bot_stack.__init__"
+      ],
+      "functions": [
+        {
+          "name": "rate_limit",
+          "description": "Decorator for rate limiting command handlers",
+          "parameters": [
+            "calls: int",
+            "period: int",
+            "scope: Literal['user', 'global'] = 'user'",
+            "message: Optional[str] = None"
+          ],
+          "returns": "Callable",
+          "features": [
+            "Per-user rate limiting",
+            "Global rate limiting",
+            "Admin bypass",
+            "Storage integration",
+            "Automatic cleanup",
+            "Fail-open behavior",
+            "Custom error messages"
+          ]
+        }
+      ],
+      "tags": [
+        "core",
+        "decorator",
+        "rate-limiting",
+        "spam-protection"
+      ],
+      "role": "Provides rate limiting for bot commands to prevent spam and abuse",
+      "criticality": "medium"
+    }
+  ],
+  "edges": [],
+  "external_dependencies": {
+    "description": "Dependencies to modules in other sub-graphs",
+    "core": [],
+    "storage": []
+  }
+}

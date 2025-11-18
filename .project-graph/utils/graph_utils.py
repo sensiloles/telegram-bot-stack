@@ -35,7 +35,7 @@ def load_router() -> Dict[str, Any]:
         FileNotFoundError: If router file doesn't exist
         json.JSONDecodeError: If router file is not valid JSON
     """
-    router_path = Path(__file__).parent / "graph-router.json"
+    router_path = Path(__file__).parent.parent / "graph-router.json"
     with open(router_path, encoding="utf-8") as f:
         return json.load(f)
 
@@ -630,6 +630,211 @@ def print_impact_analysis(graph: Dict[str, Any], node_id: str) -> None:
 
     print(f"\n{analysis['recommendation']}")
     print(f"{'=' * 60}\n")
+
+
+# ========== Hierarchical Graph Support (v3.0) ==========
+
+
+def is_hierarchical_graph(graph_type: str) -> bool:
+    """Check if a graph type uses hierarchical sub-graphs.
+
+    Args:
+        graph_type: Graph type identifier (e.g., 'bot_framework')
+
+    Returns:
+        True if graph has sub-graphs, False otherwise
+    """
+    try:
+        router = load_router()
+        for graph_file, graph_info in router["graphs"].items():
+            if graph_info["id"] == graph_type or graph_file == graph_type:
+                return graph_info.get("has_sub_graphs", False)
+        return False
+    except Exception:
+        return False
+
+
+def load_domain_router(graph_type: str) -> Dict[str, Any]:
+    """Load domain router for hierarchical graphs.
+
+    Args:
+        graph_type: Graph type identifier (e.g., 'bot_framework')
+
+    Returns:
+        Domain router dictionary with sub-graph information
+
+    Raises:
+        ValueError: If graph is not hierarchical
+        FileNotFoundError: If router file doesn't exist
+    """
+    if not is_hierarchical_graph(graph_type):
+        raise ValueError(f"Graph '{graph_type}' is not hierarchical")
+
+    router = load_router()
+    for graph_file, graph_info in router["graphs"].items():
+        if graph_info["id"] == graph_type or graph_file == graph_type:
+            router_file = graph_info.get("router_file")
+            if router_file:
+                router_path = Path(__file__).parent.parent / router_file
+                with open(router_path, encoding="utf-8") as f:
+                    return json.load(f)
+
+    raise FileNotFoundError(f"Domain router not found for '{graph_type}'")
+
+
+def list_sub_graphs(graph_type: str) -> Dict[str, Dict[str, Any]]:
+    """List all sub-graphs for a hierarchical graph.
+
+    Args:
+        graph_type: Graph type identifier (e.g., 'bot_framework')
+
+    Returns:
+        Dictionary mapping sub-graph IDs to their metadata
+
+    Example:
+        >>> sub_graphs = list_sub_graphs('bot_framework')
+        >>> print(sub_graphs.keys())  # ['core', 'storage', 'utilities']
+    """
+    domain_router = load_domain_router(graph_type)
+    return domain_router.get("sub_graphs", {})
+
+
+def load_sub_graph(graph_type: str, sub_graph_id: str) -> Dict[str, Any]:
+    """Load a specific sub-graph from a hierarchical graph.
+
+    Args:
+        graph_type: Parent graph type (e.g., 'bot_framework')
+        sub_graph_id: Sub-graph identifier (e.g., 'core', 'storage')
+
+    Returns:
+        Sub-graph dictionary
+
+    Raises:
+        ValueError: If sub-graph doesn't exist
+        FileNotFoundError: If sub-graph file doesn't exist
+
+    Example:
+        >>> core = load_sub_graph('bot_framework', 'core')
+        >>> print(core['metadata']['graph_name'])  # 'Bot Framework - Core'
+    """
+    sub_graphs = list_sub_graphs(graph_type)
+
+    if sub_graph_id not in sub_graphs:
+        available = list(sub_graphs.keys())
+        raise ValueError(
+            f"Sub-graph '{sub_graph_id}' not found in '{graph_type}'. "
+            f"Available: {available}"
+        )
+
+    sub_graph_info = sub_graphs[sub_graph_id]
+    file_path = Path(__file__).parent.parent / sub_graph_info["file"]
+
+    with open(file_path, encoding="utf-8") as f:
+        return json.load(f)
+
+
+def load_full_hierarchical_graph(graph_type: str) -> Dict[str, Any]:
+    """Load and merge all sub-graphs into a single graph view.
+
+    This is useful when you need the complete graph, but the source
+    is split into sub-graphs for manageability.
+
+    Args:
+        graph_type: Parent graph type (e.g., 'bot_framework')
+
+    Returns:
+        Merged graph dictionary with all nodes and edges
+
+    Example:
+        >>> full_graph = load_full_hierarchical_graph('bot_framework')
+        >>> print(full_graph['metadata']['node_count'])  # Total from all sub-graphs
+    """
+    domain_router = load_domain_router(graph_type)
+    sub_graphs_info = domain_router.get("sub_graphs", {})
+
+    all_nodes = []
+    all_edges = []
+    total_loc = 0
+
+    for sub_graph_id, sub_info in sub_graphs_info.items():
+        sub_graph = load_sub_graph(graph_type, sub_graph_id)
+        all_nodes.extend(sub_graph.get("nodes", []))
+        all_edges.extend(sub_graph.get("edges", []))
+        total_loc += sub_info.get("lines_of_code", 0)
+
+    # Add cross-graph edges
+    cross_edges = domain_router.get("cross_graph_edges", [])
+    for cross_edge in cross_edges:
+        edge = {
+            "id": cross_edge["id"],
+            "source": cross_edge["source_node"],
+            "target": cross_edge["target_node"],
+            "type": cross_edge["type"],
+            "description": cross_edge.get("description", ""),
+            "cross_graph": True,
+            "source_graph": cross_edge["source_graph"],
+            "target_graph": cross_edge["target_graph"],
+        }
+        all_edges.append(edge)
+
+    # Create merged graph
+    merged_graph = {
+        "metadata": {
+            "version": "3.0.0",
+            "graph_id": domain_router["metadata"]["graph_id"],
+            "graph_name": domain_router["metadata"]["graph_name"],
+            "graph_type": "merged_hierarchical",
+            "source": "merged from sub-graphs",
+            "project_name": domain_router["metadata"]["project_name"],
+            "project_version": domain_router["metadata"]["project_version"],
+            "node_count": len(all_nodes),
+            "edge_count": len(all_edges),
+            "sub_graphs_count": len(sub_graphs_info),
+        },
+        "nodes": all_nodes,
+        "edges": all_edges,
+        "sub_graphs": sub_graphs_info,
+        "statistics": domain_router.get("statistics", {}),
+    }
+
+    return merged_graph
+
+
+def get_recommended_sub_graph(graph_type: str, task_description: str) -> str:
+    """Get recommended sub-graph based on task description.
+
+    Args:
+        graph_type: Parent graph type (e.g., 'bot_framework')
+        task_description: Description of what you want to do
+
+    Returns:
+        Sub-graph ID (e.g., 'core', 'storage', 'utilities')
+
+    Example:
+        >>> sub_id = get_recommended_sub_graph('bot_framework', 'add storage backend')
+        >>> print(sub_id)  # 'storage'
+    """
+    sub_graphs = list_sub_graphs(graph_type)
+    task_lower = task_description.lower()
+
+    # Score each sub-graph based on keywords in recommended_for
+    scores = {}
+    for sub_id, sub_info in sub_graphs.items():
+        score = 0
+        recommended_for = sub_info.get("recommended_for", [])
+        for recommendation in recommended_for:
+            rec_lower = recommendation.lower()
+            # Count keyword matches
+            keywords = rec_lower.split()
+            matches = sum(1 for kw in keywords if kw in task_lower)
+            score += matches
+        scores[sub_id] = score
+
+    # Return sub-graph with highest score, or first one if no matches
+    if max(scores.values()) > 0:
+        return max(scores, key=scores.get)
+    else:
+        return list(sub_graphs.keys())[0]
 
 
 # Example usage

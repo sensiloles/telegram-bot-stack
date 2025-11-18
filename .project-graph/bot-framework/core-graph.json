@@ -1,0 +1,321 @@
+{
+  "metadata": {
+    "version": "3.0.0",
+    "generated_at": "2025-11-19",
+    "graph_id": "bot_framework_core",
+    "graph_name": "Bot Framework - Core",
+    "graph_type": "sub_graph",
+    "parent_graph": "bot_framework",
+    "project_name": "telegram-bot-stack",
+    "project_version": "1.6.0",
+    "description": "Core bot framework modules (BotBase, UserManager, AdminManager)",
+    "scope": "Core bot implementation and management",
+    "root_package": "telegram_bot_stack",
+    "node_count": 4,
+    "edge_count": 5
+  },
+  "nodes": [
+    {
+      "id": "telegram_bot_stack.__init__",
+      "name": "__init__",
+      "type": "module",
+      "category": "public_api",
+      "path": "telegram_bot_stack/__init__.py",
+      "description": "Main package entry point - exports public API for the framework",
+      "lines_of_code": 57,
+      "complexity_score": 1,
+      "exports": [
+        "BotBase",
+        "UserManager",
+        "AdminManager",
+        "rate_limit",
+        "StorageBackend",
+        "JSONStorage",
+        "MemoryStorage",
+        "Storage",
+        "create_storage",
+        "__version__"
+      ],
+      "imports": {
+        "internal": [
+          "admin_manager.AdminManager",
+          "bot_base.BotBase",
+          "decorators.rate_limit",
+          "storage.JSONStorage",
+          "storage.MemoryStorage",
+          "storage.Storage",
+          "storage.StorageBackend",
+          "storage.create_storage",
+          "user_manager.UserManager"
+        ],
+        "external": []
+      },
+      "dependencies": [
+        "telegram_bot_stack.admin_manager",
+        "telegram_bot_stack.bot_base",
+        "telegram_bot_stack.user_manager",
+        "telegram_bot_stack.storage"
+      ],
+      "dependents": [],
+      "tags": [
+        "entry-point",
+        "public-api",
+        "aggregator"
+      ],
+      "role": "Aggregates and exposes framework's public API",
+      "criticality": "high"
+    },
+    {
+      "id": "telegram_bot_stack.bot_base",
+      "name": "bot_base",
+      "type": "module",
+      "category": "core",
+      "path": "telegram_bot_stack/bot_base.py",
+      "description": "Base bot class with common patterns and hooks for customization",
+      "lines_of_code": 562,
+      "complexity_score": 8,
+      "exports": [
+        "BotBase"
+      ],
+      "imports": {
+        "internal": [
+          "admin_manager.AdminManager",
+          "storage.StorageBackend",
+          "user_manager.UserManager"
+        ],
+        "external": [
+          "asyncio",
+          "logging",
+          "telegram",
+          "telegram.ext",
+          "typing.Optional"
+        ]
+      },
+      "dependencies": [
+        "telegram_bot_stack.admin_manager",
+        "telegram_bot_stack.user_manager",
+        "telegram_bot_stack.storage.base"
+      ],
+      "dependents": [
+        "telegram_bot_stack.__init__"
+      ],
+      "classes": [
+        {
+          "name": "BotBase",
+          "description": "Base class for telegram bots with common functionality",
+          "public_methods": [
+            "on_user_registered",
+            "get_user_status",
+            "get_welcome_message",
+            "start",
+            "my_id",
+            "list_users",
+            "list_admins",
+            "add_admin",
+            "remove_admin",
+            "decline_admin",
+            "handle_callback_query",
+            "update_commands_for_user",
+            "register_handlers",
+            "set_bot_commands",
+            "shutdown"
+          ],
+          "hooks": [
+            "on_user_registered",
+            "get_user_status",
+            "get_welcome_message",
+            "register_handlers"
+          ],
+          "composition": [
+            "UserManager",
+            "AdminManager",
+            "StorageBackend",
+            "Application"
+          ]
+        }
+      ],
+      "tags": [
+        "core",
+        "base-class",
+        "extensible",
+        "command-handlers"
+      ],
+      "role": "Core bot implementation with user/admin management and command handling",
+      "criticality": "critical"
+    },
+    {
+      "id": "telegram_bot_stack.user_manager",
+      "name": "user_manager",
+      "type": "module",
+      "category": "core",
+      "path": "telegram_bot_stack/user_manager.py",
+      "description": "Generic user management for telegram bots",
+      "lines_of_code": 113,
+      "complexity_score": 3,
+      "exports": [
+        "UserManager"
+      ],
+      "imports": {
+        "internal": [
+          "storage.StorageBackend"
+        ],
+        "external": [
+          "logging",
+          "typing.List"
+        ]
+      },
+      "dependencies": [
+        "telegram_bot_stack.storage.base"
+      ],
+      "dependents": [
+        "telegram_bot_stack.bot_base",
+        "telegram_bot_stack.__init__"
+      ],
+      "classes": [
+        {
+          "name": "UserManager",
+          "description": "Manages user registration and tracking",
+          "public_methods": [
+            "add_user",
+            "remove_user",
+            "user_exists",
+            "get_all_users",
+            "get_user_count",
+            "save_users"
+          ],
+          "storage_keys": [
+            "bot_users"
+          ]
+        }
+      ],
+      "tags": [
+        "core",
+        "user-management",
+        "persistence"
+      ],
+      "role": "User registration and tracking with persistent storage",
+      "criticality": "high"
+    },
+    {
+      "id": "telegram_bot_stack.admin_manager",
+      "name": "admin_manager",
+      "type": "module",
+      "category": "core",
+      "path": "telegram_bot_stack/admin_manager.py",
+      "description": "Generic admin management for telegram bots",
+      "lines_of_code": 132,
+      "complexity_score": 4,
+      "exports": [
+        "AdminManager"
+      ],
+      "imports": {
+        "internal": [
+          "storage.StorageBackend"
+        ],
+        "external": [
+          "logging",
+          "typing.List"
+        ]
+      },
+      "dependencies": [
+        "telegram_bot_stack.storage.base"
+      ],
+      "dependents": [
+        "telegram_bot_stack.bot_base",
+        "telegram_bot_stack.__init__"
+      ],
+      "classes": [
+        {
+          "name": "AdminManager",
+          "description": "Manages administrator privileges for bot users",
+          "public_methods": [
+            "add_admin",
+            "remove_admin",
+            "is_admin",
+            "get_all_admins",
+            "get_admin_count",
+            "has_admins",
+            "save_admins"
+          ],
+          "storage_keys": [
+            "bot_admins"
+          ],
+          "special_features": [
+            "Prevents removing last admin",
+            "Auto-creates first admin"
+          ]
+        }
+      ],
+      "tags": [
+        "core",
+        "admin-management",
+        "persistence",
+        "security"
+      ],
+      "role": "Admin privilege management with protection against lockout",
+      "criticality": "high"
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge_1",
+      "source": "telegram_bot_stack.__init__",
+      "target": "telegram_bot_stack.bot_base",
+      "type": "imports",
+      "strength": 1,
+      "description": "Imports BotBase for public API",
+      "relationship": "aggregation",
+      "bidirectional": false
+    },
+    {
+      "id": "edge_2",
+      "source": "telegram_bot_stack.__init__",
+      "target": "telegram_bot_stack.user_manager",
+      "type": "imports",
+      "strength": 1,
+      "description": "Imports UserManager for public API",
+      "relationship": "aggregation",
+      "bidirectional": false
+    },
+    {
+      "id": "edge_3",
+      "source": "telegram_bot_stack.__init__",
+      "target": "telegram_bot_stack.admin_manager",
+      "type": "imports",
+      "strength": 1,
+      "description": "Imports AdminManager for public API",
+      "relationship": "aggregation",
+      "bidirectional": false
+    },
+    {
+      "id": "edge_5",
+      "source": "telegram_bot_stack.bot_base",
+      "target": "telegram_bot_stack.admin_manager",
+      "type": "uses",
+      "strength": 3,
+      "description": "Uses AdminManager for admin privilege management",
+      "relationship": "composition",
+      "bidirectional": false
+    },
+    {
+      "id": "edge_6",
+      "source": "telegram_bot_stack.bot_base",
+      "target": "telegram_bot_stack.user_manager",
+      "type": "uses",
+      "strength": 3,
+      "description": "Uses UserManager for user registration and tracking",
+      "relationship": "composition",
+      "bidirectional": false
+    }
+  ],
+  "external_dependencies": {
+    "description": "Dependencies to modules in other sub-graphs",
+    "storage": [
+      "telegram_bot_stack.storage.base",
+      "telegram_bot_stack.storage"
+    ],
+    "utilities": [
+      "telegram_bot_stack.decorators"
+    ]
+  }
+}
