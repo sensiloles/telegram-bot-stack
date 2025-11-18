@@ -1,7 +1,7 @@
 {
   "metadata": {
     "version": "2.0.0",
-    "generated_at": "2025-11-18",
+    "generated_at": "2025-11-19",
     "graph_id": "bot_framework",
     "graph_name": "Bot Framework Core",
     "graph_type": "specialized",
@@ -10,8 +10,8 @@
     "description": "Dependency graph for telegram bot framework core (telegram_bot_stack/)",
     "scope": "Bot framework implementation only",
     "root_package": "telegram_bot_stack",
-    "node_count": 9,
-    "edge_count": 16,
+    "node_count": 10,
+    "edge_count": 17,
     "router_file": "graph-router.json",
     "related_graphs": [
       "testing-graph.json - for tests of these modules",
@@ -20,9 +20,9 @@
     ]
   },
   "statistics": {
-    "total_modules": 9,
+    "total_modules": 10,
     "total_classes": 7,
-    "total_lines_of_code": 1327,
+    "total_lines_of_code": 1513,
     "average_dependencies_per_module": 1.444,
     "max_dependencies": 4,
     "circular_dependencies": 0,
@@ -51,6 +51,7 @@
         "BotBase",
         "UserManager",
         "AdminManager",
+        "rate_limit",
         "StorageBackend",
         "JSONStorage",
         "MemoryStorage",
@@ -62,6 +63,7 @@
         "internal": [
           "admin_manager.AdminManager",
           "bot_base.BotBase",
+          "decorators.rate_limit",
           "storage.JSONStorage",
           "storage.MemoryStorage",
           "storage.Storage",
@@ -614,6 +616,66 @@
         "alembic>=1.13,<2.0",
         "psycopg2-binary>=2.9 (for PostgreSQL)"
       ]
+    },
+    {
+      "id": "telegram_bot_stack.decorators",
+      "name": "decorators",
+      "type": "module",
+      "category": "core",
+      "path": "telegram_bot_stack/decorators.py",
+      "description": "Rate limiting and utility decorators for bot command handlers",
+      "lines_of_code": 186,
+      "complexity_score": 5,
+      "exports": [
+        "rate_limit"
+      ],
+      "imports": {
+        "internal": [],
+        "external": [
+          "logging",
+          "time",
+          "functools.wraps",
+          "typing.Callable",
+          "typing.Literal",
+          "typing.Optional",
+          "telegram.Update",
+          "telegram.ext.ContextTypes"
+        ]
+      },
+      "dependencies": [],
+      "dependents": [
+        "telegram_bot_stack.__init__"
+      ],
+      "functions": [
+        {
+          "name": "rate_limit",
+          "description": "Decorator for rate limiting command handlers",
+          "parameters": [
+            "calls: int",
+            "period: int",
+            "scope: Literal['user', 'global'] = 'user'",
+            "message: Optional[str] = None"
+          ],
+          "returns": "Callable",
+          "features": [
+            "Per-user rate limiting",
+            "Global rate limiting",
+            "Admin bypass",
+            "Storage integration",
+            "Automatic cleanup",
+            "Fail-open behavior",
+            "Custom error messages"
+          ]
+        }
+      ],
+      "tags": [
+        "core",
+        "decorator",
+        "rate-limiting",
+        "spam-protection"
+      ],
+      "role": "Provides rate limiting for bot commands to prevent spam and abuse",
+      "criticality": "medium"
     }
   ],
   "edges": [
@@ -775,6 +837,16 @@
       "strength": 5,
       "description": "Implements StorageBackend interface",
       "relationship": "inheritance",
+      "bidirectional": false
+    },
+    {
+      "id": "edge_17",
+      "source": "telegram_bot_stack.__init__",
+      "target": "telegram_bot_stack.decorators",
+      "type": "imports",
+      "strength": 3,
+      "description": "Imports rate_limit decorator for public API",
+      "relationship": "aggregation",
       "bidirectional": false
     }
   ],

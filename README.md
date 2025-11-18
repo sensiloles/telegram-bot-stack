@@ -56,11 +56,12 @@ python3 .github/workflows/scripts/read_issues.py --list --state open
 - 🏗️ **BotBase Class**: Inherit and customize - 70% less boilerplate code
 - 👥 **User Management**: Built-in user registration and tracking
 - 🔐 **Admin System**: Multi-admin support with protection mechanisms
-- 💾 **Storage Abstraction**: Multiple backends (JSON, Memory) with unified API
+- 💾 **Storage Abstraction**: Multiple backends (JSON, Memory, SQL) with unified API
+- ⏱️ **Rate Limiting**: Built-in `@rate_limit` decorator for spam protection
 - 📅 **Scheduler Integration**: APScheduler for periodic tasks
 - 🎯 **Hook Pattern**: Override methods for custom behavior
 - 🧪 **Comprehensive Tests**: Full test suite with high code coverage
-- 📦 **PyPI Package**: Install via `pip install telegram-bot-stack` (coming soon)
+- 📦 **PyPI Package**: `pip install telegram-bot-stack`
 
 ### 🛡️ Production-Grade Infrastructure
 
@@ -133,7 +134,7 @@ python3 bot.py
 
 ```python
 # my_bot.py
-from telegram_bot_stack import BotBase
+from telegram_bot_stack import BotBase, rate_limit
 from telegram_bot_stack.storage import JSONStorage
 from pathlib import Path
 
@@ -151,6 +152,11 @@ class MyBot(BotBase):
     async def on_user_registered(self, user_id: int):
         """Called when new user registers."""
         print(f"New user: {user_id}")
+
+    @rate_limit(calls=5, period=60)  # 5 calls per minute per user
+    async def search_command(self, update, context):
+        """Example of rate-limited command."""
+        await update.message.reply_text("Searching...")
 
 if __name__ == "__main__":
     import asyncio
