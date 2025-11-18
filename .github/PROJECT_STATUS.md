@@ -38,7 +38,7 @@ repo = get_repo()  # Auto-detects from git
 issue = repo.create_issue(title="...", body="...", labels=[...])
 ```
 
-**See:** `.github/workflows/scripts/README.md` for complete guide.
+**See:** `.github/workflows/scripts/README.md` for script details and `.github/PR_AUTOMATION.md` for PR workflow.
 
 ## 📋 Project Phases
 
@@ -141,10 +141,11 @@ telegram-bot-stack/
 │   └── storage_guide.md   # 🚧 Storage backends guide (Issue #17)
 ├── .github/
 │   ├── PROJECT_STATUS.md  # 👈 THIS FILE (project state)
+│   ├── PR_AUTOMATION.md   # Pull request automation guide
 │   └── workflows/
 │       ├── tests.yml      # ✅ CI/CD pipeline
 │       ├── release.yml    # ✅ Release automation
-│       └── scripts/       # ✅ 16 automation scripts
+│       └── scripts/       # ✅ Automation scripts (17 total)
 ├── .project-graph/        # ✅ Multi-graph system
 │   ├── graph-router.json  # Central navigation hub
 │   ├── bot-framework-graph.json
@@ -283,4 +284,5 @@ python3 -m pytest tests/core/test_storage.py -v
 ---
 
 **For detailed workflow rules, see:** `.cursorrules`
-**For GitHub automation, see:** `.github/workflows/`
+**For GitHub automation, see:** `.github/workflows/scripts/README.md`
+**For PR automation, see:** `.github/PR_AUTOMATION.md`

@@ -39,13 +39,13 @@ python3 .github/workflows/scripts/read_issues.py --list --state open
 
 ---
 
-## 🤖 New: Cloud Agent Issue Automation
+## 🤖 GitHub Automation & Workflow
 
-**Automated Issue Management** - Create, label, and break down GitHub Issues automatically!
+**Comprehensive GitHub Automation** - Automate PRs, issues, merges, and CI/CD workflows!
 
-🎤 **Voice/Text Commands** • 🏷️ **Smart Labeling** • 📋 **Task Breakdown** • ✅ **Acceptance Criteria** • 🔍 **Context Analysis**
+📝 **PR Creation** • 🔀 **Auto Merge** • ✅ **CI Checks** • 🏷️ **Auto Labeling** • 📊 **Project Overview**
 
-👉 **[Learn More about Cloud Agent](.github/docs/cloud-agent/README.md)**
+👉 **[Learn More](.github/workflows/scripts/README.md)** • **[PR Automation](.github/PR_AUTOMATION.md)**
 
 ---
 
@@ -1075,19 +1075,23 @@ git stash pop
 
 ## 🤝 Contributing
 
-### Using Cloud Agent for Issues
+### Automated Workflow Tools
 
-This project uses **Cloud Agent** for automated issue management:
+This project uses GitHub automation scripts for streamlined development:
+**GitHub Automation Scripts:**
 
-1. **Create an Issue** using templates at [Issues → New](../../issues/new/choose)
-2. **Auto-Labeling** - Labels are applied automatically based on content
-3. **Use Slash Commands** in comments:
-   - `/breakdown` - Break into subtasks
-   - `/accept` - Generate acceptance criteria
-   - `/estimate` - Get time estimate
-   - `/relate` - Find related files
+```bash
+# Create PR with issue linking
+python3 .github/workflows/scripts/create_pr.py --title "feat: add feature" --closes 42
 
-📚 **[Full Cloud Agent Guide](.github/docs/cloud-agent/GUIDE.md)**
+# Merge PR automatically
+python3 .github/workflows/scripts/merge_pr.py --cleanup
+
+# Check CI status
+python3 .github/workflows/scripts/check_ci.py --pr 5
+```
+
+📚 **[PR Automation Guide](.github/PR_AUTOMATION.md)** • **[Scripts Documentation](.github/workflows/scripts/README.md)**
 
 ### Standard Contributing Process
 

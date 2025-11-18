@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "version": "2.0.0",
-    "generated_at": "2025-11-17",
+    "version": "2.0.1",
+    "generated_at": "2025-11-18",
     "graph_id": "infrastructure",
     "graph_name": "Infrastructure & Automation",
     "graph_type": "specialized",
@@ -16,10 +16,10 @@
     ]
   },
   "statistics": {
-    "total_scripts": 16,
+    "total_scripts": 17,
     "total_workflows": 3,
-    "lines_of_code": 3500,
-    "automation_coverage": "PR, Issues, Release, Testing, Merging",
+    "lines_of_code": 3700,
+    "automation_coverage": "PR, Issues, Release, Testing, Merging, PyPI Publishing",
     "github_api_usage": "extensive"
   },
   "components": {
@@ -71,27 +71,24 @@
         "criticality": "critical",
         "frequency": "on main merge with feat/fix commits"
       },
-      "pr_automation.yml": {
-        "path": ".github/workflows/pr_automation.yml",
-        "description": "PR automation workflows",
+      "pypi-publish.yml": {
+        "path": ".github/workflows/pypi-publish.yml",
+        "description": "Publish package to PyPI",
         "triggers": [
-          "pull_request",
-          "issue_comment"
+          "release (published)",
+          "workflow_dispatch"
         ],
         "jobs": [
-          "auto_label",
-          "pr_ready_check",
-          "analyze_pr"
+          "publish"
         ],
         "key_steps": [
-          "Auto-label PRs",
-          "Check PR readiness",
-          "Analyze PR context",
-          "Add acceptance criteria"
+          "Build package",
+          "Run tests",
+          "Publish to PyPI/TestPyPI"
         ],
-        "outputs": "Labels, comments, analysis",
-        "criticality": "medium",
-        "frequency": "on PR events"
+        "outputs": "PyPI package",
+        "criticality": "high",
+        "frequency": "on release or manual dispatch"
       }
     },
     "automation_scripts": {
