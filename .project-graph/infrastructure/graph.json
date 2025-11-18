@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "version": "2.0.1",
+    "version": "2.0.2",
     "generated_at": "2025-11-18",
     "graph_id": "infrastructure",
     "graph_name": "Infrastructure & Automation",
@@ -16,10 +16,10 @@
     ]
   },
   "statistics": {
-    "total_scripts": 17,
+    "total_scripts": 19,
     "total_workflows": 3,
-    "lines_of_code": 3700,
-    "automation_coverage": "PR, Issues, Release, Testing, Merging, PyPI Publishing",
+    "lines_of_code": 4150,
+    "automation_coverage": "PR, Issues, Release, Testing, Merging, PyPI Publishing, Issue Management",
     "github_api_usage": "extensive"
   },
   "components": {
@@ -206,6 +206,46 @@
         },
         "criticality": "medium",
         "lines": 200
+      },
+      "update_issue.py": {
+        "path": ".github/workflows/scripts/update_issue.py",
+        "description": "Update issue labels, priority, and state",
+        "features": [
+          "Change priority (low/medium/high/critical)",
+          "Add/remove labels",
+          "Replace all labels",
+          "Close/reopen issues",
+          "Add comments",
+          "Dry-run mode"
+        ],
+        "usage": "python update_issue.py 31 --set-priority low --add-labels blocked",
+        "dependencies": {
+          "internal": [
+            "github_helper.py"
+          ]
+        },
+        "criticality": "medium",
+        "lines": 350
+      },
+      "link_issues.py": {
+        "path": ".github/workflows/scripts/link_issues.py",
+        "description": "Link issues with dependency relationships",
+        "features": [
+          "Mark issues as blocked by others",
+          "Mark issues as blocking others",
+          "Add related issues (no dependency)",
+          "Bidirectional linking",
+          "Custom messages",
+          "Dry-run mode"
+        ],
+        "usage": "python link_issues.py 31 --blocked-by 27,28,29 --bidirectional",
+        "dependencies": {
+          "internal": [
+            "github_helper.py"
+          ]
+        },
+        "criticality": "medium",
+        "lines": 350
       },
       "auto_label.py": {
         "path": ".github/workflows/scripts/auto_label.py",
@@ -409,6 +449,8 @@
           "create_pr.py",
           "create_issue.py",
           "read_issues.py",
+          "update_issue.py",
+          "link_issues.py",
           "auto_label.py",
           "analyze_pr.py",
           "pr_ready.py",
@@ -450,9 +492,33 @@
         ],
         "related_to": [
           "read_issues.py",
+          "update_issue.py",
+          "link_issues.py",
           "add_acceptance_criteria.py"
         ],
         "workflow": "Issue management workflow"
+      },
+      "update_issue.py": {
+        "depends_on": [
+          "github_helper.py"
+        ],
+        "related_to": [
+          "read_issues.py",
+          "create_issue.py",
+          "link_issues.py"
+        ],
+        "workflow": "Issue management workflow"
+      },
+      "link_issues.py": {
+        "depends_on": [
+          "github_helper.py"
+        ],
+        "related_to": [
+          "read_issues.py",
+          "create_issue.py",
+          "update_issue.py"
+        ],
+        "workflow": "Issue dependency management"
       }
     }
   },
@@ -484,12 +550,16 @@
         "1. Create issue (create_issue.py)",
         "2. Add acceptance criteria (add_acceptance_criteria.py)",
         "3. Generate subtasks (generate_subtasks.py)",
-        "4. Track progress (read_issues.py)"
+        "4. Link dependencies (link_issues.py)",
+        "5. Update priority/labels (update_issue.py)",
+        "6. Track progress (read_issues.py)"
       ],
       "involved_components": [
         "create_issue.py",
         "add_acceptance_criteria.py",
         "generate_subtasks.py",
+        "link_issues.py",
+        "update_issue.py",
         "read_issues.py"
       ]
     },
@@ -580,7 +650,9 @@
       "pre_commit": "pre-commit run --all-files",
       "merge_pr": "python .github/workflows/scripts/merge_pr.py --cleanup",
       "create_pr": "python .github/workflows/scripts/create_pr.py --title 'feat: ...'",
-      "list_issues": "python .github/workflows/scripts/read_issues.py --list"
+      "list_issues": "python .github/workflows/scripts/read_issues.py --list",
+      "update_issue": "python .github/workflows/scripts/update_issue.py 31 --set-priority low",
+      "link_issues": "python .github/workflows/scripts/link_issues.py 31 --blocked-by 27,28,29"
     }
   },
   "extension_points": {

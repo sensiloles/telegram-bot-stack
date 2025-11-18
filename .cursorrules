@@ -14,7 +14,9 @@ Available automation scripts:
 - merge_pr.py - Merge pull requests
 - read_issues.py - Read GitHub issues
 - create_issue.py - Create GitHub issues
-- And 10+ more - ALWAYS check before implementing!
+- update_issue.py - Update issue labels, priority, state
+- link_issues.py - Link issues with dependencies
+- And 12+ more - ALWAYS check before implementing!
 
 ## START HERE - Agent Orientation
 
@@ -180,6 +182,8 @@ Issues:
 python3 .github/workflows/scripts/read_issues.py --list
 python3 .github/workflows/scripts/read_issues.py 4
 python3 .github/workflows/scripts/create_issue.py --title "Bug: Fix issue" --file /tmp/issue.md --labels bug,priority:high
+python3 .github/workflows/scripts/update_issue.py 31 --set-priority low --add-labels blocked
+python3 .github/workflows/scripts/link_issues.py 31 --blocked-by 27,28,29
 
 Pull Requests (AUTOMATED):
 python3 .github/workflows/scripts/create_pr.py --title "feat(storage): add Redis backend" --closes 42

@@ -55,6 +55,58 @@ python3 .github/workflows/scripts/create_issue.py \
     --dry-run
 ```
 
+**update_issue.py** - Update issue labels, priority, state
+
+```bash
+# Change priority
+python3 .github/workflows/scripts/update_issue.py 31 --set-priority low
+
+# Add labels
+python3 .github/workflows/scripts/update_issue.py 31 --add-labels blocked,needs-review
+
+# Remove labels
+python3 .github/workflows/scripts/update_issue.py 31 --remove-labels priority:high
+
+# Replace all labels
+python3 .github/workflows/scripts/update_issue.py 31 --set-labels bug,priority:critical
+
+# Close issue with comment
+python3 .github/workflows/scripts/update_issue.py 31 --close --comment "Fixed in #42"
+
+# Multiple operations
+python3 .github/workflows/scripts/update_issue.py 31 \
+    --remove-labels priority:high \
+    --add-labels priority:low,blocked \
+    --comment "Blocked by core features"
+
+# Dry run
+python3 .github/workflows/scripts/update_issue.py 31 --set-priority low --dry-run
+```
+
+**link_issues.py** - Link issues with dependencies
+
+```bash
+# Mark issue as blocked by others
+python3 .github/workflows/scripts/link_issues.py 31 --blocked-by 27,28,29
+
+# Mark issue as blocking another
+python3 .github/workflows/scripts/link_issues.py 27 --blocks 31
+
+# Create bidirectional link
+python3 .github/workflows/scripts/link_issues.py 31 --blocked-by 27 --bidirectional
+
+# Add related issues (no dependency)
+python3 .github/workflows/scripts/link_issues.py 31 --related-to 19,20
+
+# With custom message
+python3 .github/workflows/scripts/link_issues.py 31 \
+    --blocked-by 27,28,29 \
+    --comment "Waiting for core VPS deployment features"
+
+# Dry run
+python3 .github/workflows/scripts/link_issues.py 31 --blocked-by 27,28 --dry-run
+```
+
 ### Pull Request Management
 
 **create_pr.py** - Create pull requests
