@@ -18,10 +18,10 @@ Features:
 import logging
 import os
 import sys
-from typing import Dict, List
+from typing import Dict
 
 from telegram import Update
-from telegram.ext import CommandHandler, ContextTypes
+from telegram.ext import Application, CommandHandler, ContextTypes
 
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../.."))
@@ -40,15 +40,14 @@ logger = logging.getLogger(__name__)
 class PollBot(BotBase):
     """Poll bot with SQL storage backend."""
 
-    def __init__(self, token: str, storage, admin_ids: List[int]):
+    def __init__(self, storage, bot_name="Poll Bot"):
         """Initialize poll bot.
 
         Args:
-            token: Telegram bot token
             storage: Storage backend (SQL recommended)
-            admin_ids: List of admin user IDs
+            bot_name: Name of the bot
         """
-        super().__init__(token=token, storage=storage, admin_ids=admin_ids)
+        super().__init__(storage=storage, bot_name=bot_name)
 
         # Storage keys
         self.POLLS_KEY = "polls"
@@ -359,20 +358,27 @@ class PollBot(BotBase):
 
 def main():
     """Run the poll bot."""
-    # Get configuration from environment
-    token = os.getenv("BOT_TOKEN")
-    if not token:
-        logger.error("BOT_TOKEN environment variable not set")
-        sys.exit(1)
+    # Get bot token from environment
+    bot_token = os.getenv("BOT_TOKEN")
+    if not bot_token:
+        raise ValueError(
+            "BOT_TOKEN environment variable is required.\n"
+            "Set it in .env file or export it: export BOT_TOKEN='your_token'"
+        )
 
     admin_id = os.getenv("ADMIN_ID")
-    if not admin_id:
-        logger.error("ADMIN_ID environment variable not set")
-        sys.exit(1)
+    if admin_id:
+        admin_id = int(admin_id)
 
     # Determine storage backend
     storage_backend = os.getenv("STORAGE_BACKEND", "sqlite")
     database_url = os.getenv("DATABASE_URL", "sqlite:///poll_bot.db")
+    if not os.path.isabs(database_url) and "://" not in database_url:
+        # Relative path - make it relative to bot directory
+        db_path = os.path.join(
+            os.path.dirname(__file__), database_url.replace("sqlite:///", "")
+        )
+        database_url = f"sqlite:///{db_path}"
 
     logger.info(f"Using storage backend: {storage_backend}")
     logger.info(f"Database URL: {database_url}")
@@ -382,20 +388,45 @@ def main():
         if storage_backend in ("sqlite", "postgres", "postgresql", "sql"):
             storage = create_storage(storage_backend, database_url=database_url)
         else:
-            storage = create_storage(storage_backend, base_dir="data")
+            base_dir = os.getenv("STORAGE_DIR", "data")
+            if not os.path.isabs(base_dir):
+                base_dir = os.path.join(os.path.dirname(__file__), base_dir)
+            storage = create_storage(storage_backend, base_dir=base_dir)
     except ImportError:
         logger.error(
             "SQL storage not available. Install with: pip install telegram-bot-stack[database]"
         )
         logger.info("Falling back to JSON storage")
-        storage = create_storage("json", base_dir="data")
+        base_dir = os.path.join(os.path.dirname(__file__), "data")
+        storage = create_storage("json", base_dir=base_dir)
 
-    # Create and run bot
-    bot = PollBot(token=token, storage=storage, admin_ids=[int(admin_id)])
+    logger.info("Storage initialized")
 
+    # Create bot instance
+    bot = PollBot(storage=storage, bot_name="Poll Bot")
+
+    # Add admin if specified
+    if admin_id:
+        bot.admin_manager.add_admin(admin_id)
+        logger.info(f"Added admin: {admin_id}")
+
+    # Create and configure application
+    application = Application.builder().token(bot_token).build()
+    bot.application = application
+
+    # Register handlers
+    bot.register_handlers()
+
+    # Set bot commands in Telegram UI
+    async def post_init_wrapper(app):
+        await bot.set_bot_commands()
+
+    application.post_init = post_init_wrapper
+
+    # Run the bot
     try:
         logger.info("Starting Poll Bot...")
-        bot.run()
+        application.run_polling(allowed_updates=Update.ALL_TYPES)
     except KeyboardInterrupt:
         logger.info("Bot stopped by user")
     finally:

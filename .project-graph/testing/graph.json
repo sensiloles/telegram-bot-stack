@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "version": "2.0.0",
-    "generated_at": "2025-11-17",
+    "version": "2.1.0",
+    "generated_at": "2025-11-18",
     "graph_id": "testing",
     "graph_name": "Testing Infrastructure",
     "graph_type": "specialized",
@@ -11,15 +11,16 @@
     "router_file": "graph-router.json",
     "related_graphs": [
       "bot-framework-graph.json - for code being tested",
-      "infrastructure-graph.json - for CI/CD test automation"
+      "infrastructure-graph.json - for CI/CD test automation",
+      "examples-graph.json - for example bot tests"
     ]
   },
   "statistics": {
-    "total_tests": 131,
-    "total_test_files": 5,
-    "coverage_percentage": 80,
+    "total_tests": 254,
+    "total_test_files": 13,
+    "coverage_percentage": 84.5,
     "coverage_threshold": 79,
-    "lines_of_test_code": 1449,
+    "lines_of_test_code": 2100,
     "test_frameworks": [
       "pytest",
       "pytest-asyncio",
@@ -33,17 +34,25 @@
       "subdirectories": {
         "core/": {
           "description": "Unit tests for core framework modules",
-          "test_files": 4,
-          "total_tests": 110,
+          "test_files": 6,
+          "total_tests": 174,
           "coverage": "High - detailed unit tests",
           "focus": "Individual module testing in isolation"
         },
         "integration/": {
           "description": "Integration tests for complete workflows",
           "test_files": 1,
-          "total_tests": 21,
+          "total_tests": 9,
           "coverage": "End-to-end scenarios",
           "focus": "Cross-module interactions and real workflows"
+        },
+        "examples/": {
+          "description": "Tests for example bot implementations",
+          "test_files": 7,
+          "total_tests": 71,
+          "coverage": "Example bot validation and integration",
+          "focus": "Verify example bots work correctly with framework",
+          "test_pattern": "Import validation, initialization, handler registration, storage integration"
         }
       },
       "configuration": {
@@ -203,12 +212,11 @@
       "path": "tests/integration/test_full_flow.py",
       "description": "End-to-end integration tests for complete bot workflows",
       "lines": 312,
-      "test_count": 16,
+      "test_count": 9,
       "test_classes": [
         "TestBotLifecycle",
         "TestUserWorkflow",
-        "TestAdminWorkflow",
-        "TestStoragePersistence"
+        "TestAdminWorkflow"
       ],
       "coverage_target": "Multiple modules working together",
       "modules_tested": [
@@ -222,11 +230,9 @@
         "Admin management workflow",
         "First user becomes admin scenario",
         "Admin cannot remove last admin",
-        "User data persistence across restarts",
-        "Admin data persistence across restarts",
+        "Data persistence across restarts",
         "Multiple storage backend compatibility",
-        "Command execution in sequence",
-        "Error recovery scenarios"
+        "Command execution in sequence"
       ],
       "fixtures_used": [
         "bot_instance",
@@ -237,6 +243,123 @@
       "async_tests": true,
       "criticality": "critical",
       "complexity": "high"
+    },
+    "tests/examples/test_counter_bot.py": {
+      "path": "tests/examples/test_counter_bot.py",
+      "description": "Tests for Counter Bot example",
+      "test_count": 7,
+      "coverage_target": "examples/counter_bot/",
+      "key_scenarios": [
+        "Module import validation",
+        "Class existence and structure",
+        "Bot initialization with JSONStorage",
+        "Required BotBase attributes present",
+        "Handler registration method exists",
+        "Storage functionality works"
+      ],
+      "criticality": "medium",
+      "complexity": "low"
+    },
+    "tests/examples/test_echo_bot.py": {
+      "path": "tests/examples/test_echo_bot.py",
+      "description": "Tests for Echo Bot example",
+      "test_count": 7,
+      "coverage_target": "examples/echo_bot/",
+      "key_scenarios": [
+        "Module import validation",
+        "Class existence and structure",
+        "Bot initialization with MemoryStorage",
+        "Required BotBase attributes present",
+        "Handler registration method exists",
+        "Welcome message customization"
+      ],
+      "criticality": "medium",
+      "complexity": "low"
+    },
+    "tests/examples/test_menu_bot.py": {
+      "path": "tests/examples/test_menu_bot.py",
+      "description": "Tests for Menu Bot example",
+      "test_count": 7,
+      "coverage_target": "examples/menu_bot/",
+      "key_scenarios": [
+        "Module import validation",
+        "Class existence and structure",
+        "Bot initialization with JSONStorage",
+        "Required BotBase attributes present",
+        "Handler registration method exists",
+        "Storage keys for items and cart"
+      ],
+      "criticality": "medium",
+      "complexity": "low"
+    },
+    "tests/examples/test_poll_bot.py": {
+      "path": "tests/examples/test_poll_bot.py",
+      "description": "Tests for Poll Bot example",
+      "test_count": 9,
+      "coverage_target": "examples/poll_bot/",
+      "key_scenarios": [
+        "Module import validation",
+        "Class existence and structure",
+        "Bot initialization with SQLStorage",
+        "Required BotBase attributes present",
+        "Handler registration method exists",
+        "Storage keys for polls",
+        "Poll-specific methods exist"
+      ],
+      "criticality": "medium",
+      "complexity": "medium"
+    },
+    "tests/examples/test_quit_smoking_bot.py": {
+      "path": "tests/examples/test_quit_smoking_bot.py",
+      "description": "Tests for Quit Smoking Bot example",
+      "test_count": 17,
+      "coverage_target": "examples/quit_smoking_bot/",
+      "key_scenarios": [
+        "Module import validation",
+        "Class existence and structure",
+        "Bot initialization with JSONStorage",
+        "Required BotBase attributes present",
+        "Handler registration method exists",
+        "Custom managers (StatusManager, QuotesManager)",
+        "Status tracking methods",
+        "Welcome message override",
+        "User status retrieval",
+        "Manager initialization"
+      ],
+      "criticality": "medium",
+      "complexity": "high"
+    },
+    "tests/examples/test_reminder_bot.py": {
+      "path": "tests/examples/test_reminder_bot.py",
+      "description": "Tests for Reminder Bot example",
+      "test_count": 7,
+      "coverage_target": "examples/reminder_bot/",
+      "key_scenarios": [
+        "Module import validation",
+        "Class existence and structure",
+        "Bot initialization with JSONStorage",
+        "Required BotBase attributes present",
+        "Handler registration method exists",
+        "Storage key for reminders",
+        "Storage functionality works"
+      ],
+      "criticality": "medium",
+      "complexity": "low"
+    },
+    "tests/examples/test_examples.py": {
+      "path": "tests/examples/test_examples.py",
+      "description": "Integration tests for all example bots",
+      "test_count": 17,
+      "coverage_target": "examples/*/bot.py",
+      "key_scenarios": [
+        "All bots use new BotBase API (no token in __init__)",
+        "All bots have main() function",
+        "All bots use post_init_wrapper for async setup",
+        "Unified BOT_TOKEN environment variable",
+        "Graceful shutdown signal handlers"
+      ],
+      "criticality": "high",
+      "complexity": "medium"
     }
   },
   "test_fixtures": {

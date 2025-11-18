@@ -112,9 +112,9 @@ class MyBot(BotBase):
 def main():
     """Run the bot."""
     # Get token from environment
-    token = os.getenv("TELEGRAM_BOT_TOKEN")
+    token = os.getenv("BOT_TOKEN")
     if not token:
-        raise ValueError("TELEGRAM_BOT_TOKEN environment variable required!")
+        raise ValueError("BOT_TOKEN environment variable required!")
 
     # Create storage
     storage = JSONStorage(base_dir=Path("data"))
@@ -145,13 +145,13 @@ if __name__ == "__main__":
 
 ```bash
 # Linux/Mac
-export TELEGRAM_BOT_TOKEN="your_token_here"
+export BOT_TOKEN="your_token_here"
 
 # Windows
-set TELEGRAM_BOT_TOKEN=your_token_here
+set BOT_TOKEN=your_token_here
 
 # Or create .env file
-echo "TELEGRAM_BOT_TOKEN=your_token_here" > .env
+echo "BOT_TOKEN=your_token_here" > .env
 ```
 
 ### Step 3: Run Your Bot
@@ -259,12 +259,12 @@ Check out complete example bots in the `examples/` directory:
 pip install -e .
 ```
 
-### Issue: "ValueError: TELEGRAM_BOT_TOKEN environment variable required"
+### Issue: "ValueError: BOT_TOKEN environment variable required"
 
 **Solution:** Set your bot token:
 
 ```bash
-export TELEGRAM_BOT_TOKEN="your_token_here"
+export BOT_TOKEN="your_token_here"
 ```
 
 ### Issue: Bot doesn't respond

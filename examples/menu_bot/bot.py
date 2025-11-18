@@ -18,11 +18,11 @@ Features:
 
 import logging
 import os
+import signal
 import sys
-from typing import List
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
-from telegram.ext import CallbackQueryHandler, CommandHandler, ContextTypes
+from telegram.ext import Application, CallbackQueryHandler, CommandHandler, ContextTypes
 
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../.."))
@@ -41,15 +41,14 @@ logger = logging.getLogger(__name__)
 class MenuBot(BotBase):
     """Menu bot with inline keyboards."""
 
-    def __init__(self, token: str, storage, admin_ids: List[int]):
+    def __init__(self, storage, bot_name="Menu Bot"):
         """Initialize menu bot.
 
         Args:
-            token: Telegram bot token
             storage: Storage backend
-            admin_ids: List of admin user IDs
+            bot_name: Name of the bot
         """
-        super().__init__(token=token, storage=storage, admin_ids=admin_ids)
+        super().__init__(storage=storage, bot_name=bot_name)
 
         # Storage keys
         self.SETTINGS_KEY = "user_settings"
@@ -430,34 +429,63 @@ class MenuBot(BotBase):
 
 def main():
     """Run the menu bot."""
-    # Get configuration from environment
-    token = os.getenv("BOT_TOKEN")
-    if not token:
-        logger.error("BOT_TOKEN environment variable not set")
-        sys.exit(1)
+    # Get bot token from environment
+    bot_token = os.getenv("BOT_TOKEN")
+    if not bot_token:
+        raise ValueError(
+            "BOT_TOKEN environment variable is required.\n"
+            "Set it in .env file or export it: export BOT_TOKEN='your_token'"
+        )
 
     admin_id = os.getenv("ADMIN_ID")
-    if not admin_id:
-        logger.error("ADMIN_ID environment variable not set")
-        sys.exit(1)
+    if admin_id:
+        admin_id = int(admin_id)
 
     # Determine storage backend
     storage_backend = os.getenv("STORAGE_BACKEND", "json")
     base_dir = os.getenv("STORAGE_DIR", "data")
+    if not os.path.isabs(base_dir):
+        base_dir = os.path.join(os.path.dirname(__file__), base_dir)
 
     logger.info(f"Using storage backend: {storage_backend}")
 
     # Create storage
     storage = create_storage(storage_backend, base_dir=base_dir)
+    logger.info(f"Storage initialized at: {base_dir}")
 
-    # Create and run bot
-    bot = MenuBot(token=token, storage=storage, admin_ids=[int(admin_id)])
+    # Create bot instance
+    bot = MenuBot(storage=storage, bot_name="Menu Bot")
 
-    try:
-        logger.info("Starting Menu Bot...")
-        bot.run()
-    except KeyboardInterrupt:
-        logger.info("Bot stopped by user")
+    # Add admin if specified
+    if admin_id:
+        bot.admin_manager.add_admin(admin_id)
+        logger.info(f"Added admin: {admin_id}")
+
+    # Create and configure application
+    application = Application.builder().token(bot_token).build()
+    bot.application = application
+
+    # Register handlers
+    bot.register_handlers()
+
+    # Set bot commands in Telegram UI
+    async def post_init_wrapper(app):
+        await bot.set_bot_commands()
+
+    application.post_init = post_init_wrapper
+
+    # Setup signal handlers for graceful shutdown
+    def signal_handler(signum, frame):
+        logger.info(f"Received signal {signum}, initiating graceful shutdown...")
+        application.stop_running()
+
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
+
+    # Run the bot
+    logger.info("Press Ctrl+C to stop")
+    logger.info("Starting Menu Bot...")
+    application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 
 if __name__ == "__main__":

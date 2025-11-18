@@ -294,6 +294,134 @@ flow: ## Show GitHub Flow workflow steps
 	@echo "  feat! or BREAKING CHANGE: → MAJOR version bump"
 	@echo "  docs:, chore:, test:, refactor: → No version bump"
 
+##@ Example Bots
+
+run-counter: ## Run Counter Bot example
+	@echo "$(GREEN)Starting Counter Bot...$(NC)"
+	@echo "$(YELLOW)Make sure BOT_TOKEN is set in .env or environment$(NC)"
+	@if [ -f examples/counter_bot/.env ]; then \
+		cd examples/counter_bot && set -a && . ./.env && set +a && python3 bot.py; \
+	else \
+		cd examples/counter_bot && python3 bot.py; \
+	fi
+
+run-echo: ## Run Echo Bot example
+	@echo "$(GREEN)Starting Echo Bot...$(NC)"
+	@echo "$(YELLOW)Make sure BOT_TOKEN is set in .env or environment$(NC)"
+	@if [ -f examples/echo_bot/.env ]; then \
+		cd examples/echo_bot && set -a && . ./.env && set +a && python3 bot.py; \
+	else \
+		cd examples/echo_bot && python3 bot.py; \
+	fi
+
+run-menu: ## Run Menu Bot example
+	@echo "$(GREEN)Starting Menu Bot...$(NC)"
+	@echo "$(YELLOW)Make sure BOT_TOKEN is set in .env or environment$(NC)"
+	@if [ -f examples/menu_bot/.env ]; then \
+		cd examples/menu_bot && set -a && . ./.env && set +a && python3 bot.py; \
+	else \
+		cd examples/menu_bot && python3 bot.py; \
+	fi
+
+run-poll: ## Run Poll Bot example (SQL storage demo)
+	@echo "$(GREEN)Starting Poll Bot...$(NC)"
+	@echo "$(YELLOW)Make sure BOT_TOKEN is set in .env or environment$(NC)"
+	@if [ -f examples/poll_bot/.env ]; then \
+		cd examples/poll_bot && set -a && . ./.env && set +a && python3 bot.py; \
+	else \
+		cd examples/poll_bot && python3 bot.py; \
+	fi
+
+run-quit-smoking: ## Run Quit Smoking Bot example
+	@echo "$(GREEN)Starting Quit Smoking Bot...$(NC)"
+	@echo "$(YELLOW)Make sure BOT_TOKEN is set in .env or environment$(NC)"
+	@if [ -f examples/quit_smoking_bot/.env ]; then \
+		cd examples/quit_smoking_bot && set -a && . ./.env && set +a && python3 bot.py; \
+	else \
+		cd examples/quit_smoking_bot && python3 bot.py; \
+	fi
+
+run-reminder: ## Run Reminder Bot example
+	@echo "$(GREEN)Starting Reminder Bot...$(NC)"
+	@echo "$(YELLOW)Make sure BOT_TOKEN is set in .env or environment$(NC)"
+	@if [ -f examples/reminder_bot/.env ]; then \
+		cd examples/reminder_bot && set -a && . ./.env && set +a && python3 bot.py; \
+	else \
+		cd examples/reminder_bot && python3 bot.py; \
+	fi
+
+test-examples: ## Run all example bot tests
+	@echo "$(GREEN)Testing all example bots...$(NC)"
+	pytest tests/examples/ -v --no-cov
+
+test-bot: ## Test specific bot (usage: make test-bot BOT=counter)
+	@if [ -z "$(BOT)" ]; then \
+		echo "$(RED)Error: Please specify bot name$(NC)"; \
+		echo "Usage: make test-bot BOT=counter"; \
+		echo "Available: counter, echo, menu, poll, quit-smoking, reminder"; \
+		exit 1; \
+	fi
+	@if [ "$(BOT)" = "quit-smoking" ]; then \
+		pytest tests/examples/test_quit_smoking_bot.py -v --no-cov; \
+	else \
+		pytest tests/examples/test_$(BOT)_bot.py -v --no-cov; \
+	fi
+
+stop-counter: ## Stop Counter Bot
+	@echo "$(YELLOW)Stopping Counter Bot...$(NC)"
+	@pkill -SIGTERM -f "examples/counter_bot" 2>/dev/null || echo "$(GREEN)Counter Bot not running$(NC)"
+
+stop-echo: ## Stop Echo Bot
+	@echo "$(YELLOW)Stopping Echo Bot...$(NC)"
+	@pkill -SIGTERM -f "examples/echo_bot" 2>/dev/null || echo "$(GREEN)Echo Bot not running$(NC)"
+
+stop-menu: ## Stop Menu Bot
+	@echo "$(YELLOW)Stopping Menu Bot...$(NC)"
+	@pkill -SIGTERM -f "examples/menu_bot" 2>/dev/null || echo "$(GREEN)Menu Bot not running$(NC)"
+
+stop-poll: ## Stop Poll Bot
+	@echo "$(YELLOW)Stopping Poll Bot...$(NC)"
+	@pkill -SIGTERM -f "examples/poll_bot" 2>/dev/null || echo "$(GREEN)Poll Bot not running$(NC)"
+
+stop-quit-smoking: ## Stop Quit Smoking Bot
+	@echo "$(YELLOW)Stopping Quit Smoking Bot...$(NC)"
+	@pkill -SIGTERM -f "examples/quit_smoking_bot" 2>/dev/null || echo "$(GREEN)Quit Smoking Bot not running$(NC)"
+
+stop-reminder: ## Stop Reminder Bot
+	@echo "$(YELLOW)Stopping Reminder Bot...$(NC)"
+	@pkill -SIGTERM -f "examples/reminder_bot" 2>/dev/null || echo "$(GREEN)Reminder Bot not running$(NC)"
+
+stop-all-bots: ## Stop all running example bots
+	@echo "$(YELLOW)Stopping all example bots...$(NC)"
+	@pkill -SIGTERM -f "examples/.*_bot" 2>/dev/null && sleep 2 || true
+	@if pgrep -f "examples/.*_bot" > /dev/null 2>&1; then \
+		echo "$(YELLOW)Some bots didn't stop gracefully, forcing...$(NC)"; \
+		pkill -SIGKILL -f "examples/.*_bot" 2>/dev/null || true; \
+		sleep 1; \
+	fi
+	@echo "$(GREEN)✓ All bots stopped$(NC)"
+
+list-running-bots: ## List all running example bots
+	@echo "$(GREEN)Running Example Bots:$(NC)"
+	@pgrep -fl "examples/.*_bot" | grep -v "pgrep" || echo "$(YELLOW)No bots currently running$(NC)"
+
+list-bots: ## List all available example bots
+	@echo "$(GREEN)Available Example Bots:$(NC)"
+	@echo ""
+	@echo "  $(BLUE)counter$(NC)       - Counter Bot (state management)"
+	@echo "  $(BLUE)echo$(NC)          - Echo Bot (simplest example)"
+	@echo "  $(BLUE)menu$(NC)          - Menu Bot (inline keyboards)"
+	@echo "  $(BLUE)poll$(NC)          - Poll Bot (SQL storage demo)"
+	@echo "  $(BLUE)quit-smoking$(NC)  - Quit Smoking Bot (real-world app)"
+	@echo "  $(BLUE)reminder$(NC)      - Reminder Bot (scheduler demo)"
+	@echo ""
+	@echo "$(YELLOW)Run:$(NC)   make run-<bot-name>"
+	@echo "$(YELLOW)Stop:$(NC)  make stop-<bot-name>"
+	@echo "$(YELLOW)Test:$(NC)  make test-bot BOT=<bot-name>"
+	@echo ""
+	@echo "$(YELLOW)Stop all:$(NC) make stop-all-bots"
+	@echo "$(YELLOW)List running:$(NC) make list-running-bots"
+
 ##@ Shortcuts
 
 t: test ## Shortcut for test

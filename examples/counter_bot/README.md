@@ -40,7 +40,7 @@ pip install -e .
 2. Create `.env` file in this directory:
 
 ```bash
-TELEGRAM_BOT_TOKEN=your_bot_token_here
+BOT_TOKEN=your_bot_token_here
 ```
 
 Get your bot token from [@BotFather](https://t.me/BotFather) on Telegram.
@@ -57,7 +57,7 @@ python bot.py
 Or with explicit token:
 
 ```bash
-export TELEGRAM_BOT_TOKEN="your_token"
+export BOT_TOKEN="your_token"
 python bot.py
 ```
 

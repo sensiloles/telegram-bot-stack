@@ -1,13 +1,13 @@
 {
   "metadata": {
-    "version": "3.0.0",
-    "generated_at": "2025-01-31",
+    "version": "3.0.1",
+    "generated_at": "2025-11-18",
     "graph_id": "docs",
     "graph_name": "Documentation",
     "graph_type": "flat_graph",
     "project_name": "telegram-bot-stack",
     "project_version": "1.6.0",
-    "description": "Project documentation files and user guides",
+    "description": "Project documentation files and user guides (updated BOT_TOKEN env var)",
     "scope": "All documentation in docs/ directory",
     "node_count": 9,
     "edge_count": 28

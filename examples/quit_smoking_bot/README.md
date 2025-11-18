@@ -54,7 +54,7 @@ MAX_PRIZE_FUND = 100000  # maximum cap
 3. Create `.env` file in this directory:
 
 ```bash
-TELEGRAM_BOT_TOKEN=your_bot_token_here
+BOT_TOKEN=your_bot_token_here
 TZ=Europe/Moscow  # Optional: set your timezone
 ```
 
@@ -72,7 +72,7 @@ python bot.py
 Or with explicit token:
 
 ```bash
-export TELEGRAM_BOT_TOKEN="your_token"
+export BOT_TOKEN="your_token"
 python bot.py
 ```
 

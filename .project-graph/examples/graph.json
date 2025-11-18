@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "version": "2.0.0",
+    "version": "2.1.0",
     "generated_at": "2025-11-18",
     "graph_id": "examples",
     "graph_name": "Example Bots & Patterns",
@@ -10,7 +10,8 @@
     "scope": "Example bots in examples/ directory",
     "router_file": "graph-router.json",
     "related_graphs": [
-      "bot-framework-graph.json - for framework API used in examples"
+      "bot-framework-graph.json - for framework API used in examples",
+      "testing-graph.json - for example bot tests"
     ]
   },
   "statistics": {
@@ -60,7 +61,7 @@
       "usage": {
         "install": "pip install telegram-bot-stack",
         "run": "python examples/echo_bot/bot.py",
-        "requires": "TELEGRAM_TOKEN in .env"
+        "requires": "BOT_TOKEN in .env"
       },
       "typical_use_case": "Learning framework basics, testing setup",
       "next_step": "counter_bot for state management"
@@ -120,7 +121,7 @@
       "usage": {
         "install": "pip install telegram-bot-stack",
         "run": "python examples/counter_bot/bot.py",
-        "requires": "TELEGRAM_TOKEN in .env"
+        "requires": "BOT_TOKEN in .env"
       },
       "typical_use_case": "Learning state management, building stateful bots",
       "next_step": "reminder_bot for scheduler integration"
@@ -181,7 +182,7 @@
       "usage": {
         "install": "pip install telegram-bot-stack",
         "run": "python examples/reminder_bot/bot.py",
-        "requires": "TELEGRAM_TOKEN in .env"
+        "requires": "BOT_TOKEN in .env"
       },
       "typical_use_case": "Learning scheduler integration, building notification bots",
       "next_step": "menu_bot for interactive keyboards"
@@ -244,7 +245,7 @@
       "usage": {
         "install": "pip install telegram-bot-stack",
         "run": "python examples/menu_bot/bot.py",
-        "requires": "TELEGRAM_TOKEN in .env"
+        "requires": "BOT_TOKEN in .env"
       },
       "typical_use_case": "Learning inline keyboards, building interactive bots",
       "next_step": "poll_bot for SQL storage"
@@ -306,7 +307,7 @@
       "usage": {
         "install": "pip install telegram-bot-stack[database]",
         "run": "python examples/poll_bot/bot.py",
-        "requires": "TELEGRAM_TOKEN, DATABASE_URL in .env"
+        "requires": "BOT_TOKEN, DATABASE_URL in .env"
       },
       "typical_use_case": "Learning SQL storage, building data-intensive bots",
       "next_step": "quit_smoking_bot for production complexity"
@@ -424,12 +425,12 @@
       "usage": {
         "install": "pip install telegram-bot-stack",
         "setup": [
-          "1. Set TELEGRAM_TOKEN in .env",
+          "1. Set BOT_TOKEN in .env",
           "2. Customize config.py if needed",
           "3. Ensure data/quotes.json exists"
         ],
         "run": "python examples/quit_smoking_bot/bot.py",
-        "requires": "TELEGRAM_TOKEN in .env"
+        "requires": "BOT_TOKEN in .env"
       },
       "typical_use_case": "Reference for building production-ready bot",
       "architecture_lessons": [
@@ -691,14 +692,41 @@
     "quick_start": [
       "1. Choose example based on needs",
       "2. Copy .env.example to .env",
-      "3. Add TELEGRAM_TOKEN to .env",
-      "4. Run: python examples/<bot_name>/bot.py",
-      "5. Open Telegram and interact with bot"
+      "3. Add BOT_TOKEN to .env",
+      "4. Run: python examples/<bot_name>/bot.py OR make run-<bot_name>",
+      "5. Open Telegram and interact with bot",
+      "6. Stop: Ctrl+C OR make stop-<bot_name>"
     ],
+    "makefile_commands": {
+      "run_bot": "make run-<bot_name> - Run specific bot (counter, echo, menu, poll, quit-smoking, reminder)",
+      "stop_bot": "make stop-<bot_name> - Stop specific bot gracefully",
+      "stop_all": "make stop-all-bots - Stop all running example bots",
+      "list_bots": "make list-bots - List all available example bots",
+      "list_running": "make list-running-bots - Show currently running bots",
+      "test_examples": "make test-examples - Run all example bot tests",
+      "test_specific": "make test-bot BOT=<name> - Test specific bot"
+    },
+    "graceful_shutdown": {
+      "description": "All example bots support graceful shutdown via SIGINT/SIGTERM",
+      "methods": [
+        "Ctrl+C in terminal",
+        "make stop-<bot_name>",
+        "make stop-all-bots",
+        "kill -SIGTERM <pid>"
+      ],
+      "implementation": "Signal handlers registered in main() function"
+    },
     "troubleshooting": {
-      "token_error": "Check TELEGRAM_TOKEN in .env file",
+      "token_error": "Check BOT_TOKEN in .env file",
       "import_error": "Install: pip install telegram-bot-stack",
-      "permission_error": "Ensure bot has necessary Telegram permissions"
+      "permission_error": "Ensure bot has necessary Telegram permissions",
+      "conflict_error": "Only one bot instance per token - use make stop-all-bots first"
+    },
+    "testing": {
+      "all_examples": "make test-examples - 71 tests across 7 files",
+      "specific_bot": "make test-bot BOT=counter - Test counter_bot only",
+      "coverage": "Tests validate: imports, initialization, handlers, storage, BotBase integration",
+      "no_coverage_impact": "Example tests run with --no-cov flag"
     }
   }
 }

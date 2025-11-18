@@ -115,7 +115,7 @@ pip install -e ".[dev]"
 
 ```bash
 # Set your bot token
-export TELEGRAM_BOT_TOKEN="your_token_here"
+export BOT_TOKEN="your_token_here"
 
 # Run Echo Bot (simplest example)
 cd examples/echo_bot
