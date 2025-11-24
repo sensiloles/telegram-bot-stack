@@ -27,7 +27,7 @@
   "python.analysis.indexing": true,
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
-    "source.organizeImports": "explicit",
+    "source.organizeImports.ruff": "explicit",
     "source.fixAll.ruff": "explicit"
   },
   "[python]": {
@@ -38,11 +38,25 @@
       "source.fixAll.ruff": "explicit"
     }
   },
-  "ruff.nativeServer": "on",
-  "ruff.importStrategy": "fromEnvironment",
-  "ruff.path": [
-    "./venv/bin/ruff"
-  ],
+  "[json]": {
+    "editor.defaultFormatter": "vscode.json-language-features",
+    "editor.formatOnSave": true,
+    "editor.tabSize": 2
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "vscode.json-language-features",
+    "editor.formatOnSave": true,
+    "editor.tabSize": 2
+  },
+  "[yaml]": {
+    "editor.defaultFormatter": "redhat.vscode-yaml",
+    "editor.formatOnSave": true,
+    "editor.tabSize": 2
+  },
+  "[markdown]": {
+    "editor.formatOnSave": true,
+    "editor.wordWrap": "on"
+  },
   "[dockerfile]": {
     "editor.defaultFormatter": "foxundermoon.shell-format",
     "editor.formatOnSave": true
@@ -52,6 +66,11 @@
     "editor.formatOnSave": true
   },
   "shellformat.flag": "-i=2 -ci",
+  "ruff.nativeServer": "on",
+  "ruff.importStrategy": "fromEnvironment",
+  "ruff.path": [
+    "./venv/bin/ruff"
+  ],
   "files.associations": {
     "*.py": "python",
     ".cursorrules": "plaintext",

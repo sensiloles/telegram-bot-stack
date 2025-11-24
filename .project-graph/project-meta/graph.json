@@ -61,7 +61,7 @@
         "counter_bot - state management",
         "quit_smoking_bot - production example"
       ],
-      "learning_progression": "simple → intermediate → complex"
+      "learning_progression": "simple \u2192 intermediate \u2192 complex"
     },
     "layer_3_tests": {
       "name": "Testing Infrastructure",
@@ -403,8 +403,8 @@
     "adding_major_feature": [
       "1. Determine which layer(s) affected",
       "2. Update bot-framework-graph if core code",
-      "3. Add tests → update testing-graph",
-      "4. Add example if significant → update examples-graph",
+      "3. Add tests \u2192 update testing-graph",
+      "4. Add example if significant \u2192 update examples-graph",
       "5. Update infrastructure if CI/CD changes needed",
       "6. Update project-meta if architecture changes"
     ]

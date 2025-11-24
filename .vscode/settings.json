@@ -7,7 +7,13 @@
     "**/.ruff_cache": true,
     "**/*.egg-info": true
   },
-  // Ruff linter configuration (uses pyproject.toml)
+  // Global editor settings
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.ruff": "explicit",
+    "source.organizeImports.ruff": "explicit"
+  },
+  // Python - Ruff linter configuration (uses pyproject.toml)
   "[python]": {
     "editor.defaultFormatter": "charliermarsh.ruff",
     "editor.formatOnSave": true,
@@ -15,6 +21,28 @@
       "source.fixAll.ruff": "explicit",
       "source.organizeImports.ruff": "explicit"
     }
+  },
+  // JSON - built-in formatter
+  "[json]": {
+    "editor.defaultFormatter": "vscode.json-language-features",
+    "editor.formatOnSave": true,
+    "editor.tabSize": 2
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "vscode.json-language-features",
+    "editor.formatOnSave": true,
+    "editor.tabSize": 2
+  },
+  // YAML
+  "[yaml]": {
+    "editor.defaultFormatter": "redhat.vscode-yaml",
+    "editor.formatOnSave": true,
+    "editor.tabSize": 2
+  },
+  // Markdown
+  "[markdown]": {
+    "editor.formatOnSave": true,
+    "editor.wordWrap": "on"
   },
   // Ruff extension settings - using native server
   "ruff.nativeServer": "on",

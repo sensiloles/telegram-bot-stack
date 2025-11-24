@@ -2,7 +2,9 @@
   "mcpServers": {
     "github-workflow": {
       "command": "python3",
-      "args": ["/Users/sensiloles/Documents/work/telegram-bot-stack/scripts/mcp_github_server.py"],
+      "args": [
+        "/Users/sensiloles/Documents/work/telegram-bot-stack/scripts/mcp_github_server.py"
+      ],
       "env": {
         "GITHUB_TOKEN": "${GITHUB_TOKEN}",
         "GITHUB_REPO": "sensiloles/telegram-bot-stack"
@@ -11,7 +13,9 @@
     },
     "project-graph": {
       "command": "python3",
-      "args": ["/Users/sensiloles/Documents/work/telegram-bot-stack/scripts/mcp_project_graph.py"],
+      "args": [
+        "/Users/sensiloles/Documents/work/telegram-bot-stack/scripts/mcp_project_graph.py"
+      ],
       "description": "Project graph navigation"
     }
   }
