@@ -30,6 +30,9 @@
     "source.organizeImports.ruff": "explicit",
     "source.fixAll.ruff": "explicit"
   },
+  // Ensure all files end with newline (POSIX compliant)
+  "files.insertFinalNewline": true,
+  "files.trimFinalNewlines": false,
   "[python]": {
     "editor.defaultFormatter": "charliermarsh.ruff",
     "editor.formatOnSave": true,
