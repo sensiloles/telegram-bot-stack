@@ -381,3 +381,15 @@ On merge:
 - Not acceptable: Decorative emoji, multiple emoji per line, emoji in explanations
 
 **Rationale:** Emoji consume 3-4 bytes each, reduce readability in terminals, and add no semantic value to technical content.
+
+### Summary Documents
+- NEVER create separate SUMMARY.md or *_SUMMARY.md files
+- Always provide summaries directly in chat/response to user
+- Summaries should be comprehensive, structured, and include:
+  - What was done (with checkmarks)
+  - Testing results
+  - Impact assessment
+  - Next steps
+- Exception: Project-level documentation (README.md, CHANGELOG.md) is acceptable
+
+**Rationale:** Summary files clutter repository, become outdated, and duplicate information already in commits/PRs/chat history.

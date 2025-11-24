@@ -2,6 +2,18 @@
 
 <!-- version list -->
 
+## Unreleased
+
+### Features
+
+- **mcp**: Enhanced MCP server with PR management and batch operations
+  - Add Pull Request management (create, merge, list, check CI)
+  - Add batch operations for updating multiple issues at once
+  - Add advanced filtering (milestone, assignee, sort, direction, since)
+  - Add repository caching for better performance
+  - Add actionable error messages with hints
+  - Version 2.0.0 of MCP server
+
 ## v1.11.0 (2025-11-18)
 
 ### Bug Fixes
@@ -13,7 +25,6 @@
 
 - **examples**: Add tests, graceful shutdown, and Makefile commands
   ([`14700bc`](https://github.com/sensiloles/telegram-bot-stack/commit/14700bc94945f51a3d27dc7167653947d710a643))
-
 
 ## v1.10.0 (2025-11-18)
 
@@ -43,14 +54,12 @@
 - **docs**: Restructure documentation and remove dev CLI wrapper
   ([`eeee909`](https://github.com/sensiloles/telegram-bot-stack/commit/eeee9096dfa557543664153e206395f73b4ee439))
 
-
 ## v1.9.0 (2025-11-18)
 
 ### Features
 
 - **scripts**: Add issue management scripts for labels and dependencies
   ([`9a350de`](https://github.com/sensiloles/telegram-bot-stack/commit/9a350de0e9e4abf616b3d41ad0d6ecfd3c62970c))
-
 
 ## v1.8.1 (2025-11-18)
 
@@ -73,7 +82,6 @@
 - **vscode**: Add recommended settings with type checking
   ([`14e4eea`](https://github.com/sensiloles/telegram-bot-stack/commit/14e4eea2f82e51952745bc332f55f66c4dfd70fd))
 
-
 ## v1.8.0 (2025-11-18)
 
 ### Features
@@ -84,14 +92,12 @@
 - **graphs**: Implement hierarchical multi-graph system v3.0
   ([`e894dd9`](https://github.com/sensiloles/telegram-bot-stack/commit/e894dd95e8a19d5e3257836057b66e15edf374ba))
 
-
 ## v1.7.1 (2025-11-18)
 
 ### Bug Fixes
 
 - **docs**: Remove .github/README.md to fix main page display
   ([`2a27a48`](https://github.com/sensiloles/telegram-bot-stack/commit/2a27a484f8369aa8f6456585cef267d0fde466ca))
-
 
 ## v1.7.0 (2025-11-18)
 
@@ -102,7 +108,6 @@
 
 - **decorators**: Add rate limiting decorator for spam protection
   ([`917a9a5`](https://github.com/sensiloles/telegram-bot-stack/commit/917a9a5607922c7eab62ae547d3c4edb0d35c47d))
-
 
 ## v1.6.0 (2025-11-18)
 
@@ -116,14 +121,12 @@
 - **storage**: Implement SQL storage backend
   ([`4ef47ad`](https://github.com/sensiloles/telegram-bot-stack/commit/4ef47ade8dfe688f15c6942ef342b5827eba198a))
 
-
 ## v1.5.0 (2025-11-17)
 
 ### Features
 
 - **graphs**: Implement multi-graph dependency system
   ([`3b61520`](https://github.com/sensiloles/telegram-bot-stack/commit/3b61520482184a3bea2100bab90415ef7665d2a8))
-
 
 ## v1.4.0 (2025-11-17)
 
@@ -132,7 +135,6 @@
 - **scripts**: Auto-delete remote branch on merge with --cleanup
   ([`0c0fd7e`](https://github.com/sensiloles/telegram-bot-stack/commit/0c0fd7efc7254bad71252e75787f6d6feca12a6e))
 
-
 ## v1.3.0 (2025-11-17)
 
 ### Features
@@ -140,14 +142,12 @@
 - **tooling**: Add comprehensive dependency graph for AI agent navigation
   ([`4a194c8`](https://github.com/sensiloles/telegram-bot-stack/commit/4a194c8c74586e19ac0b87520f56ed416675daf0))
 
-
 ## v1.2.1 (2025-11-17)
 
 ### Bug Fixes
 
 - **ci**: Ensure release only runs after tests pass
   ([`038d5ac`](https://github.com/sensiloles/telegram-bot-stack/commit/038d5accaae3266e727ad5a40e57493998eee77f))
-
 
 ## v1.2.0 (2025-11-17)
 
@@ -158,7 +158,6 @@
 
 - **pypi**: Prepare package for PyPI publication
   ([`6c82a7f`](https://github.com/sensiloles/telegram-bot-stack/commit/6c82a7f6ba5ce3aa74f30895c2a19456a3d2050a))
-
 
 ## v1.1.2 (2025-11-17)
 
@@ -175,14 +174,12 @@
 - Remove last hardcoded coverage metric from development-archive
   ([`2fb668e`](https://github.com/sensiloles/telegram-bot-stack/commit/2fb668e15829768d9a22531d7ec7f2c7a35a7340))
 
-
 ## v1.1.1 (2025-11-17)
 
 ### Bug Fixes
 
 - **scripts**: Correct PR auto-assignment to use proper GitHub client
   ([`1e9de4a`](https://github.com/sensiloles/telegram-bot-stack/commit/1e9de4aadfc4bbec2b9f66a6e9e29a002675a97e))
-
 
 ## v1.1.0 (2025-11-17)
 
@@ -195,7 +192,6 @@
 
 - **storage**: Enable all skipped tests and increase coverage to 83.91%
   ([`3acecfb`](https://github.com/sensiloles/telegram-bot-stack/commit/3acecfbaaf7a8ba361d67b0cab1890a6d34c0805))
-
 
 ## v1.0.0 (2025-11-17)
 
@@ -235,7 +231,6 @@
 ### Breaking Changes
 
 - **workflow**: Direct pushes to main will be blocked after branch protection is enabled
-
 
 ## v0.1.0 (2025-11-17)
 

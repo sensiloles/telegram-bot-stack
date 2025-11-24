@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
-"""MCP Server for GitHub Issues.
+"""MCP Server for GitHub Issues and Pull Requests.
 
-Provides GitHub issue management via Model Context Protocol (MCP).
+Provides comprehensive GitHub workflow management via Model Context Protocol (MCP).
+Supports issues, pull requests, CI status, and batch operations.
+
 MCP Protocol: https://modelcontextprotocol.io/
+
+Version: 2.0.0 (Enhanced)
 """
 
 import asyncio
@@ -10,6 +14,7 @@ import json
 import os
 import subprocess
 import sys
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Optional
 
@@ -93,11 +98,13 @@ except ImportError:
 
 
 class MCPServer:
-    """MCP Server implementation for GitHub issues."""
+    """MCP Server implementation for GitHub issues and pull requests."""
 
     def __init__(self):
         self.repo: Optional[Any] = None
         self.repo_name: Optional[str] = None
+        self._repo_cache: dict[str, Any] = {}  # Cache for multiple repos
+        self._gh_client: Optional[Any] = None  # Cached GitHub client
 
     async def initialize(self) -> dict:
         """Initialize the server and detect repository."""
@@ -107,16 +114,63 @@ class MCPServer:
             if self.repo_name:
                 log_debug(f"Repository: {self.repo_name}")
                 self.repo = get_repo(self.repo_name)
+                self._repo_cache[self.repo_name] = self.repo
                 log_debug(f"✅ Connected to {self.repo.full_name}")
 
             return {
                 "protocolVersion": "2024-11-05",
                 "capabilities": {"tools": {}, "resources": {}},
-                "serverInfo": {"name": "github-issues-mcp", "version": "1.0.0"},
+                "serverInfo": {
+                    "name": "github-workflow-mcp",
+                    "version": "2.0.0",
+                    "description": "GitHub Issues & Pull Requests Management",
+                },
             }
         except Exception as e:
             log_debug(f"❌ Initialization failed: {e}")
             return {"error": {"code": -32000, "message": f"Failed to initialize: {e}"}}
+
+    def get_repo_cached(self, repo_name: str) -> Any:
+        """Get repository with caching.
+
+        Args:
+            repo_name: Repository name in format owner/repo
+
+        Returns:
+            Cached or newly fetched Repository object
+        """
+        if repo_name not in self._repo_cache:
+            self._repo_cache[repo_name] = get_repo(repo_name)
+        return self._repo_cache[repo_name]
+
+    def format_github_error(self, e: Any) -> str:
+        """Format GitHub API error with actionable hints.
+
+        Args:
+            e: GithubException
+
+        Returns:
+            Formatted error message with hints
+        """
+        error_msg = f"❌ GitHub API error: {e}"
+
+        if hasattr(e, "status"):
+            if e.status == 404:
+                error_msg += "\n💡 Hint: Resource not found. Check issue/PR number or repo access."
+            elif e.status == 403:
+                error_msg += "\n💡 Hint: Rate limit exceeded or insufficient permissions. Check token scopes."
+            elif e.status == 401:
+                error_msg += (
+                    "\n💡 Hint: Token invalid. Check GITHUB_TOKEN in .env file."
+                )
+            elif e.status == 422:
+                error_msg += "\n💡 Hint: Validation failed. Check input parameters."
+            else:
+                error_msg += (
+                    "\n💡 Hint: Check GitHub status: https://www.githubstatus.com/"
+                )
+
+        return error_msg
 
     def list_tools(self) -> dict:
         """List available tools."""
@@ -124,7 +178,7 @@ class MCPServer:
             "tools": [
                 {
                     "name": "list_issues",
-                    "description": "List GitHub issues with optional filters",
+                    "description": "List GitHub issues with advanced filters",
                     "inputSchema": {
                         "type": "object",
                         "properties": {
@@ -138,6 +192,30 @@ class MCPServer:
                                 "type": "array",
                                 "items": {"type": "string"},
                                 "description": "Filter by labels",
+                            },
+                            "milestone": {
+                                "type": "string",
+                                "description": "Filter by milestone title",
+                            },
+                            "assignee": {
+                                "type": "string",
+                                "description": "Filter by assignee username",
+                            },
+                            "sort": {
+                                "type": "string",
+                                "enum": ["created", "updated", "comments"],
+                                "description": "Sort by field",
+                                "default": "created",
+                            },
+                            "direction": {
+                                "type": "string",
+                                "enum": ["asc", "desc"],
+                                "description": "Sort direction",
+                                "default": "desc",
+                            },
+                            "since": {
+                                "type": "string",
+                                "description": "Only issues updated after this date (ISO 8601 format)",
                             },
                             "limit": {
                                 "type": "integer",
@@ -250,6 +328,174 @@ class MCPServer:
                         "required": ["issue_number"],
                     },
                 },
+                {
+                    "name": "batch_update_issues",
+                    "description": "Update multiple issues at once (batch operation)",
+                    "inputSchema": {
+                        "type": "object",
+                        "properties": {
+                            "issue_numbers": {
+                                "type": "array",
+                                "items": {"type": "integer"},
+                                "description": "List of issue numbers to update",
+                            },
+                            "add_labels": {
+                                "type": "array",
+                                "items": {"type": "string"},
+                                "description": "Labels to add to all issues",
+                            },
+                            "remove_labels": {
+                                "type": "array",
+                                "items": {"type": "string"},
+                                "description": "Labels to remove from all issues",
+                            },
+                            "comment": {
+                                "type": "string",
+                                "description": "Add same comment to all issues",
+                            },
+                            "close": {
+                                "type": "boolean",
+                                "description": "Close all issues",
+                                "default": False,
+                            },
+                            "repo": {
+                                "type": "string",
+                                "description": "Repository in format owner/repo (auto-detected if not provided)",
+                            },
+                        },
+                        "required": ["issue_numbers"],
+                    },
+                },
+                {
+                    "name": "create_pr",
+                    "description": "Create a new Pull Request",
+                    "inputSchema": {
+                        "type": "object",
+                        "properties": {
+                            "title": {
+                                "type": "string",
+                                "description": "PR title (should follow conventional commit format)",
+                            },
+                            "body": {
+                                "type": "string",
+                                "description": "PR description (markdown)",
+                            },
+                            "head": {
+                                "type": "string",
+                                "description": "Source branch (auto-detected from current branch if not provided)",
+                            },
+                            "base": {
+                                "type": "string",
+                                "description": "Target branch",
+                                "default": "main",
+                            },
+                            "draft": {
+                                "type": "boolean",
+                                "description": "Create as draft PR",
+                                "default": False,
+                            },
+                            "closes_issue": {
+                                "type": "integer",
+                                "description": "Issue number to close (adds 'Closes #N' to description)",
+                            },
+                            "repo": {
+                                "type": "string",
+                                "description": "Repository in format owner/repo (auto-detected if not provided)",
+                            },
+                        },
+                        "required": ["title"],
+                    },
+                },
+                {
+                    "name": "merge_pr",
+                    "description": "Merge a Pull Request",
+                    "inputSchema": {
+                        "type": "object",
+                        "properties": {
+                            "pr_number": {
+                                "type": "integer",
+                                "description": "PR number to merge (auto-detected from current branch if not provided)",
+                            },
+                            "merge_method": {
+                                "type": "string",
+                                "enum": ["merge", "squash", "rebase"],
+                                "description": "Merge method",
+                                "default": "squash",
+                            },
+                            "delete_branch": {
+                                "type": "boolean",
+                                "description": "Delete branch after merge",
+                                "default": False,
+                            },
+                            "repo": {
+                                "type": "string",
+                                "description": "Repository in format owner/repo (auto-detected if not provided)",
+                            },
+                        },
+                    },
+                },
+                {
+                    "name": "check_ci",
+                    "description": "Check CI/CD status for a PR or commit",
+                    "inputSchema": {
+                        "type": "object",
+                        "properties": {
+                            "pr_number": {
+                                "type": "integer",
+                                "description": "PR number to check",
+                            },
+                            "commit_sha": {
+                                "type": "string",
+                                "description": "Commit SHA to check (alternative to pr_number)",
+                            },
+                            "repo": {
+                                "type": "string",
+                                "description": "Repository in format owner/repo (auto-detected if not provided)",
+                            },
+                        },
+                    },
+                },
+                {
+                    "name": "list_prs",
+                    "description": "List Pull Requests with filters",
+                    "inputSchema": {
+                        "type": "object",
+                        "properties": {
+                            "state": {
+                                "type": "string",
+                                "enum": ["open", "closed", "all"],
+                                "description": "Filter by PR state",
+                                "default": "open",
+                            },
+                            "sort": {
+                                "type": "string",
+                                "enum": [
+                                    "created",
+                                    "updated",
+                                    "popularity",
+                                    "long-running",
+                                ],
+                                "description": "Sort by field",
+                                "default": "created",
+                            },
+                            "direction": {
+                                "type": "string",
+                                "enum": ["asc", "desc"],
+                                "description": "Sort direction",
+                                "default": "desc",
+                            },
+                            "limit": {
+                                "type": "integer",
+                                "description": "Maximum number of PRs to return",
+                                "default": 20,
+                            },
+                            "repo": {
+                                "type": "string",
+                                "description": "Repository in format owner/repo (auto-detected if not provided)",
+                            },
+                        },
+                    },
+                },
             ]
         }
 
@@ -268,14 +514,34 @@ class MCPServer:
                 "isError": True,
             }
 
-        repo = self.repo if repo_name == self.repo_name else get_repo(repo_name)
+        # Use cached repo
+        repo = self.get_repo_cached(repo_name)
 
         try:
             if name == "list_issues":
-                issues = repo.get_issues(
-                    state=arguments.get("state", "open"),
-                    labels=arguments.get("labels") or [],
-                )
+                # Build query parameters
+                query_params = {
+                    "state": arguments.get("state", "open"),
+                    "sort": arguments.get("sort", "created"),
+                    "direction": arguments.get("direction", "desc"),
+                }
+
+                # Add optional filters
+                if arguments.get("labels"):
+                    query_params["labels"] = arguments["labels"]
+                if arguments.get("milestone"):
+                    query_params["milestone"] = arguments["milestone"]
+                if arguments.get("assignee"):
+                    query_params["assignee"] = arguments["assignee"]
+                if arguments.get("since"):
+                    try:
+                        query_params["since"] = datetime.fromisoformat(
+                            arguments["since"].replace("Z", "+00:00")
+                        )
+                    except ValueError:
+                        pass  # Skip invalid date
+
+                issues = repo.get_issues(**query_params)
                 result = [
                     issue
                     for i, issue in enumerate(issues)
@@ -375,6 +641,291 @@ class MCPServer:
                     "isError": False,
                 }
 
+            elif name == "batch_update_issues":
+                issue_numbers = arguments["issue_numbers"]
+                results = []
+                errors = []
+
+                for issue_num in issue_numbers:
+                    try:
+                        issue = repo.get_issue(issue_num)
+                        changes = []
+
+                        current_labels = [label.name for label in issue.labels]
+
+                        if "add_labels" in arguments:
+                            new_labels = list(
+                                set(current_labels + arguments["add_labels"])
+                            )
+                            issue.set_labels(*new_labels)
+                            changes.append("Added labels")
+
+                        if "remove_labels" in arguments:
+                            new_labels = [
+                                label
+                                for label in current_labels
+                                if label not in arguments["remove_labels"]
+                            ]
+                            issue.set_labels(*new_labels)
+                            changes.append("Removed labels")
+
+                        if arguments.get("close") and issue.state == "open":
+                            issue.edit(state="closed")
+                            changes.append("Closed")
+
+                        if "comment" in arguments:
+                            issue.create_comment(arguments["comment"])
+                            changes.append("Added comment")
+
+                        results.append(
+                            f"✅ #{issue_num}: {', '.join(changes) if changes else 'No changes'}"
+                        )
+                    except Exception as e:
+                        errors.append(f"❌ #{issue_num}: {str(e)}")
+
+                response_text = "📦 Batch update completed\n\n"  # noqa: F541
+                response_text += f"✅ Successful: {len(results)}/{len(issue_numbers)}\n"
+                if errors:
+                    response_text += f"❌ Failed: {len(errors)}/{len(issue_numbers)}\n"
+                response_text += "\n" + "\n".join(results)
+                if errors:
+                    response_text += "\n\nErrors:\n" + "\n".join(errors)
+
+                return {
+                    "content": [{"type": "text", "text": response_text}],
+                    "isError": len(errors) > 0,
+                }
+
+            elif name == "create_pr":
+                # Get head branch
+                head = arguments.get("head")
+                if not head:
+                    # Try to detect from git
+                    try:
+                        result = subprocess.run(
+                            ["git", "branch", "--show-current"],
+                            capture_output=True,
+                            text=True,
+                            check=True,
+                        )
+                        head = result.stdout.strip()
+                    except subprocess.CalledProcessError:
+                        return {
+                            "content": [
+                                {
+                                    "type": "text",
+                                    "text": "❌ Could not detect current branch. Provide 'head' parameter.",
+                                }
+                            ],
+                            "isError": True,
+                        }
+
+                # Build PR body
+                body = arguments.get("body", "")
+                if arguments.get("closes_issue"):
+                    body += f"\n\nCloses #{arguments['closes_issue']}"
+
+                # Create PR
+                pr = repo.create_pull(
+                    title=arguments["title"],
+                    body=body,
+                    head=head,
+                    base=arguments.get("base", "main"),
+                    draft=arguments.get("draft", False),
+                )
+
+                return {
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": f"✅ Pull Request created\n"
+                            f"   Number: #{pr.number}\n"
+                            f"   Title: {pr.title}\n"
+                            f"   From: {head} → {arguments.get('base', 'main')}\n"
+                            f"   URL: {pr.html_url}",
+                        }
+                    ],
+                    "isError": False,
+                }
+
+            elif name == "merge_pr":
+                # Get PR number
+                pr_number = arguments.get("pr_number")
+                if not pr_number:
+                    # Try to detect from current branch
+                    try:
+                        result = subprocess.run(
+                            ["git", "branch", "--show-current"],
+                            capture_output=True,
+                            text=True,
+                            check=True,
+                        )
+                        branch = result.stdout.strip()
+                        owner = repo.full_name.split("/")[0]
+                        pulls = list(
+                            repo.get_pulls(state="open", head=f"{owner}:{branch}")
+                        )
+                        if pulls:
+                            pr_number = pulls[0].number
+                        else:
+                            return {
+                                "content": [
+                                    {
+                                        "type": "text",
+                                        "text": f"❌ No open PR found for branch '{branch}'",
+                                    }
+                                ],
+                                "isError": True,
+                            }
+                    except subprocess.CalledProcessError:
+                        return {
+                            "content": [
+                                {
+                                    "type": "text",
+                                    "text": "❌ Could not detect PR. Provide 'pr_number' parameter.",
+                                }
+                            ],
+                            "isError": True,
+                        }
+
+                pr = repo.get_pull(pr_number)
+
+                # Check if mergeable
+                if not pr.mergeable:
+                    return {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": f"❌ PR #{pr_number} has conflicts and cannot be merged",
+                            }
+                        ],
+                        "isError": True,
+                    }
+
+                # Merge PR
+                merge_method = arguments.get("merge_method", "squash")
+                result = pr.merge(
+                    commit_title=pr.title,
+                    commit_message=pr.body or "",
+                    merge_method=merge_method,
+                )
+
+                response_text = f"✅ PR #{pr_number} merged successfully\n"
+                response_text += f"   Method: {merge_method}\n"
+                response_text += f"   Commit: {result.sha[:7]}\n"
+
+                # Delete branch if requested
+                if arguments.get("delete_branch"):
+                    try:
+                        ref = repo.get_git_ref(f"heads/{pr.head.ref}")
+                        ref.delete()
+                        response_text += f"   Branch '{pr.head.ref}' deleted\n"
+                    except Exception as e:
+                        response_text += f"   ⚠️ Could not delete branch: {e}\n"
+
+                return {
+                    "content": [{"type": "text", "text": response_text}],
+                    "isError": False,
+                }
+
+            elif name == "check_ci":
+                # Get commit SHA
+                if arguments.get("pr_number"):
+                    pr = repo.get_pull(arguments["pr_number"])
+                    commit_sha = pr.head.sha
+                    context = f"PR #{pr.number}"
+                elif arguments.get("commit_sha"):
+                    commit_sha = arguments["commit_sha"]
+                    context = f"Commit {commit_sha[:8]}"
+                else:
+                    return {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "❌ Provide either 'pr_number' or 'commit_sha'",
+                            }
+                        ],
+                        "isError": True,
+                    }
+
+                # Get check runs
+                commit = repo.get_commit(commit_sha)
+                check_runs = list(commit.get_check_runs())
+
+                if not check_runs:
+                    return {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": f"ℹ️ No CI checks found for {context}",
+                            }
+                        ],
+                        "isError": False,
+                    }
+
+                # Analyze checks
+                passing = sum(1 for c in check_runs if c.conclusion == "success")
+                failing = sum(1 for c in check_runs if c.conclusion == "failure")
+                running = sum(
+                    1
+                    for c in check_runs
+                    if c.conclusion is None and c.status != "completed"
+                )
+
+                response_text = f"📊 CI Status for {context}\n\n"
+                response_text += f"✅ Passed: {passing} | ❌ Failed: {failing} | ⏳ Running: {running}\n\n"
+
+                for check in check_runs:
+                    if check.conclusion == "success":
+                        icon = "✅"
+                    elif check.conclusion == "failure":
+                        icon = "❌"
+                    else:
+                        icon = "⏳"
+                    response_text += (
+                        f"{icon} {check.name}: {check.conclusion or 'running'}\n"
+                    )
+
+                return {
+                    "content": [{"type": "text", "text": response_text}],
+                    "isError": failing > 0,
+                }
+
+            elif name == "list_prs":
+                # Get PRs with filters
+                query_params = {
+                    "state": arguments.get("state", "open"),
+                    "sort": arguments.get("sort", "created"),
+                    "direction": arguments.get("direction", "desc"),
+                }
+
+                prs = repo.get_pulls(**query_params)
+                result = [
+                    pr for i, pr in enumerate(prs) if i < arguments.get("limit", 20)
+                ]
+
+                if not result:
+                    return {
+                        "content": [
+                            {"type": "text", "text": "No pull requests found."}
+                        ],
+                        "isError": False,
+                    }
+
+                response_text = f"Found {len(result)} pull request(s):\n\n"
+                for pr in result:
+                    state = "OPEN" if pr.state == "open" else "CLOSED"
+                    response_text += f"#{pr.number} [{state}] {pr.title}\n"
+                    response_text += f"   {pr.head.ref} → {pr.base.ref}\n"
+                    if pr.draft:
+                        response_text += "   🚧 Draft\n"
+                    response_text += f"   {pr.html_url}\n\n"
+
+                return {
+                    "content": [{"type": "text", "text": response_text}],
+                    "isError": False,
+                }
+
             else:
                 return {
                     "content": [{"type": "text", "text": f"Unknown tool: {name}"}],
@@ -383,7 +934,7 @@ class MCPServer:
 
         except GithubException as e:
             return {
-                "content": [{"type": "text", "text": f"❌ GitHub API error: {e}"}],
+                "content": [{"type": "text", "text": self.format_github_error(e)}],
                 "isError": True,
             }
         except Exception as e:
