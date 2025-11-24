@@ -175,7 +175,7 @@
   "tests/cli/test_dev_command.py": "306978d1125dee83fa751178003946d4e3f5ba102324ddfe652c04d28a948173",
   "tests/cli/test_init_command.py": "ecdf955d66c38d0b007a5154bd82db490b750a2d55a003f7ac25a59d68ab0b3f",
   "tests/cli/test_new_command.py": "bdd0ecfc4e1c15a7ae0fadf3b8f255f33fbb55fb2896618fb44e24f8b00728a0",
-  "tests/cli/test_utils.py": "b3efc5cfcbc09dd968ae29bc25ddf502cd201fc5540ea52cea01aae2d69f1648",
+  "tests/cli/test_utils.py": "4cc8bd2190389b3840656cd6e64e4edd5512175b31672aa0234db14368424550",
   "tests/cli/test_validate_command.py": "9c0b9e1f61addb4c4581ed154ee4dff157a1dd4200a70c0aed624bbfbcb7a5a7",
   "tests/conftest.py": "2afb283d33436f533152ea9d5fbbd53efb919249f8a6ff73a75fda0db820c5e7",
   "tests/core/__init__.py": "1a8f3b885f3ea1c3bc9950c83395ab352b7f1bc9cce6f6b3d23d6b9fd40836c1",
