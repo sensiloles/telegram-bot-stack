@@ -333,6 +333,7 @@ def regenerate_bot_framework_graphs(dry_run: bool = False) -> None:
             output_file.parent.mkdir(parents=True, exist_ok=True)
             with open(output_file, "w") as f:
                 json.dump(graph, f, indent=2)
+                f.write("\n")  # POSIX compliant - add trailing newline
             print(f"   ✅ Saved: {output_file.name}")
 
     # Auto-generate router.json from created sub-graphs
@@ -522,6 +523,7 @@ def regenerate_docs_graph(dry_run: bool = False) -> None:
         output_file.parent.mkdir(parents=True, exist_ok=True)
         with open(output_file, "w") as f:
             json.dump(graph, f, indent=2)
+            f.write("\n")  # POSIX compliant - add trailing newline
         print(f"   ✅ Saved: {output_file.name}")
 
 

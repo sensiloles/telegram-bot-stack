@@ -113,6 +113,7 @@ def update_router(dry_run: bool = False) -> None:
     else:
         with open(router_path, "w") as f:
             json.dump(router, f, indent=2, ensure_ascii=False)
+            f.write("\n")
         print("   ✅ Router updated")
 
     print()
@@ -251,6 +252,7 @@ def update_bot_framework_router(dry_run: bool = False) -> None:
     else:
         with open(bf_router_path, "w") as f:
             json.dump(bf_router, f, indent=2, ensure_ascii=False)
+            f.write("\n")
         print("   ✅ Bot-framework router updated")
 
     print()

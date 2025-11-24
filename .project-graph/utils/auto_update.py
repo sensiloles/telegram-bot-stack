@@ -89,6 +89,7 @@ def save_hash_cache(cache: Dict[str, str]) -> None:
     try:
         with open(cache_path, 'w') as f:
             json.dump(cache, f, indent=2)
+            f.write("\n")
     except OSError as e:
         print(f"⚠️  Warning: Could not save hash cache: {e}", file=sys.stderr)
 
@@ -332,6 +333,7 @@ def update_graph_metadata(graph_path: Path) -> None:
     # Save
     with open(graph_path, "w") as f:
         json.dump(graph, f, indent=2)
+        f.write("\n")
 
 
 def find_graph_file(graph_name: str, sub_graph: Optional[str] = None) -> Optional[Path]:
@@ -489,6 +491,7 @@ def update_node_in_graph(graph_path: Path, file_path: str, metadata: Dict) -> bo
             # Save updated graph
             with open(graph_path, 'w') as f:
                 json.dump(graph, f, indent=2)
+                f.write("\n")
             return True
         else:
             return False
@@ -743,6 +746,7 @@ def remove_node_from_graph(graph_path: Path, file_path: str) -> bool:
             # Save
             with open(graph_path, 'w') as f:
                 json.dump(graph, f, indent=2)
+                f.write("\n")
 
             print(f"   🗑️  Removed node for deleted file")
             return True

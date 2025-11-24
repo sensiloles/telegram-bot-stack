@@ -196,6 +196,7 @@ def save_graph(graph: Dict[str, Any], graph_path: Optional[str] = None) -> None:
 
     with open(graph_path, "w", encoding="utf-8") as f:
         json.dump(graph, f, ensure_ascii=False, indent=2)
+        f.write("\n")
 
 
 def find_node(graph: Dict[str, Any], node_id: str) -> Optional[Dict[str, Any]]:
