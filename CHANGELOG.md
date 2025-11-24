@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.13.0 (2025-11-24)
+
+### Features
+
+- **mcp**: Enhance server with PR management and batch operations
+  ([`d5f7e8d`](https://github.com/sensiloles/telegram-bot-stack/commit/d5f7e8d434e78fe31c8783be94cf7a8429a32156))
+
+
 ## Unreleased
 
 ### Features
