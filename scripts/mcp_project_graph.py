@@ -148,11 +148,14 @@ class ProjectGraphMCPServer:
         """
         self._ensure_router()
 
-        # Parse URI
-        if not uri.startswith("graph://"):
-            raise ValueError(f"Invalid URI scheme: {uri}")
+        # Convert URI to string (in case it's AnyUrl from pydantic)
+        uri_str = str(uri)
 
-        path = uri[8:]  # Remove 'graph://'
+        # Parse URI
+        if not uri_str.startswith("graph://"):
+            raise ValueError(f"Invalid URI scheme: {uri_str}")
+
+        path = uri_str[8:]  # Remove 'graph://'
 
         # Handle router
         if path == "router":
