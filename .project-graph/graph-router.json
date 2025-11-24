@@ -1,6 +1,6 @@
 {
   "version": "3.0.0",
-  "generated_at": "2025-11-19",
+  "generated_at": "2025-11-24",
   "description": "Router for selecting appropriate dependency graph based on task type",
   "architecture": "Multi-graph system for efficient AI agent navigation",
   "quick_start": {
@@ -23,22 +23,22 @@
           "name": "Core",
           "description": "BotBase, UserManager, AdminManager",
           "file": "bot-framework/core-graph.json",
-          "lines": 321,
-          "lines_of_code": 864
+          "lines": 129,
+          "lines_of_code": 863
         },
         "storage": {
           "name": "Storage",
           "description": "Storage backends (JSON, Memory, SQL)",
           "file": "bot-framework/storage-graph.json",
-          "lines": 435,
-          "lines_of_code": 617
+          "lines": 162,
+          "lines_of_code": 681
         },
         "utilities": {
           "name": "Utilities",
           "description": "Decorators and helpers",
           "file": "bot-framework/utilities-graph.json",
-          "lines": 85,
-          "lines_of_code": 186
+          "lines": 42,
+          "lines_of_code": 185
         }
       },
       "coverage": {
@@ -132,7 +132,8 @@
       ],
       "complexity": "medium",
       "criticality": "high",
-      "update_frequency": "medium"
+      "update_frequency": "medium",
+      "lines": 759
     },
     "testing": {
       "id": "testing",
@@ -179,7 +180,8 @@
       ],
       "complexity": "medium",
       "criticality": "high",
-      "update_frequency": "high"
+      "update_frequency": "high",
+      "lines": 958
     },
     "examples": {
       "id": "examples",
@@ -219,7 +221,8 @@
       ],
       "complexity": "low",
       "criticality": "medium",
-      "update_frequency": "low"
+      "update_frequency": "low",
+      "lines": 315
     },
     "project-meta": {
       "id": "project_meta",
@@ -260,7 +263,8 @@
       ],
       "complexity": "high",
       "criticality": "high",
-      "update_frequency": "low"
+      "update_frequency": "low",
+      "lines": 493
     },
     "docs": {
       "id": "docs",
@@ -303,7 +307,8 @@
       ],
       "complexity": "low",
       "criticality": "high",
-      "update_frequency": "medium"
+      "update_frequency": "medium",
+      "lines": 116
     },
     "configuration": {
       "id": "configuration",
@@ -352,7 +357,8 @@
       ],
       "complexity": "low",
       "criticality": "critical",
-      "update_frequency": "medium"
+      "update_frequency": "medium",
+      "lines": 378
     },
     "archive": {
       "id": "archive",
@@ -387,7 +393,8 @@
       ],
       "complexity": "low",
       "criticality": "low",
-      "update_frequency": "low"
+      "update_frequency": "low",
+      "lines": 239
     }
   },
   "decision_tree": {
