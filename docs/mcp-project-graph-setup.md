@@ -29,9 +29,26 @@ Add to your Cursor settings (`.cursor/mcp_config.json` or Cursor settings):
     "project-graph": {
       "command": "python3",
       "args": [
-        "/Users/sensiloles/Documents/work/telegram-bot-stack/scripts/mcp_project_graph.py"
+        "/absolute/path/to/telegram-bot-stack/scripts/mcp_project_graph.py"
       ],
       "description": "Project graph navigation for telegram-bot-stack"
+    }
+  }
+}
+```
+
+**Important:** Use absolute path to ensure MCP server starts correctly.
+
+**For this project:**
+```json
+{
+  "mcpServers": {
+    "project-graph": {
+      "command": "python3",
+      "args": [
+        "/Users/sensiloles/Documents/work/telegram-bot-stack/scripts/mcp_project_graph.py"
+      ],
+      "description": "Project graph navigation"
     }
   }
 }

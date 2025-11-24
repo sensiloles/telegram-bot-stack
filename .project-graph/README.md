@@ -232,20 +232,66 @@ python3 utils/examples.py
 
 ### Maintenance
 
-When adding new files:
+#### Automatic Graph Generation
+
+Generate graphs automatically from codebase:
+
+```bash
+# Generate all graphs
+python3 utils/generate_graphs.py
+
+# Generate specific graph
+python3 utils/generate_graphs.py --graph infrastructure
+
+# Preview without saving
+python3 utils/generate_graphs.py --dry-run
+```
+
+**Auto-generated graphs:**
+- `infrastructure` - CI/CD, scripts (51 nodes)
+- `testing` - Test suite (15 nodes)
+- `examples` - Example bots (10 nodes)
+
+**Manual graphs** (for quality control):
+- `bot-framework` - Core framework
+- `docs`, `configuration`, `archive`
+
+#### Auto-Update on Commit
+
+Pre-commit hook automatically updates graphs:
+
+```bash
+git add telegram_bot_stack/storage/redis.py
+git commit -m "feat(storage): add Redis backend"
+# → Hook updates bot-framework/storage-graph.json automatically
+```
+
+#### Manual Updates
+
+When adding files to manual graphs:
 
 1. Identify affected graph (use decision tree)
 2. Update graph JSON (add nodes/edges)
-3. Update router statistics if significant
+3. Update metadata (node_count, edge_count)
 4. Validate: `python3 utils/graph_utils.py`
 
 **Example:** Adding `telegram_bot_stack/cache.py`
 
 - Update: `bot-framework/utilities-graph.json`
 - Add node for cache module
-- Update metadata (node_count, edge_count)
+- Update metadata
 
 ## 📦 Version History
+
+**v3.2.0 (2025-11-24)** - Automatic Generation & MCP Fixes
+
+- ✅ Auto-generate graphs from codebase (`generate_graphs.py`)
+- ✅ Generated infrastructure graph (51 nodes)
+- ✅ Generated testing graph (15 nodes)
+- ✅ Generated examples graph (10 nodes)
+- ✅ Fixed MCP server bugs (list_sub_graphs, recommend_graph, analyze_impact)
+- ✅ Added find_node_by_path for file path lookups
+- ✅ Pre-commit hook auto-updates graphs
 
 **v3.1.0 (2025-11-19)** - Complete Coverage
 
@@ -263,11 +309,11 @@ When adding new files:
 
 ## 🔮 Roadmap
 
-**v3.2** - Enhanced Navigation
+**v3.3** - Enhanced Navigation
 
 - Interactive CLI for exploration
 - VS Code extension
-- Auto-update graphs on file changes
+- ✅ ~~Auto-update graphs on file changes~~ (Completed in v3.2)
 
 **v3.3** - Visualization
 

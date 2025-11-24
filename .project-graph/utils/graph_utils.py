@@ -119,14 +119,14 @@ def get_recommended_graph(router: Dict[str, Any], task_description: str) -> str:
 
         if score > best_score:
             best_score = score
-            best_match = graph_info["file"]
+            best_match = graph_info["id"]
 
     # If we found a match, return it
     if best_match and best_score >= 2:  # At least 2 matching words
         return best_match
 
     # Default to project meta for overview
-    return "project-meta-graph.json"
+    return "project_meta"
 
 
 def list_available_graphs() -> None:
@@ -210,6 +210,24 @@ def find_node(graph: Dict[str, Any], node_id: str) -> Optional[Dict[str, Any]]:
     """
     for node in graph["nodes"]:
         if node["id"] == node_id:
+            return node
+    return None
+
+
+def find_node_by_path(
+    graph: Dict[str, Any], file_path: str
+) -> Optional[Dict[str, Any]]:
+    """Find a node by its file path.
+
+    Args:
+        graph: Dependency graph
+        file_path: File path to search for (e.g., 'telegram_bot_stack/storage/base.py')
+
+    Returns:
+        Node dictionary if found, None otherwise
+    """
+    for node in graph["nodes"]:
+        if node.get("path") == file_path:
             return node
     return None
 

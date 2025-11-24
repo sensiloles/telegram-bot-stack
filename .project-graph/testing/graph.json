@@ -1,662 +1,958 @@
 {
   "metadata": {
-    "version": "2.1.0",
-    "generated_at": "2025-11-18",
+    "version": "3.0.0",
+    "generated_at": "2025-11-24",
     "graph_id": "testing",
     "graph_name": "Testing Infrastructure",
-    "graph_type": "specialized",
+    "graph_type": "domain",
     "project_name": "telegram-bot-stack",
-    "description": "Test structure, patterns, fixtures, and coverage for telegram-bot-stack",
-    "scope": "All test files and testing infrastructure",
-    "router_file": "graph-router.json",
-    "related_graphs": [
-      "bot-framework-graph.json - for code being tested",
-      "infrastructure-graph.json - for CI/CD test automation",
-      "examples-graph.json - for example bot tests"
-    ]
+    "description": "Test suite, fixtures, and testing utilities",
+    "scope": "Unit tests, integration tests, fixtures",
+    "node_count": 15,
+    "edge_count": 28
   },
-  "statistics": {
-    "total_tests": 254,
-    "total_test_files": 13,
-    "coverage_percentage": 84.5,
-    "coverage_threshold": 79,
-    "lines_of_test_code": 2100,
-    "test_frameworks": [
-      "pytest",
-      "pytest-asyncio",
-      "pytest-cov",
-      "pytest-mock"
-    ]
-  },
-  "test_structure": {
-    "tests/": {
-      "description": "Root test directory",
-      "subdirectories": {
-        "core/": {
-          "description": "Unit tests for core framework modules",
-          "test_files": 6,
-          "total_tests": 174,
-          "coverage": "High - detailed unit tests",
-          "focus": "Individual module testing in isolation"
-        },
-        "integration/": {
-          "description": "Integration tests for complete workflows",
-          "test_files": 1,
-          "total_tests": 9,
-          "coverage": "End-to-end scenarios",
-          "focus": "Cross-module interactions and real workflows"
-        },
-        "examples/": {
-          "description": "Tests for example bot implementations",
-          "test_files": 7,
-          "total_tests": 71,
-          "coverage": "Example bot validation and integration",
-          "focus": "Verify example bots work correctly with framework",
-          "test_pattern": "Import validation, initialization, handler registration, storage integration"
-        }
-      },
-      "configuration": {
-        "conftest.py": {
-          "path": "tests/conftest.py",
-          "description": "Shared test fixtures and configuration",
-          "lines": 111,
-          "fixtures": [
-            "memory_storage",
-            "json_storage",
-            "temp_dir",
-            "mock_update",
-            "mock_context",
-            "bot_instance"
-          ],
-          "purpose": "Provide reusable test fixtures for all tests"
-        }
-      }
-    }
-  },
-  "test_files": {
-    "tests/core/test_storage.py": {
-      "path": "tests/core/test_storage.py",
-      "description": "Tests for storage backends and abstraction layer",
-      "lines": 537,
-      "test_count": 47,
-      "test_classes": [
-        "TestStorageBackend",
-        "TestMemoryStorage",
-        "TestJSONStorage",
-        "TestStorageFactory"
+  "nodes": [
+    {
+      "id": "tests.conftest",
+      "name": "conftest",
+      "type": "test_module",
+      "path": "tests/conftest.py",
+      "description": "Pytest configuration and shared fixtures.",
+      "lines_of_code": 111,
+      "exports": [
+        "event_loop",
+        "temp_storage",
+        "user_manager",
+        "admin_manager",
+        "mock_telegram_update",
+        "mock_telegram_context",
+        "sample_user_data",
+        "sample_admin_data"
       ],
-      "coverage_target": "telegram_bot_stack/storage/",
-      "modules_tested": [
-        "storage/base.py - StorageBackend interface",
-        "storage/memory.py - MemoryStorage implementation",
-        "storage/json.py - JSONStorage implementation",
-        "storage/__init__.py - Factory function"
-      ],
-      "key_scenarios": [
-        "Save and load operations",
-        "Exists and delete operations",
-        "Error handling (invalid data, missing keys)",
-        "Edge cases (empty strings, None values)",
-        "File system operations (JSON)",
-        "Memory isolation (Memory)",
-        "Factory function with different backends",
-        "Concurrent access patterns"
-      ],
-      "fixtures_used": [
-        "memory_storage",
+      "classes": [],
+      "functions": [
+        "event_loop",
+        "temp_storage",
+        "user_manager",
+        "admin_manager",
+        "mock_telegram_update",
+        "mock_telegram_context",
+        "sample_user_data",
+        "sample_admin_data"
+      ]
+    },
+    {
+      "id": "tests.core.test_sql_storage",
+      "name": "test_sql_storage",
+      "type": "test_module",
+      "path": "tests/core/test_sql_storage.py",
+      "description": "Tests for SQL storage backend.",
+      "lines_of_code": 451,
+      "exports": [
+        "TestSQLiteStorage",
+        "TestSQLiteStorageFile",
+        "TestSQLStorageFactory",
+        "TestSQLStorageCompatibility",
+        "TestSQLStorageEdgeCases",
+        "TestSQLStorageConfiguration",
+        "CustomObject",
+        "storage",
+        "test_initialization",
+        "test_save_and_load",
+        "test_save_overwrites_existing",
+        "test_load_nonexistent_key",
+        "test_exists",
+        "test_delete",
+        "test_save_complex_data",
+        "test_save_list_data",
+        "test_save_unicode_data",
+        "test_multiple_keys",
+        "test_empty_data",
+        "test_boolean_and_none_values",
+        "test_numeric_values",
+        "test_save_invalid_json",
+        "storage",
+        "test_persistence",
+        "test_create_sqlite_storage",
+        "test_create_sqlite_default_url",
+        "test_create_postgres_without_url_raises",
+        "test_sql_alias",
+        "sql_storage",
         "json_storage",
-        "temp_dir"
+        "memory_storage",
+        "test_same_interface_as_json",
+        "test_same_interface_as_memory",
+        "test_default_behavior_matches",
+        "storage",
+        "test_very_long_key",
+        "test_special_characters_in_key",
+        "test_large_data",
+        "test_concurrent_operations",
+        "test_close_and_reopen",
+        "test_echo_mode",
+        "test_pool_configuration",
+        "test_invalid_database_url"
       ],
-      "criticality": "high",
-      "complexity": "medium"
+      "classes": [
+        "TestSQLiteStorage",
+        "TestSQLiteStorageFile",
+        "TestSQLStorageFactory",
+        "TestSQLStorageCompatibility",
+        "TestSQLStorageEdgeCases",
+        "TestSQLStorageConfiguration",
+        "CustomObject"
+      ],
+      "functions": [
+        "storage",
+        "test_initialization",
+        "test_save_and_load",
+        "test_save_overwrites_existing",
+        "test_load_nonexistent_key",
+        "test_exists",
+        "test_delete",
+        "test_save_complex_data",
+        "test_save_list_data",
+        "test_save_unicode_data",
+        "test_multiple_keys",
+        "test_empty_data",
+        "test_boolean_and_none_values",
+        "test_numeric_values",
+        "test_save_invalid_json",
+        "storage",
+        "test_persistence",
+        "test_create_sqlite_storage",
+        "test_create_sqlite_default_url",
+        "test_create_postgres_without_url_raises",
+        "test_sql_alias",
+        "sql_storage",
+        "json_storage",
+        "memory_storage",
+        "test_same_interface_as_json",
+        "test_same_interface_as_memory",
+        "test_default_behavior_matches",
+        "storage",
+        "test_very_long_key",
+        "test_special_characters_in_key",
+        "test_large_data",
+        "test_concurrent_operations",
+        "test_close_and_reopen",
+        "test_echo_mode",
+        "test_pool_configuration",
+        "test_invalid_database_url"
+      ]
     },
-    "tests/core/test_bot_base.py": {
-      "path": "tests/core/test_bot_base.py",
-      "description": "Tests for BotBase class and command handlers",
-      "lines": 401,
-      "test_count": 35,
-      "test_classes": [
-        "TestBotBase",
-        "TestCommandHandlers",
-        "TestAdminCommands",
-        "TestHooks"
+    {
+      "id": "tests.core.test_decorators",
+      "name": "test_decorators",
+      "type": "test_module",
+      "path": "tests/core/test_decorators.py",
+      "description": "Tests for rate limiting decorators.",
+      "lines_of_code": 423,
+      "exports": [
+        "RateLimitedBot",
+        "TestRateLimit",
+        "TestRateLimitEdgeCases",
+        "MinimalBot",
+        "MinimalBot",
+        "EdgeBot",
+        "ShortBot",
+        "LongBot",
+        "storage",
+        "bot",
+        "user",
+        "admin_user",
+        "update",
+        "context",
+        "failing_save"
       ],
-      "coverage_target": "telegram_bot_stack/bot_base.py",
-      "modules_tested": [
-        "bot_base.py - BotBase class and all command handlers"
+      "classes": [
+        "RateLimitedBot",
+        "TestRateLimit",
+        "TestRateLimitEdgeCases",
+        "MinimalBot",
+        "MinimalBot",
+        "EdgeBot",
+        "ShortBot",
+        "LongBot"
       ],
-      "key_scenarios": [
-        "Bot initialization",
-        "/start command - user registration",
-        "/start command - first user becomes admin",
-        "/my_id command",
-        "/list_users command (admin only)",
-        "/list_admins command (admin only)",
-        "/add_admin command with validation",
-        "/remove_admin command with protection",
-        "/decline_admin command",
-        "Hook execution (on_user_registered, get_welcome_message)",
-        "Permission checks for admin commands",
-        "Callback query handling",
-        "Command registration",
-        "Shutdown handling"
-      ],
-      "fixtures_used": [
-        "bot_instance",
-        "mock_update",
-        "mock_context",
-        "memory_storage"
-      ],
-      "async_tests": true,
-      "criticality": "critical",
-      "complexity": "high"
+      "functions": [
+        "storage",
+        "bot",
+        "user",
+        "admin_user",
+        "update",
+        "context",
+        "failing_save"
+      ]
     },
-    "tests/core/test_user_manager.py": {
-      "path": "tests/core/test_user_manager.py",
-      "description": "Tests for UserManager functionality",
-      "lines": 228,
-      "test_count": 15,
-      "test_classes": [
-        "TestUserManager"
-      ],
-      "coverage_target": "telegram_bot_stack/user_manager.py",
-      "modules_tested": [
-        "user_manager.py - UserManager class"
-      ],
-      "key_scenarios": [
-        "Add user (new and duplicate)",
-        "Remove user (existing and non-existing)",
-        "Check user existence",
-        "Get all users",
-        "Get user count",
-        "User persistence through storage",
-        "Empty user list handling"
-      ],
-      "fixtures_used": [
-        "memory_storage"
-      ],
-      "criticality": "high",
-      "complexity": "low"
-    },
-    "tests/core/test_admin_manager.py": {
+    {
+      "id": "tests.core.test_admin_manager",
+      "name": "test_admin_manager",
+      "type": "test_module",
       "path": "tests/core/test_admin_manager.py",
-      "description": "Tests for AdminManager functionality",
-      "lines": 284,
-      "test_count": 18,
-      "test_classes": [
+      "description": "Tests for AdminManager class.",
+      "lines_of_code": 284,
+      "exports": [
+        "TestAdminManager",
+        "test_init_loads_existing_admins",
+        "test_init_empty_storage",
+        "test_add_new_admin",
+        "test_add_duplicate_admin",
+        "test_add_multiple_admins",
+        "test_remove_admin_with_multiple_admins",
+        "test_cannot_remove_last_admin",
+        "test_remove_nonexistent_admin",
+        "test_is_admin",
+        "test_get_all_admins_returns_copy",
+        "test_get_all_admins_immutable",
+        "test_get_admin_count_empty",
+        "test_get_admin_count_with_admins",
+        "test_has_admins_false_when_empty",
+        "test_has_admins_true_when_present",
+        "test_persistence_across_instances",
+        "test_save_admins_creates_entry",
+        "test_add_admin_saves_automatically",
+        "test_remove_admin_saves_automatically",
+        "test_remove_second_to_last_admin",
+        "test_add_remove_add_same_admin",
+        "test_custom_storage_key",
+        "test_admin_ids_as_integers",
+        "test_zero_admin_id",
+        "test_negative_admin_id",
+        "test_very_large_admin_id",
+        "test_multiple_attempts_to_remove_last_admin",
+        "test_remove_from_empty_list",
+        "test_large_admin_count"
+      ],
+      "classes": [
         "TestAdminManager"
       ],
-      "coverage_target": "telegram_bot_stack/admin_manager.py",
-      "modules_tested": [
-        "admin_manager.py - AdminManager class"
-      ],
-      "key_scenarios": [
-        "Add admin (new and duplicate)",
-        "Remove admin (with last admin protection)",
-        "Check admin status",
-        "Get all admins",
-        "Get admin count",
-        "Check if has admins",
-        "Admin persistence through storage",
-        "Last admin protection (cannot remove)",
-        "Empty admin list handling",
-        "First user initialization"
-      ],
-      "fixtures_used": [
-        "memory_storage"
-      ],
-      "criticality": "high",
-      "complexity": "medium"
+      "functions": [
+        "test_init_loads_existing_admins",
+        "test_init_empty_storage",
+        "test_add_new_admin",
+        "test_add_duplicate_admin",
+        "test_add_multiple_admins",
+        "test_remove_admin_with_multiple_admins",
+        "test_cannot_remove_last_admin",
+        "test_remove_nonexistent_admin",
+        "test_is_admin",
+        "test_get_all_admins_returns_copy",
+        "test_get_all_admins_immutable",
+        "test_get_admin_count_empty",
+        "test_get_admin_count_with_admins",
+        "test_has_admins_false_when_empty",
+        "test_has_admins_true_when_present",
+        "test_persistence_across_instances",
+        "test_save_admins_creates_entry",
+        "test_add_admin_saves_automatically",
+        "test_remove_admin_saves_automatically",
+        "test_remove_second_to_last_admin",
+        "test_add_remove_add_same_admin",
+        "test_custom_storage_key",
+        "test_admin_ids_as_integers",
+        "test_zero_admin_id",
+        "test_negative_admin_id",
+        "test_very_large_admin_id",
+        "test_multiple_attempts_to_remove_last_admin",
+        "test_remove_from_empty_list",
+        "test_large_admin_count"
+      ]
     },
-    "tests/integration/test_full_flow.py": {
+    {
+      "id": "tests.core.test_storage",
+      "name": "test_storage",
+      "type": "test_module",
+      "path": "tests/core/test_storage.py",
+      "description": "Tests for Storage abstraction layer.",
+      "lines_of_code": 537,
+      "exports": [
+        "TestStorage",
+        "TestStorageFactory",
+        "TestMemoryStorageBackend",
+        "TestJSONStorageBackend",
+        "TestStorageBackendInterface",
+        "test_init_creates_directory",
+        "test_save_creates_file",
+        "test_save_and_load",
+        "test_save_overwrites_existing",
+        "test_load_nonexistent_returns_default",
+        "test_load_with_custom_default",
+        "test_exists_returns_true_for_existing",
+        "test_exists_returns_false_for_missing",
+        "test_delete_existing_file",
+        "test_delete_nonexistent_file",
+        "test_get_filepath_adds_json_extension",
+        "test_get_filepath_preserves_json_extension",
+        "test_save_complex_data_types",
+        "test_save_unicode_data",
+        "test_save_empty_dict",
+        "test_save_empty_list",
+        "test_multiple_keys_in_same_storage",
+        "test_filepath_in_base_dir",
+        "test_json_formatting",
+        "test_persistence_across_instances",
+        "test_concurrent_keys_dont_interfere",
+        "test_save_with_permission_error",
+        "test_load_with_json_decode_error",
+        "test_delete_with_permission_error",
+        "test_create_json_storage",
+        "test_create_json_storage_case_insensitive",
+        "test_create_memory_storage",
+        "test_create_memory_storage_case_insensitive",
+        "test_create_storage_default_is_json",
+        "test_create_storage_invalid_backend",
+        "test_create_storage_invalid_backend_message",
+        "test_memory_storage_ignores_kwargs",
+        "test_memory_storage_implements_backend_interface",
+        "test_memory_storage_isolated_instances",
+        "test_memory_storage_no_persistence",
+        "test_memory_storage_all_operations",
+        "test_memory_storage_clear",
+        "test_memory_storage_save_error_handling",
+        "test_memory_storage_load_error_handling",
+        "test_json_storage_implements_backend_interface",
+        "test_json_storage_persistence",
+        "test_json_storage_all_operations",
+        "backends",
+        "test_all_backends_implement_save",
+        "test_all_backends_implement_load",
+        "test_all_backends_implement_exists",
+        "test_all_backends_implement_delete",
+        "test_all_backends_consistent_behavior",
+        "mock_open",
+        "mock_unlink",
+        "mock_deepcopy",
+        "mock_deepcopy"
+      ],
+      "classes": [
+        "TestStorage",
+        "TestStorageFactory",
+        "TestMemoryStorageBackend",
+        "TestJSONStorageBackend",
+        "TestStorageBackendInterface"
+      ],
+      "functions": [
+        "test_init_creates_directory",
+        "test_save_creates_file",
+        "test_save_and_load",
+        "test_save_overwrites_existing",
+        "test_load_nonexistent_returns_default",
+        "test_load_with_custom_default",
+        "test_exists_returns_true_for_existing",
+        "test_exists_returns_false_for_missing",
+        "test_delete_existing_file",
+        "test_delete_nonexistent_file",
+        "test_get_filepath_adds_json_extension",
+        "test_get_filepath_preserves_json_extension",
+        "test_save_complex_data_types",
+        "test_save_unicode_data",
+        "test_save_empty_dict",
+        "test_save_empty_list",
+        "test_multiple_keys_in_same_storage",
+        "test_filepath_in_base_dir",
+        "test_json_formatting",
+        "test_persistence_across_instances",
+        "test_concurrent_keys_dont_interfere",
+        "test_save_with_permission_error",
+        "test_load_with_json_decode_error",
+        "test_delete_with_permission_error",
+        "test_create_json_storage",
+        "test_create_json_storage_case_insensitive",
+        "test_create_memory_storage",
+        "test_create_memory_storage_case_insensitive",
+        "test_create_storage_default_is_json",
+        "test_create_storage_invalid_backend",
+        "test_create_storage_invalid_backend_message",
+        "test_memory_storage_ignores_kwargs",
+        "test_memory_storage_implements_backend_interface",
+        "test_memory_storage_isolated_instances",
+        "test_memory_storage_no_persistence",
+        "test_memory_storage_all_operations",
+        "test_memory_storage_clear",
+        "test_memory_storage_save_error_handling",
+        "test_memory_storage_load_error_handling",
+        "test_json_storage_implements_backend_interface",
+        "test_json_storage_persistence",
+        "test_json_storage_all_operations",
+        "backends",
+        "test_all_backends_implement_save",
+        "test_all_backends_implement_load",
+        "test_all_backends_implement_exists",
+        "test_all_backends_implement_delete",
+        "test_all_backends_consistent_behavior",
+        "mock_open",
+        "mock_unlink",
+        "mock_deepcopy",
+        "mock_deepcopy"
+      ]
+    },
+    {
+      "id": "tests.core.test_user_manager",
+      "name": "test_user_manager",
+      "type": "test_module",
+      "path": "tests/core/test_user_manager.py",
+      "description": "Tests for UserManager class.",
+      "lines_of_code": 228,
+      "exports": [
+        "TestUserManager",
+        "test_init_loads_existing_users",
+        "test_init_empty_storage",
+        "test_add_new_user",
+        "test_add_duplicate_user",
+        "test_add_multiple_users",
+        "test_remove_existing_user",
+        "test_remove_nonexistent_user",
+        "test_user_exists",
+        "test_get_all_users_returns_copy",
+        "test_get_all_users_immutable",
+        "test_get_user_count_empty",
+        "test_get_user_count_with_users",
+        "test_persistence_across_instances",
+        "test_save_users_creates_entry",
+        "test_add_user_saves_automatically",
+        "test_remove_user_saves_automatically",
+        "test_large_user_count",
+        "test_remove_from_empty_list",
+        "test_add_remove_add_same_user",
+        "test_custom_storage_key",
+        "test_user_ids_as_integers",
+        "test_zero_user_id",
+        "test_negative_user_id",
+        "test_very_large_user_id"
+      ],
+      "classes": [
+        "TestUserManager"
+      ],
+      "functions": [
+        "test_init_loads_existing_users",
+        "test_init_empty_storage",
+        "test_add_new_user",
+        "test_add_duplicate_user",
+        "test_add_multiple_users",
+        "test_remove_existing_user",
+        "test_remove_nonexistent_user",
+        "test_user_exists",
+        "test_get_all_users_returns_copy",
+        "test_get_all_users_immutable",
+        "test_get_user_count_empty",
+        "test_get_user_count_with_users",
+        "test_persistence_across_instances",
+        "test_save_users_creates_entry",
+        "test_add_user_saves_automatically",
+        "test_remove_user_saves_automatically",
+        "test_large_user_count",
+        "test_remove_from_empty_list",
+        "test_add_remove_add_same_user",
+        "test_custom_storage_key",
+        "test_user_ids_as_integers",
+        "test_zero_user_id",
+        "test_negative_user_id",
+        "test_very_large_user_id"
+      ]
+    },
+    {
+      "id": "tests.core.test_bot_base",
+      "name": "test_bot_base",
+      "type": "test_module",
+      "path": "tests/core/test_bot_base.py",
+      "description": "Tests for BotBase class.",
+      "lines_of_code": 416,
+      "exports": [
+        "TestBotBase",
+        "bot_config",
+        "test_bot",
+        "test_initialization",
+        "test_default_commands",
+        "test_get_welcome_message_hook",
+        "test_register_handlers",
+        "test_user_commands_list",
+        "test_admin_commands_list",
+        "test_admin_commands_include_user_commands"
+      ],
+      "classes": [
+        "TestBotBase"
+      ],
+      "functions": [
+        "bot_config",
+        "test_bot",
+        "test_initialization",
+        "test_default_commands",
+        "test_get_welcome_message_hook",
+        "test_register_handlers",
+        "test_user_commands_list",
+        "test_admin_commands_list",
+        "test_admin_commands_include_user_commands"
+      ]
+    },
+    {
+      "id": "tests.integration.test_full_flow",
+      "name": "test_full_flow",
+      "type": "test_module",
       "path": "tests/integration/test_full_flow.py",
-      "description": "End-to-end integration tests for complete bot workflows",
-      "lines": 312,
-      "test_count": 9,
-      "test_classes": [
-        "TestBotLifecycle",
-        "TestUserWorkflow",
-        "TestAdminWorkflow"
+      "description": "Integration tests for complete user flows.",
+      "lines_of_code": 258,
+      "exports": [
+        "TestFullUserFlow"
       ],
-      "coverage_target": "Multiple modules working together",
-      "modules_tested": [
-        "bot_base.py + user_manager.py + admin_manager.py",
-        "bot_base.py + storage (JSON and Memory)",
-        "Complete command workflows"
+      "classes": [
+        "TestFullUserFlow"
       ],
-      "key_scenarios": [
-        "Complete bot lifecycle (init → commands → shutdown)",
-        "User registration and management flow",
-        "Admin management workflow",
-        "First user becomes admin scenario",
-        "Admin cannot remove last admin",
-        "Data persistence across restarts",
-        "Multiple storage backend compatibility",
-        "Command execution in sequence"
-      ],
-      "fixtures_used": [
-        "bot_instance",
-        "json_storage",
-        "memory_storage",
-        "temp_dir"
-      ],
-      "async_tests": true,
-      "criticality": "critical",
-      "complexity": "high"
+      "functions": []
     },
-    "tests/examples/test_counter_bot.py": {
-      "path": "tests/examples/test_counter_bot.py",
-      "description": "Tests for Counter Bot example",
-      "test_count": 7,
-      "coverage_target": "examples/counter_bot/",
-      "key_scenarios": [
-        "Module import validation",
-        "Class existence and structure",
-        "Bot initialization with JSONStorage",
-        "Required BotBase attributes present",
-        "Handler registration method exists",
-        "Storage functionality works"
-      ],
-      "criticality": "medium",
-      "complexity": "low"
-    },
-    "tests/examples/test_echo_bot.py": {
-      "path": "tests/examples/test_echo_bot.py",
-      "description": "Tests for Echo Bot example",
-      "test_count": 7,
-      "coverage_target": "examples/echo_bot/",
-      "key_scenarios": [
-        "Module import validation",
-        "Class existence and structure",
-        "Bot initialization with MemoryStorage",
-        "Required BotBase attributes present",
-        "Handler registration method exists",
-        "Welcome message customization"
-      ],
-      "criticality": "medium",
-      "complexity": "low"
-    },
-    "tests/examples/test_menu_bot.py": {
-      "path": "tests/examples/test_menu_bot.py",
-      "description": "Tests for Menu Bot example",
-      "test_count": 7,
-      "coverage_target": "examples/menu_bot/",
-      "key_scenarios": [
-        "Module import validation",
-        "Class existence and structure",
-        "Bot initialization with JSONStorage",
-        "Required BotBase attributes present",
-        "Handler registration method exists",
-        "Storage keys for items and cart"
-      ],
-      "criticality": "medium",
-      "complexity": "low"
-    },
-    "tests/examples/test_poll_bot.py": {
-      "path": "tests/examples/test_poll_bot.py",
-      "description": "Tests for Poll Bot example",
-      "test_count": 9,
-      "coverage_target": "examples/poll_bot/",
-      "key_scenarios": [
-        "Module import validation",
-        "Class existence and structure",
-        "Bot initialization with SQLStorage",
-        "Required BotBase attributes present",
-        "Handler registration method exists",
-        "Storage keys for polls",
-        "Poll-specific methods exist"
-      ],
-      "criticality": "medium",
-      "complexity": "medium"
-    },
-    "tests/examples/test_quit_smoking_bot.py": {
-      "path": "tests/examples/test_quit_smoking_bot.py",
-      "description": "Tests for Quit Smoking Bot example",
-      "test_count": 17,
-      "coverage_target": "examples/quit_smoking_bot/",
-      "key_scenarios": [
-        "Module import validation",
-        "Class existence and structure",
-        "Bot initialization with JSONStorage",
-        "Required BotBase attributes present",
-        "Handler registration method exists",
-        "Custom managers (StatusManager, QuotesManager)",
-        "Status tracking methods",
-        "Welcome message override",
-        "User status retrieval",
-        "Manager initialization"
-      ],
-      "criticality": "medium",
-      "complexity": "high"
-    },
-    "tests/examples/test_reminder_bot.py": {
+    {
+      "id": "tests.examples.test_reminder_bot",
+      "name": "test_reminder_bot",
+      "type": "test_module",
       "path": "tests/examples/test_reminder_bot.py",
-      "description": "Tests for Reminder Bot example",
-      "test_count": 7,
-      "coverage_target": "examples/reminder_bot/",
-      "key_scenarios": [
-        "Module import validation",
-        "Class existence and structure",
-        "Bot initialization with JSONStorage",
-        "Required BotBase attributes present",
-        "Handler registration method exists",
-        "Storage key for reminders",
-        "Storage functionality works"
-      ],
-      "criticality": "medium",
-      "complexity": "low"
-    },
-    "tests/examples/test_examples.py": {
-      "path": "tests/examples/test_examples.py",
-      "description": "Integration tests for all example bots",
-      "test_count": 17,
-      "coverage_target": "examples/*/bot.py",
-      "key_scenarios": [
-        "All bots use new BotBase API (no token in __init__)",
-        "All bots have main() function",
-        "All bots use post_init_wrapper for async setup",
-        "Unified BOT_TOKEN environment variable",
-        "Graceful shutdown signal handlers"
-      ],
-      "criticality": "high",
-      "complexity": "medium"
-    }
-  },
-  "test_fixtures": {
-    "memory_storage": {
-      "defined_in": "tests/conftest.py",
-      "type": "MemoryStorage",
-      "scope": "function",
-      "description": "Provides clean MemoryStorage instance for each test",
-      "use_case": "Fast unit tests without file I/O",
-      "cleanup": "Automatic (new instance per test)"
-    },
-    "json_storage": {
-      "defined_in": "tests/conftest.py",
-      "type": "JSONStorage",
-      "scope": "function",
-      "description": "Provides JSONStorage with temporary directory",
-      "use_case": "Testing file-based persistence",
-      "cleanup": "Temporary directory auto-deleted",
-      "depends_on": [
-        "temp_dir"
-      ]
-    },
-    "temp_dir": {
-      "defined_in": "tests/conftest.py",
-      "type": "Path",
-      "scope": "function",
-      "description": "Temporary directory for file-based tests",
-      "use_case": "Testing file operations",
-      "cleanup": "Auto-deleted after test"
-    },
-    "mock_update": {
-      "defined_in": "tests/conftest.py",
-      "type": "Mock",
-      "scope": "function",
-      "description": "Mock Telegram Update object",
-      "use_case": "Testing command handlers without Telegram API",
-      "attributes": [
-        "effective_user.id",
-        "effective_user.first_name",
-        "message"
-      ]
-    },
-    "mock_context": {
-      "defined_in": "tests/conftest.py",
-      "type": "Mock",
-      "scope": "function",
-      "description": "Mock Telegram Context object",
-      "use_case": "Testing command handlers without Telegram API",
-      "attributes": [
-        "args",
-        "bot"
-      ]
-    },
-    "bot_instance": {
-      "defined_in": "tests/conftest.py",
-      "type": "BotBase",
-      "scope": "function",
-      "description": "Initialized BotBase instance with MemoryStorage",
-      "use_case": "Testing bot functionality",
-      "cleanup": "New instance per test"
-    }
-  },
-  "testing_patterns": {
-    "unit_tests": {
-      "location": "tests/core/",
-      "pattern": "Test individual modules in isolation",
-      "fixtures": [
-        "memory_storage",
-        "json_storage"
-      ],
-      "focus": "Single module functionality",
-      "mocking": "Minimal - test actual implementations",
-      "speed": "Fast (no Telegram API calls)"
-    },
-    "integration_tests": {
-      "location": "tests/integration/",
-      "pattern": "Test multiple modules working together",
-      "fixtures": [
+      "description": "Tests for Reminder Bot example.",
+      "lines_of_code": 76,
+      "exports": [
+        "TestReminderBot",
+        "bot_module",
+        "bot_class",
         "bot_instance",
-        "json_storage",
-        "temp_dir"
+        "test_module_import",
+        "test_class_exists",
+        "test_initialization",
+        "test_has_required_attributes",
+        "test_has_register_handlers",
+        "test_has_storage_key",
+        "test_storage_works"
       ],
-      "focus": "Cross-module interactions",
-      "mocking": "Telegram API only",
-      "speed": "Moderate (includes file I/O)"
-    },
-    "async_testing": {
-      "framework": "pytest-asyncio",
-      "decorator": "@pytest.mark.asyncio",
-      "used_in": [
-        "test_bot_base.py",
-        "test_full_flow.py"
+      "classes": [
+        "TestReminderBot"
       ],
-      "pattern": "async def test_* for async functions"
-    },
-    "parametrized_tests": {
-      "framework": "@pytest.mark.parametrize",
-      "usage": "Test multiple scenarios with same logic",
-      "example": "test_storage.py - multiple backends"
-    }
-  },
-  "coverage": {
-    "overall": {
-      "target": 79,
-      "current": 80,
-      "status": "✅ Above threshold"
-    },
-    "by_module": {
-      "bot_base.py": {
-        "coverage": 87,
-        "lines": 562,
-        "missing": "Error handling edge cases",
-        "status": "High"
-      },
-      "storage/base.py": {
-        "coverage": 100,
-        "lines": 62,
-        "missing": "None",
-        "status": "Complete"
-      },
-      "storage/json.py": {
-        "coverage": 95,
-        "lines": 124,
-        "missing": "Some error recovery paths",
-        "status": "Excellent"
-      },
-      "storage/memory.py": {
-        "coverage": 98,
-        "lines": 110,
-        "missing": "Minimal",
-        "status": "Excellent"
-      },
-      "user_manager.py": {
-        "coverage": 100,
-        "lines": 112,
-        "missing": "None",
-        "status": "Complete"
-      },
-      "admin_manager.py": {
-        "coverage": 100,
-        "lines": 131,
-        "missing": "None",
-        "status": "Complete"
-      }
-    },
-    "report_commands": {
-      "terminal": "pytest --cov=telegram_bot_stack --cov-report=term",
-      "html": "pytest --cov=telegram_bot_stack --cov-report=html",
-      "missing_lines": "pytest --cov=telegram_bot_stack --cov-report=term-missing"
-    }
-  },
-  "running_tests": {
-    "all_tests": {
-      "command": "pytest",
-      "description": "Run all tests",
-      "duration": "~5 seconds"
-    },
-    "with_coverage": {
-      "command": "pytest --cov=telegram_bot_stack --cov-report=term",
-      "description": "Run tests with coverage report",
-      "duration": "~7 seconds"
-    },
-    "specific_file": {
-      "command": "pytest tests/core/test_storage.py",
-      "description": "Run tests from specific file",
-      "duration": "~2 seconds"
-    },
-    "specific_test": {
-      "command": "pytest tests/core/test_storage.py::TestMemoryStorage::test_save",
-      "description": "Run single test",
-      "duration": "~0.5 seconds"
-    },
-    "verbose": {
-      "command": "pytest -v",
-      "description": "Run with verbose output",
-      "use_case": "Debugging test failures"
-    },
-    "last_failed": {
-      "command": "pytest --lf",
-      "description": "Run only last failed tests",
-      "use_case": "Quick iteration on failures"
-    },
-    "markers": {
-      "command": "pytest -m asyncio",
-      "description": "Run tests with specific marker",
-      "available_markers": [
-        "asyncio",
-        "slow",
-        "integration"
-      ]
-    }
-  },
-  "ai_agent_hints": {
-    "adding_tests": {
-      "for_new_feature": [
-        "1. Determine if unit or integration test",
-        "2. Create test in appropriate directory (core/ or integration/)",
-        "3. Import necessary fixtures from conftest",
-        "4. Follow existing test patterns",
-        "5. Run pytest to verify",
-        "6. Check coverage: pytest --cov"
-      ],
-      "for_storage_backend": [
-        "1. Add test class to tests/core/test_storage.py",
-        "2. Test all StorageBackend methods",
-        "3. Test error cases",
-        "4. Use both memory_storage and json_storage fixtures as examples"
-      ],
-      "for_bot_command": [
-        "1. Add test to tests/core/test_bot_base.py",
-        "2. Use mock_update and mock_context fixtures",
-        "3. Mark as @pytest.mark.asyncio if async",
-        "4. Test both success and error cases",
-        "5. Test permission checks if admin command"
+      "functions": [
+        "bot_module",
+        "bot_class",
+        "bot_instance",
+        "test_module_import",
+        "test_class_exists",
+        "test_initialization",
+        "test_has_required_attributes",
+        "test_has_register_handlers",
+        "test_has_storage_key",
+        "test_storage_works"
       ]
     },
-    "debugging_tests": {
-      "test_failure": [
-        "1. Run with -v for verbose output",
-        "2. Run single failing test: pytest path/to/test.py::test_name",
-        "3. Add print statements or use pytest -s",
-        "4. Check fixtures are working correctly",
-        "5. Verify mocks are configured properly"
+    {
+      "id": "tests.examples.test_counter_bot",
+      "name": "test_counter_bot",
+      "type": "test_module",
+      "path": "tests/examples/test_counter_bot.py",
+      "description": "Tests for Counter Bot example.",
+      "lines_of_code": 71,
+      "exports": [
+        "TestCounterBot",
+        "bot_module",
+        "bot_class",
+        "bot_instance",
+        "test_module_import",
+        "test_class_exists",
+        "test_initialization",
+        "test_has_required_attributes",
+        "test_has_register_handlers",
+        "test_storage_works"
       ],
-      "coverage_too_low": [
-        "1. Run: pytest --cov-report=html",
-        "2. Open htmlcov/index.html in browser",
-        "3. Find uncovered lines (red)",
-        "4. Add tests for missing scenarios",
-        "5. Verify new coverage meets threshold"
+      "classes": [
+        "TestCounterBot"
+      ],
+      "functions": [
+        "bot_module",
+        "bot_class",
+        "bot_instance",
+        "test_module_import",
+        "test_class_exists",
+        "test_initialization",
+        "test_has_required_attributes",
+        "test_has_register_handlers",
+        "test_storage_works"
       ]
     },
-    "common_tasks": [
-      {
-        "task": "Add test for new storage backend",
-        "file": "tests/core/test_storage.py",
-        "pattern": "Follow TestJSONStorage or TestMemoryStorage",
-        "fixtures": [
-          "memory_storage",
-          "temp_dir"
-        ]
-      },
-      {
-        "task": "Test new bot command",
-        "file": "tests/core/test_bot_base.py",
-        "pattern": "Follow existing command tests",
-        "fixtures": [
-          "bot_instance",
-          "mock_update",
-          "mock_context"
-        ],
-        "async": true
-      },
-      {
-        "task": "Add integration test",
-        "file": "tests/integration/test_full_flow.py",
-        "pattern": "Test complete workflow",
-        "fixtures": [
-          "bot_instance",
-          "json_storage",
-          "temp_dir"
-        ]
-      }
-    ]
-  },
-  "test_configuration": {
-    "pytest.ini": {
-      "location": "pyproject.toml [tool.pytest.ini_options]",
-      "settings": {
-        "testpaths": [
-          "tests"
-        ],
-        "python_files": [
-          "test_*.py"
-        ],
-        "python_classes": [
-          "Test*"
-        ],
-        "python_functions": [
-          "test_*"
-        ],
-        "asyncio_mode": "auto",
-        "addopts": "--strict-markers"
-      }
+    {
+      "id": "tests.examples.test_poll_bot",
+      "name": "test_poll_bot",
+      "type": "test_module",
+      "path": "tests/examples/test_poll_bot.py",
+      "description": "Tests for Poll Bot example.",
+      "lines_of_code": 81,
+      "exports": [
+        "TestPollBot",
+        "bot_module",
+        "bot_class",
+        "bot_instance",
+        "test_module_import",
+        "test_class_exists",
+        "test_initialization",
+        "test_has_required_attributes",
+        "test_has_register_handlers",
+        "test_has_storage_keys",
+        "test_has_poll_methods"
+      ],
+      "classes": [
+        "TestPollBot"
+      ],
+      "functions": [
+        "bot_module",
+        "bot_class",
+        "bot_instance",
+        "test_module_import",
+        "test_class_exists",
+        "test_initialization",
+        "test_has_required_attributes",
+        "test_has_register_handlers",
+        "test_has_storage_keys",
+        "test_has_poll_methods"
+      ]
     },
-    "coverage_config": {
-      "location": "pyproject.toml [tool.coverage]",
-      "settings": {
-        "source": [
-          "telegram_bot_stack"
-        ],
-        "omit": [
-          "*/tests/*",
-          "*/__pycache__/*"
-        ],
-        "fail_under": 79
-      }
+    {
+      "id": "tests.examples.test_menu_bot",
+      "name": "test_menu_bot",
+      "type": "test_module",
+      "path": "tests/examples/test_menu_bot.py",
+      "description": "Tests for Menu Bot example.",
+      "lines_of_code": 74,
+      "exports": [
+        "TestMenuBot",
+        "bot_module",
+        "bot_class",
+        "bot_instance",
+        "test_module_import",
+        "test_class_exists",
+        "test_initialization",
+        "test_has_required_attributes",
+        "test_has_register_handlers",
+        "test_has_storage_keys"
+      ],
+      "classes": [
+        "TestMenuBot"
+      ],
+      "functions": [
+        "bot_module",
+        "bot_class",
+        "bot_instance",
+        "test_module_import",
+        "test_class_exists",
+        "test_initialization",
+        "test_has_required_attributes",
+        "test_has_register_handlers",
+        "test_has_storage_keys"
+      ]
+    },
+    {
+      "id": "tests.examples.test_echo_bot",
+      "name": "test_echo_bot",
+      "type": "test_module",
+      "path": "tests/examples/test_echo_bot.py",
+      "description": "Tests for Echo Bot example.",
+      "lines_of_code": 73,
+      "exports": [
+        "TestEchoBot",
+        "bot_module",
+        "bot_class",
+        "bot_instance",
+        "test_module_import",
+        "test_class_exists",
+        "test_initialization",
+        "test_has_required_attributes",
+        "test_has_register_handlers",
+        "test_welcome_message"
+      ],
+      "classes": [
+        "TestEchoBot"
+      ],
+      "functions": [
+        "bot_module",
+        "bot_class",
+        "bot_instance",
+        "test_module_import",
+        "test_class_exists",
+        "test_initialization",
+        "test_has_required_attributes",
+        "test_has_register_handlers",
+        "test_welcome_message"
+      ]
+    },
+    {
+      "id": "tests.examples.test_quit_smoking_bot",
+      "name": "test_quit_smoking_bot",
+      "type": "test_module",
+      "path": "tests/examples/test_quit_smoking_bot.py",
+      "description": "Tests for Quit Smoking Bot example.",
+      "lines_of_code": 99,
+      "exports": [
+        "TestQuitSmokingBot",
+        "bot_module",
+        "bot_class",
+        "bot_instance",
+        "test_module_import",
+        "test_class_exists",
+        "test_initialization",
+        "test_has_required_attributes",
+        "test_has_register_handlers",
+        "test_has_custom_managers",
+        "test_has_status_method",
+        "test_welcome_message_override",
+        "test_get_user_status",
+        "test_quotes_manager_initialized",
+        "test_status_manager_initialized"
+      ],
+      "classes": [
+        "TestQuitSmokingBot"
+      ],
+      "functions": [
+        "bot_module",
+        "bot_class",
+        "bot_instance",
+        "test_module_import",
+        "test_class_exists",
+        "test_initialization",
+        "test_has_required_attributes",
+        "test_has_register_handlers",
+        "test_has_custom_managers",
+        "test_has_status_method",
+        "test_welcome_message_override",
+        "test_get_user_status",
+        "test_quotes_manager_initialized",
+        "test_status_manager_initialized"
+      ]
+    },
+    {
+      "id": "tests.examples.test_examples",
+      "name": "test_examples",
+      "type": "test_module",
+      "path": "tests/examples/test_examples.py",
+      "description": "Test suite to validate all example bots.",
+      "lines_of_code": 279,
+      "exports": [
+        "TestExampleBots",
+        "TestExampleBotsIntegration",
+        "examples_dir",
+        "bot_files",
+        "test_all_bots_found",
+        "test_bot_import",
+        "test_bot_class_exists",
+        "test_bot_initialization",
+        "test_bot_has_register_handlers",
+        "test_all_bots_use_new_api",
+        "test_all_bots_have_main_function",
+        "test_all_bots_use_post_init_wrapper"
+      ],
+      "classes": [
+        "TestExampleBots",
+        "TestExampleBotsIntegration"
+      ],
+      "functions": [
+        "examples_dir",
+        "bot_files",
+        "test_all_bots_found",
+        "test_bot_import",
+        "test_bot_class_exists",
+        "test_bot_initialization",
+        "test_bot_has_register_handlers",
+        "test_all_bots_use_new_api",
+        "test_all_bots_have_main_function",
+        "test_all_bots_use_post_init_wrapper"
+      ]
     }
-  }
+  ],
+  "edges": [
+    {
+      "id": "edge_1",
+      "source": "tests.conftest",
+      "target": "telegram_bot_stack.admin_manager",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.admin_manager"
+    },
+    {
+      "id": "edge_2",
+      "source": "tests.conftest",
+      "target": "telegram_bot_stack.storage",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.storage"
+    },
+    {
+      "id": "edge_3",
+      "source": "tests.conftest",
+      "target": "telegram_bot_stack.user_manager",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.user_manager"
+    },
+    {
+      "id": "edge_4",
+      "source": "tests.core.test_sql_storage",
+      "target": "telegram_bot_stack.storage.sql",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.storage.sql"
+    },
+    {
+      "id": "edge_5",
+      "source": "tests.core.test_sql_storage",
+      "target": "telegram_bot_stack.storage",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.storage"
+    },
+    {
+      "id": "edge_6",
+      "source": "tests.core.test_sql_storage",
+      "target": "telegram_bot_stack.storage",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.storage"
+    },
+    {
+      "id": "edge_7",
+      "source": "tests.core.test_sql_storage",
+      "target": "telegram_bot_stack.storage",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.storage"
+    },
+    {
+      "id": "edge_8",
+      "source": "tests.core.test_sql_storage",
+      "target": "telegram_bot_stack.storage",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.storage"
+    },
+    {
+      "id": "edge_9",
+      "source": "tests.core.test_sql_storage",
+      "target": "telegram_bot_stack.storage",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.storage"
+    },
+    {
+      "id": "edge_10",
+      "source": "tests.core.test_sql_storage",
+      "target": "telegram_bot_stack.storage",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.storage"
+    },
+    {
+      "id": "edge_11",
+      "source": "tests.core.test_decorators",
+      "target": "telegram_bot_stack",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack"
+    },
+    {
+      "id": "edge_12",
+      "source": "tests.core.test_decorators",
+      "target": "telegram_bot_stack.storage",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.storage"
+    },
+    {
+      "id": "edge_13",
+      "source": "tests.core.test_admin_manager",
+      "target": "telegram_bot_stack.admin_manager",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.admin_manager"
+    },
+    {
+      "id": "edge_14",
+      "source": "tests.core.test_admin_manager",
+      "target": "telegram_bot_stack.storage",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.storage"
+    },
+    {
+      "id": "edge_15",
+      "source": "tests.core.test_storage",
+      "target": "telegram_bot_stack.storage",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.storage"
+    },
+    {
+      "id": "edge_16",
+      "source": "tests.core.test_user_manager",
+      "target": "telegram_bot_stack.storage",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.storage"
+    },
+    {
+      "id": "edge_17",
+      "source": "tests.core.test_user_manager",
+      "target": "telegram_bot_stack.user_manager",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.user_manager"
+    },
+    {
+      "id": "edge_18",
+      "source": "tests.core.test_bot_base",
+      "target": "telegram_bot_stack.bot_base",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.bot_base"
+    },
+    {
+      "id": "edge_19",
+      "source": "tests.core.test_bot_base",
+      "target": "telegram_bot_stack.storage",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.storage"
+    },
+    {
+      "id": "edge_20",
+      "source": "tests.integration.test_full_flow",
+      "target": "telegram_bot_stack.bot_base",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.bot_base"
+    },
+    {
+      "id": "edge_21",
+      "source": "tests.integration.test_full_flow",
+      "target": "telegram_bot_stack.storage",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.storage"
+    },
+    {
+      "id": "edge_22",
+      "source": "tests.examples.test_reminder_bot",
+      "target": "telegram_bot_stack.storage",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.storage"
+    },
+    {
+      "id": "edge_23",
+      "source": "tests.examples.test_counter_bot",
+      "target": "telegram_bot_stack.storage",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.storage"
+    },
+    {
+      "id": "edge_24",
+      "source": "tests.examples.test_poll_bot",
+      "target": "telegram_bot_stack.storage",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.storage"
+    },
+    {
+      "id": "edge_25",
+      "source": "tests.examples.test_menu_bot",
+      "target": "telegram_bot_stack.storage",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.storage"
+    },
+    {
+      "id": "edge_26",
+      "source": "tests.examples.test_echo_bot",
+      "target": "telegram_bot_stack.storage",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.storage"
+    },
+    {
+      "id": "edge_27",
+      "source": "tests.examples.test_quit_smoking_bot",
+      "target": "telegram_bot_stack.storage",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.storage"
+    },
+    {
+      "id": "edge_28",
+      "source": "tests.examples.test_examples",
+      "target": "telegram_bot_stack.storage",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.storage"
+    }
+  ]
 }

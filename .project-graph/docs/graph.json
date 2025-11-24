@@ -1,7 +1,7 @@
 {
   "metadata": {
     "version": "3.0.1",
-    "generated_at": "2025-11-18",
+    "generated_at": "2025-11-24",
     "graph_id": "docs",
     "graph_name": "Documentation",
     "graph_type": "flat_graph",
@@ -638,8 +638,8 @@
     },
     "navigation": {
       "start_here": "docs.quickstart for overview, docs.api_reference for details",
-      "for_users": "installation → quickstart → guides",
-      "for_developers": "architecture → api_reference → storage_guide"
+      "for_users": "installation \u2192 quickstart \u2192 guides",
+      "for_developers": "architecture \u2192 api_reference \u2192 storage_guide"
     }
   }
 }

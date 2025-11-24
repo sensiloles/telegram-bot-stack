@@ -52,6 +52,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent / ".project-graph"))
 from utils.graph_utils import (
     find_dependencies,
     find_dependents,
+    find_node_by_path,
     get_impact_analysis,
     get_recommended_graph,
     list_sub_graphs,
@@ -219,7 +220,19 @@ class ProjectGraphMCPServer:
             else:
                 graph = load_graph_by_type(graph_type)
 
-            impact = get_impact_analysis(graph, file_path)
+            # Convert file_path to node_id
+            node = find_node_by_path(graph, file_path)
+            if node:
+                node_id = node["id"]
+                impact = get_impact_analysis(graph, node_id)
+            else:
+                impact = {
+                    "error": f"Node not found for path: {file_path}",
+                    "direct_dependents": [],
+                    "transitive_dependents": [],
+                    "total_impact": 0,
+                    "impact_level": "unknown",
+                }
             return json.dumps(impact, indent=2)
 
         elif name == "find_dependencies":
@@ -252,8 +265,13 @@ class ProjectGraphMCPServer:
             graph_type = arguments.get("graph_type", "bot_framework")
             self._ensure_router()
 
-            sub_graphs = list_sub_graphs(graph_type)
-            return json.dumps({"sub_graphs": sub_graphs})
+            sub_graphs_dict = list_sub_graphs(graph_type)
+            # Convert dict to list format expected by client
+            sub_graphs_list = [
+                {"name": name, "lines": info.get("lines", "N/A"), **info}
+                for name, info in sub_graphs_dict.items()
+            ]
+            return json.dumps({"sub_graphs": sub_graphs_list})
 
         else:
             return json.dumps({"error": f"Unknown tool: {name}"})
