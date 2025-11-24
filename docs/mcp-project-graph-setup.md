@@ -40,6 +40,7 @@ Add to your Cursor settings (`.cursor/mcp_config.json` or Cursor settings):
 **Important:** Use absolute path to ensure MCP server starts correctly.
 
 **For this project:**
+
 ```json
 {
   "mcpServers": {
@@ -80,25 +81,25 @@ Add to your Cursor settings (`.cursor/mcp_config.json` or Cursor settings):
 
 ### Main Graphs
 
-| URI | Description | Lines | Use When |
-|-----|-------------|-------|----------|
-| `graph://router` | Navigation router | 783 | Start here - understand structure |
-| `graph://bot_framework` | Framework core | ~800 | Working with core bot code |
-| `graph://infrastructure` | CI/CD automation | 639 | Fixing workflows, scripts |
-| `graph://testing` | Test infrastructure | 539 | Writing/debugging tests |
-| `graph://examples` | Example bots | 471 | Understanding bot patterns |
-| `graph://docs` | Documentation | ~300 | Updating docs |
-| `graph://configuration` | Build configs | ~200 | Changing dependencies, config |
-| `graph://archive` | Historical | ~250 | Understanding project history |
-| `graph://project_meta` | Architecture | 493 | High-level understanding |
+| URI                      | Description         | Lines | Use When                          |
+| ------------------------ | ------------------- | ----- | --------------------------------- |
+| `graph://router`         | Navigation router   | 783   | Start here - understand structure |
+| `graph://bot_framework`  | Framework core      | ~800  | Working with core bot code        |
+| `graph://infrastructure` | CI/CD automation    | 639   | Fixing workflows, scripts         |
+| `graph://testing`        | Test infrastructure | 539   | Writing/debugging tests           |
+| `graph://examples`       | Example bots        | 471   | Understanding bot patterns        |
+| `graph://docs`           | Documentation       | ~300  | Updating docs                     |
+| `graph://configuration`  | Build configs       | ~200  | Changing dependencies, config     |
+| `graph://archive`        | Historical          | ~250  | Understanding project history     |
+| `graph://project_meta`   | Architecture        | 493   | High-level understanding          |
 
 ### Hierarchical Sub-Graphs (bot-framework)
 
-| URI | Description | Lines |
-|-----|-------------|-------|
-| `graph://bot_framework/core` | BotBase, managers | 321 |
-| `graph://bot_framework/storage` | Storage backends | 435 |
-| `graph://bot_framework/utilities` | Decorators, helpers | 85 |
+| URI                               | Description         | Lines |
+| --------------------------------- | ------------------- | ----- |
+| `graph://bot_framework/core`      | BotBase, managers   | 321   |
+| `graph://bot_framework/storage`   | Storage backends    | 435   |
+| `graph://bot_framework/utilities` | Decorators, helpers | 85    |
 
 ### Special URIs
 
@@ -278,6 +279,7 @@ Add to `.cursorrules`:
 ## Project Navigation (MCP-Enhanced)
 
 ### Before Implementation:
+
 1. Get graph recommendation:
    Use MCP: `recommend_graph` tool with task description
 
@@ -289,15 +291,16 @@ Add to `.cursorrules`:
 
 ### Common Tasks → MCP Resources:
 
-| Task | MCP Resource |
-|------|--------------|
-| Add storage backend | `graph://bot_framework/storage` |
-| Fix CI workflow | `graph://infrastructure` |
-| Update docs | `graph://docs` |
-| Add CLI command | `graph://bot_framework/utilities` |
-| Write tests | `graph://testing` |
+| Task                | MCP Resource                      |
+| ------------------- | --------------------------------- |
+| Add storage backend | `graph://bot_framework/storage`   |
+| Fix CI workflow     | `graph://infrastructure`          |
+| Update docs         | `graph://docs`                    |
+| Add CLI command     | `graph://bot_framework/utilities` |
+| Write tests         | `graph://testing`                 |
 
 ### Token Efficiency:
+
 - ✅ Load graphs via MCP (200-800 lines)
 - ❌ Don't read entire codebase (10,000+ lines)
 - 💰 90-95% token savings
@@ -308,14 +311,17 @@ Add to `.cursorrules`:
 ### For AI Agents
 
 1. **Standardized Interface**
+
    - No need to know project-specific graph API
    - Works across different projects with MCP
 
 2. **Automatic Caching**
+
    - MCP handles resource caching
    - Faster repeated queries
 
 3. **Context Independence**
+
    - Works from any directory
    - No Python import issues
 
@@ -327,11 +333,13 @@ Add to `.cursorrules`:
 ### For Developers
 
 1. **90-95% Token Savings**
+
    - Load 900 lines instead of 10,000+
    - Faster AI responses
    - Lower API costs
 
 2. **Better Understanding**
+
    - Graph shows dependencies explicitly
    - Clear project structure
    - Easy navigation
@@ -343,17 +351,18 @@ Add to `.cursorrules`:
 
 ## Performance Comparison
 
-| Approach | Tokens | Time | Accuracy |
-|----------|--------|------|----------|
-| Read all files | 10,000+ | Slow | Low (too much context) |
-| Manual selection | ~2,000 | Medium | Medium (might miss files) |
-| **Graph + MCP** | **900** | **Fast** | **High (comprehensive)** |
+| Approach         | Tokens  | Time     | Accuracy                  |
+| ---------------- | ------- | -------- | ------------------------- |
+| Read all files   | 10,000+ | Slow     | Low (too much context)    |
+| Manual selection | ~2,000  | Medium   | Medium (might miss files) |
+| **Graph + MCP**  | **900** | **Fast** | **High (comprehensive)**  |
 
 ## Maintenance
 
 ### When to Update Graphs
 
 Update graphs when:
+
 - Adding new files to project
 - Changing dependencies
 - Refactoring module structure
@@ -412,19 +421,122 @@ cd /Users/sensiloles/Documents/work/telegram-bot-stack
 python3 -c "from .project-graph.utils.graph_utils import load_router"
 ```
 
+## Auto-Update System
+
+The project now includes automatic graph updates with file change detection:
+
+### Features
+
+**Hash-Based Change Detection:**
+
+- SHA-256 hashing tracks file changes
+- Skips updates for unchanged files
+- Cache stored in `.project-graph/.file_hashes.json`
+
+**AST Analysis:**
+
+- Extracts classes, functions, and imports
+- Updates node metadata automatically
+- Analyzes Python file structure
+
+**Cross-Graph Updates:**
+
+- Updates all related graphs automatically
+- Example: Changing `storage/base.py` updates both `bot_framework/storage` and `testing` graphs
+
+**New File Support:**
+
+- Automatically creates nodes for new files
+- Analyzes structure and adds to appropriate graphs
+
+**Deleted File Handling:**
+
+- Removes nodes when files are deleted
+- Cleans up related edges
+
+### Usage
+
+```bash
+# Initialize hash cache (first time)
+python3 .project-graph/utils/auto_update.py --init-cache
+
+# Update graph for specific file
+python3 .project-graph/utils/auto_update.py --file telegram_bot_stack/storage/base.py
+
+# Force update (ignore hash)
+python3 .project-graph/utils/auto_update.py --file <path> --force
+
+# Watch for changes (requires watchdog)
+python3 .project-graph/utils/auto_update.py --watch
+
+# Dry run (see what would be updated)
+python3 .project-graph/utils/auto_update.py --file <path> --dry-run
+```
+
+### How It Works
+
+When a file changes:
+
+1. **Hash Check:** Compares SHA-256 hash with cached value
+2. **Skip if Unchanged:** No hash difference = no update needed
+3. **AST Analysis:** Parses Python files to extract structure
+4. **Find Affected Graphs:** Determines all graphs that need updates
+5. **Update Nodes:** Updates existing nodes or creates new ones
+6. **Update Metadata:** Refreshes graph metadata (timestamp, counts)
+7. **Save Hash:** Updates hash cache for next check
+
+Example output:
+
+```
+📝 File changed: telegram_bot_stack/storage/redis.py
+   Hash: Changed ✓
+   Classes: 1
+   Functions: 5
+   Lines: 120
+
+📊 Updating graph: bot_framework/storage
+   ✨ Created new node: telegram_bot_stack.storage.redis
+   ✅ Updated node in storage-graph.json
+
+📊 Updating graph: testing
+   ✨ Created new node: telegram_bot_stack.storage.redis
+   ✅ Updated node in graph.json
+
+✅ Successfully updated 2 graph(s)
+```
+
+### Testing
+
+Run integration tests:
+
+```bash
+cd .project-graph/utils
+python3 test_integration.py
+```
+
 ## Roadmap
 
 ### v1.1 (Current)
+
 - ✅ MCP server implementation
 - ✅ Basic resource exposure
 - ✅ Analysis tools
 
-### v1.2 (Planned)
-- 🔄 Auto-update graphs on file changes
+### v1.2 (Completed!)
+
+- ✅ Auto-update graphs on file changes
+- ✅ Hash-based change detection
+- ✅ New file and deletion support
+- ✅ Cross-graph updates
+
+### v1.3 (Planned)
+
 - 🔄 Graph visualization via MCP
 - 🔄 Diff analysis between commits
+- 🔄 Import-based edge generation
 
-### v1.3 (Future)
+### v1.4 (Future)
+
 - ⏳ Multi-repository support
 - ⏳ Real-time dependency tracking
 - ⏳ Breaking change detection

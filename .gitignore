@@ -66,3 +66,6 @@ Thumbs.db
 
 # Backup files
 backups/
+
+# Project graph file hash cache (runtime generated)
+.project-graph/.file_hashes.json
