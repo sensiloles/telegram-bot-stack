@@ -8,7 +8,7 @@
     "project_name": "telegram-bot-stack",
     "description": "CI/CD workflows, automation scripts, and tooling",
     "scope": "GitHub Actions, automation scripts, deployment",
-    "node_count": 51,
+    "node_count": 50,
     "edge_count": 1
   },
   "nodes": [
@@ -39,13 +39,6 @@
       "type": "workflow",
       "path": ".github/workflows/release.yml",
       "description": "Configuration file release.yml"
-    },
-    {
-      "id": ".github.workflows.lint.yml",
-      "name": "lint",
-      "type": "workflow",
-      "path": ".github/workflows/lint.yml",
-      "description": "Configuration file lint.yml"
     },
     {
       "id": ".github.workflows.pypi-publish.yml",

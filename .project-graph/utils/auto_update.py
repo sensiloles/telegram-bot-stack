@@ -141,11 +141,11 @@ def determine_graph_for_file(file_path: str) -> Optional[str]:
     path = Path(file_path)
     path_str = str(path)
 
-    # Bot framework
+    # Bot framework (source code)
     if path_str.startswith("telegram_bot_stack/"):
         return "bot_framework"
 
-    # Infrastructure
+    # Infrastructure (CI/CD, automation)
     if path_str.startswith(".github/") or path_str.startswith("scripts/"):
         return "infrastructure"
 
@@ -161,19 +161,39 @@ def determine_graph_for_file(file_path: str) -> Optional[str]:
     if path_str.startswith("docs/"):
         return "docs"
 
-    # Configuration
+    # Archive
+    if path_str.startswith("archive/"):
+        return "archive"
+
+    # Configuration files (build system, dependencies, IDE)
     if path_str in [
         "pyproject.toml",
         ".pre-commit-config.yaml",
         "Makefile",
         "setup.py",
         "setup.cfg",
-    ]:
+        "requirements.txt",
+        "requirements-dev.txt",
+        ".env.example",
+    ] or path_str.startswith(".vscode/") or path_str.startswith(".cursor/") or path_str.startswith(".idea/"):
         return "configuration"
 
-    # Archive
-    if path_str.startswith("archive/"):
-        return "archive"
+    # Project meta (root level documentation and meta files)
+    if path_str in [
+        "README.md",
+        "CHANGELOG.md",
+        "CONTRIBUTING.md",
+        "LICENSE",
+        "CODE_OF_CONDUCT.md",
+        ".gitignore",
+        ".gitattributes",
+        ".cursorrules",
+    ]:
+        return "project_meta"
+
+    # Project graph files themselves
+    if path_str.startswith(".project-graph/"):
+        return "project_meta"  # Graph files are meta-information about project
 
     return None
 
@@ -735,11 +755,12 @@ def remove_node_from_graph(graph_path: Path, file_path: str) -> bool:
         return False
 
 
-def init_hash_cache(force: bool = False) -> None:
+def init_hash_cache(force: bool = False, use_git: bool = True) -> None:
     """Initialize hash cache for all tracked files.
 
     Args:
         force: If True, recompute all hashes even if cache exists
+        use_git: If True, use git ls-files to get list (respects .gitignore)
     """
     cache_path = get_hash_cache_path()
 
@@ -752,42 +773,86 @@ def init_hash_cache(force: bool = False) -> None:
     project_root = get_project_root()
     cache = {}
 
-    # Directories to scan
-    directories = [
-        "telegram_bot_stack",
-        "tests",
-        "examples",
-        "docs",
-        ".github",
-        "scripts",
-    ]
+    if use_git:
+        # Use git to get all tracked files (respects .gitignore automatically)
+        print("   📦 Using git ls-files (respects .gitignore)")
+        import subprocess
 
-    file_count = 0
-    for directory in directories:
-        dir_path = project_root / directory
-        if not dir_path.exists():
-            continue
+        try:
+            result = subprocess.run(
+                ["git", "ls-files"],
+                cwd=project_root,
+                capture_output=True,
+                text=True,
+                check=True,
+            )
 
-        for file_path in dir_path.rglob("*"):
-            if file_path.is_file():
-                # Skip unwanted files
-                if any(x in str(file_path) for x in ["__pycache__", ".pyc", ".egg-info", ".git"]):
+            tracked_files = [f.strip() for f in result.stdout.split("\n") if f.strip()]
+            print(f"   Found {len(tracked_files)} tracked files")
+
+            file_count = 0
+            for rel_path in tracked_files:
+                file_path = project_root / rel_path
+
+                # Skip the hash cache file itself
+                if ".file_hashes.json" in rel_path:
                     continue
 
-                # Compute hash
-                rel_path = str(file_path.relative_to(project_root))
-                try:
-                    file_hash = compute_file_hash(file_path)
-                    cache[rel_path] = file_hash
-                    file_count += 1
-                    if file_count % 50 == 0:
-                        print(f"   Processed {file_count} files...")
-                except Exception as e:
-                    print(f"   ⚠️  Could not hash {rel_path}: {e}")
+                if file_path.exists() and file_path.is_file():
+                    try:
+                        file_hash = compute_file_hash(file_path)
+                        cache[rel_path] = file_hash
+                        file_count += 1
+
+                        if file_count % 50 == 0:
+                            print(f"   Processed {file_count} files...")
+                    except Exception as e:
+                        print(f"   ⚠️  Could not hash {rel_path}: {e}")
+
+        except subprocess.CalledProcessError as e:
+            print(f"⚠️  Git command failed: {e}")
+            print("   Falling back to directory scanning...")
+            use_git = False
+
+    if not use_git:
+        # Fallback: scan directories manually
+        print("   📁 Scanning directories manually")
+        directories = [
+            "telegram_bot_stack",
+            "tests",
+            "examples",
+            "docs",
+            ".github",
+            "scripts",
+            ".project-graph",
+        ]
+
+        file_count = 0
+        for directory in directories:
+            dir_path = project_root / directory
+            if not dir_path.exists():
+                continue
+
+            for file_path in dir_path.rglob("*"):
+                if file_path.is_file():
+                    # Skip unwanted files
+                    if any(x in str(file_path) for x in ["__pycache__", ".pyc", ".egg-info", ".git", ".file_hashes.json"]):
+                        continue
+
+                    # Compute hash
+                    rel_path = str(file_path.relative_to(project_root))
+                    try:
+                        file_hash = compute_file_hash(file_path)
+                        cache[rel_path] = file_hash
+                        file_count += 1
+                        if file_count % 50 == 0:
+                            print(f"   Processed {file_count} files...")
+                    except Exception as e:
+                        print(f"   ⚠️  Could not hash {rel_path}: {e}")
 
     # Save cache
     save_hash_cache(cache)
-    print(f"✅ Hash cache initialized with {file_count} files")
+    print(f"✅ Hash cache initialized with {len(cache)} files")
     print(f"   Saved to: {cache_path}")
 
 
@@ -822,11 +887,16 @@ def main():
         action="store_true",
         help="Force update even if hash hasn't changed (or rebuild cache)",
     )
+    parser.add_argument(
+        "--no-git",
+        action="store_true",
+        help="Don't use git ls-files, scan directories manually instead",
+    )
 
     args = parser.parse_args()
 
     if args.init_cache:
-        init_hash_cache(force=args.force)
+        init_hash_cache(force=args.force, use_git=not args.no_git)
     elif args.watch:
         watch_files(dry_run=args.dry_run)
     elif args.file:
