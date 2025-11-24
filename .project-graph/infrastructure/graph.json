@@ -1,7 +1,7 @@
 {
   "metadata": {
     "version": "2.0.2",
-    "generated_at": "2025-11-18",
+    "generated_at": "2025-11-24",
     "graph_id": "infrastructure",
     "graph_name": "Infrastructure & Automation",
     "graph_type": "specialized",
@@ -13,7 +13,9 @@
       "bot-framework-graph.json - for code being tested/deployed",
       "testing-graph.json - for test automation",
       "project-meta-graph.json - for build system overview"
-    ]
+    ],
+    "node_count": 0,
+    "edge_count": 0
   },
   "statistics": {
     "total_scripts": 19,
@@ -639,7 +641,7 @@
           "check_ci.py",
           "GitHub Actions logs"
         ],
-        "approach": "Check workflow file → Check script → Check logs"
+        "approach": "Check workflow file \u2192 Check script \u2192 Check logs"
       }
     ],
     "quick_reference": {

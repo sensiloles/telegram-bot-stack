@@ -55,6 +55,7 @@ from utils.graph_utils import (
     get_impact_analysis,
     get_recommended_graph,
     list_sub_graphs,
+    load_full_hierarchical_graph,
     load_graph_by_type,
     load_router,
     load_sub_graph,
@@ -209,7 +210,12 @@ class ProjectGraphMCPServer:
             file_path = arguments.get("file_path", "")
             graph_type = arguments.get("graph_type", "bot_framework")
 
-            graph = load_graph_by_type(graph_type)
+            # Load full hierarchical graph for bot_framework
+            if graph_type == "bot_framework":
+                graph = load_full_hierarchical_graph(graph_type)
+            else:
+                graph = load_graph_by_type(graph_type)
+
             impact = get_impact_analysis(graph, file_path)
             return json.dumps(impact, indent=2)
 
@@ -217,7 +223,12 @@ class ProjectGraphMCPServer:
             node_id = arguments.get("node_id", "")
             graph_type = arguments.get("graph_type", "bot_framework")
 
-            graph = load_graph_by_type(graph_type)
+            # Load full hierarchical graph for bot_framework
+            if graph_type == "bot_framework":
+                graph = load_full_hierarchical_graph(graph_type)
+            else:
+                graph = load_graph_by_type(graph_type)
+
             deps = find_dependencies(graph, node_id)
             return json.dumps({"dependencies": deps})
 
@@ -225,7 +236,12 @@ class ProjectGraphMCPServer:
             node_id = arguments.get("node_id", "")
             graph_type = arguments.get("graph_type", "bot_framework")
 
-            graph = load_graph_by_type(graph_type)
+            # Load full hierarchical graph for bot_framework
+            if graph_type == "bot_framework":
+                graph = load_full_hierarchical_graph(graph_type)
+            else:
+                graph = load_graph_by_type(graph_type)
+
             dependents = find_dependents(graph, node_id)
             return json.dumps({"dependents": dependents})
 
@@ -233,7 +249,7 @@ class ProjectGraphMCPServer:
             graph_type = arguments.get("graph_type", "bot_framework")
             self._ensure_router()
 
-            sub_graphs = list_sub_graphs(self.router, graph_type)
+            sub_graphs = list_sub_graphs(graph_type)
             return json.dumps({"sub_graphs": sub_graphs})
 
         else:
