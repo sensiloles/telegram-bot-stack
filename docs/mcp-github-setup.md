@@ -25,9 +25,29 @@ Quick setup guide for the enhanced MCP server that provides comprehensive GitHub
 4. **Test:**
    In Cursor chat, ask: "List all open GitHub issues"
 
+## Configuration Priority
+
+Cursor reads MCP configuration in this order (according to [official docs](https://docs.cursor.com/context/mcp)):
+
+1. **Workspace config** (`.cursor/mcp.json`) - **Highest priority** ✅
+2. **Global config** (`~/.cursor/mcp.json`) - Lower priority
+
+**Additionally supported:**
+
+- **VS Code settings** (`.vscode/settings.json`) with `cursor.mcp.servers` key - Alternative approach
+
+**Why workspace config?**
+
+- ✅ **Project isolation** - Each project has its own MCP servers
+- ✅ **Team sharing** - Can be committed to repository (add to `.gitignore` if sensitive)
+- ✅ **Auto-priority** - Overrides global config automatically
+- ✅ **No global pollution** - Doesn't affect other Cursor projects
+
 ## Manual Configuration
 
-If you prefer manual setup, create `.cursor/mcp.json`:
+### Option 1: Workspace config (Recommended)
+
+Create `.cursor/mcp.json`:
 
 ```json
 {
@@ -46,11 +66,59 @@ If you prefer manual setup, create `.cursor/mcp.json`:
 }
 ```
 
-**Note:** Use absolute paths for reliability.
+**Note:** Use absolute paths for reliability (setup script auto-detects them).
 
-**Note:** `GITHUB_TOKEN` and `GITHUB_REPO` are read from `.env` file automatically, not from MCP config (more secure).
+**For this project:**
 
-**Note:** The setup script automatically detects the repository from git and creates this configuration.
+```json
+{
+  "mcpServers": {
+    "github-workflow": {
+      "command": "python3",
+      "args": [
+        "/Users/sensiloles/Documents/work/telegram-bot-stack/scripts/mcp_github_server.py"
+      ],
+      "description": "GitHub workflow management (issues, PRs, CI)"
+    },
+    "project-graph": {
+      "command": "python3",
+      "args": [
+        "/Users/sensiloles/Documents/work/telegram-bot-stack/scripts/mcp_project_graph.py"
+      ],
+      "description": "Project graph navigation"
+    }
+  }
+}
+```
+
+### Option 2: VS Code settings (Alternative)
+
+Add to `.vscode/settings.json`:
+
+```json
+{
+  "cursor.mcp.servers": {
+    "github-workflow": {
+      "command": "python3",
+      "args": ["${workspaceFolder}/scripts/mcp_github_server.py"],
+      "description": "GitHub workflow management (issues, PRs, CI)"
+    },
+    "project-graph": {
+      "command": "python3",
+      "args": ["${workspaceFolder}/scripts/mcp_project_graph.py"],
+      "description": "Project graph navigation"
+    }
+  }
+}
+```
+
+**Note:** Uses `${workspaceFolder}` variable - works on any machine! Can be version controlled.
+
+### Option 3: Global config (Not recommended)
+
+Add to `~/.cursor/mcp.json` - applies to all Cursor projects.
+
+**Security Note:** `GITHUB_TOKEN` and `GITHUB_REPO` are read from `.env` file automatically, not from MCP config (more secure).
 
 ## Available Tools
 
@@ -133,7 +201,49 @@ Create a **Classic Personal Access Token** with:
 
 Get token: https://github.com/settings/tokens/new
 
+## Migration from Global to Workspace Config
+
+If you previously used global config (`~/.cursor/mcp.json`), migrate to workspace-specific:
+
+**Step 1:** Run setup script to create workspace config:
+
+```bash
+bash scripts/setup_mcp.sh
+```
+
+**Step 2:** Clear global config:
+
+```bash
+echo '{"mcpServers": {}}' > ~/.cursor/mcp.json
+```
+
+**Step 3:** Restart Cursor
+
+**Step 4:** Verify MCP servers are **Enabled** in Settings → Tools & MCP → Installed MCP Servers
+
+**Why clear global config?**
+
+- Cursor prioritizes workspace config over global
+- But if global has same server names, it can cause conflicts
+- Empty global config ensures workspace config is always used
+
 ## Troubleshooting
+
+### MCP Servers show as "Disabled"
+
+**Cause:** Cursor is reading empty global config instead of workspace config.
+
+**Solution:**
+
+```bash
+# Option 1: Clear global config (recommended)
+echo '{"mcpServers": {}}' > ~/.cursor/mcp.json
+
+# Option 2: Re-run setup script
+bash scripts/setup_mcp.sh --restore
+
+# Then restart Cursor
+```
 
 ### Configuration becomes empty
 
