@@ -29,30 +29,35 @@ def log_debug(message: str) -> None:
     print(f"[MCP DEBUG] {message}", file=sys.stderr, flush=True)
 
 
-def load_token_from_env() -> None:
-    """Load GITHUB_TOKEN from .env file if not in environment or is placeholder."""
-    env_token = os.getenv("GITHUB_TOKEN")
-    is_placeholder = env_token and (
-        (env_token.startswith("${") and env_token.endswith("}")) or len(env_token) < 20
-    )
+def load_env_variables() -> None:
+    """Load GITHUB_TOKEN and GITHUB_REPO from .env file if not in environment or is placeholder."""
+    env_file = project_root / ".env"
 
-    if is_placeholder:
-        log_debug("Token is placeholder, loading from .env")
-        env_token = None
+    # Variables to load from .env
+    variables = ["GITHUB_TOKEN", "GITHUB_REPO"]
 
-    if not env_token:
-        env_file = project_root / ".env"
-        if env_file.exists():
+    for var_name in variables:
+        env_value = os.getenv(var_name)
+        is_placeholder = env_value and (
+            (env_value.startswith("${") and env_value.endswith("}"))
+            or (var_name == "GITHUB_TOKEN" and len(env_value) < 20)
+        )
+
+        if is_placeholder:
+            log_debug(f"{var_name} is placeholder, loading from .env")
+            env_value = None
+
+        if not env_value and env_file.exists():
             with open(env_file) as f:
                 for line in f:
                     line = line.strip()
-                    if line.startswith("GITHUB_TOKEN="):
-                        token = line.split("=", 1)[1].strip().strip('"').strip("'")
-                        if token and not (
-                            token.startswith("${") and token.endswith("}")
+                    if line.startswith(f"{var_name}="):
+                        value = line.split("=", 1)[1].strip().strip('"').strip("'")
+                        if value and not (
+                            value.startswith("${") and value.endswith("}")
                         ):
-                            os.environ["GITHUB_TOKEN"] = token
-                            log_debug("Token loaded from .env")
+                            os.environ[var_name] = value
+                            log_debug(f"{var_name} loaded from .env")
                             break
 
 
@@ -80,8 +85,8 @@ def detect_repo_from_git() -> Optional[str]:
     return None
 
 
-# Load token before importing github_helper
-load_token_from_env()
+# Load environment variables before importing github_helper
+load_env_variables()
 
 from github_helper import (  # type: ignore[import-untyped]
     format_issue_detail,

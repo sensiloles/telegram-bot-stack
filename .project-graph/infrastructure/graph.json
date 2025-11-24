@@ -720,12 +720,12 @@
       "type": "script",
       "path": "scripts/mcp_github_server.py",
       "description": "MCP Server for GitHub Issues and Pull Requests.",
-      "lines_of_code": 1054,
+      "lines_of_code": 1059,
       "exports": [
         "MCPServer",
         "GithubException",
         "log_debug",
-        "load_token_from_env",
+        "load_env_variables",
         "detect_repo_from_git",
         "main",
         "get_repo_cached",
@@ -738,7 +738,7 @@
       ],
       "functions": [
         "log_debug",
-        "load_token_from_env",
+        "load_env_variables",
         "detect_repo_from_git",
         "main",
         "get_repo_cached",
