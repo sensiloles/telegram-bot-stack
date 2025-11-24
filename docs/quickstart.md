@@ -1,84 +1,70 @@
 # Quick Start Guide
 
-> 📚 **Documentation Index:** See [Documentation Index](README.md) for all available guides.
-
-Get started with `telegram-bot-stack` in minutes! This guide will walk you through creating your first bot.
+Get started with telegram-bot-stack in less than 5 minutes!
 
 ## Installation
-
-### Option 1: Install from GitHub (Recommended)
-
-```bash
-# Install latest version directly from GitHub
-pip install git+https://github.com/sensiloles/telegram-bot-stack.git
-
-# Or install specific version
-pip install git+https://github.com/sensiloles/telegram-bot-stack.git@v0.1.0
-```
-
-**Advantages:**
-
-- ✅ No cloning needed
-- ✅ Works like normal pip package
-- ✅ Easy to specify versions via git tags
-
-### Option 2: Install from Source
-
-```bash
-# Clone and install in development mode
-git clone https://github.com/sensiloles/telegram-bot-stack.git
-cd telegram-bot-stack
-pip install -e .
-```
-
-**Use this when:**
-
-- You want to modify the framework
-- You need editable installation for development
-
-### Option 3: Install from PyPI (Coming Soon)
 
 ```bash
 pip install telegram-bot-stack
 ```
 
-**Status:** Available after public release to PyPI
+## Method 1: Using CLI (Recommended)
 
-> 📝 **For private installations:** See [Private Installation Guide](private_installation.md) for GitHub Packages, self-hosted PyPI, and other options
+The fastest way to create a new bot with complete development environment:
 
-## Prerequisites
+### Step 1: Initialize Project
 
-1. **Python 3.9+** installed on your system
-2. **Telegram Bot Token** from [@BotFather](https://t.me/BotFather)
+```bash
+telegram-bot-stack init my-awesome-bot
+```
 
-### Getting a Bot Token
+This creates a complete bot project with:
+- ✅ Virtual environment
+- ✅ Dependencies installed
+- ✅ Linting configured (ruff, mypy, pre-commit)
+- ✅ Testing configured (pytest)
+- ✅ IDE settings (VS Code)
+- ✅ Git initialized
 
-1. Open Telegram and search for [@BotFather](https://t.me/BotFather)
-2. Send `/newbot` command
-3. Follow instructions to create your bot
-4. Copy the bot token (looks like `1234567890:ABCdefGHIjklMNOpqrsTUVwxyz`)
+### Step 2: Configure Bot Token
 
-## Your First Bot
+```bash
+cd my-awesome-bot
+echo "BOT_TOKEN=your_token_here" > .env
+```
 
-Let's create a simple echo bot that repeats everything you say!
+Get your token from [@BotFather](https://t.me/BotFather)
 
-### Step 1: Create Bot File
+### Step 3: Run Your Bot
 
-Create a new file `my_bot.py`:
+```bash
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+python bot.py
+```
+
+That's it! Your bot is running. 🎉
+
+## Method 2: Manual Setup
+
+If you prefer manual setup:
+
+### Step 1: Create Project Structure
+
+```bash
+mkdir my-bot
+cd my-bot
+```
+
+### Step 2: Create `bot.py`
 
 ```python
-"""My First Bot - Echoes user messages."""
+"""Simple echo bot."""
 
+import asyncio
 import logging
 import os
-from pathlib import Path
 
-from telegram import Update
-from telegram.ext import Application, MessageHandler, filters
-from telegram.ext._contexttypes import ContextTypes
-
-from telegram_bot_stack import BotBase
-from telegram_bot_stack.storage import JSONStorage
+from telegram_bot_stack import BotBase, MemoryStorage
 
 # Configure logging
 logging.basicConfig(
@@ -89,204 +75,149 @@ logger = logging.getLogger(__name__)
 
 
 class MyBot(BotBase):
-    """Simple bot that echoes messages."""
+    """My awesome bot."""
 
     def get_welcome_message(self) -> str:
-        """Custom welcome message."""
-        return "👋 Welcome! I will echo your messages!"
-
-    def register_handlers(self):
-        """Register message handlers."""
-        super().register_handlers()
-
-        # Echo text messages
-        self.application.add_handler(
-            MessageHandler(filters.TEXT & ~filters.COMMAND, self.echo)
+        """Return welcome message for new users."""
+        return (
+            "👋 Welcome! I'm your awesome bot.\\n\\n"
+            "Available commands:\\n"
+            "/start - Show this message\\n"
+            "/help - Get help"
         )
 
-    async def echo(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Echo the user's message."""
-        await update.message.reply_text(f"You said: {update.message.text}")
 
-
-def main():
+def main() -> None:
     """Run the bot."""
-    # Get token from environment
+    # Get bot token from environment
     token = os.getenv("BOT_TOKEN")
     if not token:
-        raise ValueError("BOT_TOKEN environment variable required!")
+        logger.error("BOT_TOKEN environment variable not set!")
+        return
 
-    # Create storage
-    storage = JSONStorage(base_dir=Path("data"))
-
-    # Create bot
-    bot = MyBot(storage=storage, bot_name="My Bot")
-
-    # Create application
-    application = Application.builder().token(token).build()
-    bot.application = application
-
-    # Register handlers
-    bot.register_handlers()
-
-    # Set commands in Telegram UI
-    application.post_init = bot.set_bot_commands
+    # Initialize bot with storage
+    storage = MemoryStorage()
+    bot = MyBot(storage=storage)
 
     # Run bot
     logger.info("Starting bot...")
-    application.run_polling(allowed_updates=Update.ALL_TYPES)
+    asyncio.run(bot.run())
 
 
 if __name__ == "__main__":
     main()
 ```
 
-### Step 2: Set Your Bot Token
+### Step 3: Create `.env` File
 
 ```bash
-# Linux/Mac
-export BOT_TOKEN="your_token_here"
-
-# Windows
-set BOT_TOKEN=your_token_here
-
-# Or create .env file
 echo "BOT_TOKEN=your_token_here" > .env
 ```
 
-### Step 3: Run Your Bot
+### Step 4: Install Dependencies
 
 ```bash
-python my_bot.py
+pip install telegram-bot-stack python-dotenv
 ```
 
-### Step 4: Test Your Bot
+### Step 5: Run Your Bot
 
-1. Open Telegram
-2. Find your bot by username
-3. Send `/start` to register
-4. Send any message - the bot will echo it back!
+```bash
+python bot.py
+```
 
-## Built-in Features
+## CLI Commands
 
-Your bot automatically has these features:
+### Initialize New Project
 
-### User Commands
+```bash
+# Full setup with all features
+telegram-bot-stack init my-bot
 
-- `/start` - Register and get welcome message
-- `/my_id` - Get your Telegram user ID
+# Minimal setup
+telegram-bot-stack init my-bot --no-linting --no-testing --no-git
 
-### Admin Commands
+# With specific IDE
+telegram-bot-stack init my-bot --ide pycharm
 
-The first user becomes admin and gets additional commands:
+# With specific package manager
+telegram-bot-stack init my-bot --package-manager poetry
+```
 
-- `/list_users` - List all registered users
-- `/list_admins` - List all admins
-- `/add_admin <user_id>` - Promote user to admin
-- `/remove_admin <user_id>` - Demote admin
-- `/decline_admin` - Decline your own admin status
+### Create from Template
+
+```bash
+# Create from basic template
+telegram-bot-stack new my-bot --template basic
+
+# Available templates: basic, counter, menu, advanced
+telegram-bot-stack new analytics-bot --template advanced
+```
+
+### Development Mode
+
+```bash
+# Run with auto-reload
+telegram-bot-stack dev --reload
+
+# Run specific file
+telegram-bot-stack dev --bot-file my_bot.py
+```
+
+### Validate Configuration
+
+```bash
+# Check configuration
+telegram-bot-stack validate
+
+# Strict mode (exit with error if validation fails)
+telegram-bot-stack validate --strict
+```
 
 ## Next Steps
 
-### Customize Your Bot
-
-Override these methods to customize behavior:
-
-```python
-class MyBot(BotBase):
-    def get_welcome_message(self) -> str:
-        """Custom welcome message."""
-        return "Welcome to My Bot!"
-
-    async def get_user_status(self, user_id: int) -> str:
-        """Custom status for /my_id command."""
-        return f"User {user_id} status: Active"
-
-    async def on_user_registered(self, user_id: int):
-        """Called when new user registers."""
-        logger.info(f"New user registered: {user_id}")
-```
-
-### Use Different Storage Backends
-
-```python
-# JSON Storage (default, persistent)
-from telegram_bot_stack.storage import JSONStorage
-storage = JSONStorage(base_dir="data")
-
-# Memory Storage (fast, for testing)
-from telegram_bot_stack.storage import MemoryStorage
-storage = MemoryStorage()
-
-# Using factory function
-from telegram_bot_stack.storage import create_storage
-storage = create_storage("json", base_dir="data")
-```
-
-### Add Custom Commands
-
-```python
-from telegram.ext import CommandHandler
-
-class MyBot(BotBase):
-    def register_handlers(self):
-        """Register custom commands."""
-        super().register_handlers()
-
-        # Add your custom commands
-        self.application.add_handler(CommandHandler("hello", self.hello))
-
-    async def hello(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Say hello."""
-        await update.message.reply_text("Hello from custom command!")
-```
-
-## Example Bots
-
-Check out complete example bots in the `examples/` directory:
-
-- **echo_bot** - Simplest bot (5-10 lines of code)
-- **counter_bot** - User-specific counter with state management
-- **quit_smoking_bot** - Real-world tracking application
+- 📖 Read the [Architecture Guide](architecture.md)
+- 🔧 Learn about [Storage Options](storage_guide.md)
+- 📚 Check the [API Reference](api_reference.md)
+- 🚀 See [Examples](../examples/)
 
 ## Common Issues
 
-### Issue: "No module named 'telegram_bot_stack'"
+### Bot Token Not Found
+
+```
+Error: BOT_TOKEN environment variable not set!
+```
+
+**Solution:** Create a `.env` file with your bot token:
+```bash
+echo "BOT_TOKEN=your_token_here" > .env
+```
+
+### Import Errors
+
+```
+ModuleNotFoundError: No module named 'telegram_bot_stack'
+```
 
 **Solution:** Install the package:
-
 ```bash
-pip install -e .
+pip install telegram-bot-stack
 ```
 
-### Issue: "ValueError: BOT_TOKEN environment variable required"
+### Permission Denied (Virtual Environment)
 
-**Solution:** Set your bot token:
-
-```bash
-export BOT_TOKEN="your_token_here"
+```
+Permission denied: venv/bin/activate
 ```
 
-### Issue: Bot doesn't respond
-
-**Solutions:**
-
-1. Check that bot is running (no errors in console)
-2. Verify bot token is correct
-3. Make sure you sent `/start` first
-4. Check bot privacy settings with @BotFather
-
-## What's Next?
-
-- 📖 Read the [API Reference](api_reference.md) for detailed documentation
-- 🏗️ Check [Architecture Guide](architecture.md) for design patterns
-- 💡 Browse [examples/](../examples/) for more complex bots
-- 📚 See [Documentation Index](README.md) for all guides
+**Solution:** Activate virtual environment:
+```bash
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
 
 ## Getting Help
 
-- 📝 [GitHub Issues](https://github.com/sensiloles/telegram-bot-stack/issues)
-- 📚 [Full Documentation](../README.md)
-- 💬 Ask questions in GitHub Discussions
-
-Happy bot building! 🤖✨
+- 📖 [Documentation](https://github.com/sensiloles/telegram-bot-stack)
+- 🐛 [Report Issues](https://github.com/sensiloles/telegram-bot-stack/issues)
+- 💬 [Discussions](https://github.com/sensiloles/telegram-bot-stack/discussions)

@@ -29,6 +29,9 @@ dependencies = [
 "python-telegram-bot[job-queue]>=22.3,<23.0",
 "APScheduler>=3.11.0,<4.0",
 "python-dotenv>=1.1.0",
+"click>=8.1.0",
+"jinja2>=3.1.0",
+"watchdog>=3.0.0",
 ]
 
 [project.optional-dependencies]
@@ -72,6 +75,9 @@ github-actions = [
 release = [
 "python-semantic-release>=8.7.0",
 ]
+
+[project.scripts]
+telegram-bot-stack = "telegram_bot_stack.cli.main:main"
 
 [project.urls]
 Homepage = "https://github.com/sensiloles/telegram-bot-stack"
