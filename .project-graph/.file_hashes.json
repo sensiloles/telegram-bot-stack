@@ -52,7 +52,7 @@
   ".github/workflows/scripts/update_issue.py": "0260fe1ee3f651e60adc35baacac8e16c686be36bbb24b655035f51b119adc89",
   ".github/workflows/tests.yml": "ba4ec1e244e2d560250d2704f9f4faff38b1e868d0d46800de0df75225673e8b",
   ".gitignore": "acd98d7be686f6892a391301d1e248123fa9e410b2b170aa2f85524faac50656",
-  ".pre-commit-config.yaml": "8af4cd56bcb26f72684f53808ddfd22a1192d0fa727576fc44e99a9bfe076ad9",
+  ".pre-commit-config.yaml": "95a53fd81a6da04e1c7f49ebd050ed8a09b40663d174e60826d9dcec25f0ef45",
   ".project-graph/README.md": "12c9ef5d0cb4037483495c3b71bd664c090bc7208e166c1a398627e5d37b6e26",
   ".project-graph/__init__.py": "99ff2dc56735744c60175980f761366ebc722e3ab907ff33f0af9215b0e24013",
   ".project-graph/archive/graph.json": "27cfc3311bdef04f753c104387a9411d709d162c41873e6d0092a81f38013cc8",
