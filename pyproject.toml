@@ -99,6 +99,14 @@ exclude = [
 [tool.ruff]
 line-length = 88
 target-version = "py39"
+exclude = [
+    ".project-graph/",
+    "venv/",
+    "build/",
+    "dist/",
+    ".git/",
+    "__pycache__/",
+]
 
 [tool.ruff.lint]
 # Start with basic rules, gradually adding stricter ones
