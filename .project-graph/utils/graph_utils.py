@@ -167,12 +167,12 @@ def load_graph(graph_path: Optional[str] = None) -> Dict[str, Any]:
     """
     if graph_path is None:
         # Default to bot framework graph
-        graph_path = Path(__file__).parent / "bot-framework-graph.json"
+        graph_path = Path(__file__).parent.parent / "bot-framework" / "router.json"
     else:
         graph_path = Path(graph_path)
         # If just filename provided, look in .project-graph directory
         if not graph_path.is_absolute() and not graph_path.exists():
-            graph_path = Path(__file__).parent / graph_path
+            graph_path = Path(__file__).parent.parent / graph_path
 
     with open(graph_path, encoding="utf-8") as f:
         return json.load(f)
