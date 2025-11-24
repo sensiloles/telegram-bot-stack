@@ -8,15 +8,15 @@ repos:
       - id: end-of-file-fixer
       - id: check-yaml
       - id: check-json
-        exclude: '^\.vscode/settings\.json$'  # JSONC with comments
+        exclude: '^\.vscode/(settings\.json|settings\.recommended\.json)$'  # JSONC with comments
       - id: pretty-format-json
         args: ['--autofix', '--indent=2', '--no-sort-keys']
-        exclude: '^\.vscode/settings\.json$'  # JSONC with comments
+        exclude: '^\.vscode/(settings\.json|settings\.recommended\.json)$'  # JSONC with comments
       - id: check-added-large-files
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    # Ruff version - keep in sync with CI (lint.yml) and dev dependencies
-    rev: fa1ed65ba95bfa7771a71003a9d74402541f5a5c  # frozen: v0.14.6
+    # Ruff version - keep in sync with pyproject.toml and CI
+    rev: v0.8.4
     hooks:
       - id: ruff
         name: "🔍 Ruff Linter"

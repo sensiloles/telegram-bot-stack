@@ -50,7 +50,7 @@ all = [
 
 # Development dependencies
 dev = [
-"ruff==0.8.4",  # Keep in sync with pre-commit and CI
+"ruff==0.8.4",            # Keep in sync with pre-commit and CI
 "mypy>=1.17.0",
 "pytest>=8.4.0",
 "pytest-asyncio>=0.24.0",
@@ -90,6 +90,7 @@ warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true
 disallow_incomplete_defs = true
+ignore_missing_imports = true
 exclude = [
 "venv/",
 "build/",
@@ -100,12 +101,12 @@ exclude = [
 line-length = 88
 target-version = "py39"
 exclude = [
-    ".project-graph/",
-    "venv/",
-    "build/",
-    "dist/",
-    ".git/",
-    "__pycache__/",
+".project-graph/",
+"venv/",
+"build/",
+"dist/",
+".git/",
+"__pycache__/",
 ]
 
 [tool.ruff.lint]

@@ -10,16 +10,16 @@
   // Global editor settings
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
-    "source.fixAll.ruff": "explicit",
-    "source.organizeImports.ruff": "explicit"
+    "source.organizeImports.ruff": "explicit",
+    "source.fixAll.ruff": "explicit"
   },
   // Python - Ruff linter configuration (uses pyproject.toml)
   "[python]": {
     "editor.defaultFormatter": "charliermarsh.ruff",
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
-      "source.fixAll.ruff": "explicit",
-      "source.organizeImports.ruff": "explicit"
+      "source.organizeImports.ruff": "explicit",
+      "source.fixAll.ruff": "explicit"
     }
   },
   // JSON - built-in formatter
@@ -48,6 +48,10 @@
   "ruff.nativeServer": "on",
   "ruff.enable": true,
   "ruff.configurationPreference": "filesystemFirst",
+  "ruff.importStrategy": "fromEnvironment",
+  "ruff.path": [
+    "./venv/bin/ruff"
+  ],
   // Disable other formatters/linters to avoid conflicts
   "python.linting.enabled": false,
   "python.linting.pylintEnabled": false,

@@ -67,10 +67,16 @@
   },
   "shellformat.flag": "-i=2 -ci",
   "ruff.nativeServer": "on",
+  "ruff.enable": true,
+  "ruff.configurationPreference": "filesystemFirst",
   "ruff.importStrategy": "fromEnvironment",
   "ruff.path": [
     "./venv/bin/ruff"
   ],
+  "python.linting.enabled": false,
+  "python.linting.pylintEnabled": false,
+  "python.linting.flake8Enabled": false,
+  "python.formatting.provider": "none",
   "files.associations": {
     "*.py": "python",
     ".cursorrules": "plaintext",

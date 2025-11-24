@@ -83,7 +83,7 @@ format-check: ## Check code formatting without changes
 
 type-check: ## Run type checker (mypy)
 	@echo "$(GREEN)Running type checker...$(NC)"
-	mypy telegram_bot_stack
+	mypy telegram_bot_stack --config-file=pyproject.toml
 
 pre-commit: ## Run all pre-commit hooks
 	@echo "$(GREEN)Running pre-commit hooks...$(NC)"
