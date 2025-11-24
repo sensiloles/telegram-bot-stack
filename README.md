@@ -96,6 +96,7 @@ python bot.py
 ```
 
 **What you get:**
+
 - ✅ Virtual environment + dependencies
 - ✅ Linting (ruff, mypy) + pre-commit hooks
 - ✅ Testing (pytest) + fixtures
