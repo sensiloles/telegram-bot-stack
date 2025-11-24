@@ -2,6 +2,19 @@
 
 <!-- version list -->
 
+## v1.15.0 (2025-11-24)
+
+### Bug Fixes
+
+- **mcp**: Read credentials from .env file for better security
+  ([`daf7fc4`](https://github.com/sensiloles/telegram-bot-stack/commit/daf7fc44cadcd96da291a6e735938821a53e10e2))
+
+### Features
+
+- **mcp**: Add MCP servers automation and monitoring tools
+  ([`691ddb2`](https://github.com/sensiloles/telegram-bot-stack/commit/691ddb2e856242a3060c94d04c193d1be2ec115e))
+
+
 ## v1.14.0 (2025-11-24)
 
 ### Features
