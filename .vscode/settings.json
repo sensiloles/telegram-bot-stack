@@ -13,6 +13,9 @@
     "source.organizeImports.ruff": "explicit",
     "source.fixAll.ruff": "explicit"
   },
+  // Ensure all files end with newline (POSIX compliant)
+  "files.insertFinalNewline": true,
+  "files.trimFinalNewlines": false,
   // Python - Ruff linter configuration (uses pyproject.toml)
   "[python]": {
     "editor.defaultFormatter": "charliermarsh.ruff",
