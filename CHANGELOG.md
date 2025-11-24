@@ -2,6 +2,27 @@
 
 <!-- version list -->
 
+## v1.14.1 (2025-11-24)
+
+### Bug Fixes
+
+- **mcp**: Read GITHUB_TOKEN from .env file instead of hardcoding
+  ([`9abc523`](https://github.com/sensiloles/telegram-bot-stack/commit/9abc523c703e3db2a3ef868b5e11cc0bbd3aa7d9))
+
+- **mcp**: Update MCP config to read credentials from .env
+  ([`324e3f6`](https://github.com/sensiloles/telegram-bot-stack/commit/324e3f6a1243ccd91a8f0971eb1c0b7fa5970626))
+
+### Chores
+
+- **gitignore**: Add .cursor/ to ignore MCP local config
+  ([`0712ddf`](https://github.com/sensiloles/telegram-bot-stack/commit/0712ddfa6a54a6a1f6b6531605e5bf6c293d0cfd))
+
+### Refactoring
+
+- **mcp**: Read both GITHUB_TOKEN and GITHUB_REPO from .env file
+  ([`a146ce8`](https://github.com/sensiloles/telegram-bot-stack/commit/a146ce8814ee22f488884f2c79abc91c6cbfe8dc))
+
+
 ## v1.14.0 (2025-11-24)
 
 ### Features
