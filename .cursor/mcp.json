@@ -5,10 +5,6 @@
       "args": [
         "/Users/sensiloles/Documents/work/telegram-bot-stack/scripts/mcp_github_server.py"
       ],
-      "env": {
-        "GITHUB_TOKEN": "${GITHUB_TOKEN}",
-        "GITHUB_REPO": "sensiloles/telegram-bot-stack"
-      },
       "description": "GitHub workflow management (issues, PRs, CI)"
     },
     "project-graph": {
