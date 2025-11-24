@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "github-issues": {
+      "command": "python3",
+      "args": [
+        "${workspaceFolder}/scripts/mcp_github_server.py"
+      ],
+      "description": "GitHub issues management for telegram-bot-stack"
+    },
+    "project-graph": {
+      "command": "python3",
+      "args": [
+        "${workspaceFolder}/scripts/mcp_project_graph.py"
+      ],
+      "description": "Project graph navigation (90-95% token savings)"
+    }
+  }
+}
