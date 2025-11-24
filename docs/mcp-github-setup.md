@@ -31,19 +31,26 @@ If you prefer manual setup, create `.cursor/mcp.json`:
 ```json
 {
   "mcpServers": {
-    "github-issues": {
+    "github-workflow": {
       "command": "python3",
-      "args": ["scripts/mcp_github_server.py"],
+      "args": ["/absolute/path/to/scripts/mcp_github_server.py"],
       "env": {
-        "GITHUB_TOKEN": "${GITHUB_TOKEN}",
         "GITHUB_REPO": "owner/repo"
-      }
+      },
+      "description": "GitHub workflow management (issues, PRs, CI)"
+    },
+    "project-graph": {
+      "command": "python3",
+      "args": ["/absolute/path/to/scripts/mcp_project_graph.py"],
+      "description": "Project graph navigation"
     }
   }
 }
 ```
 
-**Note:** Paths are relative to the project root directory.
+**Note:** Use absolute paths for reliability.
+
+**Note:** `GITHUB_TOKEN` is read from `.env` file automatically, not from MCP config (more secure).
 
 **Note:** The setup script automatically detects the repository from git and creates this configuration.
 
@@ -101,6 +108,24 @@ List PRs sorted by most recently updated
 Check CI status for commit abc123
 ```
 
+## How Token Authentication Works
+
+**Security-First Approach:**
+
+The MCP server automatically reads `GITHUB_TOKEN` from your `.env` file (not from MCP config). This means:
+
+✅ **More Secure** - Token never stored in MCP config (which might be committed)
+✅ **Simpler Setup** - Just add token to `.env` once
+✅ **Automatic Loading** - Server reads `.env` on startup
+
+**Token Priority:**
+
+1. Check environment variable `GITHUB_TOKEN`
+2. If not found or placeholder → Read from `.env` file
+3. If still not found → Error message
+
+This happens automatically in `load_token_from_env()` function.
+
 ## GitHub Token Requirements
 
 Create a **Classic Personal Access Token** with:
@@ -121,9 +146,21 @@ bash scripts/setup_mcp.sh --restore
 
 ### Token not working
 
-1. Verify token is in `.env` file: `GITHUB_TOKEN=your_token`
-2. Check token has required scopes (`repo` or `public_repo`)
-3. Restart Cursor after updating token
+1. **Verify token is in `.env` file** (project root):
+
+   ```bash
+   grep GITHUB_TOKEN .env
+   # Should show: GITHUB_TOKEN=ghp_...
+   ```
+
+2. **MCP server reads token from `.env` automatically** - no need to set environment variables
+
+3. **Check token has required scopes** (`repo` or `public_repo`):
+
+   - Visit: https://github.com/settings/tokens
+   - Verify token exists and has correct permissions
+
+4. **Restart Cursor** after updating `.env` or MCP config
 
 ### Server not loading
 
