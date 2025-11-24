@@ -14,6 +14,24 @@
   - Add actionable error messages with hints
   - Version 2.0.0 of MCP server
 
+## v1.12.0 (2025-11-24)
+
+### Documentation
+
+- **archive**: Add business analysis document
+  ([`1c0e6f1`](https://github.com/sensiloles/telegram-bot-stack/commit/1c0e6f120c658c36690bf00a9154b003c1461e9b))
+
+- **roadmap**: Consolidate roadmap into PROJECT_STATUS.md
+  ([`5b692c0`](https://github.com/sensiloles/telegram-bot-stack/commit/5b692c019eab4a41c16a1a8d816b0de6a2242910))
+
+- **roadmap**: Update PROJECT_STATUS with 12 new issues and scaling roadmap
+  ([`e2633d2`](https://github.com/sensiloles/telegram-bot-stack/commit/e2633d28fb7d8b753ab7faec37eaf106342789df))
+
+### Features
+
+- **mcp**: Add custom MCP server for GitHub issues integration
+  ([`5eda78e`](https://github.com/sensiloles/telegram-bot-stack/commit/5eda78e32f1635ee7bee8005076b8992cd313623))
+
 ## v1.11.0 (2025-11-18)
 
 ### Bug Fixes
