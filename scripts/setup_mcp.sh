@@ -68,52 +68,54 @@ if command -v git >/dev/null 2>&1; then
     fi
 fi
 
-# Create configuration
+# Detect absolute path to MCP servers
+MCP_GITHUB_ABSOLUTE="$PROJECT_ROOT/$MCP_SERVER_RELATIVE_PATH"
+MCP_GRAPH_RELATIVE="scripts/mcp_project_graph.py"
+MCP_GRAPH_ABSOLUTE="$PROJECT_ROOT/$MCP_GRAPH_RELATIVE"
+
+# Detect repository (for .env file suggestion)
 if [ -n "$GITHUB_REPO" ]; then
     echo "📦 Detected repository: $GITHUB_REPO"
-    cat > "$CURSOR_CONFIG" << EOF
-{
-  "mcpServers": {
-    "github-issues": {
-      "command": "python3",
-      "args": [
-        "$MCP_SERVER_RELATIVE_PATH"
-      ],
-      "env": {
-        "GITHUB_TOKEN": "\${GITHUB_TOKEN}",
-        "GITHUB_REPO": "$GITHUB_REPO"
-      }
-    }
-  }
-}
-EOF
-else
-    echo "⚠️  Could not detect repository from git, creating config without GITHUB_REPO"
-    cat > "$CURSOR_CONFIG" << EOF
-{
-  "mcpServers": {
-    "github-issues": {
-      "command": "python3",
-      "args": [
-        "$MCP_SERVER_RELATIVE_PATH"
-      ],
-      "env": {
-        "GITHUB_TOKEN": "\${GITHUB_TOKEN}"
-      }
-    }
-  }
-}
-EOF
 fi
+
+# Create unified configuration (both servers, no env variables)
+cat > "$CURSOR_CONFIG" << EOF
+{
+  "mcpServers": {
+    "github-workflow": {
+      "command": "python3",
+      "args": [
+        "$MCP_GITHUB_ABSOLUTE"
+      ],
+      "description": "GitHub workflow management (issues, PRs, CI)"
+    },
+    "project-graph": {
+      "command": "python3",
+      "args": [
+        "$MCP_GRAPH_ABSOLUTE"
+      ],
+      "description": "Project graph navigation"
+    }
+  }
+}
+EOF
 
 echo "✅ Configuration created at $CURSOR_CONFIG"
 echo ""
 echo "📝 Next steps:"
-echo "   1. Ensure GITHUB_TOKEN is set in your environment or .env file"
+echo "   1. Add to .env file:"
+if [ -n "$GITHUB_REPO" ]; then
+    echo "      echo 'GITHUB_TOKEN=your_token_here' >> .env"
+    echo "      echo 'GITHUB_REPO=$GITHUB_REPO' >> .env"
+else
+    echo "      echo 'GITHUB_TOKEN=your_token_here' >> .env"
+    echo "      echo 'GITHUB_REPO=owner/repo' >> .env"
+fi
 echo "   2. Restart Cursor"
 echo "   3. Test by asking: 'List all open GitHub issues'"
 echo ""
-echo "💡 To verify token:"
-echo "   export GITHUB_TOKEN=your_token_here"
-echo "   # or add to .env file:"
-echo "   echo 'GITHUB_TOKEN=your_token_here' >> .env"
+echo "💡 MCP servers configured:"
+echo "   • github-workflow: GitHub issues, PRs, CI"
+echo "   • project-graph: Project navigation"
+echo ""
+echo "🔒 Security: GITHUB_TOKEN and GITHUB_REPO read from .env file"
