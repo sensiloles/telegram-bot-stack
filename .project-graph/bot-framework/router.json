@@ -43,7 +43,7 @@
       "name": "Utilities",
       "description": "Decorators and helper functions",
       "modules": 1,
-      "lines_of_code": 185,
+      "lines_of_code": 2281,
       "recommended_for": [
         "Adding new decorators",
         "Adding utility functions",
@@ -83,9 +83,9 @@
   "statistics": {
     "total_sub_graphs": 3,
     "total_modules": 10,
-    "total_lines_of_code": 1729,
+    "total_lines_of_code": 3825,
     "cross_graph_edges": 3,
-    "total_nodes": 10,
-    "total_edges": 0
+    "total_nodes": 28,
+    "total_edges": 15
   }
 }

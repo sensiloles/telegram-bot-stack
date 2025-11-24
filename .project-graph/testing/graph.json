@@ -8,8 +8,8 @@
     "project_name": "telegram-bot-stack",
     "description": "Test suite, fixtures, and testing utilities",
     "scope": "Unit tests, integration tests, fixtures",
-    "node_count": 15,
-    "edge_count": 28
+    "node_count": 21,
+    "edge_count": 34
   },
   "nodes": [
     {
@@ -501,6 +501,175 @@
       "functions": []
     },
     {
+      "id": "tests.cli.test_init_command",
+      "name": "test_init_command",
+      "type": "test_module",
+      "path": "tests/cli/test_init_command.py",
+      "description": "Tests for init command.",
+      "lines_of_code": 195,
+      "exports": [
+        "test_init_basic",
+        "test_init_with_linting",
+        "test_init_with_testing",
+        "test_init_with_vscode",
+        "test_init_with_pycharm",
+        "test_init_with_git",
+        "test_init_pyproject_toml",
+        "test_init_existing_directory",
+        "test_init_minimal"
+      ],
+      "classes": [],
+      "functions": [
+        "test_init_basic",
+        "test_init_with_linting",
+        "test_init_with_testing",
+        "test_init_with_vscode",
+        "test_init_with_pycharm",
+        "test_init_with_git",
+        "test_init_pyproject_toml",
+        "test_init_existing_directory",
+        "test_init_minimal"
+      ]
+    },
+    {
+      "id": "tests.cli.test_utils",
+      "name": "test_utils",
+      "type": "test_module",
+      "path": "tests/cli/test_utils.py",
+      "description": "Tests for CLI utility modules.",
+      "lines_of_code": 124,
+      "exports": [
+        "TestVenvUtils",
+        "TestDependenciesUtils",
+        "TestGitUtils",
+        "test_create_virtualenv",
+        "test_get_venv_python",
+        "test_get_venv_pip",
+        "test_get_activation_command",
+        "test_create_requirements_file",
+        "test_create_pyproject_toml",
+        "test_create_gitignore",
+        "test_init_git",
+        "test_init_git_with_commit"
+      ],
+      "classes": [
+        "TestVenvUtils",
+        "TestDependenciesUtils",
+        "TestGitUtils"
+      ],
+      "functions": [
+        "test_create_virtualenv",
+        "test_get_venv_python",
+        "test_get_venv_pip",
+        "test_get_activation_command",
+        "test_create_requirements_file",
+        "test_create_pyproject_toml",
+        "test_create_gitignore",
+        "test_init_git",
+        "test_init_git_with_commit"
+      ]
+    },
+    {
+      "id": "tests.cli.test_cli_main",
+      "name": "test_cli_main",
+      "type": "test_module",
+      "path": "tests/cli/test_cli_main.py",
+      "description": "Tests for CLI main entry point.",
+      "lines_of_code": 69,
+      "exports": [
+        "test_cli_help",
+        "test_cli_version",
+        "test_init_help",
+        "test_new_help",
+        "test_dev_help",
+        "test_validate_help"
+      ],
+      "classes": [],
+      "functions": [
+        "test_cli_help",
+        "test_cli_version",
+        "test_init_help",
+        "test_new_help",
+        "test_dev_help",
+        "test_validate_help"
+      ]
+    },
+    {
+      "id": "tests.cli.test_dev_command",
+      "name": "test_dev_command",
+      "type": "test_module",
+      "path": "tests/cli/test_dev_command.py",
+      "description": "Tests for the 'dev' command.",
+      "lines_of_code": 110,
+      "exports": [
+        "test_dev_no_bot_file",
+        "test_dev_with_bot_file",
+        "test_dev_no_env_warning",
+        "test_dev_custom_bot_file",
+        "test_dev_reload_mode",
+        "test_dev_help"
+      ],
+      "classes": [],
+      "functions": [
+        "test_dev_no_bot_file",
+        "test_dev_with_bot_file",
+        "test_dev_no_env_warning",
+        "test_dev_custom_bot_file",
+        "test_dev_reload_mode",
+        "test_dev_help"
+      ]
+    },
+    {
+      "id": "tests.cli.test_validate_command",
+      "name": "test_validate_command",
+      "type": "test_module",
+      "path": "tests/cli/test_validate_command.py",
+      "description": "Tests for validate command.",
+      "lines_of_code": 81,
+      "exports": [
+        "test_validate_no_bot_file",
+        "test_validate_no_env_file",
+        "test_validate_no_bot_token",
+        "test_validate_success",
+        "test_validate_strict_mode"
+      ],
+      "classes": [],
+      "functions": [
+        "test_validate_no_bot_file",
+        "test_validate_no_env_file",
+        "test_validate_no_bot_token",
+        "test_validate_success",
+        "test_validate_strict_mode"
+      ]
+    },
+    {
+      "id": "tests.cli.test_new_command",
+      "name": "test_new_command",
+      "type": "test_module",
+      "path": "tests/cli/test_new_command.py",
+      "description": "Tests for the 'new' command.",
+      "lines_of_code": 113,
+      "exports": [
+        "test_new_basic_template",
+        "test_new_counter_template",
+        "test_new_menu_template",
+        "test_new_advanced_template",
+        "test_new_existing_directory",
+        "test_new_default_template",
+        "test_new_help"
+      ],
+      "classes": [],
+      "functions": [
+        "test_new_basic_template",
+        "test_new_counter_template",
+        "test_new_menu_template",
+        "test_new_advanced_template",
+        "test_new_existing_directory",
+        "test_new_default_template",
+        "test_new_help"
+      ]
+    },
+    {
       "id": "tests.examples.test_reminder_bot",
       "name": "test_reminder_bot",
       "type": "test_module",
@@ -907,48 +1076,90 @@
     },
     {
       "id": "edge_22",
+      "source": "tests.cli.test_init_command",
+      "target": "telegram_bot_stack.cli.main",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.main"
+    },
+    {
+      "id": "edge_23",
+      "source": "tests.cli.test_utils",
+      "target": "telegram_bot_stack.cli.utils",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.utils"
+    },
+    {
+      "id": "edge_24",
+      "source": "tests.cli.test_cli_main",
+      "target": "telegram_bot_stack.cli.main",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.main"
+    },
+    {
+      "id": "edge_25",
+      "source": "tests.cli.test_dev_command",
+      "target": "telegram_bot_stack.cli.main",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.main"
+    },
+    {
+      "id": "edge_26",
+      "source": "tests.cli.test_validate_command",
+      "target": "telegram_bot_stack.cli.main",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.main"
+    },
+    {
+      "id": "edge_27",
+      "source": "tests.cli.test_new_command",
+      "target": "telegram_bot_stack.cli.main",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.main"
+    },
+    {
+      "id": "edge_28",
       "source": "tests.examples.test_reminder_bot",
       "target": "telegram_bot_stack.storage",
       "type": "imports",
       "description": "Imports from telegram_bot_stack.storage"
     },
     {
-      "id": "edge_23",
+      "id": "edge_29",
       "source": "tests.examples.test_counter_bot",
       "target": "telegram_bot_stack.storage",
       "type": "imports",
       "description": "Imports from telegram_bot_stack.storage"
     },
     {
-      "id": "edge_24",
+      "id": "edge_30",
       "source": "tests.examples.test_poll_bot",
       "target": "telegram_bot_stack.storage",
       "type": "imports",
       "description": "Imports from telegram_bot_stack.storage"
     },
     {
-      "id": "edge_25",
+      "id": "edge_31",
       "source": "tests.examples.test_menu_bot",
       "target": "telegram_bot_stack.storage",
       "type": "imports",
       "description": "Imports from telegram_bot_stack.storage"
     },
     {
-      "id": "edge_26",
+      "id": "edge_32",
       "source": "tests.examples.test_echo_bot",
       "target": "telegram_bot_stack.storage",
       "type": "imports",
       "description": "Imports from telegram_bot_stack.storage"
     },
     {
-      "id": "edge_27",
+      "id": "edge_33",
       "source": "tests.examples.test_quit_smoking_bot",
       "target": "telegram_bot_stack.storage",
       "type": "imports",
       "description": "Imports from telegram_bot_stack.storage"
     },
     {
-      "id": "edge_28",
+      "id": "edge_34",
       "source": "tests.examples.test_examples",
       "target": "telegram_bot_stack.storage",
       "type": "imports",

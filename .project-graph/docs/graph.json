@@ -37,7 +37,7 @@
       "category": "documentation",
       "path": "docs/mcp-project-graph-setup.md",
       "description": "Documentation: mcp-project-graph-setup",
-      "lines_of_code": 553
+      "lines_of_code": 550
     },
     {
       "id": "docs.quickstart",
@@ -46,7 +46,7 @@
       "category": "documentation",
       "path": "docs/quickstart.md",
       "description": "Documentation: quickstart",
-      "lines_of_code": 292
+      "lines_of_code": 223
     },
     {
       "id": "docs.private_installation",
@@ -91,7 +91,7 @@
       "category": "documentation",
       "path": "docs/mcp-github-setup.md",
       "description": "Documentation: mcp-github-setup",
-      "lines_of_code": 143
+      "lines_of_code": 291
     },
     {
       "id": "docs.storage_guide",
