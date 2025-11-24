@@ -113,6 +113,7 @@ python3 .github/workflows/scripts/merge_pr.py --cleanup
 - Status: `.github/PROJECT_STATUS.md`
 - Graphs: `.project-graph/` (8 domains, 100% coverage)
 - Automation: `.github/workflows/scripts/` (16+ scripts)
+- MCP Server: `scripts/mcp_github_server.py` (GitHub issues integration)
 - Plan: `archive/PACKAGE_CONVERSION_PLAN_RU.md` (archived)
 
 ---
@@ -136,22 +137,26 @@ fix(auth): resolve token validation
 docs(readme): update quickstart
 ```
 
-### GitHub Automation Scripts
+### GitHub Automation
 
-**Issues:**
+**Preferred: MCP Server (if configured)**
+Use MCP tools for GitHub issues directly in chat:
+- `list_issues` - List issues with filters
+- `get_issue` - Get issue details
+- `create_issue` - Create new issue
+- `update_issue` - Update labels, priority, comments, state
+
+**Fallback: CLI Scripts**
 ```bash
 python3 .github/workflows/scripts/read_issues.py --list --state open
 python3 .github/workflows/scripts/create_issue.py --title "Bug: X" --labels bug
 python3 .github/workflows/scripts/update_issue.py <N> --set-priority high
-```
-
-**PRs:**
-```bash
 python3 .github/workflows/scripts/create_pr.py --title "feat: X" --closes <N>
 python3 .github/workflows/scripts/merge_pr.py --cleanup
 ```
 
 See: `.github/workflows/scripts/README.md` for all 16+ scripts.
+MCP Setup: `docs/mcp-github-setup.md`
 
 ### Testing
 
@@ -213,15 +218,15 @@ Threshold: >=80% for `telegram_bot_stack/`
 
 ### On New Context:
 1. Read `.github/PROJECT_STATUS.md` (20 lines)
-2. Check open issues: `read_issues.py --list --state open`
+2. Check open issues: Use MCP `list_issues` tool (or `read_issues.py --list --state open`)
 3. Verify branch: `git branch --show-current` (NOT main)
 4. Load relevant graph from `.project-graph/`
 5. Implement following workflow above
 
 ### On "Continue Work":
 1. Check `PROJECT_STATUS.md`
-2. List open issues → identify active
-3. Read issue details
+2. List open issues: Use MCP `list_issues` → identify active
+3. Read issue details: Use MCP `get_issue <N>`
 4. Check current branch
 5. Load relevant graph
 6. Implement → test → commit → push → PR
@@ -243,6 +248,7 @@ Threshold: >=80% for `telegram_bot_stack/`
 **Detailed guides:**
 - Multi-Graph System: `.project-graph/README.md`
 - GitHub Automation: `.github/workflows/scripts/README.md`
+- MCP Setup: `docs/mcp-github-setup.md`
 - PR Automation: `.github/PR_AUTOMATION.md`
 - Architecture: `README.md` (lines 155-250)
 - Testing: `README.md` (lines 80-154)
@@ -342,6 +348,7 @@ Goal: Maximum density, minimum tokens, zero ambiguity.
 
 Before EVERY implementation:
 - [ ] Check branch (not main)
+- [ ] Check open issues (MCP `list_issues` or CLI)
 - [ ] Load graph-router.json
 - [ ] Load relevant domain graph
 - [ ] Understand dependencies/impact
