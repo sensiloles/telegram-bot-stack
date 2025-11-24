@@ -156,18 +156,18 @@ class TestExampleBots:
         bot = bot_class(storage=storage, bot_name=f"Test {bot_name}")
 
         # Verify bot has required attributes
-        assert hasattr(bot, "storage"), (
-            f"{bot_class.__name__} missing storage attribute"
-        )
-        assert hasattr(bot, "user_manager"), (
-            f"{bot_class.__name__} missing user_manager"
-        )
-        assert hasattr(bot, "admin_manager"), (
-            f"{bot_class.__name__} missing admin_manager"
-        )
-        assert hasattr(bot, "register_handlers"), (
-            f"{bot_class.__name__} missing register_handlers method"
-        )
+        assert hasattr(
+            bot, "storage"
+        ), f"{bot_class.__name__} missing storage attribute"
+        assert hasattr(
+            bot, "user_manager"
+        ), f"{bot_class.__name__} missing user_manager"
+        assert hasattr(
+            bot, "admin_manager"
+        ), f"{bot_class.__name__} missing admin_manager"
+        assert hasattr(
+            bot, "register_handlers"
+        ), f"{bot_class.__name__} missing register_handlers method"
 
         # Verify storage is set correctly
         assert bot.storage is storage, f"{bot_class.__name__} storage not set correctly"
@@ -236,14 +236,14 @@ class TestExampleBotsIntegration:
             # New style: def __init__(self, storage, bot_name="...")
 
             # Should not have 'token' as first parameter after self
-            assert "def __init__(self, token:" not in content, (
-                f"{bot_name} still uses old-style initialization with token parameter"
-            )
+            assert (
+                "def __init__(self, token:" not in content
+            ), f"{bot_name} still uses old-style initialization with token parameter"
 
             # Should not have 'admin_ids' parameter
-            assert "admin_ids: List[int]" not in content, (
-                f"{bot_name} still uses old-style initialization with admin_ids parameter"
-            )
+            assert (
+                "admin_ids: List[int]" not in content
+            ), f"{bot_name} still uses old-style initialization with admin_ids parameter"
 
     def test_all_bots_have_main_function(self):
         """Test that all bots have a main() function."""
@@ -256,9 +256,9 @@ class TestExampleBotsIntegration:
 
             assert "def main():" in content, f"{bot_name} missing main() function"
 
-            assert 'if __name__ == "__main__":' in content, (
-                f"{bot_name} missing __main__ guard"
-            )
+            assert (
+                'if __name__ == "__main__":' in content
+            ), f"{bot_name} missing __main__ guard"
 
     def test_all_bots_use_post_init_wrapper(self):
         """Test that all bots use post_init wrapper for set_bot_commands."""
@@ -270,10 +270,10 @@ class TestExampleBotsIntegration:
             content = bot_file.read_text()
 
             # Should use async wrapper
-            assert "async def post_init_wrapper" in content, (
-                f"{bot_name} missing post_init_wrapper"
-            )
+            assert (
+                "async def post_init_wrapper" in content
+            ), f"{bot_name} missing post_init_wrapper"
 
-            assert "await bot.set_bot_commands()" in content, (
-                f"{bot_name} not calling set_bot_commands correctly"
-            )
+            assert (
+                "await bot.set_bot_commands()" in content
+            ), f"{bot_name} not calling set_bot_commands correctly"
