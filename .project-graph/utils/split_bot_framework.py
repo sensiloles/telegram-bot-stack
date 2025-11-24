@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""Split bot-framework-graph.json into hierarchical sub-graphs."""
+"""Split bot-framework-graph.json into hierarchical sub-graphs.
+
+Auto-discovers modules by directory structure to avoid manual maintenance.
+"""
 
 import json
 from pathlib import Path
@@ -19,35 +22,83 @@ def save_graph(graph: Dict[str, Any], path: Path):
         f.write("\n")  # Add newline at end
 
 
+def classify_module(module_id: str) -> str:
+    """Classify module into a sub-graph based on its path.
+
+    Args:
+        module_id: Module identifier (e.g., 'telegram_bot_stack.storage.json')
+
+    Returns:
+        Sub-graph name: 'core', 'storage', 'cli', or 'utilities'
+    """
+    # Storage: anything in telegram_bot_stack/storage/
+    if ".storage" in module_id:
+        return "storage"
+
+    # CLI: anything in telegram_bot_stack/cli/
+    if ".cli" in module_id:
+        return "cli"
+
+    # Utilities: decorators module
+    if module_id == "telegram_bot_stack.decorators":
+        return "utilities"
+
+    # Core: everything else in telegram_bot_stack (root level modules)
+    # This includes: __init__, bot_base, user_manager, admin_manager
+    return "core"
+
+
+def auto_discover_modules(graph: Dict[str, Any]) -> Dict[str, List[str]]:
+    """Auto-discover and classify all modules from graph.
+
+    Args:
+        graph: Full bot-framework graph
+
+    Returns:
+        Dictionary mapping sub-graph name to list of module IDs
+    """
+    module_groups = {
+        "core": [],
+        "storage": [],
+        "cli": [],
+        "utilities": [],
+    }
+
+    for node in graph["nodes"]:
+        module_id = node["id"]
+        sub_graph = classify_module(module_id)
+        module_groups[sub_graph].append(module_id)
+
+    return module_groups
+
+
 def split_graph():
-    """Split bot-framework-graph into 3 sub-graphs."""
+    """Split bot-framework-graph into sub-graphs with auto-discovery."""
 
     # Load original graph
     graph_path = Path(__file__).parent / "bot-framework-graph.json"
     graph = load_graph(graph_path)
 
-    # Define module groups
-    core_modules = [
-        "telegram_bot_stack.__init__",
-        "telegram_bot_stack.bot_base",
-        "telegram_bot_stack.user_manager",
-        "telegram_bot_stack.admin_manager",
-    ]
+    # Auto-discover module groups
+    print("🔍 Auto-discovering modules...")
+    module_groups = auto_discover_modules(graph)
 
-    storage_modules = [
-        "telegram_bot_stack.storage",
-        "telegram_bot_stack.storage.base",
-        "telegram_bot_stack.storage.json",
-        "telegram_bot_stack.storage.memory",
-        "telegram_bot_stack.storage.sql",
-    ]
+    core_modules = module_groups["core"]
+    storage_modules = module_groups["storage"]
+    cli_modules = module_groups["cli"]
+    utilities_modules = module_groups["utilities"]
 
-    utilities_modules = ["telegram_bot_stack.decorators"]
+    print(f"  Core: {len(core_modules)} modules")
+    print(f"  Storage: {len(storage_modules)} modules")
+    print(f"  CLI: {len(cli_modules)} modules")
+    print(f"  Utilities: {len(utilities_modules)} modules")
+    print()
 
     # Split nodes
     core_nodes = [n for n in graph["nodes"] if n["id"] in core_modules]
     storage_nodes = [n for n in graph["nodes"] if n["id"] in storage_modules]
     utilities_nodes = [n for n in graph["nodes"] if n["id"] in utilities_modules]
+    cli_nodes = [n for n in graph["nodes"] if n["id"] in cli_modules]
 
     # Split edges
     def get_edges_for_modules(module_ids: List[str]) -> List[Dict]:
@@ -61,6 +112,7 @@ def split_graph():
     core_edges = get_edges_for_modules(core_modules)
     storage_edges = get_edges_for_modules(storage_modules)
     utilities_edges = get_edges_for_modules(utilities_modules)
+    cli_edges = get_edges_for_modules(cli_modules)
 
     # Create core graph
     core_graph = {
@@ -121,13 +173,13 @@ def split_graph():
     utilities_graph = {
         "metadata": {
             "version": "3.0.0",
-            "generated_at": "2025-11-19",
+            "generated_at": "2025-11-24",
             "graph_id": "bot_framework_utilities",
             "graph_name": "Bot Framework - Utilities",
             "graph_type": "sub_graph",
             "parent_graph": "bot_framework",
             "project_name": "telegram-bot-stack",
-            "project_version": "1.6.0",
+            "project_version": "1.15.0",
             "description": "Utility decorators and helper functions",
             "scope": "Decorators (rate_limit) and utilities",
             "root_package": "telegram_bot_stack",
@@ -143,17 +195,44 @@ def split_graph():
         },
     }
 
+    # Create CLI graph (new in v2.0.0 - Killer Feature #1)
+    cli_graph = {
+        "metadata": {
+            "version": "3.0.0",
+            "generated_at": "2025-11-24",
+            "graph_id": "bot_framework_cli",
+            "graph_name": "Bot Framework - CLI",
+            "graph_type": "sub_graph",
+            "parent_graph": "bot_framework",
+            "project_name": "telegram-bot-stack",
+            "project_version": "1.15.0",
+            "description": "CLI tool for bot project management and development",
+            "scope": "Commands (init, new, dev, validate) and utilities (venv, git, linting, testing, IDE)",
+            "root_package": "telegram_bot_stack.cli",
+            "node_count": len(cli_nodes),
+            "edge_count": len(cli_edges),
+        },
+        "nodes": cli_nodes,
+        "edges": cli_edges,
+        "external_dependencies": {
+            "description": "Dependencies to modules in other sub-graphs",
+            "core": [],
+            "storage": [],
+            "utilities": [],
+        },
+    }
+
     # Create domain router
     router = {
         "metadata": {
             "version": "3.0.0",
-            "generated_at": "2025-11-19",
+            "generated_at": "2025-11-24",
             "graph_id": "bot_framework",
             "graph_name": "Bot Framework",
             "graph_type": "domain_router",
             "has_sub_graphs": True,
             "project_name": "telegram-bot-stack",
-            "project_version": "1.6.0",
+            "project_version": "1.15.0",
             "description": "Router for bot framework sub-graphs",
         },
         "sub_graphs": {
@@ -198,6 +277,20 @@ def split_graph():
                     "Rate limiting changes",
                 ],
             },
+            "cli": {
+                "file": "bot-framework/cli-graph.json",
+                "graph_id": "bot_framework_cli",
+                "name": "CLI",
+                "description": "CLI tool for bot project management (init, new, dev, validate)",
+                "modules": len(cli_nodes),
+                "lines_of_code": sum(n.get("lines_of_code", 0) for n in cli_nodes),
+                "recommended_for": [
+                    "CLI command development",
+                    "Project scaffolding changes",
+                    "Dev environment automation",
+                    "Working on Issue #40 (Killer Feature #1)",
+                ],
+            },
         },
         "cross_graph_edges": [
             {
@@ -229,14 +322,17 @@ def split_graph():
             },
         ],
         "statistics": {
-            "total_sub_graphs": 3,
+            "total_sub_graphs": 4,
             "total_modules": len(core_nodes)
             + len(storage_nodes)
-            + len(utilities_nodes),
+            + len(utilities_nodes)
+            + len(cli_nodes),
             "total_lines_of_code": sum(
                 n.get("lines_of_code", 0) for n in graph["nodes"]
             ),
             "cross_graph_edges": 3,
+            "total_nodes": len(core_nodes) + len(storage_nodes) + len(utilities_nodes) + len(cli_nodes),
+            "total_edges": len(core_edges) + len(storage_edges) + len(utilities_edges) + len(cli_edges),
         },
     }
 
@@ -259,8 +355,13 @@ def split_graph():
         f"✅ Created bot-framework/utilities-graph.json ({len(utilities_nodes)} nodes, {len(utilities_edges)} edges)"
     )
 
+    save_graph(cli_graph, output_dir / "cli-graph.json")
+    print(
+        f"✅ Created bot-framework/cli-graph.json ({len(cli_nodes)} nodes, {len(cli_edges)} edges)"
+    )
+
     save_graph(router, output_dir / "router.json")
-    print("✅ Created bot-framework/router.json (3 sub-graphs)")
+    print(f"✅ Created bot-framework/router.json ({router['statistics']['total_sub_graphs']} sub-graphs)")
 
     # Print summary
     print("\n📊 Summary:")
@@ -272,6 +373,9 @@ def split_graph():
     )
     print(
         f"  Utilities: {len(utilities_nodes)} modules, {sum(n.get('lines_of_code', 0) for n in utilities_nodes)} LOC"
+    )
+    print(
+        f"  CLI: {len(cli_nodes)} modules, {sum(n.get('lines_of_code', 0) for n in cli_nodes)} LOC"
     )
     print(
         f"  Total: {len(graph['nodes'])} modules, {sum(n.get('lines_of_code', 0) for n in graph['nodes'])} LOC"

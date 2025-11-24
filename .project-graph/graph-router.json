@@ -37,8 +37,8 @@
           "name": "Utilities",
           "description": "Decorators and helpers",
           "file": "bot-framework/utilities-graph.json",
-          "lines": 42,
-          "lines_of_code": 185
+          "lines": 549,
+          "lines_of_code": 2281
         }
       },
       "coverage": {
@@ -181,7 +181,7 @@
       "complexity": "medium",
       "criticality": "high",
       "update_frequency": "high",
-      "lines": 958
+      "lines": 1169
     },
     "examples": {
       "id": "examples",

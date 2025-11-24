@@ -184,8 +184,66 @@ def find_imports_in_files(
     return edges
 
 
+def classify_module_by_path(file_path: Path, bot_dir: Path) -> str:
+    """Classify module into sub-graph based on file path.
+
+    Args:
+        file_path: Path to Python file
+        bot_dir: Root telegram_bot_stack directory
+
+    Returns:
+        Sub-graph name: 'core', 'storage', 'cli', or 'utilities'
+    """
+    rel_path = file_path.relative_to(bot_dir)
+    path_parts = rel_path.parts
+
+    # Check first directory level
+    if len(path_parts) > 1:
+        first_dir = path_parts[0]
+
+        if first_dir == "storage":
+            return "storage"
+        elif first_dir == "cli":
+            return "cli"
+
+    # Special case: decorators.py -> utilities
+    if file_path.name == "decorators.py":
+        return "utilities"
+
+    # Everything else in root -> core
+    return "core"
+
+
+def auto_discover_bot_modules(bot_dir: Path) -> Dict[str, List[Path]]:
+    """Auto-discover and group all bot framework modules.
+
+    Args:
+        bot_dir: Root telegram_bot_stack directory
+
+    Returns:
+        Dictionary mapping sub-graph name to list of file paths
+    """
+    module_groups = {
+        "core": [],
+        "storage": [],
+        "cli": [],
+        "utilities": [],
+    }
+
+    # Scan all Python files
+    for py_file in bot_dir.rglob("*.py"):
+        # Skip __pycache__
+        if "__pycache__" in py_file.parts:
+            continue
+
+        sub_graph = classify_module_by_path(py_file, bot_dir)
+        module_groups[sub_graph].append(py_file)
+
+    return module_groups
+
+
 def regenerate_bot_framework_graphs(dry_run: bool = False) -> None:
-    """Regenerate bot_framework sub-graphs."""
+    """Regenerate bot_framework sub-graphs with auto-discovery."""
     project_root = get_project_root()
     graph_root = get_graph_root()
 
@@ -196,53 +254,44 @@ def regenerate_bot_framework_graphs(dry_run: bool = False) -> None:
         print("⚠️  telegram_bot_stack directory not found")
         return
 
-    # Define sub-graphs
-    sub_graphs = {
+    # Auto-discover modules
+    print("🔍 Auto-discovering modules...")
+    module_groups = auto_discover_bot_modules(bot_dir)
+
+    # Print discovery results
+    for sub_id, files in module_groups.items():
+        if files:
+            print(f"   {sub_id}: {len(files)} modules")
+    print()
+
+    # Sub-graph metadata
+    sub_graph_metadata = {
         "core": {
-            "files": [
-                "bot_base.py",
-                "user_manager.py",
-                "admin_manager.py",
-                "__init__.py"
-            ],
             "name": "Core",
             "description": "Core bot framework components",
         },
         "storage": {
-            "directory": "storage",
             "name": "Storage",
             "description": "Storage abstraction layer and implementations",
         },
+        "cli": {
+            "name": "CLI",
+            "description": "CLI tool for bot project management and development",
+        },
         "utilities": {
-            "files": ["decorators.py"],
-            "directories": ["cli"],
             "name": "Utilities",
-            "description": "Utility functions and CLI tools",
+            "description": "Utility decorators and helper functions",
         },
     }
 
-    for sub_id, sub_info in sub_graphs.items():
+    for sub_id, python_files in module_groups.items():
+        if not python_files:
+            continue
+
         print(f"\n📊 Generating {sub_id} sub-graph...")
 
+        sub_info = sub_graph_metadata[sub_id]
         nodes = []
-        python_files = []
-
-        # Collect files for this sub-graph
-        if "directory" in sub_info:
-            sub_dir = bot_dir / sub_info["directory"]
-            if sub_dir.exists():
-                python_files = list(sub_dir.rglob("*.py"))
-        else:
-            if "files" in sub_info:
-                for fname in sub_info["files"]:
-                    fpath = bot_dir / fname
-                    if fpath.exists():
-                        python_files.append(fpath)
-            if "directories" in sub_info:
-                for dname in sub_info["directories"]:
-                    dpath = bot_dir / dname
-                    if dpath.exists():
-                        python_files.extend(dpath.rglob("*.py"))
 
         # Create nodes
         for file_path in python_files:
@@ -285,6 +334,140 @@ def regenerate_bot_framework_graphs(dry_run: bool = False) -> None:
             with open(output_file, "w") as f:
                 json.dump(graph, f, indent=2)
             print(f"   ✅ Saved: {output_file.name}")
+
+    # Auto-generate router.json from created sub-graphs
+    if not dry_run:
+        print("\n📋 Generating bot-framework router...")
+        generate_bot_framework_router(graph_root)
+
+
+def generate_bot_framework_router(graph_root: Path) -> None:
+    """Auto-generate bot-framework/router.json from sub-graphs.
+
+    Reads all *-graph.json files in bot-framework/ and creates router.
+    """
+    bf_dir = graph_root / "bot-framework"
+
+    # Load all sub-graphs
+    sub_graphs_data = {}
+    total_modules = 0
+    total_loc = 0
+
+    for graph_file in sorted(bf_dir.glob("*-graph.json")):
+        if graph_file.name == "router.json":
+            continue
+
+        sub_id = graph_file.stem.replace("-graph", "")
+
+        with open(graph_file) as f:
+            graph = json.load(f)
+
+        metadata = graph["metadata"]
+        nodes = graph.get("nodes", [])
+
+        # Calculate statistics
+        modules_count = len(nodes)
+        loc_count = sum(n.get("lines_of_code", 0) for n in nodes)
+
+        total_modules += modules_count
+        total_loc += loc_count
+
+        # Determine recommended_for
+        recommended_for = []
+        if sub_id == "core":
+            recommended_for = [
+                "Adding new bot features",
+                "Customizing bot behavior",
+                "User/admin management changes",
+            ]
+        elif sub_id == "storage":
+            recommended_for = [
+                "Adding new storage backend",
+                "Storage migration",
+                "Data persistence changes",
+            ]
+        elif sub_id == "cli":
+            recommended_for = [
+                "CLI command development",
+                "Project scaffolding changes",
+                "Dev environment automation",
+                "Working on Issue #40 (Killer Feature #1)",
+            ]
+        elif sub_id == "utilities":
+            recommended_for = [
+                "Adding new decorators",
+                "Adding utility functions",
+                "Rate limiting changes",
+            ]
+
+        sub_graphs_data[sub_id] = {
+            "file": f"bot-framework/{graph_file.name}",
+            "graph_id": metadata["graph_id"],
+            "name": metadata.get("graph_name", "").replace("Bot Framework - ", ""),
+            "description": metadata["description"],
+            "modules": modules_count,
+            "lines_of_code": loc_count,
+            "recommended_for": recommended_for,
+        }
+
+    # Create router
+    router = {
+        "metadata": {
+            "version": "3.0.0",
+            "generated_at": datetime.now().strftime("%Y-%m-%d"),
+            "graph_id": "bot_framework",
+            "graph_name": "Bot Framework",
+            "graph_type": "domain_router",
+            "has_sub_graphs": True,
+            "project_name": "telegram-bot-stack",
+            "project_version": "1.15.0",
+            "description": "Router for bot framework sub-graphs",
+        },
+        "sub_graphs": sub_graphs_data,
+        "cross_graph_edges": [
+            {
+                "id": "cross_edge_1",
+                "source_graph": "core",
+                "source_node": "telegram_bot_stack.bot_base",
+                "target_graph": "storage",
+                "target_node": "telegram_bot_stack.storage.base",
+                "type": "uses",
+                "description": "BotBase uses StorageBackend interface",
+            },
+            {
+                "id": "cross_edge_2",
+                "source_graph": "core",
+                "source_node": "telegram_bot_stack.__init__",
+                "target_graph": "storage",
+                "target_node": "telegram_bot_stack.storage",
+                "type": "imports",
+                "description": "Public API imports storage factories",
+            },
+            {
+                "id": "cross_edge_3",
+                "source_graph": "core",
+                "source_node": "telegram_bot_stack.__init__",
+                "target_graph": "utilities",
+                "target_node": "telegram_bot_stack.decorators",
+                "type": "imports",
+                "description": "Public API imports decorators",
+            },
+        ],
+        "statistics": {
+            "total_sub_graphs": len(sub_graphs_data),
+            "total_modules": total_modules,
+            "total_lines_of_code": total_loc,
+            "cross_graph_edges": 3,
+        },
+    }
+
+    # Save router
+    router_file = bf_dir / "router.json"
+    with open(router_file, "w") as f:
+        json.dump(router, f, indent=2)
+        f.write("\n")
+
+    print(f"   ✅ Generated router.json ({len(sub_graphs_data)} sub-graphs, {total_modules} modules)")
 
 
 def regenerate_docs_graph(dry_run: bool = False) -> None:
