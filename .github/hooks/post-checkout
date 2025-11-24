@@ -1,0 +1,23 @@
+#!/bin/bash
+# Post-checkout hook to remind about MCP servers
+# This runs after git checkout (switching branches, cloning, etc.)
+
+# Check if this is initial clone or branch switch
+prev_head=$1
+new_head=$2
+branch_checkout=$3
+
+# Only show reminder on branch checkout or initial clone
+if [ "$branch_checkout" = "1" ] || [ -z "$prev_head" ]; then
+    # Check if .cursor/mcp.json exists
+    if [ -f ".cursor/mcp.json" ]; then
+        echo ""
+        echo "💡 MCP Servers configured for this project!"
+        echo "   Enable in Cursor: Settings → Tools & MCP"
+        echo ""
+        echo "   Run: bash scripts/check_mcp_status.sh"
+        echo ""
+    fi
+fi
+
+exit 0

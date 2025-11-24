@@ -21,49 +21,46 @@ pip install mcp
 
 ### 2. Configure Cursor
 
-Add to your Cursor settings (`.cursor/mcp_config.json` or Cursor settings):
+**Recommended:** Add to workspace-specific settings (`.vscode/settings.json`):
 
 ```json
 {
-  "mcpServers": {
+  "cursor.mcp.servers": {
+    "github-workflow": {
+      "command": "python3",
+      "args": ["${workspaceFolder}/scripts/mcp_github_server.py"],
+      "description": "GitHub workflow management (issues, PRs, CI)"
+    },
     "project-graph": {
       "command": "python3",
-      "args": [
-        "/absolute/path/to/telegram-bot-stack/scripts/mcp_project_graph.py"
-      ],
-      "description": "Project graph navigation for telegram-bot-stack"
-    }
-  }
-}
-```
-
-**Important:** Use absolute path to ensure MCP server starts correctly.
-
-**For this project:**
-
-```json
-{
-  "mcpServers": {
-    "project-graph": {
-      "command": "python3",
-      "args": [
-        "/Users/sensiloles/Documents/work/telegram-bot-stack/scripts/mcp_project_graph.py"
-      ],
+      "args": ["${workspaceFolder}/scripts/mcp_project_graph.py"],
       "description": "Project graph navigation"
     }
   }
 }
 ```
 
-**Or** add to workspace-specific settings:
+**Why workspace-specific?**
+
+- ✅ Uses `${workspaceFolder}` - works on any machine
+- ✅ Can be version controlled and shared with team
+- ✅ Project isolation - doesn't affect other Cursor projects
+
+**Alternative:** Run setup script (automatically creates workspace config):
+
+```bash
+bash scripts/setup_mcp.sh
+```
+
+**Legacy option:** Create `.cursor/mcp.json` (requires absolute paths):
 
 ```json
-// .vscode/settings.json or workspace settings
 {
-  "cursor.mcp.servers": {
+  "mcpServers": {
     "project-graph": {
       "command": "python3",
-      "args": ["${workspaceFolder}/scripts/mcp_project_graph.py"]
+      "args": ["/absolute/path/to/scripts/mcp_project_graph.py"],
+      "description": "Project graph navigation"
     }
   }
 }
