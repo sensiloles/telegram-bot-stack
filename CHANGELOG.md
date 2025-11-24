@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.14.0 (2025-11-24)
+
+### Features
+
+- **mcp**: Fix project-graph server and auto-generate graphs
+  ([`6bc51c1`](https://github.com/sensiloles/telegram-bot-stack/commit/6bc51c1162896e9d228aae6c96cdaf9d1d6b9d1c))
+
+
 ## v1.13.0 (2025-11-24)
 
 ### Features
