@@ -3,6 +3,7 @@
 ## CRITICAL WORKFLOW (Always Follow This Order)
 
 ### 1. GitHub Flow - NEVER Push to Main
+
 ```bash
 git branch --show-current # MUST NOT be 'main'
 ```
@@ -14,71 +15,19 @@ git checkout -b feature/<issue>-<name> # or fix/, docs/
 
 main branch is **protected** - direct pushes will fail.
 
-### 2. Graph Analysis - BEFORE Any Implementation
+### 2. Implementation
 
-**ALWAYS load graphs before coding:**
+Before coding:
+- Check open issues: Use MCP `list_issues` (or `python3 .github/workflows/scripts/read_issues.py --list --state open`)
+- Understand task requirements
+- Plan changes
 
-```python
-from utils.graph_utils import load_router, get_recommended_graph, load_graph_by_type
-
-# Step 1: Load router
-router = load_router() # 783 lines
-
-# Step 2: Get recommendation for task
-graph_file = get_recommended_graph(router, "your task")
-
-# Step 3: Load specific domain
-graph = load_graph_by_type('docs') # or 'bot_framework', 'testing', etc.
-```
-
-**Decision tree:**
-- Framework code → `load_graph_by_type('bot_framework')` → `load_sub_graph('bot_framework', 'storage')`
-- CI/CD, automation → `load_graph_by_type('infrastructure')`
-- Tests → `load_graph_by_type('testing')`
-- Documentation → `load_graph_by_type('docs')`
-- Build/config → `load_graph_by_type('configuration')`
-- History → `load_graph_by_type('archive')`
-- Examples → `load_graph_by_type('examples')`
-
-**Why:** 90-95% token savings. Read 900 lines instead of 10,000+.
-
-See: `.project-graph/README.md` for complete guide.
-
-### 3. Implementation
-
-After loading relevant graph:
-- Check dependencies/dependents in graph
-- Understand impact (use `get_impact_analysis()`)
+During implementation:
 - Implement changes
 - Write tests (>=80% coverage for `telegram_bot_stack/`)
+- Update documentation if needed
 
-### 4. Graph Update - AFTER Code Changes (If Needed)
-
-**When to update:**
-- `telegram_bot_stack/` → update `bot-framework/` graph
-- `.github/workflows/` → update `infrastructure/graph.json`
-- `tests/` → update `testing/graph.json`
-- `examples/` → update `examples/graph.json`
-- `docs/` → update `docs/graph.json`
-
-**Skip update for:**
-- Documentation-only changes
-- Bug fixes without structure changes
-- Minor refactoring within same module
-
-**How to update:**
-```bash
-# Edit relevant graph in .project-graph/
-# Update metadata.generated_at to current date
-# Update node_count, edge_count if changed
-
-# Validate
-cd .project-graph && python3 utils/graph_utils.py
-```
-
-See: `.project-graph/README.md` → "Maintenance" section for examples.
-
-### 5. Commit & Push
+### 3. Commit & Push
 
 ```bash
 git status
@@ -87,13 +36,13 @@ git commit -m "type(scope): description" # See Conventional Commits below
 git push -u origin feature/<name>
 ```
 
-### 6. Create PR (Automated)
+### 4. Create PR (Automated)
 
 ```bash
 python3 .github/workflows/scripts/create_pr.py --title "type(scope): description" --closes <issue>
 ```
 
-### 7. Merge PR (One Command)
+### 5. Merge PR (One Command)
 
 ```bash
 python3 .github/workflows/scripts/merge_pr.py --cleanup
@@ -111,8 +60,7 @@ python3 .github/workflows/scripts/merge_pr.py --cleanup
 
 **Key Files:**
 - Status: `.github/PROJECT_STATUS.md`
-- Graphs: `.project-graph/` (8 domains, 100% coverage)
-- Automation: `.github/workflows/scripts/` (16+ scripts)
+- Automation: `.github/workflows/scripts/` (automation scripts)
 - MCP Server: `scripts/mcp_github_server.py` (GitHub issues integration)
 - Plan: `archive/PACKAGE_CONVERSION_PLAN_RU.md` (archived)
 
@@ -155,7 +103,7 @@ python3 .github/workflows/scripts/create_pr.py --title "feat: X" --closes <N>
 python3 .github/workflows/scripts/merge_pr.py --cleanup
 ```
 
-See: `.github/workflows/scripts/README.md` for all 16+ scripts.
+See: `.github/workflows/scripts/README.md` for all scripts.
 MCP Setup: `docs/mcp-github-setup.md`
 
 ### Testing
@@ -194,33 +142,13 @@ Threshold: >=80% for `telegram_bot_stack/`
 
 ---
 
-## Token Efficiency
-
-**Multi-Graph System: 90-95% savings**
-
-| Your Task | Load Graph | Tokens | Savings |
-|--------------------|-------------------------|--------|---------|
-| Add storage | bot-framework/storage | 435 | 96% |
-| Fix CI | infrastructure/graph | 639 | 94% |
-| Add tests | testing/graph | 539 | 95% |
-| Update docs | docs/graph | 300 | 97% |
-| Add dependency | configuration/graph | 200 | 98% |
-| History | archive/graph | 250 | 98% |
-
-**Always:**
-1. Start with `graph-router.json` (783 lines)
-2. Load ONLY relevant graph (200-900 lines)
-3. Never read entire codebase (10,000+ lines)
-
----
-
 ## Agent Decision Tree
 
 ### On New Context:
-1. Read `.github/PROJECT_STATUS.md` (20 lines)
+1. Read `.github/PROJECT_STATUS.md` (current state)
 2. Check open issues: Use MCP `list_issues` tool (or `read_issues.py --list --state open`)
 3. Verify branch: `git branch --show-current` (NOT main)
-4. Load relevant graph from `.project-graph/`
+4. Understand task requirements
 5. Implement following workflow above
 
 ### On "Continue Work":
@@ -228,8 +156,7 @@ Threshold: >=80% for `telegram_bot_stack/`
 2. List open issues: Use MCP `list_issues` → identify active
 3. Read issue details: Use MCP `get_issue <N>`
 4. Check current branch
-5. Load relevant graph
-6. Implement → test → commit → push → PR
+5. Implement → test → commit → push → PR
 
 ### Branch Strategy:
 - On main? → Create `feature/<issue>-<name>`
@@ -239,14 +166,13 @@ Threshold: >=80% for `telegram_bot_stack/`
 ### Commit Strategy:
 - One commit per logical unit
 - Batch related changes (docs + tests together)
-- Update graphs in same commit as code changes
+- Use conventional commits format
 
 ---
 
 ## Reference Links
 
 **Detailed guides:**
-- Multi-Graph System: `.project-graph/README.md`
 - GitHub Automation: `.github/workflows/scripts/README.md`
 - MCP Setup: `docs/mcp-github-setup.md`
 - PR Automation: `.github/PR_AUTOMATION.md`
@@ -271,52 +197,54 @@ Threshold: >=80% for `telegram_bot_stack/`
 ### Example 1: Add new storage backend
 
 ```python
-# 1. Load storage sub-graph
-storage = load_sub_graph('bot_framework', 'storage')
-base = find_node(storage, 'telegram_bot_stack.storage.base')
+# 1. Check existing storage implementations
+# Read: telegram_bot_stack/storage/base.py
+# Read: telegram_bot_stack/storage/sql.py (as reference)
 
 # 2. Implement: telegram_bot_stack/storage/redis.py
 
-# 3. Update graph: bot-framework/storage-graph.json
-# Add node, edges, update metadata
+# 3. Write tests: tests/core/test_redis_storage.py
 
-# 4. Validate
-cd .project-graph && python3 utils/graph_utils.py
+# 4. Update docs: docs/storage_guide.md
 
 # 5. Commit
-git add telegram_bot_stack/storage/redis.py .project-graph/
+git add telegram_bot_stack/storage/redis.py tests/core/test_redis_storage.py docs/storage_guide.md
 git commit -m "feat(storage): add Redis backend"
 ```
 
 ### Example 2: Update documentation
 
 ```python
-# 1. Load docs graph
-docs = load_graph_by_type('docs')
-api_ref = find_node(docs, 'docs.api_reference')
+# 1. Identify doc to update
+# Edit: docs/api_reference.md
 
-# 2. Edit: docs/api_reference.md
+# 2. Test examples still work
 
-# 3. No graph update needed (docs only)
-
-# 4. Commit
+# 3. Commit
 git commit -m "docs(api): update storage backend examples"
 ```
 
-### Example 3: Fix CI pipeline
+### Example 3: Fix bug
 
 ```python
-# 1. Load infrastructure graph
-infra = load_graph_by_type('infrastructure')
+# 1. Create issue (if not exists)
+python3 .github/workflows/scripts/create_issue.py \
+--title "Bug: Connection leak in SQL storage" \
+--labels bug
 
-# 2. Find relevant workflow/script
-# Edit: .github/workflows/tests.yml
+# 2. Create branch
+git checkout -b fix/sql-connection-leak
 
-# 3. Update graph if structure changed
-# Edit: infrastructure/graph.json
+# 3. Fix code + add test
 
 # 4. Commit
-git commit -m "fix(ci): resolve test timeout issue"
+git commit -m "fix(storage): resolve SQL connection leak"
+
+# 5. Push and create PR
+git push -u origin fix/sql-connection-leak
+python3 .github/workflows/scripts/create_pr.py \
+--title "fix(storage): resolve SQL connection leak" \
+--closes <issue_number>
 ```
 
 ---
@@ -325,14 +253,14 @@ git commit -m "fix(ci): resolve test timeout issue"
 
 ### Check Before Writing Code:
 ```bash
-ls .github/workflows/scripts/ # 16+ automation scripts exist
+ls .github/workflows/scripts/ # automation scripts exist
 ```
 
 Use existing tools instead of ad-hoc PyGithub code.
 
 ### File Size Policy:
-This file (.cursorrules) target: <400 lines
-Current: ~350 lines ✓
+This file (.cursorrules) target: <300 lines
+Current: ~290 lines ✓
 
 When updating:
 1. Add new critical rule
@@ -349,24 +277,23 @@ Goal: Maximum density, minimum tokens, zero ambiguity.
 Before EVERY implementation:
 - [ ] Check branch (not main)
 - [ ] Check open issues (MCP `list_issues` or CLI)
-- [ ] Load graph-router.json
-- [ ] Load relevant domain graph
-- [ ] Understand dependencies/impact
+- [ ] Understand task requirements
+- [ ] Check existing code structure
 
 After implementation:
-- [ ] Update graph if structure changed
-- [ ] Validate: `python3 utils/graph_utils.py`
 - [ ] Write/update tests (>=80% coverage)
 - [ ] Update docs if needed
+- [ ] Run linting: `ruff check .`
+- [ ] Run tests: `pytest`
 - [ ] Commit with conventional format
 - [ ] Push + auto-create PR
 
 On merge:
 - [ ] Run `merge_pr.py --cleanup`
-- [ ] Verify release triggered
+- [ ] Verify release triggered (if on main)
 - [ ] Check CI passed
 
-**Remember:** GitHub Flow → Graph Analysis → Implementation → Graph Update → Commit → PR → Merge
+**Remember:** GitHub Flow → Implementation → Testing → Docs → Commit → PR → Merge
 
 ---
 
@@ -386,10 +313,35 @@ On merge:
 - NEVER create separate SUMMARY.md or *_SUMMARY.md files
 - Always provide summaries directly in chat/response to user
 - Summaries should be comprehensive, structured, and include:
-  - What was done (with checkmarks)
-  - Testing results
-  - Impact assessment
-  - Next steps
+- What was done (with checkmarks)
+- Testing results
+- Impact assessment
+- Next steps
 - Exception: Project-level documentation (README.md, CHANGELOG.md) is acceptable
 
 **Rationale:** Summary files clutter repository, become outdated, and duplicate information already in commits/PRs/chat history.
+
+---
+
+## Validation on Start
+
+Before following any workflow, agent MUST verify infrastructure exists:
+
+### 1. Check GitHub Automation
+```bash
+ls .github/workflows/scripts/
+```
+- ✅ Exists → Use GitHub automation scripts
+- ❌ Missing → Use manual git commands
+
+### 2. Check MCP Server
+Try MCP `list_issues` tool:
+- ✅ Works → Use MCP tools
+- ❌ Fails → Use CLI scripts fallback
+
+### 3. If Infrastructure Missing
+- INFORM USER instead of silently failing
+- Suggest running setup or using alternatives
+- Continue with available tools
+
+**Rule:** Never assume infrastructure exists. Verify first, adapt workflow accordingly.

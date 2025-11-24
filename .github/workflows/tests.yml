@@ -139,7 +139,7 @@ jobs:
         # TODO: Fix type errors and remove this flag
         continue-on-error: true
         run: |
-          mypy telegram_bot_stack --ignore-missing-imports
+          mypy telegram_bot_stack
 
   summary:
     name: Test Summary

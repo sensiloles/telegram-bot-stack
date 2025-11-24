@@ -1,6 +1,6 @@
 {
   "version": "3.0.0",
-  "generated_at": "2025-11-19",
+  "generated_at": "2025-11-24",
   "description": "Router for selecting appropriate dependency graph based on task type",
   "architecture": "Multi-graph system for efficient AI agent navigation",
   "quick_start": {
@@ -13,7 +13,7 @@
   "graphs": {
     "bot-framework": {
       "id": "bot_framework",
-      "name": "🤖 Bot Framework Core",
+      "name": "\ud83e\udd16 Bot Framework Core",
       "file": "bot-framework/router.json",
       "description": "Core telegram bot framework implementation (telegram_bot_stack/)",
       "has_sub_graphs": true,
@@ -23,22 +23,22 @@
           "name": "Core",
           "description": "BotBase, UserManager, AdminManager",
           "file": "bot-framework/core-graph.json",
-          "lines": 321,
-          "lines_of_code": 864
+          "lines": 129,
+          "lines_of_code": 863
         },
         "storage": {
           "name": "Storage",
           "description": "Storage backends (JSON, Memory, SQL)",
           "file": "bot-framework/storage-graph.json",
-          "lines": 435,
-          "lines_of_code": 617
+          "lines": 162,
+          "lines_of_code": 681
         },
         "utilities": {
           "name": "Utilities",
           "description": "Decorators and helpers",
           "file": "bot-framework/utilities-graph.json",
-          "lines": 85,
-          "lines_of_code": 186
+          "lines": 42,
+          "lines_of_code": 185
         }
       },
       "coverage": {
@@ -87,7 +87,7 @@
     },
     "infrastructure": {
       "id": "infrastructure",
-      "name": "🔧 Infrastructure & Automation",
+      "name": "\ud83d\udd27 Infrastructure & Automation",
       "file": "infrastructure/graph.json",
       "router_file": "infrastructure/router.json",
       "description": "CI/CD pipelines, GitHub workflows, automation scripts",
@@ -132,11 +132,12 @@
       ],
       "complexity": "medium",
       "criticality": "high",
-      "update_frequency": "medium"
+      "update_frequency": "medium",
+      "lines": 759
     },
     "testing": {
       "id": "testing",
-      "name": "🧪 Testing Infrastructure",
+      "name": "\ud83e\uddea Testing Infrastructure",
       "file": "testing/graph.json",
       "router_file": "testing/router.json",
       "description": "Test structure, patterns, fixtures, and coverage",
@@ -179,11 +180,12 @@
       ],
       "complexity": "medium",
       "criticality": "high",
-      "update_frequency": "high"
+      "update_frequency": "high",
+      "lines": 958
     },
     "examples": {
       "id": "examples",
-      "name": "📚 Example Bots & Patterns",
+      "name": "\ud83d\udcda Example Bots & Patterns",
       "file": "examples/graph.json",
       "router_file": "examples/router.json",
       "description": "Example bot implementations and usage patterns",
@@ -219,11 +221,12 @@
       ],
       "complexity": "low",
       "criticality": "medium",
-      "update_frequency": "low"
+      "update_frequency": "low",
+      "lines": 315
     },
     "project-meta": {
       "id": "project_meta",
-      "name": "🌐 Project Meta & Architecture",
+      "name": "\ud83c\udf10 Project Meta & Architecture",
       "file": "project-meta/graph.json",
       "router_file": "project-meta/router.json",
       "description": "Cross-graph relationships, project structure, and architecture overview",
@@ -260,11 +263,12 @@
       ],
       "complexity": "high",
       "criticality": "high",
-      "update_frequency": "low"
+      "update_frequency": "low",
+      "lines": 493
     },
     "docs": {
       "id": "docs",
-      "name": "📖 Documentation",
+      "name": "\ud83d\udcd6 Documentation",
       "file": "docs/graph.json",
       "router_file": "docs/router.json",
       "description": "Project documentation, guides, and API reference",
@@ -303,11 +307,12 @@
       ],
       "complexity": "low",
       "criticality": "high",
-      "update_frequency": "medium"
+      "update_frequency": "medium",
+      "lines": 116
     },
     "configuration": {
       "id": "configuration",
-      "name": "⚙️ Configuration",
+      "name": "\u2699\ufe0f Configuration",
       "file": "configuration/graph.json",
       "router_file": "configuration/router.json",
       "description": "Build system, project settings, and tool configuration",
@@ -352,11 +357,12 @@
       ],
       "complexity": "low",
       "criticality": "critical",
-      "update_frequency": "medium"
+      "update_frequency": "medium",
+      "lines": 378
     },
     "archive": {
       "id": "archive",
-      "name": "📦 Archive",
+      "name": "\ud83d\udce6 Archive",
       "file": "archive/graph.json",
       "router_file": "archive/router.json",
       "description": "Archived plans, deprecated code, and historical context",
@@ -387,7 +393,8 @@
       ],
       "complexity": "low",
       "criticality": "low",
-      "update_frequency": "low"
+      "update_frequency": "low",
+      "lines": 239
     }
   },
   "decision_tree": {
@@ -561,7 +568,7 @@
         "secondary": [
           "testing-graph.json"
         ],
-        "workflow": "1. Bot framework for implementation → 2. Testing for tests"
+        "workflow": "1. Bot framework for implementation \u2192 2. Testing for tests"
       },
       "bug_fix": {
         "description": "Fixing a bug in code",
@@ -571,7 +578,7 @@
         "secondary": [
           "testing-graph.json"
         ],
-        "workflow": "1. Bot framework to find bug → 2. Testing to verify fix"
+        "workflow": "1. Bot framework to find bug \u2192 2. Testing to verify fix"
       },
       "ci_cd_work": {
         "description": "Working with CI/CD or automation",
@@ -589,7 +596,7 @@
         "secondary": [
           "bot-framework-graph.json"
         ],
-        "workflow": "1. Testing for structure → 2. Bot framework for implementation details"
+        "workflow": "1. Testing for structure \u2192 2. Bot framework for implementation details"
       },
       "documentation": {
         "description": "Writing documentation or examples",
@@ -600,7 +607,7 @@
           "bot-framework-graph.json",
           "project-meta-graph.json"
         ],
-        "workflow": "1. Examples for patterns → 2. Bot framework for API → 3. Meta for architecture"
+        "workflow": "1. Examples for patterns \u2192 2. Bot framework for API \u2192 3. Meta for architecture"
       },
       "architecture_review": {
         "description": "Understanding or changing architecture",
@@ -610,7 +617,7 @@
         "secondary": [
           "bot-framework-graph.json"
         ],
-        "workflow": "1. Meta for overview → 2. Bot framework for details"
+        "workflow": "1. Meta for overview \u2192 2. Bot framework for details"
       },
       "new_example": {
         "description": "Creating new example bot",
@@ -619,7 +626,7 @@
           "bot-framework-graph.json"
         ],
         "secondary": [],
-        "workflow": "1. Examples for patterns → 2. Bot framework for API"
+        "workflow": "1. Examples for patterns \u2192 2. Bot framework for API"
       },
       "refactoring": {
         "description": "Major refactoring across components",
@@ -630,7 +637,7 @@
         "secondary": [
           "testing-graph.json"
         ],
-        "workflow": "1. Meta for impact → 2. Bot framework for changes → 3. Testing for validation"
+        "workflow": "1. Meta for impact \u2192 2. Bot framework for changes \u2192 3. Testing for validation"
       },
       "documentation_work": {
         "description": "Writing or updating documentation",
@@ -640,7 +647,7 @@
         "secondary": [
           "bot-framework-graph.json"
         ],
-        "workflow": "1. Docs graph for doc structure → 2. Bot framework for technical details"
+        "workflow": "1. Docs graph for doc structure \u2192 2. Bot framework for technical details"
       },
       "configuration_changes": {
         "description": "Changing build system or configuration",
@@ -666,7 +673,7 @@
         "secondary": [
           "project-meta-graph.json"
         ],
-        "workflow": "1. Archive for historical context → 2. Meta for current state"
+        "workflow": "1. Archive for historical context \u2192 2. Meta for current state"
       }
     }
   },
@@ -756,14 +763,14 @@
   },
   "maintenance": {
     "update_triggers": [
-      "When adding/removing modules in telegram_bot_stack/ → bot-framework",
-      "When adding/removing automation scripts → infrastructure",
-      "When restructuring tests → testing",
-      "When adding new example bots → examples",
-      "When adding/updating documentation → docs",
-      "When changing build config or dependencies → configuration",
-      "When archiving deprecated features → archive",
-      "When changing project structure → project-meta"
+      "When adding/removing modules in telegram_bot_stack/ \u2192 bot-framework",
+      "When adding/removing automation scripts \u2192 infrastructure",
+      "When restructuring tests \u2192 testing",
+      "When adding new example bots \u2192 examples",
+      "When adding/updating documentation \u2192 docs",
+      "When changing build config or dependencies \u2192 configuration",
+      "When archiving deprecated features \u2192 archive",
+      "When changing project structure \u2192 project-meta"
     ],
     "update_procedure": [
       "1. Identify affected graph(s) using update_triggers",

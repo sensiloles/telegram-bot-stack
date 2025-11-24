@@ -1,7 +1,7 @@
 {
   "metadata": {
     "version": "3.0.0",
-    "generated_at": "2025-11-19",
+    "generated_at": "2025-11-24",
     "graph_id": "bot_framework",
     "graph_name": "Bot Framework",
     "graph_type": "domain_router",
@@ -17,7 +17,7 @@
       "name": "Core",
       "description": "BotBase, UserManager, AdminManager",
       "modules": 4,
-      "lines_of_code": 864,
+      "lines_of_code": 863,
       "recommended_for": [
         "Adding new bot features",
         "Customizing bot behavior",
@@ -30,7 +30,7 @@
       "name": "Storage",
       "description": "Storage backends (JSON, Memory, SQL)",
       "modules": 5,
-      "lines_of_code": 617,
+      "lines_of_code": 681,
       "recommended_for": [
         "Adding new storage backend",
         "Storage migration",
@@ -43,7 +43,7 @@
       "name": "Utilities",
       "description": "Decorators and helper functions",
       "modules": 1,
-      "lines_of_code": 186,
+      "lines_of_code": 185,
       "recommended_for": [
         "Adding new decorators",
         "Adding utility functions",
@@ -83,7 +83,9 @@
   "statistics": {
     "total_sub_graphs": 3,
     "total_modules": 10,
-    "total_lines_of_code": 1667,
-    "cross_graph_edges": 3
+    "total_lines_of_code": 1729,
+    "cross_graph_edges": 3,
+    "total_nodes": 10,
+    "total_edges": 0
   }
 }

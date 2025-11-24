@@ -12,7 +12,7 @@
       "envFile": "${workspaceFolder}/.env"
     },
     {
-      "name": "🤖 Example: Echo Bot",
+      "name": "\ud83e\udd16 Example: Echo Bot",
       "type": "debugpy",
       "request": "launch",
       "program": "${workspaceFolder}/examples/echo_bot/bot.py",
@@ -22,7 +22,7 @@
       "envFile": "${workspaceFolder}/.env"
     },
     {
-      "name": "🤖 Example: Counter Bot",
+      "name": "\ud83e\udd16 Example: Counter Bot",
       "type": "debugpy",
       "request": "launch",
       "program": "${workspaceFolder}/examples/counter_bot/bot.py",
@@ -32,7 +32,7 @@
       "envFile": "${workspaceFolder}/.env"
     },
     {
-      "name": "🤖 Example: Quit Smoking Bot",
+      "name": "\ud83e\udd16 Example: Quit Smoking Bot",
       "type": "debugpy",
       "request": "launch",
       "program": "${workspaceFolder}/examples/quit_smoking_bot/bot.py",
@@ -42,7 +42,7 @@
       "envFile": "${workspaceFolder}/.env"
     },
     {
-      "name": "🧪 Tests: All",
+      "name": "\ud83e\uddea Tests: All",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -51,11 +51,14 @@
       "python": "./venv/bin/python3"
     },
     {
-      "name": "🧪 Tests: Current File",
+      "name": "\ud83e\uddea Tests: Current File",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
-      "args": ["${file}", "-v"],
+      "args": [
+        "${file}",
+        "-v"
+      ],
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}",
       "python": "./venv/bin/python3"
