@@ -2,7 +2,7 @@
 # See https://pre-commit.com/hooks.html for more hooks
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v6.0.0
+    rev: 3e8a8703264a2f4a69428a0aa4dcb512790b2c8c  # frozen: v6.0.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
@@ -10,17 +10,19 @@ repos:
       - id: check-added-large-files
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    # Ruff version.
-    rev: v0.14.5
+    # Ruff version - keep in sync with CI (lint.yml) and dev dependencies
+    rev: fa1ed65ba95bfa7771a71003a9d74402541f5a5c  # frozen: v0.14.6
     hooks:
       - id: ruff
         name: "🔍 Ruff Linter"
+        # Uses config from pyproject.toml
         args: [--fix]
       - id: ruff-format
         name: "🎨 Ruff Formatter"
+        # Uses config from pyproject.toml
 
   - repo: https://github.com/commitizen-tools/commitizen
-    rev: v4.10.0
+    rev: 9f3ec868c0429155a46b4819b625d47a8522a3d5  # frozen: v4.10.0
     hooks:
       - id: commitizen
         name: "📝 Conventional Commits"

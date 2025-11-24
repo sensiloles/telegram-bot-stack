@@ -6,5 +6,23 @@
     "**/.mypy_cache": true,
     "**/.ruff_cache": true,
     "**/*.egg-info": true
-  }
+  },
+  // Ruff linter configuration (uses pyproject.toml)
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll.ruff": "explicit",
+      "source.organizeImports.ruff": "explicit"
+    }
+  },
+  // Ruff extension settings - using native server
+  "ruff.nativeServer": "on",
+  "ruff.enable": true,
+  "ruff.configurationPreference": "filesystemFirst",
+  // Disable other formatters/linters to avoid conflicts
+  "python.linting.enabled": false,
+  "python.linting.pylintEnabled": false,
+  "python.linting.flake8Enabled": false,
+  "python.formatting.provider": "none"
 }
