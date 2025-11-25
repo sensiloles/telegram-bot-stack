@@ -11,8 +11,8 @@
     "description": "CLI tool for bot project management and development",
     "scope": "CLI tool for bot project management and development",
     "root_package": "telegram_bot_stack.cli",
-    "node_count": 18,
-    "edge_count": 14
+    "node_count": 21,
+    "edge_count": 20
   },
   "nodes": [
     {
@@ -37,7 +37,7 @@
       "type": "module",
       "path": "telegram_bot_stack/cli/main.py",
       "description": "Main CLI entry point for telegram-bot-stack.",
-      "lines_of_code": 40,
+      "lines_of_code": 41,
       "classes": [],
       "functions": [
         "cli",
@@ -415,6 +415,120 @@
       "dependents": [],
       "criticality": "medium",
       "category": "implementation"
+    },
+    {
+      "id": "telegram_bot_stack.cli.commands.deploy",
+      "name": "deploy",
+      "type": "module",
+      "category": "implementation",
+      "path": "telegram_bot_stack/cli/commands/deploy.py",
+      "description": "Module deploy",
+      "lines_of_code": 426,
+      "complexity_score": 1,
+      "exports": [
+        "deploy",
+        "init",
+        "up",
+        "update",
+        "status",
+        "logs",
+        "down"
+      ],
+      "classes": [],
+      "functions": [
+        "deploy",
+        "init",
+        "up",
+        "update",
+        "status",
+        "logs",
+        "down"
+      ],
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium"
+    },
+    {
+      "id": "telegram_bot_stack.cli.utils.deployment",
+      "name": "deployment",
+      "type": "module",
+      "category": "implementation",
+      "path": "telegram_bot_stack/cli/utils/deployment.py",
+      "description": "Module deployment",
+      "lines_of_code": 245,
+      "complexity_score": 1,
+      "exports": [
+        "DeploymentConfig",
+        "DockerTemplateRenderer",
+        "create_env_file",
+        "load",
+        "save",
+        "get",
+        "set",
+        "validate",
+        "render_dockerfile",
+        "render_compose",
+        "render_dockerignore",
+        "render_makefile",
+        "render_all"
+      ],
+      "classes": [
+        "DeploymentConfig",
+        "DockerTemplateRenderer"
+      ],
+      "functions": [
+        "create_env_file",
+        "load",
+        "save",
+        "get",
+        "set",
+        "validate",
+        "render_dockerfile",
+        "render_compose",
+        "render_dockerignore",
+        "render_makefile",
+        "render_all"
+      ],
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium"
+    },
+    {
+      "id": "telegram_bot_stack.cli.utils.vps",
+      "name": "vps",
+      "type": "module",
+      "category": "implementation",
+      "path": "telegram_bot_stack/cli/utils/vps.py",
+      "description": "Module vps",
+      "lines_of_code": 200,
+      "complexity_score": 1,
+      "exports": [
+        "VPSConnection",
+        "check_docker_compose_installed",
+        "test_connection",
+        "connect",
+        "run_command",
+        "check_docker_installed",
+        "install_docker",
+        "transfer_files",
+        "close"
+      ],
+      "classes": [
+        "VPSConnection"
+      ],
+      "functions": [
+        "check_docker_compose_installed",
+        "test_connection",
+        "connect",
+        "run_command",
+        "check_docker_installed",
+        "install_docker",
+        "transfer_files",
+        "close"
+      ],
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium"
     }
   ],
   "edges": [
@@ -515,6 +629,48 @@
       "target": "telegram_bot_stack.cli.utils.dependencies",
       "type": "imports",
       "description": "Imports from telegram_bot_stack.cli.utils.dependencies"
+    },
+    {
+      "id": "edge_15",
+      "source": "telegram_bot_stack.cli.commands.deploy",
+      "target": "telegram_bot_stack.cli.utils",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.utils"
+    },
+    {
+      "id": "edge_16",
+      "source": "telegram_bot_stack.cli.main",
+      "target": "telegram_bot_stack.cli.commands.dev",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.commands.dev"
+    },
+    {
+      "id": "edge_17",
+      "source": "telegram_bot_stack.cli.main",
+      "target": "telegram_bot_stack.cli.commands.deploy",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.commands.deploy"
+    },
+    {
+      "id": "edge_18",
+      "source": "telegram_bot_stack.cli.main",
+      "target": "telegram_bot_stack.cli.commands.init",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.commands.init"
+    },
+    {
+      "id": "edge_19",
+      "source": "telegram_bot_stack.cli.main",
+      "target": "telegram_bot_stack.cli.commands.validate",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.commands.validate"
+    },
+    {
+      "id": "edge_20",
+      "source": "telegram_bot_stack.cli.main",
+      "target": "telegram_bot_stack.cli.commands.new",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.commands.new"
     }
   ]
 }

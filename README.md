@@ -65,21 +65,22 @@ python3 .github/workflows/scripts/read_issues.py --list --state open
 
 ### 🛡️ Production-Grade Infrastructure
 
+- 🚀 **One-Command Deployment**: Deploy to VPS with `telegram-bot-stack deploy up`
 - 🐳 **Docker-Ready**: Advanced production containerization with entrypoint
 - ⚡ **Optimized Caching**: Docker layer caching for faster rebuilds
-- 🧹 **Auto Image Cleanup**: Automatic removal of dangling Docker images for this project only
-- 🔧 **Unified Management**: Single-command interface via `manager.py`
+- 🧹 **Auto Image Cleanup**: Automatic removal of dangling Docker images
 - 📊 **Health Monitoring**: Real-time health checks and continuous monitoring
 - 🔄 **Log Management**: Automatic log rotation and archiving
 - 🔄 **Auto-Recovery**: Process management and graceful restarts
 - 🛠️ **Environment Setup**: Automated initialization and permission management
 - 📦 **Modern Packaging**: pyproject.toml-based dependency management
+- 🔧 **SSH Automation**: Automatic Docker installation and configuration
 
 ## 🚀 Quick Start
 
-### ⚡ CLI Tool (Recommended)
+### ⚡ From Zero to Production in 10 Minutes
 
-Create a complete bot project in seconds:
+**Step 1: Create Bot (5 minutes)**
 
 ```bash
 # Install framework
