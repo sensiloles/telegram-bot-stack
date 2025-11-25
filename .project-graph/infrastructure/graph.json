@@ -1,7 +1,7 @@
 {
   "metadata": {
     "version": "3.0.0",
-    "generated_at": "2025-11-24",
+    "generated_at": "2025-11-25",
     "graph_id": "infrastructure",
     "graph_name": "Infrastructure",
     "graph_type": "domain",
@@ -692,7 +692,7 @@
       "type": "script",
       "path": "scripts/mcp_project_graph.py",
       "description": "MCP Server for Project Graph Navigation.",
-      "lines_of_code": 419,
+      "lines_of_code": 521,
       "exports": [
         "ProjectGraphMCPServer",
         "get_project_root",
