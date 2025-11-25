@@ -8,7 +8,7 @@
     "project_name": "telegram-bot-stack",
     "description": "CI/CD workflows, automation scripts, and tooling",
     "scope": "GitHub Actions, automation scripts, deployment",
-    "node_count": 51,
+    "node_count": 54,
     "edge_count": 0
   },
   "nodes": [
@@ -597,6 +597,84 @@
         "format_github_error",
         "list_tools"
       ]
+    },
+    {
+      "id": ".github.workflows.scripts.agent_cache",
+      "name": "agent_cache",
+      "type": "module",
+      "category": "implementation",
+      "path": ".github/workflows/scripts/agent_cache.py",
+      "description": "Module agent_cache",
+      "lines_of_code": 254,
+      "complexity_score": 1,
+      "exports": [
+        "is_cache_valid",
+        "get_cached",
+        "update_cache",
+        "refresh_cache",
+        "invalidate_cache",
+        "main"
+      ],
+      "classes": [],
+      "functions": [
+        "is_cache_valid",
+        "get_cached",
+        "update_cache",
+        "refresh_cache",
+        "invalidate_cache",
+        "main"
+      ],
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium"
+    },
+    {
+      "id": ".github.workflows.scripts.agent_metrics_dashboard",
+      "name": "agent_metrics_dashboard",
+      "type": "module",
+      "category": "implementation",
+      "path": ".github/workflows/scripts/agent_metrics_dashboard.py",
+      "description": "Module agent_metrics_dashboard",
+      "lines_of_code": 198,
+      "complexity_score": 1,
+      "exports": [
+        "load_metrics",
+        "analyze_metrics",
+        "print_dashboard",
+        "main"
+      ],
+      "classes": [],
+      "functions": [
+        "load_metrics",
+        "analyze_metrics",
+        "print_dashboard",
+        "main"
+      ],
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium"
+    },
+    {
+      "id": ".github.workflows.scripts.log_agent_action",
+      "name": "log_agent_action",
+      "type": "module",
+      "category": "implementation",
+      "path": ".github/workflows/scripts/log_agent_action.py",
+      "description": "Module log_agent_action",
+      "lines_of_code": 138,
+      "complexity_score": 1,
+      "exports": [
+        "log_action",
+        "main"
+      ],
+      "classes": [],
+      "functions": [
+        "log_action",
+        "main"
+      ],
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium"
     }
   ],
   "edges": []
