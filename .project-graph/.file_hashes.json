@@ -13,5 +13,6 @@
   ".github/workflows/scripts/log_agent_action.py": "b0ff423b8043cdf91172fdc9bcfcf5ef4b3d48b04e66ef83cb799b3264ef52a9",
   "tests/agent/__init__.py": "b339273c0738e548009da7909247cad56f3ae28044b580567e56169e7eb7244d",
   "tests/agent/test_agent_cache.py": "69fc830cc87eed1bd623138855c1026258c6d2c923dc9ae956313afba627356f",
-  "tests/agent/test_agent_metrics.py": "500c7aa45c890dd7da22b4603c18d77fec707b58479a49e8fa1061ddf8170d80"
+  "tests/agent/test_agent_metrics.py": "500c7aa45c890dd7da22b4603c18d77fec707b58479a49e8fa1061ddf8170d80",
+  "scripts/mcp_project_graph.py": "1642885af75caadc692106eddcd4f695ff9f52c88b4e4a968534ea713d0d8399"
 }

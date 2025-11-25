@@ -755,7 +755,7 @@
       "type": "script",
       "path": "scripts/mcp_project_graph.py",
       "description": "MCP Server for Project Graph Navigation.",
-      "lines_of_code": 521,
+      "lines_of_code": 523,
       "exports": [
         "ProjectGraphMCPServer",
         "get_project_root",

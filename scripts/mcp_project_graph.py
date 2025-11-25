@@ -46,6 +46,8 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, List
 
+from mcp import types
+
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent / ".project-graph"))
 
@@ -171,7 +173,7 @@ class ProjectGraphMCPServer:
 
         return json.dumps(context, indent=2)
 
-    def list_resources(self) -> List[Dict[str, str]]:
+    def list_resources(self) -> List[types.Resource]:
         """List all available graph resources.
 
         Returns:
@@ -180,55 +182,55 @@ class ProjectGraphMCPServer:
         self._ensure_router()
 
         resources = [
-            {
-                "uri": "graph://router",
-                "name": "Graph Router",
-                "description": "Main navigation router for all graphs (783 lines)",
-                "mimeType": "application/json",
-            }
+            types.Resource(
+                uri="graph://router",
+                name="Graph Router",
+                description="Main navigation router for all graphs (783 lines)",
+                mimeType="application/json",
+            )
         ]
 
         # Add main graphs
         for _graph_key, graph_info in self.router["graphs"].items():
             graph_id = graph_info["id"]
             resources.append(
-                {
-                    "uri": f"graph://{graph_id}",
-                    "name": graph_info["name"],
-                    "description": graph_info["description"],
-                    "mimeType": "application/json",
-                }
+                types.Resource(
+                    uri=f"graph://{graph_id}",
+                    name=graph_info["name"],
+                    description=graph_info["description"],
+                    mimeType="application/json",
+                )
             )
 
             # Add sub-graphs if hierarchical
             if graph_info.get("has_sub_graphs"):
                 for sub_name, sub_info in graph_info["sub_graphs"].items():
                     resources.append(
-                        {
-                            "uri": f"graph://{graph_id}/{sub_name}",
-                            "name": f"{graph_info['name']} - {sub_info['name']}",
-                            "description": sub_info["description"],
-                            "mimeType": "application/json",
-                        }
+                        types.Resource(
+                            uri=f"graph://{graph_id}/{sub_name}",
+                            name=f"{graph_info['name']} - {sub_info['name']}",
+                            description=sub_info["description"],
+                            mimeType="application/json",
+                        )
                     )
 
         # Add special resources
         resources.append(
-            {
-                "uri": "graph://recommend",
-                "name": "Graph Recommendation",
-                "description": "Get graph recommendation for a task (use ?task=description)",
-                "mimeType": "text/plain",
-            }
+            types.Resource(
+                uri="graph://recommend",
+                name="Graph Recommendation",
+                description="Get graph recommendation for a task (use ?task=description)",
+                mimeType="text/plain",
+            )
         )
 
         resources.append(
-            {
-                "uri": "graph://agent_context",
-                "name": "Agent Quick Context",
-                "description": "Minimal context for agent orientation (~100 lines)",
-                "mimeType": "application/json",
-            }
+            types.Resource(
+                uri="graph://agent_context",
+                name="Agent Quick Context",
+                description="Minimal context for agent orientation (~100 lines)",
+                mimeType="application/json",
+            )
         )
 
         return resources
