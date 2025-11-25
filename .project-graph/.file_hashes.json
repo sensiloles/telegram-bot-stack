@@ -6,5 +6,12 @@
   "telegram_bot_stack/cli/utils/dependencies.py": "7d6ea1b1a2c757830745b09d63dfa928e3cf55cd1d56f1ae95ebd23c0eec4258",
   "scripts/mcp_github_server.py": "fdbd1f5a065ff2febf3e268ba6687fd684a0502ea321c55f9a0faf14fe8dabd4",
   ".github/workflows/tests.yml": "7f302575adac9cef426971b755b0af360ab2929a51df704a4b7b81e79d0fa1ce",
-  "README.md": "87548cd4a14c7bee7f523f398e5d8d78de399fc63190c4e11fe1a5c0087c0f8b"
+  "README.md": "87548cd4a14c7bee7f523f398e5d8d78de399fc63190c4e11fe1a5c0087c0f8b",
+  ".github/PROJECT_STATUS.md": "447323df9dc4642ba76dafd0372a6f5366322464c3101aa7f3593156e807354a",
+  ".github/workflows/scripts/agent_cache.py": "591a0be50a42580cdeef3986bfd4ae4bf7d277e2c29f60d170583366654d2360",
+  ".github/workflows/scripts/agent_metrics_dashboard.py": "7f19b49921907bc62670c75f155171eb52fd522e368b86ba7473a99fd999f57b",
+  ".github/workflows/scripts/log_agent_action.py": "b0ff423b8043cdf91172fdc9bcfcf5ef4b3d48b04e66ef83cb799b3264ef52a9",
+  "tests/agent/__init__.py": "b339273c0738e548009da7909247cad56f3ae28044b580567e56169e7eb7244d",
+  "tests/agent/test_agent_cache.py": "69fc830cc87eed1bd623138855c1026258c6d2c923dc9ae956313afba627356f",
+  "tests/agent/test_agent_metrics.py": "500c7aa45c890dd7da22b4603c18d77fec707b58479a49e8fa1061ddf8170d80"
 }

@@ -1,15 +1,15 @@
-# Project Status - telegram-bot-stack b
+# Project Status - telegram-bot-stack
 
-**Version:** v1.11.0 → v2.0.0 MVP
-**Updated:** 2025-11-19
-**Status:** 🎯 Ready for Sprint 1 (Killer Feature #1)
+**Version:** v1.17.0 → v2.0.0 MVP
+**Updated:** 2025-11-25
+**Status:** 🎯 Phase 2 - MVP Development
 
 ---
 
 ## Current Phase: Product-First MVP
 
-**Strategy Change:** Engineering-first → Product-first approach
-**Timeline:** 8 weeks to MVP (was 18 weeks)
+**Strategy:** Product-first approach (changed from engineering-first)
+**Timeline:** 8 weeks to MVP
 **Focus:** Ship TWO killer features, add scaling later
 
 ### The Vision
@@ -17,182 +17,128 @@
 ```
 From idea to production in 10 minutes
 
-1. CREATE  → telegram-bot-stack init my-bot           (5 min)  ⭐ Killer #1
-2. CODE    → telegram-bot-stack dev --reload          (instant)
-3. DEPLOY  → telegram-bot-stack deploy up             (1 cmd)  ⭐ Killer #2
+1. CREATE  → telegram-bot-stack init my-bot           (5 min)  ✅ DONE
+2. CODE    → telegram-bot-stack dev --reload          (instant) ✅ DONE
+3. DEPLOY  → telegram-bot-stack deploy up             (1 cmd)  ⏳ NEXT
 
 Total: ~10 minutes to live bot 🚀
 ```
 
 ---
 
-## TWO Killer Features (8 weeks)
+## Sprint Status
 
-### ⭐ Killer Feature #1: Full Dev Environment (#40)
+### ✅ Sprint 1 Complete: Full Dev Environment (#40)
 
-**Week 1-3 | CRITICAL | START HERE**
+**Shipped:** v1.17.0 (2025-11-25)
 
-**Problem:** Setting up bot project takes 30-60 minutes
-**Solution:** One command creates complete dev environment
+**Delivered:**
 
-```bash
-telegram-bot-stack init my-bot --with-linting --ide vscode --git
-```
+- CLI infrastructure (init, new, dev, validate)
+- Full dev automation (venv, linting, testing, IDE)
+- 4 bot templates
+- Documentation
 
-**Auto-configures:**
-
-- Virtual environment + dependencies
-- Linting (ruff, mypy, pre-commit hooks)
-- Testing (pytest + fixtures)
-- IDE settings (VS Code/PyCharm)
-- Git initialization + .gitignore
-
-**Result:** Zero to coding in 5 minutes
+**Result:** Zero to coding in 5 minutes ✅
 
 ---
 
-### ⭐ Killer Feature #2: VPS Deployment (#27, #28, #29)
+### ⏳ Sprint 2 Next: VPS Deployment (#27, #28)
 
-**Week 4-8 | CRITICAL | Depends on #40**
+**Timeline:** Week 4-8
+**Status:** Ready to start
+**Dependencies:** #40 complete ✅
 
-**Problem:** Deployment requires DevOps knowledge
-**Solution:** One command deploys to production
+**Commands:**
 
-```bash
-telegram-bot-stack deploy up
-```
+- `telegram-bot-stack deploy up` - Deploy to VPS
+- `telegram-bot-stack deploy status` - Check deployment
+- `telegram-bot-stack deploy logs` - View logs
+- `telegram-bot-stack deploy down` - Teardown
 
 **Auto-configures:**
 
-- SSH connection + Docker setup
-- Production-ready templates (#28)
+- SSH + Docker setup
+- Production templates (#28)
 - Health monitoring + logging
 - Zero-downtime deployment
 
-**Result:** From code to production in 1 command
-
----
-
-## Critical Path (8 Weeks)
-
-```
-Week 1-3:  #40  Full Dev Environment ⭐
-              ├─ CLI infrastructure
-              ├─ Dev automation (venv, linting, testing, IDE)
-              └─ Templates
-
-Week 4-7:  #27 + #28  VPS Deployment ⭐ (parallel)
-              ├─ #27: Deploy automation
-              └─ #28: Docker templates
-
-Week 8:    #29  Documentation + Marketing
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-✅ v2.0.0 MVP READY
-
-Week 9-14: Redis + Observability + Security + Webhooks
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-✅ v2.0.1 PRODUCTION-HARDENED
-```
+**Result:** Code to production in 1 command
 
 ---
 
 ## Issue Status Matrix
 
-### 🔴 CRITICAL (Start Now)
+### 🔴 CRITICAL (Active)
 
-| #   | Title          | Status     | Week | Blocks   |
-| --- | -------------- | ---------- | ---- | -------- |
-| #40 | Full Dev Setup | ✅ Ready   | 1-3  | #27      |
-| #27 | VPS Deploy CLI | ⏸️ Blocked | 4-7  | #29, #31 |
+| #   | Title          | Status         | Sprint | Blocks   |
+| --- | -------------- | -------------- | ------ | -------- |
+| #40 | Full Dev Setup | ✅ Complete    | 1      | #27      |
+| #27 | VPS Deploy CLI | ⏳ Ready       | 2      | #29, #31 |
+| #28 | Docker Tpl     | ⏳ Ready       | 2      | #29      |
+| #60 | Agent Optimize | 🏗️ In Progress | 1-2    | -        |
 
-### 🟠 HIGH (Post-MVP or Parallel)
+### 🟠 HIGH (Post-MVP)
 
-| #   | Title            | Week  | Notes             |
-| --- | ---------------- | ----- | ----------------- |
-| #28 | Docker Templates | 4-7   | Parallel with #27 |
-| #29 | Deploy Docs      | 8     | After #27, #28    |
-| #41 | Redis Storage    | 9-10  | Post-MVP scaling  |
-| #42 | Observability    | 9-10  | Post-MVP          |
-| #43 | Security         | 11-12 | Post-MVP          |
-| #44 | Multi-instance   | 11-12 | Needs #41         |
-| #33 | Auto Graphs      | v2.1+ | DX improvement    |
+| #   | Title         | Week  | Notes            |
+| --- | ------------- | ----- | ---------------- |
+| #29 | Deploy Docs   | 8     | After #27, #28   |
+| #41 | Redis Storage | 9-10  | Post-MVP scaling |
+| #42 | Observability | 9-10  | Post-MVP         |
+| #43 | Security      | 11-12 | Post-MVP         |
+| #44 | Multi-inst    | 11-12 | Needs #41        |
 
 ### 🟡 MEDIUM (v2.0.1+)
 
-#19 (Webhooks), #46 (Retry), #47 (Migration), #45 (i18n), #30 (MyPy), #48 (Benchmarks), #49 (Examples)
+#19 (Webhooks), #46 (Retry), #47 (Migration), #45 (i18n), #30 (MyPy), #33 (Auto Graphs)
 
 ### 🟢 LOW (v3.0+)
 
-#31 (PyPI Auto), #50 (Load Testing), #51 (Plugins), #52 (Admin Dashboard)
+#31 (PyPI Auto), #48 (Benchmarks), #49 (Examples), #50 (Load Test), #51 (Plugins)
 
 ---
 
-## Key Changes & Rationale
-
-### What Changed
-
-**Before (Engineering-First):**
+## Critical Path
 
 ```
-Redis (2w) → Multi-instance (2w) → CLI (3w) → VPS Deploy (4w)
-└─ 18 weeks to MVP, killer feature last
+✅ Week 1-3:  #40  Full Dev Environment (DONE)
+⏳ Week 4-7:  #27 + #28  VPS Deployment (NEXT)
+   Week 8:    #29  Documentation + Marketing
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ v2.0.0 MVP READY (Week 8)
+
+   Week 9-14: Redis + Observability + Security
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ v2.0.1 PRODUCTION-HARDENED (Week 14)
 ```
-
-**After (Product-First):**
-
-```
-Full Dev (3w) → VPS Deploy (4w) → MVP
-└─ 8 weeks to MVP, TWO killer features first
-```
-
-### Why This Works
-
-1. **Most bots don't need Redis** - JSON/SQL handles 1k-10k users fine
-2. **Complete developer journey** - Create → Code → Deploy (not just deploy)
-3. **Immediate wow-moments** - Each step = satisfaction
-4. **Faster validation** - Ship in 8 weeks, get feedback, iterate
-5. **Competitors lack this** - Neither feature exists elsewhere
-
-### Priority Fixes Applied
-
-- ✅ #40: HIGH → CRITICAL (Killer Feature #1)
-- ✅ #27: Remains CRITICAL (Killer Feature #2)
-- ✅ #19: Removed conflicting priority (now MEDIUM)
-- ✅ All killer feature issues linked with context
 
 ---
 
 ## Next Actions
 
-### Immediate (Now)
+### Immediate (Sprint 2)
 
 ```bash
-# 1. Start Sprint 1
-git checkout -b feature/40-full-dev-setup
+# 1. Start Sprint 2
+git checkout -b feature/27-vps-deployment
 
-# 2. Review expanded scope
-python3 .github/workflows/scripts/read_issues.py 40
+# 2. Review deployment spec
+python3 .github/workflows/scripts/read_issues.py 27
 
-# 3. Load graphs
-cd .project-graph
-python3 -c "
-from utils.graph_utils import load_router, load_graph_by_type
-router = load_router()
-infra = load_graph_by_type('infrastructure')
-"
-
-# 4. Begin Week 1: CLI Infrastructure
-# See issue #40 for 3-phase implementation plan
+# 3. Begin implementation
+# - Deploy commands (deploy up/down/status/logs)
+# - SSH + Docker automation
+# - Production templates (#28)
+# - Health monitoring
 ```
 
-### Week-by-Week Goals
+### Week Goals
 
-**Week 1:** CLI infrastructure (init, new, dev, validate commands)
-**Week 2:** Dev automation (venv, linting, testing, IDE, git) ⭐
-**Week 3:** Templates + polish + testing
-**Week 4-7:** VPS deployment + Docker (parallel)
-**Week 8:** Documentation + marketing + v2.0.0 MVP release 🎉
+**Week 4-5:** VPS deploy commands + SSH automation
+**Week 6:** Docker production templates (#28)
+**Week 7:** Health monitoring + zero-downtime
+**Week 8:** Documentation (#29) + v2.0.0 MVP release 🎉
 
 ---
 
@@ -202,14 +148,13 @@ infra = load_graph_by_type('infrastructure')
 
 **Developer Experience:**
 
-- ⏱️ `pip install` → first bot message: < 5 minutes
-- ⏱️ Code → production: 1 command (~3 minutes)
+- ⏱️ `pip install` → first bot: < 5 min ✅
+- ⏱️ Code → production: 1 command ⏳
 - ⏱️ Total: < 10 minutes end-to-end
 
 **Technical:**
 
-- ✅ Zero manual configuration required
-- ✅ Works on fresh Python install
+- ✅ Zero manual configuration
 - ✅ Cross-platform (Linux, macOS, Windows)
 - ✅ Test coverage ≥80%
 
@@ -217,16 +162,6 @@ infra = load_graph_by_type('infrastructure')
 
 - 🎯 "From idea to production in 10 minutes"
 - 🚀 Best-in-class developer experience
-- 💎 Unique value proposition (TWO killer features)
-
-### v2.0.1 Complete (Week 14)
-
-**Production Scaling:**
-
-- ✅ Redis distributed state
-- ✅ 10+ instances coordination
-- ✅ 100k-1M users capacity
-- ✅ Full observability + security
 
 ---
 
@@ -234,89 +169,55 @@ infra = load_graph_by_type('infrastructure')
 
 ### Storage Strategy
 
-- **MVP:** JSON/SQL (sufficient for 1k-10k users)
-- **v2.0.1:** Add Redis for 100k+ users
-- **Rationale:** Don't over-engineer before validation
+- **MVP:** JSON/SQL (1k-10k users)
+- **v2.0.1:** Add Redis (100k+ users)
 
 ### Deployment Strategy
 
 - **MVP:** VPS with Docker (most flexible)
 - **Future:** Serverless/K8s (if demand exists)
-- **Rationale:** VPS covers 80% of use cases
 
 ### CLI Design
 
-- **Phase 1:** Core commands (init, new, dev, validate)
-- **Phase 2:** Deploy commands (integrate with #27)
+- **Phase 1:** Core commands ✅
+- **Phase 2:** Deploy commands ⏳
 - **Phase 3:** Advanced tooling (migrate, benchmark)
-- **Rationale:** Incremental, user-driven expansion
-
----
-
-## Dependencies & Blockers
-
-### Critical Dependencies
-
-```
-#40 (Killer #1) → #27 (Killer #2) → #29 (Docs) → v2.0.0 MVP
-                     ↓
-                  #28 (Docker, parallel with #27)
-```
-
-### Post-MVP (Independent)
-
-```
-#41 (Redis) → #44 (Multi-instance)
-#42 (Observability) ─┐
-#43 (Security)       ├─→ v2.0.1
-#19 (Webhooks)       │
-#46, #47             ┘
-```
 
 ---
 
 ## References
 
-**Full Roadmap:** `.github/CONSOLIDATED_ROADMAP.md` (783 lines)
-**Changes Log:** `.github/ROADMAP_CHANGES_SUMMARY.md` (341 lines)
+**Full Roadmap:** `.github/CONSOLIDATED_ROADMAP.md`
 
 **Key Issues:**
 
-- #40: Full Dev Setup (Killer Feature #1)
-- #27: VPS Deployment (Killer Feature #2)
-- #28: Docker Templates
-- #29: Deployment Docs
+- #40: Full Dev Setup (✅ Complete)
+- #27: VPS Deployment (⏳ Next)
+- #28: Docker Templates (⏳ Next)
+- #60: Agent Optimization (🏗️ In Progress)
 
 **GitHub:** https://github.com/sensiloles/telegram-bot-stack
-**PyPI:** https://pypi.org/project/telegram-bot-stack/ (v1.11.0)
+**PyPI:** https://pypi.org/project/telegram-bot-stack/ (v1.17.0)
 
 ---
 
-## Quick Wins
+## Quick Stats
 
-**Already Complete:**
+**Current State:**
 
-- ✅ Framework published to PyPI
-- ✅ 131 tests, 80% coverage
+- ✅ 137+ tests, 80%+ coverage
+- ✅ CLI tool (init, new, dev, validate)
+- ✅ 4 bot templates
 - ✅ CI/CD with automated releases
 - ✅ 17 automation scripts
-- ✅ Multi-graph system (90% token savings)
+- ✅ MCP project graph system
 
-**Ready to Ship Fast:**
+**Ready to Ship:**
 
-- Week 8: v2.0.0 MVP (TWO killer features)
+- Week 8: v2.0.0 MVP (Killer Features #1 + #2)
 - Week 14: v2.0.1 (Production-hardened)
-- Week 20: v2.1 (Enhanced DX)
 
 ---
 
-## Contact & Support
-
-**Issues:** Report bugs or request features via GitHub Issues
-**Automation:** Use scripts in `.github/workflows/scripts/`
-**Graphs:** Navigate codebase via `.project-graph/`
-
----
-
-**Status:** 🎯 Sprint 1 ready to start
-**Next Review:** After completing #40 (Week 3)
+**Status:** 🏗️ Sprint 1 complete, Sprint 2 starting
+**Next Review:** After completing #27 (Week 7)
