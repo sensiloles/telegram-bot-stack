@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.18.0 (2025-11-25)
+
+### Features
+
+- **agent**: Implement Phase 2 agent optimizations - cache, metrics, and analytics
+  ([`bdfb889`](https://github.com/sensiloles/telegram-bot-stack/commit/bdfb889b68458b6be6352bf074f902c2c27d2f8c))
+
+
 ## v1.17.0 (2025-11-25)
 
 ### Features
