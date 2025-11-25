@@ -43,6 +43,22 @@
 
 ### Features
 
+- **cli**: Implement CLI tool with full dev environment setup (#40)
+
+  - Add `telegram-bot-stack init` command - Initialize new bot project with complete dev environment
+  - Add `telegram-bot-stack new` command - Create bot from template
+  - Add `telegram-bot-stack dev` command - Run bot in development mode with auto-reload
+  - Add `telegram-bot-stack validate` command - Validate bot configuration
+  - Add virtual environment management utilities
+  - Add dependency management (pip, poetry, pdm support)
+  - Add linting setup (ruff, mypy, pre-commit hooks)
+  - Add testing setup (pytest with fixtures)
+  - Add IDE configuration (VS Code, PyCharm)
+  - Add Git initialization with .gitignore
+  - Add basic bot template
+  - Add CLI entry point to pyproject.toml
+  - Add comprehensive CLI tests (29 tests, 283 total)
+
 - **mcp**: Enhanced MCP server with PR management and batch operations
   - Add Pull Request management (create, merge, list, check CI)
   - Add batch operations for updating multiple issues at once
@@ -50,6 +66,10 @@
   - Add repository caching for better performance
   - Add actionable error messages with hints
   - Version 2.0.0 of MCP server
+
+### Changed
+
+- Add CLI dependencies: `click>=8.1.0`, `jinja2>=3.1.0`, `watchdog>=3.0.0`
 
 ## v1.12.0 (2025-11-24)
 

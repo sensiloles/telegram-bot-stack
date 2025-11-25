@@ -1,15 +1,15 @@
 {
   "metadata": {
     "version": "3.0.0",
-    "generated_at": "2025-11-24",
+    "generated_at": "2025-11-25",
     "graph_id": "testing",
     "graph_name": "Testing Infrastructure",
     "graph_type": "domain",
     "project_name": "telegram-bot-stack",
     "description": "Test suite, fixtures, and testing utilities",
     "scope": "Unit tests, integration tests, fixtures",
-    "node_count": 15,
-    "edge_count": 28
+    "node_count": 30,
+    "edge_count": 3
   },
   "nodes": [
     {
@@ -19,16 +19,6 @@
       "path": "tests/conftest.py",
       "description": "Pytest configuration and shared fixtures.",
       "lines_of_code": 111,
-      "exports": [
-        "event_loop",
-        "temp_storage",
-        "user_manager",
-        "admin_manager",
-        "mock_telegram_update",
-        "mock_telegram_context",
-        "sample_user_data",
-        "sample_admin_data"
-      ],
       "classes": [],
       "functions": [
         "event_loop",
@@ -39,7 +29,38 @@
         "mock_telegram_context",
         "sample_user_data",
         "sample_admin_data"
-      ]
+      ],
+      "exports": [
+        "event_loop",
+        "temp_storage",
+        "user_manager",
+        "admin_manager",
+        "mock_telegram_update",
+        "mock_telegram_context",
+        "sample_user_data",
+        "sample_admin_data"
+      ],
+      "complexity_score": 1,
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "low",
+      "category": "testing"
+    },
+    {
+      "id": "tests",
+      "name": "__init__",
+      "type": "test_module",
+      "path": "tests/__init__.py",
+      "description": "Test suite for telegram-bot-stack core components.",
+      "lines_of_code": 1,
+      "classes": [],
+      "functions": [],
+      "exports": [],
+      "complexity_score": 1,
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "critical",
+      "category": "testing"
     },
     {
       "id": "tests.core.test_sql_storage",
@@ -48,51 +69,6 @@
       "path": "tests/core/test_sql_storage.py",
       "description": "Tests for SQL storage backend.",
       "lines_of_code": 451,
-      "exports": [
-        "TestSQLiteStorage",
-        "TestSQLiteStorageFile",
-        "TestSQLStorageFactory",
-        "TestSQLStorageCompatibility",
-        "TestSQLStorageEdgeCases",
-        "TestSQLStorageConfiguration",
-        "CustomObject",
-        "storage",
-        "test_initialization",
-        "test_save_and_load",
-        "test_save_overwrites_existing",
-        "test_load_nonexistent_key",
-        "test_exists",
-        "test_delete",
-        "test_save_complex_data",
-        "test_save_list_data",
-        "test_save_unicode_data",
-        "test_multiple_keys",
-        "test_empty_data",
-        "test_boolean_and_none_values",
-        "test_numeric_values",
-        "test_save_invalid_json",
-        "storage",
-        "test_persistence",
-        "test_create_sqlite_storage",
-        "test_create_sqlite_default_url",
-        "test_create_postgres_without_url_raises",
-        "test_sql_alias",
-        "sql_storage",
-        "json_storage",
-        "memory_storage",
-        "test_same_interface_as_json",
-        "test_same_interface_as_memory",
-        "test_default_behavior_matches",
-        "storage",
-        "test_very_long_key",
-        "test_special_characters_in_key",
-        "test_large_data",
-        "test_concurrent_operations",
-        "test_close_and_reopen",
-        "test_echo_mode",
-        "test_pool_configuration",
-        "test_invalid_database_url"
-      ],
       "classes": [
         "TestSQLiteStorage",
         "TestSQLiteStorageFile",
@@ -139,7 +115,57 @@
         "test_echo_mode",
         "test_pool_configuration",
         "test_invalid_database_url"
-      ]
+      ],
+      "exports": [
+        "TestSQLiteStorage",
+        "TestSQLiteStorageFile",
+        "TestSQLStorageFactory",
+        "TestSQLStorageCompatibility",
+        "TestSQLStorageEdgeCases",
+        "TestSQLStorageConfiguration",
+        "CustomObject",
+        "storage",
+        "test_initialization",
+        "test_save_and_load",
+        "test_save_overwrites_existing",
+        "test_load_nonexistent_key",
+        "test_exists",
+        "test_delete",
+        "test_save_complex_data",
+        "test_save_list_data",
+        "test_save_unicode_data",
+        "test_multiple_keys",
+        "test_empty_data",
+        "test_boolean_and_none_values",
+        "test_numeric_values",
+        "test_save_invalid_json",
+        "storage",
+        "test_persistence",
+        "test_create_sqlite_storage",
+        "test_create_sqlite_default_url",
+        "test_create_postgres_without_url_raises",
+        "test_sql_alias",
+        "sql_storage",
+        "json_storage",
+        "memory_storage",
+        "test_same_interface_as_json",
+        "test_same_interface_as_memory",
+        "test_default_behavior_matches",
+        "storage",
+        "test_very_long_key",
+        "test_special_characters_in_key",
+        "test_large_data",
+        "test_concurrent_operations",
+        "test_close_and_reopen",
+        "test_echo_mode",
+        "test_pool_configuration",
+        "test_invalid_database_url"
+      ],
+      "complexity_score": 4,
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "critical",
+      "category": "testing"
     },
     {
       "id": "tests.core.test_decorators",
@@ -148,23 +174,6 @@
       "path": "tests/core/test_decorators.py",
       "description": "Tests for rate limiting decorators.",
       "lines_of_code": 423,
-      "exports": [
-        "RateLimitedBot",
-        "TestRateLimit",
-        "TestRateLimitEdgeCases",
-        "MinimalBot",
-        "MinimalBot",
-        "EdgeBot",
-        "ShortBot",
-        "LongBot",
-        "storage",
-        "bot",
-        "user",
-        "admin_user",
-        "update",
-        "context",
-        "failing_save"
-      ],
       "classes": [
         "RateLimitedBot",
         "TestRateLimit",
@@ -183,7 +192,29 @@
         "update",
         "context",
         "failing_save"
-      ]
+      ],
+      "exports": [
+        "RateLimitedBot",
+        "TestRateLimit",
+        "TestRateLimitEdgeCases",
+        "MinimalBot",
+        "MinimalBot",
+        "EdgeBot",
+        "ShortBot",
+        "LongBot",
+        "storage",
+        "bot",
+        "user",
+        "admin_user",
+        "update",
+        "context",
+        "failing_save"
+      ],
+      "complexity_score": 4,
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium",
+      "category": "testing"
     },
     {
       "id": "tests.core.test_admin_manager",
@@ -192,38 +223,6 @@
       "path": "tests/core/test_admin_manager.py",
       "description": "Tests for AdminManager class.",
       "lines_of_code": 284,
-      "exports": [
-        "TestAdminManager",
-        "test_init_loads_existing_admins",
-        "test_init_empty_storage",
-        "test_add_new_admin",
-        "test_add_duplicate_admin",
-        "test_add_multiple_admins",
-        "test_remove_admin_with_multiple_admins",
-        "test_cannot_remove_last_admin",
-        "test_remove_nonexistent_admin",
-        "test_is_admin",
-        "test_get_all_admins_returns_copy",
-        "test_get_all_admins_immutable",
-        "test_get_admin_count_empty",
-        "test_get_admin_count_with_admins",
-        "test_has_admins_false_when_empty",
-        "test_has_admins_true_when_present",
-        "test_persistence_across_instances",
-        "test_save_admins_creates_entry",
-        "test_add_admin_saves_automatically",
-        "test_remove_admin_saves_automatically",
-        "test_remove_second_to_last_admin",
-        "test_add_remove_add_same_admin",
-        "test_custom_storage_key",
-        "test_admin_ids_as_integers",
-        "test_zero_admin_id",
-        "test_negative_admin_id",
-        "test_very_large_admin_id",
-        "test_multiple_attempts_to_remove_last_admin",
-        "test_remove_from_empty_list",
-        "test_large_admin_count"
-      ],
       "classes": [
         "TestAdminManager"
       ],
@@ -257,7 +256,60 @@
         "test_multiple_attempts_to_remove_last_admin",
         "test_remove_from_empty_list",
         "test_large_admin_count"
-      ]
+      ],
+      "exports": [
+        "TestAdminManager",
+        "test_init_loads_existing_admins",
+        "test_init_empty_storage",
+        "test_add_new_admin",
+        "test_add_duplicate_admin",
+        "test_add_multiple_admins",
+        "test_remove_admin_with_multiple_admins",
+        "test_cannot_remove_last_admin",
+        "test_remove_nonexistent_admin",
+        "test_is_admin",
+        "test_get_all_admins_returns_copy",
+        "test_get_all_admins_immutable",
+        "test_get_admin_count_empty",
+        "test_get_admin_count_with_admins",
+        "test_has_admins_false_when_empty",
+        "test_has_admins_true_when_present",
+        "test_persistence_across_instances",
+        "test_save_admins_creates_entry",
+        "test_add_admin_saves_automatically",
+        "test_remove_admin_saves_automatically",
+        "test_remove_second_to_last_admin",
+        "test_add_remove_add_same_admin",
+        "test_custom_storage_key",
+        "test_admin_ids_as_integers",
+        "test_zero_admin_id",
+        "test_negative_admin_id",
+        "test_very_large_admin_id",
+        "test_multiple_attempts_to_remove_last_admin",
+        "test_remove_from_empty_list",
+        "test_large_admin_count"
+      ],
+      "complexity_score": 3,
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "high",
+      "category": "testing"
+    },
+    {
+      "id": "tests.core",
+      "name": "__init__",
+      "type": "test_module",
+      "path": "tests/core/__init__.py",
+      "description": "Core component tests.",
+      "lines_of_code": 1,
+      "classes": [],
+      "functions": [],
+      "exports": [],
+      "complexity_score": 1,
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "critical",
+      "category": "testing"
     },
     {
       "id": "tests.core.test_storage",
@@ -266,65 +318,6 @@
       "path": "tests/core/test_storage.py",
       "description": "Tests for Storage abstraction layer.",
       "lines_of_code": 537,
-      "exports": [
-        "TestStorage",
-        "TestStorageFactory",
-        "TestMemoryStorageBackend",
-        "TestJSONStorageBackend",
-        "TestStorageBackendInterface",
-        "test_init_creates_directory",
-        "test_save_creates_file",
-        "test_save_and_load",
-        "test_save_overwrites_existing",
-        "test_load_nonexistent_returns_default",
-        "test_load_with_custom_default",
-        "test_exists_returns_true_for_existing",
-        "test_exists_returns_false_for_missing",
-        "test_delete_existing_file",
-        "test_delete_nonexistent_file",
-        "test_get_filepath_adds_json_extension",
-        "test_get_filepath_preserves_json_extension",
-        "test_save_complex_data_types",
-        "test_save_unicode_data",
-        "test_save_empty_dict",
-        "test_save_empty_list",
-        "test_multiple_keys_in_same_storage",
-        "test_filepath_in_base_dir",
-        "test_json_formatting",
-        "test_persistence_across_instances",
-        "test_concurrent_keys_dont_interfere",
-        "test_save_with_permission_error",
-        "test_load_with_json_decode_error",
-        "test_delete_with_permission_error",
-        "test_create_json_storage",
-        "test_create_json_storage_case_insensitive",
-        "test_create_memory_storage",
-        "test_create_memory_storage_case_insensitive",
-        "test_create_storage_default_is_json",
-        "test_create_storage_invalid_backend",
-        "test_create_storage_invalid_backend_message",
-        "test_memory_storage_ignores_kwargs",
-        "test_memory_storage_implements_backend_interface",
-        "test_memory_storage_isolated_instances",
-        "test_memory_storage_no_persistence",
-        "test_memory_storage_all_operations",
-        "test_memory_storage_clear",
-        "test_memory_storage_save_error_handling",
-        "test_memory_storage_load_error_handling",
-        "test_json_storage_implements_backend_interface",
-        "test_json_storage_persistence",
-        "test_json_storage_all_operations",
-        "backends",
-        "test_all_backends_implement_save",
-        "test_all_backends_implement_load",
-        "test_all_backends_implement_exists",
-        "test_all_backends_implement_delete",
-        "test_all_backends_consistent_behavior",
-        "mock_open",
-        "mock_unlink",
-        "mock_deepcopy",
-        "mock_deepcopy"
-      ],
       "classes": [
         "TestStorage",
         "TestStorageFactory",
@@ -385,7 +378,71 @@
         "mock_unlink",
         "mock_deepcopy",
         "mock_deepcopy"
-      ]
+      ],
+      "exports": [
+        "TestStorage",
+        "TestStorageFactory",
+        "TestMemoryStorageBackend",
+        "TestJSONStorageBackend",
+        "TestStorageBackendInterface",
+        "test_init_creates_directory",
+        "test_save_creates_file",
+        "test_save_and_load",
+        "test_save_overwrites_existing",
+        "test_load_nonexistent_returns_default",
+        "test_load_with_custom_default",
+        "test_exists_returns_true_for_existing",
+        "test_exists_returns_false_for_missing",
+        "test_delete_existing_file",
+        "test_delete_nonexistent_file",
+        "test_get_filepath_adds_json_extension",
+        "test_get_filepath_preserves_json_extension",
+        "test_save_complex_data_types",
+        "test_save_unicode_data",
+        "test_save_empty_dict",
+        "test_save_empty_list",
+        "test_multiple_keys_in_same_storage",
+        "test_filepath_in_base_dir",
+        "test_json_formatting",
+        "test_persistence_across_instances",
+        "test_concurrent_keys_dont_interfere",
+        "test_save_with_permission_error",
+        "test_load_with_json_decode_error",
+        "test_delete_with_permission_error",
+        "test_create_json_storage",
+        "test_create_json_storage_case_insensitive",
+        "test_create_memory_storage",
+        "test_create_memory_storage_case_insensitive",
+        "test_create_storage_default_is_json",
+        "test_create_storage_invalid_backend",
+        "test_create_storage_invalid_backend_message",
+        "test_memory_storage_ignores_kwargs",
+        "test_memory_storage_implements_backend_interface",
+        "test_memory_storage_isolated_instances",
+        "test_memory_storage_no_persistence",
+        "test_memory_storage_all_operations",
+        "test_memory_storage_clear",
+        "test_memory_storage_save_error_handling",
+        "test_memory_storage_load_error_handling",
+        "test_json_storage_implements_backend_interface",
+        "test_json_storage_persistence",
+        "test_json_storage_all_operations",
+        "backends",
+        "test_all_backends_implement_save",
+        "test_all_backends_implement_load",
+        "test_all_backends_implement_exists",
+        "test_all_backends_implement_delete",
+        "test_all_backends_consistent_behavior",
+        "mock_open",
+        "mock_unlink",
+        "mock_deepcopy",
+        "mock_deepcopy"
+      ],
+      "complexity_score": 5,
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "critical",
+      "category": "testing"
     },
     {
       "id": "tests.core.test_user_manager",
@@ -394,33 +451,6 @@
       "path": "tests/core/test_user_manager.py",
       "description": "Tests for UserManager class.",
       "lines_of_code": 228,
-      "exports": [
-        "TestUserManager",
-        "test_init_loads_existing_users",
-        "test_init_empty_storage",
-        "test_add_new_user",
-        "test_add_duplicate_user",
-        "test_add_multiple_users",
-        "test_remove_existing_user",
-        "test_remove_nonexistent_user",
-        "test_user_exists",
-        "test_get_all_users_returns_copy",
-        "test_get_all_users_immutable",
-        "test_get_user_count_empty",
-        "test_get_user_count_with_users",
-        "test_persistence_across_instances",
-        "test_save_users_creates_entry",
-        "test_add_user_saves_automatically",
-        "test_remove_user_saves_automatically",
-        "test_large_user_count",
-        "test_remove_from_empty_list",
-        "test_add_remove_add_same_user",
-        "test_custom_storage_key",
-        "test_user_ids_as_integers",
-        "test_zero_user_id",
-        "test_negative_user_id",
-        "test_very_large_user_id"
-      ],
       "classes": [
         "TestUserManager"
       ],
@@ -449,7 +479,39 @@
         "test_zero_user_id",
         "test_negative_user_id",
         "test_very_large_user_id"
-      ]
+      ],
+      "exports": [
+        "TestUserManager",
+        "test_init_loads_existing_users",
+        "test_init_empty_storage",
+        "test_add_new_user",
+        "test_add_duplicate_user",
+        "test_add_multiple_users",
+        "test_remove_existing_user",
+        "test_remove_nonexistent_user",
+        "test_user_exists",
+        "test_get_all_users_returns_copy",
+        "test_get_all_users_immutable",
+        "test_get_user_count_empty",
+        "test_get_user_count_with_users",
+        "test_persistence_across_instances",
+        "test_save_users_creates_entry",
+        "test_add_user_saves_automatically",
+        "test_remove_user_saves_automatically",
+        "test_large_user_count",
+        "test_remove_from_empty_list",
+        "test_add_remove_add_same_user",
+        "test_custom_storage_key",
+        "test_user_ids_as_integers",
+        "test_zero_user_id",
+        "test_negative_user_id",
+        "test_very_large_user_id"
+      ],
+      "complexity_score": 3,
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "high",
+      "category": "testing"
     },
     {
       "id": "tests.core.test_bot_base",
@@ -458,18 +520,6 @@
       "path": "tests/core/test_bot_base.py",
       "description": "Tests for BotBase class.",
       "lines_of_code": 416,
-      "exports": [
-        "TestBotBase",
-        "bot_config",
-        "test_bot",
-        "test_initialization",
-        "test_default_commands",
-        "test_get_welcome_message_hook",
-        "test_register_handlers",
-        "test_user_commands_list",
-        "test_admin_commands_list",
-        "test_admin_commands_include_user_commands"
-      ],
       "classes": [
         "TestBotBase"
       ],
@@ -483,7 +533,24 @@
         "test_user_commands_list",
         "test_admin_commands_list",
         "test_admin_commands_include_user_commands"
-      ]
+      ],
+      "exports": [
+        "TestBotBase",
+        "bot_config",
+        "test_bot",
+        "test_initialization",
+        "test_default_commands",
+        "test_get_welcome_message_hook",
+        "test_register_handlers",
+        "test_user_commands_list",
+        "test_admin_commands_list",
+        "test_admin_commands_include_user_commands"
+      ],
+      "complexity_score": 2,
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "critical",
+      "category": "testing"
     },
     {
       "id": "tests.integration.test_full_flow",
@@ -492,13 +559,279 @@
       "path": "tests/integration/test_full_flow.py",
       "description": "Integration tests for complete user flows.",
       "lines_of_code": 258,
-      "exports": [
-        "TestFullUserFlow"
-      ],
       "classes": [
         "TestFullUserFlow"
       ],
-      "functions": []
+      "functions": [],
+      "exports": [
+        "TestFullUserFlow"
+      ],
+      "complexity_score": 2,
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "low",
+      "category": "testing"
+    },
+    {
+      "id": "tests.integration",
+      "name": "__init__",
+      "type": "test_module",
+      "path": "tests/integration/__init__.py",
+      "description": "Integration tests.",
+      "lines_of_code": 1,
+      "classes": [],
+      "functions": [],
+      "exports": [],
+      "complexity_score": 1,
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "critical",
+      "category": "testing"
+    },
+    {
+      "id": "tests.cli.test_init_command",
+      "name": "test_init_command",
+      "type": "test_module",
+      "path": "tests/cli/test_init_command.py",
+      "description": "Tests for init command.",
+      "lines_of_code": 195,
+      "classes": [],
+      "functions": [
+        "test_init_basic",
+        "test_init_with_linting",
+        "test_init_with_testing",
+        "test_init_with_vscode",
+        "test_init_with_pycharm",
+        "test_init_with_git",
+        "test_init_pyproject_toml",
+        "test_init_existing_directory",
+        "test_init_minimal"
+      ],
+      "exports": [
+        "test_init_basic",
+        "test_init_with_linting",
+        "test_init_with_testing",
+        "test_init_with_vscode",
+        "test_init_with_pycharm",
+        "test_init_with_git",
+        "test_init_pyproject_toml",
+        "test_init_existing_directory",
+        "test_init_minimal"
+      ],
+      "complexity_score": 1,
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "high",
+      "category": "testing"
+    },
+    {
+      "id": "tests.cli.test_utils",
+      "name": "test_utils",
+      "type": "test_module",
+      "path": "tests/cli/test_utils.py",
+      "description": "Tests for CLI utility modules.",
+      "lines_of_code": 296,
+      "classes": [
+        "TestVenvUtils",
+        "TestDependenciesUtils",
+        "TestGitUtils",
+        "TestIdeUtils",
+        "TestLintingUtils",
+        "TestTestingUtils"
+      ],
+      "functions": [
+        "test_create_virtualenv",
+        "test_get_venv_python",
+        "test_get_venv_pip",
+        "test_get_activation_command",
+        "test_create_requirements_file",
+        "test_create_pyproject_toml",
+        "test_install_package",
+        "test_install_package_with_upgrade",
+        "test_install_package_quiet",
+        "test_install_package_failure",
+        "test_install_requirements",
+        "test_install_requirements_failure",
+        "test_create_gitignore",
+        "test_init_git",
+        "test_init_git_with_commit",
+        "test_create_vscode_settings",
+        "test_create_pycharm_settings",
+        "test_create_precommit_config",
+        "test_install_precommit_hooks",
+        "test_install_precommit_hooks_failure",
+        "test_create_test_structure"
+      ],
+      "exports": [
+        "TestVenvUtils",
+        "TestDependenciesUtils",
+        "TestGitUtils",
+        "TestIdeUtils",
+        "TestLintingUtils",
+        "TestTestingUtils",
+        "test_create_virtualenv",
+        "test_get_venv_python",
+        "test_get_venv_pip",
+        "test_get_activation_command",
+        "test_create_requirements_file",
+        "test_create_pyproject_toml",
+        "test_install_package",
+        "test_install_package_with_upgrade",
+        "test_install_package_quiet",
+        "test_install_package_failure",
+        "test_install_requirements",
+        "test_install_requirements_failure",
+        "test_create_gitignore",
+        "test_init_git",
+        "test_init_git_with_commit",
+        "test_create_vscode_settings",
+        "test_create_pycharm_settings",
+        "test_create_precommit_config",
+        "test_install_precommit_hooks",
+        "test_install_precommit_hooks_failure",
+        "test_create_test_structure"
+      ],
+      "complexity_score": 4,
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium",
+      "category": "testing"
+    },
+    {
+      "id": "tests.cli.test_cli_main",
+      "name": "test_cli_main",
+      "type": "test_module",
+      "path": "tests/cli/test_cli_main.py",
+      "description": "Tests for CLI main entry point.",
+      "lines_of_code": 69,
+      "classes": [],
+      "functions": [
+        "test_cli_help",
+        "test_cli_version",
+        "test_init_help",
+        "test_new_help",
+        "test_dev_help",
+        "test_validate_help"
+      ],
+      "exports": [
+        "test_cli_help",
+        "test_cli_version",
+        "test_init_help",
+        "test_new_help",
+        "test_dev_help",
+        "test_validate_help"
+      ],
+      "complexity_score": 1,
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "critical",
+      "category": "testing"
+    },
+    {
+      "id": "tests.cli.test_dev_command",
+      "name": "test_dev_command",
+      "type": "test_module",
+      "path": "tests/cli/test_dev_command.py",
+      "description": "Tests for the 'dev' command.",
+      "lines_of_code": 110,
+      "classes": [],
+      "functions": [
+        "test_dev_no_bot_file",
+        "test_dev_with_bot_file",
+        "test_dev_no_env_warning",
+        "test_dev_custom_bot_file",
+        "test_dev_reload_mode",
+        "test_dev_help"
+      ],
+      "exports": [
+        "test_dev_no_bot_file",
+        "test_dev_with_bot_file",
+        "test_dev_no_env_warning",
+        "test_dev_custom_bot_file",
+        "test_dev_reload_mode",
+        "test_dev_help"
+      ],
+      "complexity_score": 1,
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "high",
+      "category": "testing"
+    },
+    {
+      "id": "tests.cli.test_validate_command",
+      "name": "test_validate_command",
+      "type": "test_module",
+      "path": "tests/cli/test_validate_command.py",
+      "description": "Tests for validate command.",
+      "lines_of_code": 81,
+      "classes": [],
+      "functions": [
+        "test_validate_no_bot_file",
+        "test_validate_no_env_file",
+        "test_validate_no_bot_token",
+        "test_validate_success",
+        "test_validate_strict_mode"
+      ],
+      "exports": [
+        "test_validate_no_bot_file",
+        "test_validate_no_env_file",
+        "test_validate_no_bot_token",
+        "test_validate_success",
+        "test_validate_strict_mode"
+      ],
+      "complexity_score": 1,
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "high",
+      "category": "testing"
+    },
+    {
+      "id": "tests.cli",
+      "name": "__init__",
+      "type": "test_module",
+      "path": "tests/cli/__init__.py",
+      "description": "Tests for CLI module.",
+      "lines_of_code": 1,
+      "classes": [],
+      "functions": [],
+      "exports": [],
+      "complexity_score": 1,
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "critical",
+      "category": "testing"
+    },
+    {
+      "id": "tests.cli.test_new_command",
+      "name": "test_new_command",
+      "type": "test_module",
+      "path": "tests/cli/test_new_command.py",
+      "description": "Tests for the 'new' command.",
+      "lines_of_code": 113,
+      "classes": [],
+      "functions": [
+        "test_new_basic_template",
+        "test_new_counter_template",
+        "test_new_menu_template",
+        "test_new_advanced_template",
+        "test_new_existing_directory",
+        "test_new_default_template",
+        "test_new_help"
+      ],
+      "exports": [
+        "test_new_basic_template",
+        "test_new_counter_template",
+        "test_new_menu_template",
+        "test_new_advanced_template",
+        "test_new_existing_directory",
+        "test_new_default_template",
+        "test_new_help"
+      ],
+      "complexity_score": 1,
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "high",
+      "category": "testing"
     },
     {
       "id": "tests.examples.test_reminder_bot",
@@ -507,19 +840,6 @@
       "path": "tests/examples/test_reminder_bot.py",
       "description": "Tests for Reminder Bot example.",
       "lines_of_code": 76,
-      "exports": [
-        "TestReminderBot",
-        "bot_module",
-        "bot_class",
-        "bot_instance",
-        "test_module_import",
-        "test_class_exists",
-        "test_initialization",
-        "test_has_required_attributes",
-        "test_has_register_handlers",
-        "test_has_storage_key",
-        "test_storage_works"
-      ],
       "classes": [
         "TestReminderBot"
       ],
@@ -534,17 +854,9 @@
         "test_has_register_handlers",
         "test_has_storage_key",
         "test_storage_works"
-      ]
-    },
-    {
-      "id": "tests.examples.test_counter_bot",
-      "name": "test_counter_bot",
-      "type": "test_module",
-      "path": "tests/examples/test_counter_bot.py",
-      "description": "Tests for Counter Bot example.",
-      "lines_of_code": 71,
+      ],
       "exports": [
-        "TestCounterBot",
+        "TestReminderBot",
         "bot_module",
         "bot_class",
         "bot_instance",
@@ -553,8 +865,22 @@
         "test_initialization",
         "test_has_required_attributes",
         "test_has_register_handlers",
+        "test_has_storage_key",
         "test_storage_works"
       ],
+      "complexity_score": 2,
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "low",
+      "category": "testing"
+    },
+    {
+      "id": "tests.examples.test_counter_bot",
+      "name": "test_counter_bot",
+      "type": "test_module",
+      "path": "tests/examples/test_counter_bot.py",
+      "description": "Tests for Counter Bot example.",
+      "lines_of_code": 71,
       "classes": [
         "TestCounterBot"
       ],
@@ -568,17 +894,9 @@
         "test_has_required_attributes",
         "test_has_register_handlers",
         "test_storage_works"
-      ]
-    },
-    {
-      "id": "tests.examples.test_poll_bot",
-      "name": "test_poll_bot",
-      "type": "test_module",
-      "path": "tests/examples/test_poll_bot.py",
-      "description": "Tests for Poll Bot example.",
-      "lines_of_code": 81,
+      ],
       "exports": [
-        "TestPollBot",
+        "TestCounterBot",
         "bot_module",
         "bot_class",
         "bot_instance",
@@ -587,9 +905,37 @@
         "test_initialization",
         "test_has_required_attributes",
         "test_has_register_handlers",
-        "test_has_storage_keys",
-        "test_has_poll_methods"
+        "test_storage_works"
       ],
+      "complexity_score": 1,
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "low",
+      "category": "testing"
+    },
+    {
+      "id": "tests.examples",
+      "name": "__init__",
+      "type": "test_module",
+      "path": "tests/examples/__init__.py",
+      "description": "Tests for example bots.",
+      "lines_of_code": 1,
+      "classes": [],
+      "functions": [],
+      "exports": [],
+      "complexity_score": 1,
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "critical",
+      "category": "testing"
+    },
+    {
+      "id": "tests.examples.test_poll_bot",
+      "name": "test_poll_bot",
+      "type": "test_module",
+      "path": "tests/examples/test_poll_bot.py",
+      "description": "Tests for Poll Bot example.",
+      "lines_of_code": 81,
       "classes": [
         "TestPollBot"
       ],
@@ -604,17 +950,9 @@
         "test_has_register_handlers",
         "test_has_storage_keys",
         "test_has_poll_methods"
-      ]
-    },
-    {
-      "id": "tests.examples.test_menu_bot",
-      "name": "test_menu_bot",
-      "type": "test_module",
-      "path": "tests/examples/test_menu_bot.py",
-      "description": "Tests for Menu Bot example.",
-      "lines_of_code": 74,
+      ],
       "exports": [
-        "TestMenuBot",
+        "TestPollBot",
         "bot_module",
         "bot_class",
         "bot_instance",
@@ -623,8 +961,22 @@
         "test_initialization",
         "test_has_required_attributes",
         "test_has_register_handlers",
-        "test_has_storage_keys"
+        "test_has_storage_keys",
+        "test_has_poll_methods"
       ],
+      "complexity_score": 2,
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "low",
+      "category": "testing"
+    },
+    {
+      "id": "tests.examples.test_menu_bot",
+      "name": "test_menu_bot",
+      "type": "test_module",
+      "path": "tests/examples/test_menu_bot.py",
+      "description": "Tests for Menu Bot example.",
+      "lines_of_code": 74,
       "classes": [
         "TestMenuBot"
       ],
@@ -638,17 +990,9 @@
         "test_has_required_attributes",
         "test_has_register_handlers",
         "test_has_storage_keys"
-      ]
-    },
-    {
-      "id": "tests.examples.test_echo_bot",
-      "name": "test_echo_bot",
-      "type": "test_module",
-      "path": "tests/examples/test_echo_bot.py",
-      "description": "Tests for Echo Bot example.",
-      "lines_of_code": 73,
+      ],
       "exports": [
-        "TestEchoBot",
+        "TestMenuBot",
         "bot_module",
         "bot_class",
         "bot_instance",
@@ -657,8 +1001,21 @@
         "test_initialization",
         "test_has_required_attributes",
         "test_has_register_handlers",
-        "test_welcome_message"
+        "test_has_storage_keys"
       ],
+      "complexity_score": 1,
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "low",
+      "category": "testing"
+    },
+    {
+      "id": "tests.examples.test_echo_bot",
+      "name": "test_echo_bot",
+      "type": "test_module",
+      "path": "tests/examples/test_echo_bot.py",
+      "description": "Tests for Echo Bot example.",
+      "lines_of_code": 73,
       "classes": [
         "TestEchoBot"
       ],
@@ -672,17 +1029,9 @@
         "test_has_required_attributes",
         "test_has_register_handlers",
         "test_welcome_message"
-      ]
-    },
-    {
-      "id": "tests.examples.test_quit_smoking_bot",
-      "name": "test_quit_smoking_bot",
-      "type": "test_module",
-      "path": "tests/examples/test_quit_smoking_bot.py",
-      "description": "Tests for Quit Smoking Bot example.",
-      "lines_of_code": 99,
+      ],
       "exports": [
-        "TestQuitSmokingBot",
+        "TestEchoBot",
         "bot_module",
         "bot_class",
         "bot_instance",
@@ -691,13 +1040,21 @@
         "test_initialization",
         "test_has_required_attributes",
         "test_has_register_handlers",
-        "test_has_custom_managers",
-        "test_has_status_method",
-        "test_welcome_message_override",
-        "test_get_user_status",
-        "test_quotes_manager_initialized",
-        "test_status_manager_initialized"
+        "test_welcome_message"
       ],
+      "complexity_score": 1,
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "low",
+      "category": "testing"
+    },
+    {
+      "id": "tests.examples.test_quit_smoking_bot",
+      "name": "test_quit_smoking_bot",
+      "type": "test_module",
+      "path": "tests/examples/test_quit_smoking_bot.py",
+      "description": "Tests for Quit Smoking Bot example.",
+      "lines_of_code": 99,
       "classes": [
         "TestQuitSmokingBot"
       ],
@@ -716,7 +1073,29 @@
         "test_get_user_status",
         "test_quotes_manager_initialized",
         "test_status_manager_initialized"
-      ]
+      ],
+      "exports": [
+        "TestQuitSmokingBot",
+        "bot_module",
+        "bot_class",
+        "bot_instance",
+        "test_module_import",
+        "test_class_exists",
+        "test_initialization",
+        "test_has_required_attributes",
+        "test_has_register_handlers",
+        "test_has_custom_managers",
+        "test_has_status_method",
+        "test_welcome_message_override",
+        "test_get_user_status",
+        "test_quotes_manager_initialized",
+        "test_status_manager_initialized"
+      ],
+      "complexity_score": 2,
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "low",
+      "category": "testing"
     },
     {
       "id": "tests.examples.test_examples",
@@ -725,20 +1104,6 @@
       "path": "tests/examples/test_examples.py",
       "description": "Test suite to validate all example bots.",
       "lines_of_code": 279,
-      "exports": [
-        "TestExampleBots",
-        "TestExampleBotsIntegration",
-        "examples_dir",
-        "bot_files",
-        "test_all_bots_found",
-        "test_bot_import",
-        "test_bot_class_exists",
-        "test_bot_initialization",
-        "test_bot_has_register_handlers",
-        "test_all_bots_use_new_api",
-        "test_all_bots_have_main_function",
-        "test_all_bots_use_post_init_wrapper"
-      ],
       "classes": [
         "TestExampleBots",
         "TestExampleBotsIntegration"
@@ -754,205 +1119,137 @@
         "test_all_bots_use_new_api",
         "test_all_bots_have_main_function",
         "test_all_bots_use_post_init_wrapper"
-      ]
+      ],
+      "exports": [
+        "TestExampleBots",
+        "TestExampleBotsIntegration",
+        "examples_dir",
+        "bot_files",
+        "test_all_bots_found",
+        "test_bot_import",
+        "test_bot_class_exists",
+        "test_bot_initialization",
+        "test_bot_has_register_handlers",
+        "test_all_bots_use_new_api",
+        "test_all_bots_have_main_function",
+        "test_all_bots_use_post_init_wrapper"
+      ],
+      "complexity_score": 3,
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "low",
+      "category": "testing"
+    },
+    {
+      "id": "telegram_bot_stack.cli.commands.init",
+      "name": "init",
+      "type": "module",
+      "category": "implementation",
+      "path": "telegram_bot_stack/cli/commands/init.py",
+      "description": "Module init",
+      "lines_of_code": 410,
+      "complexity_score": 1,
+      "exports": [
+        "init"
+      ],
+      "classes": [],
+      "functions": [
+        "init"
+      ],
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium"
+    },
+    {
+      "id": "telegram_bot_stack.cli.utils.dependencies",
+      "name": "dependencies",
+      "type": "module",
+      "category": "implementation",
+      "path": "telegram_bot_stack/cli/utils/dependencies.py",
+      "description": "Module dependencies",
+      "lines_of_code": 179,
+      "complexity_score": 1,
+      "exports": [
+        "install_package",
+        "install_requirements",
+        "create_requirements_file",
+        "create_pyproject_toml"
+      ],
+      "classes": [],
+      "functions": [
+        "install_package",
+        "install_requirements",
+        "create_requirements_file",
+        "create_pyproject_toml"
+      ],
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium"
+    },
+    {
+      "id": "telegram_bot_stack.cli.utils.linting",
+      "name": "linting",
+      "type": "module",
+      "category": "implementation",
+      "path": "telegram_bot_stack/cli/utils/linting.py",
+      "description": "Module linting",
+      "lines_of_code": 84,
+      "complexity_score": 1,
+      "exports": [
+        "create_precommit_config",
+        "install_precommit_hooks"
+      ],
+      "classes": [],
+      "functions": [
+        "create_precommit_config",
+        "install_precommit_hooks"
+      ],
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium"
+    },
+    {
+      "id": "telegram_bot_stack.cli.utils.testing",
+      "name": "testing",
+      "type": "module",
+      "category": "implementation",
+      "path": "telegram_bot_stack/cli/utils/testing.py",
+      "description": "Module testing",
+      "lines_of_code": 102,
+      "complexity_score": 1,
+      "exports": [
+        "create_test_structure"
+      ],
+      "classes": [],
+      "functions": [
+        "create_test_structure"
+      ],
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium"
     }
   ],
   "edges": [
     {
       "id": "edge_1",
-      "source": "tests.conftest",
-      "target": "telegram_bot_stack.admin_manager",
+      "source": "telegram_bot_stack.cli.commands.init",
+      "target": "telegram_bot_stack.cli.utils.dependencies",
       "type": "imports",
-      "description": "Imports from telegram_bot_stack.admin_manager"
+      "description": "Imports from telegram_bot_stack.cli.utils.dependencies"
     },
     {
       "id": "edge_2",
-      "source": "tests.conftest",
-      "target": "telegram_bot_stack.storage",
+      "source": "telegram_bot_stack.cli.commands.init",
+      "target": "telegram_bot_stack.cli.utils.linting",
       "type": "imports",
-      "description": "Imports from telegram_bot_stack.storage"
+      "description": "Imports from telegram_bot_stack.cli.utils.linting"
     },
     {
       "id": "edge_3",
-      "source": "tests.conftest",
-      "target": "telegram_bot_stack.user_manager",
+      "source": "telegram_bot_stack.cli.commands.init",
+      "target": "telegram_bot_stack.cli.utils.testing",
       "type": "imports",
-      "description": "Imports from telegram_bot_stack.user_manager"
-    },
-    {
-      "id": "edge_4",
-      "source": "tests.core.test_sql_storage",
-      "target": "telegram_bot_stack.storage.sql",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.storage.sql"
-    },
-    {
-      "id": "edge_5",
-      "source": "tests.core.test_sql_storage",
-      "target": "telegram_bot_stack.storage",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.storage"
-    },
-    {
-      "id": "edge_6",
-      "source": "tests.core.test_sql_storage",
-      "target": "telegram_bot_stack.storage",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.storage"
-    },
-    {
-      "id": "edge_7",
-      "source": "tests.core.test_sql_storage",
-      "target": "telegram_bot_stack.storage",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.storage"
-    },
-    {
-      "id": "edge_8",
-      "source": "tests.core.test_sql_storage",
-      "target": "telegram_bot_stack.storage",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.storage"
-    },
-    {
-      "id": "edge_9",
-      "source": "tests.core.test_sql_storage",
-      "target": "telegram_bot_stack.storage",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.storage"
-    },
-    {
-      "id": "edge_10",
-      "source": "tests.core.test_sql_storage",
-      "target": "telegram_bot_stack.storage",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.storage"
-    },
-    {
-      "id": "edge_11",
-      "source": "tests.core.test_decorators",
-      "target": "telegram_bot_stack",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack"
-    },
-    {
-      "id": "edge_12",
-      "source": "tests.core.test_decorators",
-      "target": "telegram_bot_stack.storage",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.storage"
-    },
-    {
-      "id": "edge_13",
-      "source": "tests.core.test_admin_manager",
-      "target": "telegram_bot_stack.admin_manager",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.admin_manager"
-    },
-    {
-      "id": "edge_14",
-      "source": "tests.core.test_admin_manager",
-      "target": "telegram_bot_stack.storage",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.storage"
-    },
-    {
-      "id": "edge_15",
-      "source": "tests.core.test_storage",
-      "target": "telegram_bot_stack.storage",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.storage"
-    },
-    {
-      "id": "edge_16",
-      "source": "tests.core.test_user_manager",
-      "target": "telegram_bot_stack.storage",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.storage"
-    },
-    {
-      "id": "edge_17",
-      "source": "tests.core.test_user_manager",
-      "target": "telegram_bot_stack.user_manager",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.user_manager"
-    },
-    {
-      "id": "edge_18",
-      "source": "tests.core.test_bot_base",
-      "target": "telegram_bot_stack.bot_base",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.bot_base"
-    },
-    {
-      "id": "edge_19",
-      "source": "tests.core.test_bot_base",
-      "target": "telegram_bot_stack.storage",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.storage"
-    },
-    {
-      "id": "edge_20",
-      "source": "tests.integration.test_full_flow",
-      "target": "telegram_bot_stack.bot_base",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.bot_base"
-    },
-    {
-      "id": "edge_21",
-      "source": "tests.integration.test_full_flow",
-      "target": "telegram_bot_stack.storage",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.storage"
-    },
-    {
-      "id": "edge_22",
-      "source": "tests.examples.test_reminder_bot",
-      "target": "telegram_bot_stack.storage",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.storage"
-    },
-    {
-      "id": "edge_23",
-      "source": "tests.examples.test_counter_bot",
-      "target": "telegram_bot_stack.storage",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.storage"
-    },
-    {
-      "id": "edge_24",
-      "source": "tests.examples.test_poll_bot",
-      "target": "telegram_bot_stack.storage",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.storage"
-    },
-    {
-      "id": "edge_25",
-      "source": "tests.examples.test_menu_bot",
-      "target": "telegram_bot_stack.storage",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.storage"
-    },
-    {
-      "id": "edge_26",
-      "source": "tests.examples.test_echo_bot",
-      "target": "telegram_bot_stack.storage",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.storage"
-    },
-    {
-      "id": "edge_27",
-      "source": "tests.examples.test_quit_smoking_bot",
-      "target": "telegram_bot_stack.storage",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.storage"
-    },
-    {
-      "id": "edge_28",
-      "source": "tests.examples.test_examples",
-      "target": "telegram_bot_stack.storage",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.storage"
+      "description": "Imports from telegram_bot_stack.cli.utils.testing"
     }
   ]
 }

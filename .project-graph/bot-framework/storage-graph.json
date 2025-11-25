@@ -1,7 +1,7 @@
 {
   "metadata": {
     "version": "3.0.0",
-    "generated_at": "2025-11-24",
+    "generated_at": "2025-11-25",
     "graph_id": "bot_framework_storage",
     "graph_name": "Bot Framework - Storage",
     "graph_type": "sub_graph",
@@ -12,26 +12,16 @@
     "scope": "Storage abstraction layer and implementations",
     "root_package": "telegram_bot_stack.storage",
     "node_count": 5,
-    "edge_count": 0
+    "edge_count": 1
   },
   "nodes": [
     {
       "id": "telegram_bot_stack.storage.memory",
       "name": "memory",
       "type": "module",
-      "category": "implementation",
       "path": "telegram_bot_stack/storage/memory.py",
       "description": "In-memory storage backend for testing.",
       "lines_of_code": 110,
-      "complexity_score": 1,
-      "exports": [
-        "MemoryStorage",
-        "save",
-        "load",
-        "exists",
-        "delete",
-        "clear"
-      ],
       "classes": [
         "MemoryStorage"
       ],
@@ -42,48 +32,47 @@
         "delete",
         "clear"
       ],
+      "exports": [
+        "MemoryStorage",
+        "save",
+        "load",
+        "exists",
+        "delete",
+        "clear"
+      ],
+      "complexity_score": 1,
       "dependencies": [],
       "dependents": [],
-      "criticality": "medium"
+      "criticality": "medium",
+      "category": "implementation"
     },
     {
       "id": "telegram_bot_stack.storage",
       "name": "__init__",
       "type": "module",
-      "category": "implementation",
       "path": "telegram_bot_stack/storage/__init__.py",
       "description": "Storage abstraction layer for telegram-bot-stack.",
       "lines_of_code": 129,
-      "complexity_score": 1,
-      "exports": [
-        "create_storage"
-      ],
       "classes": [],
       "functions": [
         "create_storage"
       ],
+      "exports": [
+        "create_storage"
+      ],
+      "complexity_score": 1,
       "dependencies": [],
       "dependents": [],
-      "criticality": "medium"
+      "criticality": "medium",
+      "category": "implementation"
     },
     {
       "id": "telegram_bot_stack.storage.sql",
       "name": "sql",
       "type": "module",
-      "category": "implementation",
       "path": "telegram_bot_stack/storage/sql.py",
       "description": "SQL-based storage backend using SQLAlchemy.",
       "lines_of_code": 256,
-      "complexity_score": 1,
-      "exports": [
-        "StorageRecord",
-        "SQLStorage",
-        "save",
-        "load",
-        "exists",
-        "delete",
-        "close"
-      ],
       "classes": [
         "StorageRecord",
         "SQLStorage"
@@ -95,26 +84,28 @@
         "delete",
         "close"
       ],
+      "exports": [
+        "StorageRecord",
+        "SQLStorage",
+        "save",
+        "load",
+        "exists",
+        "delete",
+        "close"
+      ],
+      "complexity_score": 1,
       "dependencies": [],
       "dependents": [],
-      "criticality": "medium"
+      "criticality": "medium",
+      "category": "implementation"
     },
     {
       "id": "telegram_bot_stack.storage.json",
       "name": "json",
       "type": "module",
-      "category": "implementation",
       "path": "telegram_bot_stack/storage/json.py",
       "description": "JSON file-based storage backend.",
       "lines_of_code": 124,
-      "complexity_score": 1,
-      "exports": [
-        "JSONStorage",
-        "save",
-        "load",
-        "exists",
-        "delete"
-      ],
       "classes": [
         "JSONStorage"
       ],
@@ -124,26 +115,26 @@
         "exists",
         "delete"
       ],
-      "dependencies": [],
-      "dependents": [],
-      "criticality": "medium"
-    },
-    {
-      "id": "telegram_bot_stack.storage.base",
-      "name": "base",
-      "type": "module",
-      "category": "implementation",
-      "path": "telegram_bot_stack/storage/base.py",
-      "description": "Base storage backend interface for telegram-bot-stack.",
-      "lines_of_code": 62,
-      "complexity_score": 1,
       "exports": [
-        "StorageBackend",
+        "JSONStorage",
         "save",
         "load",
         "exists",
         "delete"
       ],
+      "complexity_score": 1,
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium",
+      "category": "implementation"
+    },
+    {
+      "id": "telegram_bot_stack.storage.base",
+      "name": "base",
+      "type": "module",
+      "path": "telegram_bot_stack/storage/base.py",
+      "description": "Base storage backend interface for telegram-bot-stack.",
+      "lines_of_code": 62,
       "classes": [
         "StorageBackend"
       ],
@@ -153,10 +144,27 @@
         "exists",
         "delete"
       ],
+      "exports": [
+        "StorageBackend",
+        "save",
+        "load",
+        "exists",
+        "delete"
+      ],
+      "complexity_score": 1,
       "dependencies": [],
       "dependents": [],
-      "criticality": "medium"
+      "criticality": "medium",
+      "category": "implementation"
     }
   ],
-  "edges": []
+  "edges": [
+    {
+      "id": "edge_1",
+      "source": "telegram_bot_stack.storage.sql",
+      "target": "telegram_bot_stack.storage.base",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.storage.base"
+    }
+  ]
 }

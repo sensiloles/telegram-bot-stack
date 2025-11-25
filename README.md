@@ -77,9 +77,100 @@ python3 .github/workflows/scripts/read_issues.py --list --state open
 
 ## 🚀 Quick Start
 
-### Installation
+### ⚡ CLI Tool (Recommended)
 
-#### Option 1: Install from PyPI (Recommended)
+Create a complete bot project in seconds:
+
+```bash
+# Install framework
+pip install telegram-bot-stack
+
+# Create new bot project with full dev environment
+telegram-bot-stack init my-bot \
+    --with-linting \
+    --with-testing \
+    --ide vscode \
+    --git
+
+# Navigate to project
+cd my-bot
+
+# Add your bot token
+echo "BOT_TOKEN=your_token_here" > .env
+
+# Run bot
+telegram-bot-stack dev --reload
+```
+
+**What you get:**
+
+- ✅ Complete project structure
+- ✅ Virtual environment configured
+- ✅ Dependencies installed
+- ✅ Linting setup (ruff, mypy, pre-commit hooks)
+- ✅ Testing setup (pytest with fixtures)
+- ✅ IDE configuration (VS Code/PyCharm)
+- ✅ Git initialized with .gitignore
+
+**Available CLI commands:**
+
+- `telegram-bot-stack init <name>` - Initialize new project
+- `telegram-bot-stack new --template <type>` - Create from template (basic, counter, menu, advanced)
+- `telegram-bot-stack dev --reload` - Run with auto-reload
+- `telegram-bot-stack validate` - Validate configuration
+
+See [`docs/cli-specification.md`](docs/cli-specification.md) for complete CLI documentation.
+
+### 📦 Manual Setup (Alternative)
+
+Create a complete bot project with full dev environment in **5 minutes**:
+
+```bash
+# Install framework
+pip install telegram-bot-stack
+
+# Create new bot project (auto-configures everything!)
+telegram-bot-stack init my-awesome-bot
+
+# Get started
+cd my-awesome-bot
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+echo "BOT_TOKEN=your_token_here" > .env
+python bot.py
+```
+
+**What you get:**
+
+- ✅ Virtual environment + dependencies
+- ✅ Linting (ruff, mypy) + pre-commit hooks
+- ✅ Testing (pytest) + fixtures
+- ✅ IDE configuration (VS Code/PyCharm)
+- ✅ Git initialization + .gitignore
+- ✅ Ready-to-run bot template
+
+**CLI Commands:**
+
+```bash
+# Initialize new project with full dev environment
+telegram-bot-stack init my-bot [--with-linting] [--ide vscode] [--git]
+
+# Create from template (basic, counter, menu, advanced)
+telegram-bot-stack new my-bot --template counter
+
+# Run in development mode with auto-reload
+telegram-bot-stack dev --reload
+
+# Validate configuration
+telegram-bot-stack validate
+```
+
+👉 **See [CLI Guide](docs/cli-specification.md) for all commands**
+
+---
+
+### 📦 Manual Installation
+
+#### Option 1: Install from PyPI
 
 ```bash
 # Install the latest stable version

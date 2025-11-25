@@ -13,6 +13,9 @@
     "source.organizeImports.ruff": "explicit",
     "source.fixAll.ruff": "explicit"
   },
+  // Ensure all files end with newline (POSIX compliant)
+  "files.insertFinalNewline": true,
+  "files.trimFinalNewlines": false,
   // Python - Ruff linter configuration (uses pyproject.toml)
   "[python]": {
     "editor.defaultFormatter": "charliermarsh.ruff",
@@ -57,21 +60,4 @@
   "python.linting.pylintEnabled": false,
   "python.linting.flake8Enabled": false,
   "python.formatting.provider": "none",
-  // MCP Servers - Workspace-specific configuration
-  "cursor.mcp.servers": {
-    "github-workflow": {
-      "command": "python3",
-      "args": [
-        "${workspaceFolder}/scripts/mcp_github_server.py"
-      ],
-      "description": "GitHub workflow management (issues, PRs, CI)"
-    },
-    "project-graph": {
-      "command": "python3",
-      "args": [
-        "${workspaceFolder}/scripts/mcp_project_graph.py"
-      ],
-      "description": "Project graph navigation"
-    }
-  }
 }

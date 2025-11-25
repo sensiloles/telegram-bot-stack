@@ -7,15 +7,29 @@
     "graph_type": "domain_router",
     "has_sub_graphs": true,
     "project_name": "telegram-bot-stack",
-    "project_version": "1.6.0",
+    "project_version": "1.15.0",
     "description": "Router for bot framework sub-graphs"
   },
   "sub_graphs": {
+    "cli": {
+      "file": "bot-framework/cli-graph.json",
+      "graph_id": "bot_framework_cli",
+      "name": "CLI",
+      "description": "CLI tool for bot project management and development",
+      "modules": 18,
+      "lines_of_code": 2096,
+      "recommended_for": [
+        "CLI command development",
+        "Project scaffolding changes",
+        "Dev environment automation",
+        "Working on Issue #40 (Killer Feature #1)"
+      ]
+    },
     "core": {
       "file": "bot-framework/core-graph.json",
       "graph_id": "bot_framework_core",
       "name": "Core",
-      "description": "BotBase, UserManager, AdminManager",
+      "description": "Core bot framework components",
       "modules": 4,
       "lines_of_code": 863,
       "recommended_for": [
@@ -28,7 +42,7 @@
       "file": "bot-framework/storage-graph.json",
       "graph_id": "bot_framework_storage",
       "name": "Storage",
-      "description": "Storage backends (JSON, Memory, SQL)",
+      "description": "Storage abstraction layer and implementations",
       "modules": 5,
       "lines_of_code": 681,
       "recommended_for": [
@@ -41,7 +55,7 @@
       "file": "bot-framework/utilities-graph.json",
       "graph_id": "bot_framework_utilities",
       "name": "Utilities",
-      "description": "Decorators and helper functions",
+      "description": "Utility decorators and helper functions",
       "modules": 1,
       "lines_of_code": 185,
       "recommended_for": [
@@ -81,11 +95,9 @@
     }
   ],
   "statistics": {
-    "total_sub_graphs": 3,
-    "total_modules": 10,
-    "total_lines_of_code": 1729,
-    "cross_graph_edges": 3,
-    "total_nodes": 10,
-    "total_edges": 0
+    "total_sub_graphs": 4,
+    "total_modules": 28,
+    "total_lines_of_code": 3825,
+    "cross_graph_edges": 3
   }
 }

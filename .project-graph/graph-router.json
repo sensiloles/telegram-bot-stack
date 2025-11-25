@@ -1,8 +1,14 @@
 {
   "version": "3.0.0",
-  "generated_at": "2025-11-24",
+  "generated_at": "2025-11-25",
   "description": "Router for selecting appropriate dependency graph based on task type",
   "architecture": "Multi-graph system for efficient AI agent navigation",
+  "metadata": {
+    "total_graphs": 7,
+    "total_nodes": 111,
+    "total_edges": 19,
+    "last_updated": "2025-11-25 08:44:30"
+  },
   "quick_start": {
     "step_1": "Read this file (graph-router.json) - ~150 lines",
     "step_2": "Identify your task type using 'decision_tree'",
@@ -10,108 +16,255 @@
     "step_4": "Work with focused graph instead of reading everything",
     "benefit": "Read 200-400 lines instead of 2000+ lines (80-90% token savings)"
   },
-  "graphs": {
-    "bot-framework": {
-      "id": "bot_framework",
-      "name": "\ud83e\udd16 Bot Framework Core",
-      "file": "bot-framework/router.json",
-      "description": "Core telegram bot framework implementation (telegram_bot_stack/)",
-      "has_sub_graphs": true,
-      "router_file": "bot-framework/router.json",
-      "sub_graphs": {
-        "core": {
-          "name": "Core",
-          "description": "BotBase, UserManager, AdminManager",
-          "file": "bot-framework/core-graph.json",
-          "lines": 129,
-          "lines_of_code": 863
+  "decision_tree": {
+    "understanding_project": {
+      "description": "I want to understand the project structure",
+      "recommended_graphs": [
+        "project_meta",
+        "bot_framework"
+      ],
+      "reason": "project_meta provides overview, bot_framework shows core implementation"
+    },
+    "adding_features": {
+      "description": "I want to add new features to the bot",
+      "questions": {
+        "storage_related": {
+          "question": "Is it storage-related (database, persistence)?",
+          "yes": [
+            "bot_framework/storage"
+          ],
+          "no": "next"
         },
-        "storage": {
-          "name": "Storage",
-          "description": "Storage backends (JSON, Memory, SQL)",
-          "file": "bot-framework/storage-graph.json",
-          "lines": 162,
-          "lines_of_code": 681
+        "user_management": {
+          "question": "Is it user/admin management related?",
+          "yes": [
+            "bot_framework/core"
+          ],
+          "no": "next"
         },
-        "utilities": {
-          "name": "Utilities",
-          "description": "Decorators and helpers",
-          "file": "bot-framework/utilities-graph.json",
-          "lines": 42,
-          "lines_of_code": 185
+        "cli_tools": {
+          "question": "Is it CLI/developer tools related?",
+          "yes": [
+            "bot_framework/cli"
+          ],
+          "no": [
+            "bot_framework"
+          ]
         }
-      },
+      }
+    },
+    "fixing_bugs": {
+      "description": "I want to fix bugs or issues",
+      "questions": {
+        "where": {
+          "question": "Where is the bug?",
+          "ci_cd": [
+            "infrastructure"
+          ],
+          "tests": [
+            "testing"
+          ],
+          "framework": [
+            "bot_framework"
+          ],
+          "examples": [
+            "examples"
+          ]
+        }
+      }
+    },
+    "writing_tests": {
+      "description": "I want to write or fix tests",
+      "recommended_graphs": [
+        "testing",
+        "bot_framework"
+      ],
+      "reason": "testing shows test structure, bot_framework shows what to test"
+    },
+    "documentation": {
+      "description": "I want to update documentation",
+      "recommended_graphs": [
+        "docs",
+        "examples"
+      ],
+      "reason": "docs for guides, examples for code samples"
+    },
+    "learning_usage": {
+      "description": "I want to learn how to use the framework",
+      "recommended_graphs": [
+        "examples",
+        "docs"
+      ],
+      "reason": "examples show practical usage, docs explain concepts"
+    }
+  },
+  "graphs": {
+    "archive": {
+      "id": "archive",
+      "name": "\ud83d\udce6 Archive",
+      "file": "archive/graph.json",
+      "description": "Archived documentation, deprecated features, and historical files",
+      "node_count": 6,
+      "edge_count": 4,
+      "lines": 240,
+      "scope": "archive/ directory and deprecated functionality",
       "coverage": {
         "directories": [
-          "telegram_bot_stack/"
+          "archive"
         ],
         "file_patterns": [
-          "telegram_bot_stack/**/*.py"
+          "archive/**/*.py"
         ],
-        "modules": 10,
-        "lines_of_code": 1667,
-        "key_components": [
-          "BotBase",
-          "UserManager",
-          "AdminManager",
-          "StorageBackend",
-          "JSONStorage",
-          "MemoryStorage",
-          "SQLStorage",
-          "rate_limit"
+        "modules": 1,
+        "lines_of_code": 437
+      },
+      "when_to_use": [
+        "Understanding project history",
+        "Reviewing deprecated features",
+        "Historical context for decisions",
+        "Learning about removed functionality"
+      ],
+      "typical_queries": [
+        "What was the original plan?",
+        "Why was Docker removed?",
+        "Project evolution history?",
+        "What features were deprecated?"
+      ],
+      "criticality": "low",
+      "update_frequency": "low",
+      "complexity": "low"
+    },
+    "configuration": {
+      "id": "configuration",
+      "name": "\u2699\ufe0f Configuration",
+      "file": "configuration/graph.json",
+      "description": "Project configuration, build system, and tool settings",
+      "node_count": 7,
+      "edge_count": 8,
+      "lines": 263,
+      "scope": "Root-level configuration files",
+      "coverage": {
+        "directories": [
+          "."
+        ],
+        "file_patterns": [],
+        "modules": 5
+      },
+      "when_to_use": [
+        "Modifying build system",
+        "Changing dependencies",
+        "Configuring dev tools",
+        "Updating project metadata",
+        "Version management",
+        "Tool configuration"
+      ],
+      "typical_queries": [
+        "How to add dependency?",
+        "Where to configure pytest?",
+        "How to update version?",
+        "What's in the Makefile?",
+        "How to configure ruff?",
+        "Where's the changelog?"
+      ],
+      "criticality": "critical",
+      "update_frequency": "medium",
+      "complexity": "low"
+    },
+    "docs": {
+      "id": "docs",
+      "name": "\ud83d\udcd6 Documentation",
+      "file": "docs/graph.json",
+      "description": "Project documentation files",
+      "node_count": 11,
+      "edge_count": 0,
+      "lines": 105,
+      "scope": "User guides, API reference, setup instructions",
+      "coverage": {
+        "directories": [
+          "docs"
+        ],
+        "file_patterns": [
+          "docs/**/*.py"
         ]
       },
       "when_to_use": [
-        "Adding new storage backend",
-        "Modifying BotBase functionality",
-        "Extending framework core features",
-        "Understanding bot architecture",
-        "Refactoring telegram_bot_stack modules",
-        "Implementing custom hooks",
-        "Working with user/admin management",
-        "Adding decorators"
+        "Writing or updating documentation",
+        "API reference updates",
+        "Creating user guides",
+        "Documentation consistency",
+        "Understanding documented features",
+        "Migration guide updates"
       ],
       "typical_queries": [
-        "How to add Redis storage backend?",
-        "Where is user registration handled?",
-        "How to customize bot welcome message?",
-        "What hooks can I override in BotBase?",
-        "How to implement new StorageBackend?",
-        "Where are admin commands defined?",
-        "How does rate limiting work?"
+        "Where to update API documentation?",
+        "How to document new feature?",
+        "What's in the architecture docs?",
+        "Where's the storage guide?",
+        "How to update installation guide?"
       ],
-      "complexity": "medium",
-      "criticality": "critical",
-      "update_frequency": "high",
-      "usage_note": "This graph is now hierarchical. Use load_sub_graph() to load specific sub-graphs for better efficiency."
+      "criticality": "high",
+      "update_frequency": "medium",
+      "complexity": "low"
+    },
+    "examples": {
+      "id": "examples",
+      "name": "\ud83d\udcda Example Bots",
+      "file": "examples/graph.json",
+      "description": "Example bot implementations and usage patterns",
+      "node_count": 10,
+      "edge_count": 7,
+      "lines": 323,
+      "scope": "Example bots demonstrating framework features",
+      "coverage": {
+        "directories": [
+          "examples"
+        ],
+        "file_patterns": [
+          "examples/**/*.py"
+        ],
+        "modules": 10,
+        "lines_of_code": 2181
+      },
+      "when_to_use": [
+        "Learning how to use framework",
+        "Finding usage examples",
+        "Understanding best practices",
+        "Creating new example bot",
+        "Seeing real-world implementations",
+        "Learning framework patterns"
+      ],
+      "typical_queries": [
+        "How to create a simple bot?",
+        "Example of custom storage usage?",
+        "Real-world bot implementation?",
+        "How to use BotBase hooks?",
+        "Pattern for state management?",
+        "Example bot with custom commands?"
+      ],
+      "criticality": "medium",
+      "update_frequency": "low",
+      "complexity": "low"
     },
     "infrastructure": {
       "id": "infrastructure",
-      "name": "\ud83d\udd27 Infrastructure & Automation",
+      "name": "\ud83d\udd27 Infrastructure",
       "file": "infrastructure/graph.json",
-      "router_file": "infrastructure/router.json",
-      "description": "CI/CD pipelines, GitHub workflows, automation scripts",
+      "description": "CI/CD workflows, automation scripts, and tooling",
+      "node_count": 51,
+      "edge_count": 0,
+      "lines": 578,
+      "scope": "GitHub Actions, automation scripts, deployment",
       "coverage": {
         "directories": [
-          ".github/",
-          "scripts/"
+          ".github",
+          "scripts"
         ],
         "file_patterns": [
-          ".github/**/*",
-          "scripts/**/*.py",
-          "*.yml"
+          ".github/**/*.py",
+          "scripts/**/*.py"
         ],
-        "scripts": 16,
-        "workflows": 3,
-        "key_components": [
-          "merge_pr.py",
-          "create_pr.py",
-          "create_issue.py",
-          "read_issues.py",
-          "tests.yml",
-          "release.yml",
-          "github_helper.py"
-        ]
+        "modules": 25,
+        "lines_of_code": 6585
       },
       "when_to_use": [
         "Modifying CI/CD pipeline",
@@ -130,119 +283,25 @@
         "Where are GitHub actions defined?",
         "How to debug CI/CD failure?"
       ],
-      "complexity": "medium",
       "criticality": "high",
       "update_frequency": "medium",
-      "lines": 759
-    },
-    "testing": {
-      "id": "testing",
-      "name": "\ud83e\uddea Testing Infrastructure",
-      "file": "testing/graph.json",
-      "router_file": "testing/router.json",
-      "description": "Test structure, patterns, fixtures, and coverage",
-      "coverage": {
-        "directories": [
-          "tests/"
-        ],
-        "file_patterns": [
-          "tests/**/*.py",
-          "conftest.py"
-        ],
-        "tests": 131,
-        "coverage_percentage": 80,
-        "test_files": 5,
-        "key_components": [
-          "test_bot_base.py",
-          "test_storage.py",
-          "test_user_manager.py",
-          "test_admin_manager.py",
-          "test_full_flow.py",
-          "conftest.py"
-        ]
-      },
-      "when_to_use": [
-        "Adding new tests",
-        "Understanding test structure",
-        "Improving test coverage",
-        "Using test fixtures",
-        "Debugging test failures",
-        "Writing integration tests",
-        "Understanding test patterns"
-      ],
-      "typical_queries": [
-        "How to test new storage backend?",
-        "Where are bot command tests?",
-        "How to use test fixtures?",
-        "What fixtures are available?",
-        "How to write integration test?",
-        "Where to add tests for new feature?"
-      ],
-      "complexity": "medium",
-      "criticality": "high",
-      "update_frequency": "high",
-      "lines": 958
-    },
-    "examples": {
-      "id": "examples",
-      "name": "\ud83d\udcda Example Bots & Patterns",
-      "file": "examples/graph.json",
-      "router_file": "examples/router.json",
-      "description": "Example bot implementations and usage patterns",
-      "coverage": {
-        "directories": [
-          "examples/"
-        ],
-        "file_patterns": [
-          "examples/**/*.py"
-        ],
-        "example_bots": 3,
-        "key_components": [
-          "echo_bot",
-          "counter_bot",
-          "quit_smoking_bot"
-        ]
-      },
-      "when_to_use": [
-        "Learning how to use framework",
-        "Finding usage examples",
-        "Understanding best practices",
-        "Creating new example bot",
-        "Seeing real-world implementations",
-        "Learning framework patterns"
-      ],
-      "typical_queries": [
-        "How to create a simple bot?",
-        "Example of custom storage usage?",
-        "Real-world bot implementation?",
-        "How to use BotBase hooks?",
-        "Pattern for state management?",
-        "Example bot with custom commands?"
-      ],
-      "complexity": "low",
-      "criticality": "medium",
-      "update_frequency": "low",
-      "lines": 315
+      "complexity": "medium"
     },
     "project-meta": {
       "id": "project_meta",
-      "name": "\ud83c\udf10 Project Meta & Architecture",
+      "name": "\ud83c\udfaf Project Meta & Architecture",
       "file": "project-meta/graph.json",
-      "router_file": "project-meta/router.json",
-      "description": "Cross-graph relationships, project structure, and architecture overview",
+      "description": "High-level project structure, cross-graph relationships, and architecture overview",
+      "node_count": 0,
+      "edge_count": 0,
+      "lines": 495,
+      "scope": "Project-wide structure and component relationships",
       "coverage": {
         "directories": [
-          "./"
+          "."
         ],
-        "scope": "project-wide connections",
-        "key_components": [
-          "Inter-graph relationships",
-          "Project structure",
-          "Architecture layers",
-          "Component interactions",
-          "Build system",
-          "Package structure"
-        ]
+        "file_patterns": [],
+        "modules": 5
       },
       "when_to_use": [
         "Understanding overall architecture",
@@ -261,530 +320,49 @@
         "How are graphs related?",
         "Project structure explanation?"
       ],
-      "complexity": "high",
       "criticality": "high",
       "update_frequency": "low",
-      "lines": 493
+      "complexity": "high"
     },
-    "docs": {
-      "id": "docs",
-      "name": "\ud83d\udcd6 Documentation",
-      "file": "docs/graph.json",
-      "router_file": "docs/router.json",
-      "description": "Project documentation, guides, and API reference",
+    "testing": {
+      "id": "testing",
+      "name": "\ud83e\uddea Testing Infrastructure",
+      "file": "testing/graph.json",
+      "description": "Test suite, fixtures, and testing utilities",
+      "node_count": 26,
+      "edge_count": 0,
+      "lines": 1145,
+      "scope": "Unit tests, integration tests, fixtures",
       "coverage": {
         "directories": [
-          "docs/"
+          "tests"
         ],
         "file_patterns": [
-          "docs/**/*.md"
+          "tests/**/*.py"
         ],
-        "files": 9,
-        "total_lines": 4746,
-        "key_components": [
-          "API Reference",
-          "Architecture",
-          "Installation Guide",
-          "Quickstart",
-          "Storage Guide",
-          "Migration Guide"
-        ]
+        "modules": 26,
+        "lines_of_code": 4330
       },
       "when_to_use": [
-        "Writing or updating documentation",
-        "API reference updates",
-        "Creating user guides",
-        "Documentation consistency",
-        "Understanding documented features",
-        "Migration guide updates"
+        "Adding new tests",
+        "Understanding test structure",
+        "Improving test coverage",
+        "Using test fixtures",
+        "Debugging test failures",
+        "Writing integration tests",
+        "Understanding test patterns"
       ],
       "typical_queries": [
-        "Where to update API documentation?",
-        "How to document new feature?",
-        "What's in the architecture docs?",
-        "Where's the storage guide?",
-        "How to update installation guide?"
+        "How to test new storage backend?",
+        "Where are bot command tests?",
+        "How to use test fixtures?",
+        "What fixtures are available?",
+        "How to write integration test?",
+        "Where to add tests for new feature?"
       ],
-      "complexity": "low",
       "criticality": "high",
-      "update_frequency": "medium",
-      "lines": 116
-    },
-    "configuration": {
-      "id": "configuration",
-      "name": "\u2699\ufe0f Configuration",
-      "file": "configuration/graph.json",
-      "router_file": "configuration/router.json",
-      "description": "Build system, project settings, and tool configuration",
-      "coverage": {
-        "directories": [
-          "./"
-        ],
-        "file_patterns": [
-          "pyproject.toml",
-          "Makefile",
-          ".cursorrules",
-          ".pre-commit-config.yaml",
-          "README.md",
-          "CHANGELOG.md",
-          "LICENSE"
-        ],
-        "files": 7,
-        "key_components": [
-          "pyproject.toml",
-          "Makefile",
-          ".cursorrules",
-          "pre-commit config",
-          "README",
-          "CHANGELOG"
-        ]
-      },
-      "when_to_use": [
-        "Modifying build system",
-        "Changing dependencies",
-        "Configuring dev tools",
-        "Updating project metadata",
-        "Version management",
-        "Tool configuration"
-      ],
-      "typical_queries": [
-        "How to add dependency?",
-        "Where to configure pytest?",
-        "How to update version?",
-        "What's in the Makefile?",
-        "How to configure ruff?",
-        "Where's the changelog?"
-      ],
-      "complexity": "low",
-      "criticality": "critical",
-      "update_frequency": "medium",
-      "lines": 378
-    },
-    "archive": {
-      "id": "archive",
-      "name": "\ud83d\udce6 Archive",
-      "file": "archive/graph.json",
-      "router_file": "archive/router.json",
-      "description": "Archived plans, deprecated code, and historical context",
-      "coverage": {
-        "directories": [
-          "archive/"
-        ],
-        "file_patterns": [
-          "archive/**/*"
-        ],
-        "files": 6,
-        "key_components": [
-          "Package conversion plan",
-          "Deprecated Docker setup"
-        ]
-      },
-      "when_to_use": [
-        "Understanding project history",
-        "Reviewing deprecated features",
-        "Historical context for decisions",
-        "Learning about removed functionality"
-      ],
-      "typical_queries": [
-        "What was the original plan?",
-        "Why was Docker removed?",
-        "Project evolution history?",
-        "What features were deprecated?"
-      ],
-      "complexity": "low",
-      "criticality": "low",
-      "update_frequency": "low",
-      "lines": 239
+      "update_frequency": "high",
+      "complexity": "medium"
     }
-  },
-  "decision_tree": {
-    "description": "Use this tree to quickly select the right graph(s)",
-    "by_keywords": {
-      "bot_framework": {
-        "keywords": [
-          "BotBase",
-          "storage",
-          "UserManager",
-          "AdminManager",
-          "hooks",
-          "commands",
-          "bot implementation",
-          "framework",
-          "telegram_bot_stack",
-          "backend",
-          "core"
-        ],
-        "graphs": [
-          "bot-framework-graph.json"
-        ]
-      },
-      "infrastructure": {
-        "keywords": [
-          "CI/CD",
-          "workflow",
-          "release",
-          "merge",
-          "PR",
-          "issue",
-          "automation",
-          "github actions",
-          "pipeline",
-          "deploy",
-          "pre-commit",
-          "lint",
-          "format"
-        ],
-        "graphs": [
-          "infrastructure-graph.json"
-        ]
-      },
-      "testing": {
-        "keywords": [
-          "test",
-          "pytest",
-          "coverage",
-          "fixture",
-          "mock",
-          "integration test",
-          "unit test",
-          "conftest",
-          "assert",
-          "test_*",
-          "debugging tests"
-        ],
-        "graphs": [
-          "testing-graph.json"
-        ]
-      },
-      "examples": {
-        "keywords": [
-          "example",
-          "echo_bot",
-          "counter_bot",
-          "quit_smoking",
-          "demo",
-          "tutorial",
-          "how to use",
-          "sample",
-          "getting started",
-          "quickstart"
-        ],
-        "graphs": [
-          "examples-graph.json"
-        ]
-      },
-      "architecture": {
-        "keywords": [
-          "architecture",
-          "structure",
-          "overview",
-          "onboarding",
-          "how everything works",
-          "big picture",
-          "design",
-          "cross-component",
-          "system design"
-        ],
-        "graphs": [
-          "project-meta-graph.json"
-        ]
-      },
-      "docs": {
-        "keywords": [
-          "documentation",
-          "docs",
-          "guide",
-          "API reference",
-          "quickstart",
-          "installation guide",
-          "storage guide",
-          "migration guide",
-          "user guide",
-          "tutorial",
-          "how to document"
-        ],
-        "graphs": [
-          "docs-graph.json"
-        ]
-      },
-      "configuration": {
-        "keywords": [
-          "configuration",
-          "config",
-          "pyproject",
-          "makefile",
-          "build system",
-          "dependencies",
-          "version",
-          "changelog",
-          "cursorrules",
-          "pre-commit",
-          "tool configuration",
-          "project metadata"
-        ],
-        "graphs": [
-          "configuration-graph.json"
-        ]
-      },
-      "archive": {
-        "keywords": [
-          "archive",
-          "deprecated",
-          "historical",
-          "old",
-          "removed",
-          "docker",
-          "conversion plan",
-          "project history"
-        ],
-        "graphs": [
-          "archive-graph.json"
-        ]
-      }
-    },
-    "by_file_path": {
-      "telegram_bot_stack/": "bot-framework-graph.json",
-      ".github/workflows/": "infrastructure-graph.json",
-      ".github/workflows/scripts/": "infrastructure-graph.json",
-      "scripts/": "infrastructure-graph.json",
-      "tests/": "testing-graph.json",
-      "examples/": "examples-graph.json",
-      "docs/": "docs-graph.json",
-      "pyproject.toml": "configuration-graph.json",
-      "Makefile": "configuration-graph.json",
-      ".cursorrules": "configuration-graph.json",
-      ".pre-commit-config.yaml": "configuration-graph.json",
-      "README.md": "configuration-graph.json",
-      "CHANGELOG.md": "configuration-graph.json",
-      "LICENSE": "configuration-graph.json",
-      "archive/": "archive-graph.json"
-    },
-    "by_task_type": {
-      "feature_development": {
-        "description": "Adding new feature to framework",
-        "primary": [
-          "bot-framework-graph.json"
-        ],
-        "secondary": [
-          "testing-graph.json"
-        ],
-        "workflow": "1. Bot framework for implementation \u2192 2. Testing for tests"
-      },
-      "bug_fix": {
-        "description": "Fixing a bug in code",
-        "primary": [
-          "bot-framework-graph.json"
-        ],
-        "secondary": [
-          "testing-graph.json"
-        ],
-        "workflow": "1. Bot framework to find bug \u2192 2. Testing to verify fix"
-      },
-      "ci_cd_work": {
-        "description": "Working with CI/CD or automation",
-        "primary": [
-          "infrastructure-graph.json"
-        ],
-        "secondary": [],
-        "workflow": "Infrastructure graph only"
-      },
-      "test_writing": {
-        "description": "Writing or improving tests",
-        "primary": [
-          "testing-graph.json"
-        ],
-        "secondary": [
-          "bot-framework-graph.json"
-        ],
-        "workflow": "1. Testing for structure \u2192 2. Bot framework for implementation details"
-      },
-      "documentation": {
-        "description": "Writing documentation or examples",
-        "primary": [
-          "examples-graph.json"
-        ],
-        "secondary": [
-          "bot-framework-graph.json",
-          "project-meta-graph.json"
-        ],
-        "workflow": "1. Examples for patterns \u2192 2. Bot framework for API \u2192 3. Meta for architecture"
-      },
-      "architecture_review": {
-        "description": "Understanding or changing architecture",
-        "primary": [
-          "project-meta-graph.json"
-        ],
-        "secondary": [
-          "bot-framework-graph.json"
-        ],
-        "workflow": "1. Meta for overview \u2192 2. Bot framework for details"
-      },
-      "new_example": {
-        "description": "Creating new example bot",
-        "primary": [
-          "examples-graph.json",
-          "bot-framework-graph.json"
-        ],
-        "secondary": [],
-        "workflow": "1. Examples for patterns \u2192 2. Bot framework for API"
-      },
-      "refactoring": {
-        "description": "Major refactoring across components",
-        "primary": [
-          "project-meta-graph.json",
-          "bot-framework-graph.json"
-        ],
-        "secondary": [
-          "testing-graph.json"
-        ],
-        "workflow": "1. Meta for impact \u2192 2. Bot framework for changes \u2192 3. Testing for validation"
-      },
-      "documentation_work": {
-        "description": "Writing or updating documentation",
-        "primary": [
-          "docs-graph.json"
-        ],
-        "secondary": [
-          "bot-framework-graph.json"
-        ],
-        "workflow": "1. Docs graph for doc structure \u2192 2. Bot framework for technical details"
-      },
-      "configuration_changes": {
-        "description": "Changing build system or configuration",
-        "primary": [
-          "configuration-graph.json"
-        ],
-        "secondary": [],
-        "workflow": "Configuration graph for build system and tools"
-      },
-      "dependency_management": {
-        "description": "Adding or updating dependencies",
-        "primary": [
-          "configuration-graph.json"
-        ],
-        "secondary": [],
-        "workflow": "Edit pyproject.toml and update lockfiles"
-      },
-      "historical_research": {
-        "description": "Understanding project history or deprecated features",
-        "primary": [
-          "archive-graph.json"
-        ],
-        "secondary": [
-          "project-meta-graph.json"
-        ],
-        "workflow": "1. Archive for historical context \u2192 2. Meta for current state"
-      }
-    }
-  },
-  "usage_examples": {
-    "example_1": {
-      "query": "How to add Redis storage backend?",
-      "analysis": "Contains keyword 'storage' and 'backend'",
-      "selected_graph": "bot-framework-graph.json",
-      "reasoning": "Storage backends are part of bot framework core",
-      "token_savings": "80% (read 250 lines instead of 1200)"
-    },
-    "example_2": {
-      "query": "How to modify merge_pr.py to delete branches?",
-      "analysis": "Contains 'merge_pr.py' which is in .github/workflows/scripts/",
-      "selected_graph": "infrastructure-graph.json",
-      "reasoning": "merge_pr.py is automation script",
-      "token_savings": "85% (read 200 lines instead of 1200)"
-    },
-    "example_3": {
-      "query": "Where are the tests for BotBase?",
-      "analysis": "Contains 'tests' and 'BotBase'",
-      "selected_graphs": [
-        "testing-graph.json",
-        "bot-framework-graph.json"
-      ],
-      "reasoning": "Need testing graph for test location, bot framework for BotBase details",
-      "token_savings": "60% (read 500 lines instead of 1200)"
-    },
-    "example_4": {
-      "query": "Show me example of simple bot",
-      "analysis": "Contains 'example' and 'simple bot'",
-      "selected_graph": "examples-graph.json",
-      "reasoning": "Looking for example implementations",
-      "token_savings": "90% (read 150 lines instead of 1200)"
-    },
-    "example_5": {
-      "query": "Explain overall project architecture",
-      "analysis": "Contains 'overall' and 'architecture'",
-      "selected_graph": "project-meta-graph.json",
-      "reasoning": "High-level architecture overview",
-      "token_savings": "70% (read 400 lines instead of 1200)"
-    },
-    "example_6": {
-      "query": "Update API reference documentation",
-      "analysis": "Contains 'API reference' and 'documentation'",
-      "selected_graph": "docs-graph.json",
-      "reasoning": "Documentation work requires docs graph",
-      "token_savings": "85% (read 300 lines instead of 2000)"
-    },
-    "example_7": {
-      "query": "Add new dependency to pyproject.toml",
-      "analysis": "Contains 'dependency' and 'pyproject.toml'",
-      "selected_graph": "configuration-graph.json",
-      "reasoning": "Configuration changes need config graph",
-      "token_savings": "90% (read 200 lines instead of 2000)"
-    },
-    "example_8": {
-      "query": "Why was Docker deployment removed?",
-      "analysis": "Contains 'Docker' and historical question",
-      "selected_graph": "archive-graph.json",
-      "reasoning": "Historical context is in archive",
-      "token_savings": "88% (read 250 lines instead of 2000)"
-    }
-  },
-  "ai_agent_workflow": {
-    "recommended_flow": [
-      "Step 1: Read graph-router.json (this file) - ~200 lines",
-      "Step 2: Parse user query to extract keywords/file paths/task type",
-      "Step 3: Use decision_tree to select appropriate graph(s)",
-      "Step 4: Load ONLY selected graph(s) - typically 200-400 lines",
-      "Step 5: Work with focused, relevant information",
-      "Step 6: If need more context, load secondary graph"
-    ],
-    "fallback": "If unsure, start with project-meta-graph.json for overview",
-    "multiple_graphs": "Load primary graph first, then secondary only if needed"
-  },
-  "statistics": {
-    "total_graphs": 8,
-    "hierarchical_graphs": 1,
-    "flat_graphs": 7,
-    "total_files_covered": "~100",
-    "avg_graph_size": "200-400 lines",
-    "router_size": "~700 lines",
-    "typical_usage": "router (700) + one graph (300) = 1000 lines",
-    "token_savings": "Read 1000 lines instead of all files (10000+)",
-    "best_case_savings": "router (700) + archive (200) = 900 lines for specific queries"
-  },
-  "maintenance": {
-    "update_triggers": [
-      "When adding/removing modules in telegram_bot_stack/ \u2192 bot-framework",
-      "When adding/removing automation scripts \u2192 infrastructure",
-      "When restructuring tests \u2192 testing",
-      "When adding new example bots \u2192 examples",
-      "When adding/updating documentation \u2192 docs",
-      "When changing build config or dependencies \u2192 configuration",
-      "When archiving deprecated features \u2192 archive",
-      "When changing project structure \u2192 project-meta"
-    ],
-    "update_procedure": [
-      "1. Identify affected graph(s) using update_triggers",
-      "2. Update specific graph(s) with new nodes/edges",
-      "3. Update router if new files/patterns added",
-      "4. Update project-meta-graph if cross-graph relationships changed",
-      "5. Validate all graphs: cd .project-graph && python3 utils/graph_utils.py"
-    ]
-  },
-  "notes": {
-    "design_rationale": "Specialized graphs reduce cognitive load and token usage",
-    "coverage": "Now covers 100% of project files across 8 domain graphs",
-    "scalability": "System scales well - added 3 new graphs without complexity increase",
-    "backward_compatibility": "Old dependency-graph.json renamed to bot-framework-graph.json",
-    "completeness": "All files now tracked: code, tests, docs, config, examples, infrastructure, archive"
   }
 }

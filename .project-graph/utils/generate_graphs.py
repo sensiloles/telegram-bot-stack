@@ -381,6 +381,7 @@ def save_graph(graph: Dict[str, Any], graph_name: str, dry_run: bool = False) ->
         output_file.parent.mkdir(parents=True, exist_ok=True)
         with open(output_file, "w") as f:
             json.dump(graph, f, indent=2)
+            f.write("\n")  # POSIX compliant
         print(f"✅ Saved: {output_file}")
 
 

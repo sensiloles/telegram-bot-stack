@@ -17,237 +17,122 @@
       "id": "config.pyproject",
       "name": "pyproject.toml",
       "type": "configuration",
-      "category": "build_system",
       "path": "pyproject.toml",
       "description": "Python project metadata and build configuration (PEP 518)",
-      "format": "toml",
-      "configures": [
-        "Package metadata",
-        "Dependencies",
-        "Build system (setuptools)",
-        "pytest configuration",
-        "ruff linting rules",
-        "coverage settings"
-      ],
-      "sections": [
-        "project",
-        "build-system",
-        "tool.pytest.ini_options",
-        "tool.ruff",
-        "tool.coverage.run",
-        "tool.coverage.report"
-      ],
       "dependencies": [],
-      "affects": [
-        "Package building",
-        "PyPI publishing",
-        "Testing",
-        "Linting",
-        "Coverage reporting"
-      ],
+      "dependents": [],
+      "criticality": "critical",
+      "category": "build_system",
       "tags": [
         "build",
         "metadata",
         "dependencies",
         "tools"
       ],
-      "criticality": "critical"
+      "format": "toml"
     },
     {
       "id": "config.makefile",
       "name": "Makefile",
       "type": "configuration",
-      "category": "build_system",
       "path": "Makefile",
       "description": "Build automation and common development tasks",
-      "format": "makefile",
-      "targets": [
-        "install",
-        "test",
-        "coverage",
-        "lint",
-        "format",
-        "build",
-        "publish",
-        "clean",
-        "run-counter",
-        "run-echo",
-        "run-menu",
-        "run-poll",
-        "run-quit-smoking",
-        "run-reminder",
-        "stop-counter",
-        "stop-echo",
-        "stop-menu",
-        "stop-poll",
-        "stop-quit-smoking",
-        "stop-reminder",
-        "stop-all-bots",
-        "list-bots",
-        "list-running-bots",
-        "test-examples",
-        "test-bot"
-      ],
       "dependencies": [
         "config.pyproject"
       ],
-      "affects": [
-        "Development workflow",
-        "Build process",
-        "Testing",
-        "Publishing",
-        "Example bot management"
-      ],
+      "dependents": [],
+      "criticality": "high",
+      "category": "build_system",
       "tags": [
         "automation",
         "build",
         "development"
       ],
-      "criticality": "high"
+      "format": "makefile"
     },
     {
       "id": "config.cursorrules",
       "name": ".cursorrules",
       "type": "configuration",
-      "category": "ai_agent",
       "path": ".cursorrules",
       "description": "Instructions and rules for AI agents working on the project",
-      "format": "markdown",
-      "sections": [
-        "Agent Orientation",
-        "Project Context",
-        "Essential Workflows",
-        "Git Workflow",
-        "Conventional Commits",
-        "Testing",
-        "Documentation",
-        "Multi-Graph System"
-      ],
       "dependencies": [
         "config.pyproject",
         "config.pre_commit"
       ],
-      "affects": [
-        "AI agent behavior",
-        "Development workflow",
-        "Code quality",
-        "Documentation standards"
-      ],
+      "dependents": [],
+      "criticality": "high",
+      "category": "ai_agent",
       "tags": [
         "ai-agent",
         "workflow",
         "standards"
       ],
-      "criticality": "high"
+      "format": "markdown"
     },
     {
       "id": "config.pre_commit",
       "name": ".pre-commit-config.yaml",
       "type": "configuration",
-      "category": "dev_tools",
       "path": ".pre-commit-config.yaml",
       "description": "Pre-commit hooks configuration for code quality",
-      "format": "yaml",
-      "hooks": [
-        "trailing-whitespace",
-        "end-of-file-fixer",
-        "check-yaml",
-        "ruff linter",
-        "ruff formatter"
-      ],
       "dependencies": [
         "config.pyproject"
       ],
-      "affects": [
-        "Code quality",
-        "Git commits",
-        "Linting",
-        "Formatting"
-      ],
+      "dependents": [],
+      "criticality": "medium",
+      "category": "dev_tools",
       "tags": [
         "hooks",
         "quality",
         "automation"
       ],
-      "criticality": "medium"
+      "format": "yaml"
     },
     {
       "id": "config.readme",
       "name": "README.md",
       "type": "documentation",
-      "category": "project_root",
       "path": "README.md",
       "description": "Main project README with overview, installation, and usage",
-      "format": "markdown",
-      "sections": [
-        "Overview",
-        "Features",
-        "Installation",
-        "Quick Start",
-        "Testing",
-        "Architecture",
-        "Examples",
-        "Contributing"
-      ],
-      "dependencies": [],
-      "affects": [
-        "PyPI page",
-        "GitHub landing page",
-        "First impression"
-      ],
+      "category": "project_root",
       "tags": [
         "documentation",
         "overview",
         "landing"
       ],
-      "criticality": "critical"
+      "format": "markdown"
     },
     {
       "id": "config.changelog",
       "name": "CHANGELOG.md",
       "type": "documentation",
-      "category": "project_root",
       "path": "CHANGELOG.md",
       "description": "Version history and release notes",
-      "format": "markdown",
-      "sections": [
-        "Unreleased",
-        "Version entries"
-      ],
-      "dependencies": [],
-      "affects": [
-        "Release documentation",
-        "Version tracking",
-        "User communication"
-      ],
+      "category": "project_root",
       "tags": [
         "changelog",
         "releases",
         "history"
       ],
-      "criticality": "high"
+      "format": "markdown"
     },
     {
       "id": "config.license",
       "name": "LICENSE",
       "type": "legal",
-      "category": "project_root",
       "path": "LICENSE",
       "description": "Project license (MIT)",
-      "format": "text",
-      "license_type": "MIT",
       "dependencies": [],
-      "affects": [
-        "Package distribution",
-        "Legal usage terms",
-        "PyPI metadata"
-      ],
+      "dependents": [],
+      "criticality": "critical",
+      "category": "project_root",
       "tags": [
         "license",
         "legal",
         "mit"
       ],
-      "criticality": "critical"
+      "format": "text"
     }
   ],
   "edges": [

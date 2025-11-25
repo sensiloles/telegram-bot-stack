@@ -1,0 +1,520 @@
+{
+  "metadata": {
+    "version": "3.0.0",
+    "generated_at": "2025-11-25",
+    "graph_id": "bot_framework_cli",
+    "graph_name": "Bot Framework - CLI",
+    "graph_type": "sub_graph",
+    "parent_graph": "bot_framework",
+    "project_name": "telegram-bot-stack",
+    "project_version": "1.6.0",
+    "description": "CLI tool for bot project management and development",
+    "scope": "CLI tool for bot project management and development",
+    "root_package": "telegram_bot_stack.cli",
+    "node_count": 18,
+    "edge_count": 14
+  },
+  "nodes": [
+    {
+      "id": "telegram_bot_stack.cli",
+      "name": "__init__",
+      "type": "module",
+      "path": "telegram_bot_stack/cli/__init__.py",
+      "description": "CLI module for telegram-bot-stack.",
+      "lines_of_code": 10,
+      "classes": [],
+      "functions": [],
+      "exports": [],
+      "complexity_score": 1,
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium",
+      "category": "implementation"
+    },
+    {
+      "id": "telegram_bot_stack.cli.main",
+      "name": "main",
+      "type": "module",
+      "path": "telegram_bot_stack/cli/main.py",
+      "description": "Main CLI entry point for telegram-bot-stack.",
+      "lines_of_code": 40,
+      "classes": [],
+      "functions": [
+        "cli",
+        "main"
+      ],
+      "exports": [
+        "cli",
+        "main"
+      ],
+      "complexity_score": 1,
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium",
+      "category": "implementation"
+    },
+    {
+      "id": "telegram_bot_stack.cli.utils.git",
+      "name": "git",
+      "type": "module",
+      "path": "telegram_bot_stack/cli/utils/git.py",
+      "description": "Git initialization utilities.",
+      "lines_of_code": 129,
+      "classes": [],
+      "functions": [
+        "init_git",
+        "create_gitignore"
+      ],
+      "exports": [
+        "init_git",
+        "create_gitignore"
+      ],
+      "complexity_score": 1,
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium",
+      "category": "implementation"
+    },
+    {
+      "id": "telegram_bot_stack.cli.utils",
+      "name": "__init__",
+      "type": "module",
+      "path": "telegram_bot_stack/cli/utils/__init__.py",
+      "description": "Utility modules for CLI commands.",
+      "lines_of_code": 5,
+      "classes": [],
+      "functions": [],
+      "exports": [],
+      "complexity_score": 1,
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium",
+      "category": "implementation"
+    },
+    {
+      "id": "telegram_bot_stack.cli.utils.venv",
+      "name": "venv",
+      "type": "module",
+      "path": "telegram_bot_stack/cli/utils/venv.py",
+      "description": "Virtual environment management utilities.",
+      "lines_of_code": 90,
+      "classes": [],
+      "functions": [
+        "create_virtualenv",
+        "get_venv_python",
+        "get_venv_pip",
+        "get_activation_command"
+      ],
+      "exports": [
+        "create_virtualenv",
+        "get_venv_python",
+        "get_venv_pip",
+        "get_activation_command"
+      ],
+      "complexity_score": 1,
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium",
+      "category": "implementation"
+    },
+    {
+      "id": "telegram_bot_stack.cli.utils.ide",
+      "name": "ide",
+      "type": "module",
+      "path": "telegram_bot_stack/cli/utils/ide.py",
+      "description": "IDE configuration utilities.",
+      "lines_of_code": 95,
+      "classes": [],
+      "functions": [
+        "create_vscode_settings",
+        "create_pycharm_settings"
+      ],
+      "exports": [
+        "create_vscode_settings",
+        "create_pycharm_settings"
+      ],
+      "complexity_score": 1,
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium",
+      "category": "implementation"
+    },
+    {
+      "id": "telegram_bot_stack.cli.utils.linting",
+      "name": "linting",
+      "type": "module",
+      "path": "telegram_bot_stack/cli/utils/linting.py",
+      "description": "Linting and formatting setup utilities.",
+      "lines_of_code": 84,
+      "classes": [],
+      "functions": [
+        "create_precommit_config",
+        "install_precommit_hooks"
+      ],
+      "exports": [
+        "create_precommit_config",
+        "install_precommit_hooks"
+      ],
+      "complexity_score": 1,
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium",
+      "category": "implementation"
+    },
+    {
+      "id": "telegram_bot_stack.cli.utils.testing",
+      "name": "testing",
+      "type": "module",
+      "path": "telegram_bot_stack/cli/utils/testing.py",
+      "description": "Testing setup utilities.",
+      "lines_of_code": 102,
+      "classes": [],
+      "functions": [
+        "create_test_structure"
+      ],
+      "exports": [
+        "create_test_structure"
+      ],
+      "complexity_score": 1,
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium",
+      "category": "implementation"
+    },
+    {
+      "id": "telegram_bot_stack.cli.utils.dependencies",
+      "name": "dependencies",
+      "type": "module",
+      "path": "telegram_bot_stack/cli/utils/dependencies.py",
+      "description": "Dependency management utilities.",
+      "lines_of_code": 179,
+      "classes": [],
+      "functions": [
+        "install_package",
+        "install_requirements",
+        "create_requirements_file",
+        "create_pyproject_toml"
+      ],
+      "exports": [
+        "install_package",
+        "install_requirements",
+        "create_requirements_file",
+        "create_pyproject_toml"
+      ],
+      "complexity_score": 1,
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium",
+      "category": "implementation"
+    },
+    {
+      "id": "telegram_bot_stack.cli.commands",
+      "name": "__init__",
+      "type": "module",
+      "path": "telegram_bot_stack/cli/commands/__init__.py",
+      "description": "CLI commands for telegram-bot-stack.",
+      "lines_of_code": 5,
+      "classes": [],
+      "functions": [],
+      "exports": [],
+      "complexity_score": 1,
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium",
+      "category": "implementation"
+    },
+    {
+      "id": "telegram_bot_stack.cli.commands.validate",
+      "name": "validate",
+      "type": "module",
+      "path": "telegram_bot_stack/cli/commands/validate.py",
+      "description": "Validate bot configuration and environment.",
+      "lines_of_code": 124,
+      "classes": [],
+      "functions": [
+        "validate"
+      ],
+      "exports": [
+        "validate"
+      ],
+      "complexity_score": 1,
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium",
+      "category": "implementation"
+    },
+    {
+      "id": "telegram_bot_stack.cli.commands.new",
+      "name": "new",
+      "type": "module",
+      "path": "telegram_bot_stack/cli/commands/new.py",
+      "description": "Create a new bot from template.",
+      "lines_of_code": 75,
+      "classes": [],
+      "functions": [
+        "new"
+      ],
+      "exports": [
+        "new"
+      ],
+      "complexity_score": 1,
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium",
+      "category": "implementation"
+    },
+    {
+      "id": "telegram_bot_stack.cli.commands.dev",
+      "name": "dev",
+      "type": "module",
+      "path": "telegram_bot_stack/cli/commands/dev.py",
+      "description": "Run bot in development mode with auto-reload.",
+      "lines_of_code": 158,
+      "classes": [
+        "BotReloadHandler"
+      ],
+      "functions": [
+        "dev",
+        "start_bot",
+        "on_modified"
+      ],
+      "exports": [
+        "BotReloadHandler",
+        "dev",
+        "start_bot",
+        "on_modified"
+      ],
+      "complexity_score": 1,
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium",
+      "category": "implementation"
+    },
+    {
+      "id": "telegram_bot_stack.cli.commands.init",
+      "name": "init",
+      "type": "module",
+      "path": "telegram_bot_stack/cli/commands/init.py",
+      "description": "Initialize a new bot project with full dev environment.",
+      "lines_of_code": 410,
+      "classes": [],
+      "functions": [
+        "init"
+      ],
+      "exports": [
+        "init"
+      ],
+      "complexity_score": 1,
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium",
+      "category": "implementation"
+    },
+    {
+      "id": "telegram_bot_stack.cli.templates.advanced.bot",
+      "name": "bot",
+      "type": "module",
+      "path": "telegram_bot_stack/cli/templates/advanced/bot.py",
+      "description": "Advanced bot - demonstrates all best practices.",
+      "lines_of_code": 206,
+      "classes": [
+        "AdvancedBot"
+      ],
+      "functions": [
+        "main",
+        "get_welcome_message",
+        "register_handlers"
+      ],
+      "exports": [
+        "AdvancedBot",
+        "main",
+        "get_welcome_message",
+        "register_handlers"
+      ],
+      "complexity_score": 1,
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium",
+      "category": "implementation"
+    },
+    {
+      "id": "telegram_bot_stack.cli.templates.basic.bot",
+      "name": "bot",
+      "type": "module",
+      "path": "telegram_bot_stack/cli/templates/basic/bot.py",
+      "description": "Simple echo bot - basic template.",
+      "lines_of_code": 51,
+      "classes": [
+        "EchoBot"
+      ],
+      "functions": [
+        "main",
+        "get_welcome_message"
+      ],
+      "exports": [
+        "EchoBot",
+        "main",
+        "get_welcome_message"
+      ],
+      "complexity_score": 1,
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium",
+      "category": "implementation"
+    },
+    {
+      "id": "telegram_bot_stack.cli.templates.menu.bot",
+      "name": "bot",
+      "type": "module",
+      "path": "telegram_bot_stack/cli/templates/menu/bot.py",
+      "description": "Menu bot - demonstrates interactive inline keyboards.",
+      "lines_of_code": 211,
+      "classes": [
+        "MenuBot"
+      ],
+      "functions": [
+        "main",
+        "get_welcome_message",
+        "register_handlers"
+      ],
+      "exports": [
+        "MenuBot",
+        "main",
+        "get_welcome_message",
+        "register_handlers"
+      ],
+      "complexity_score": 1,
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium",
+      "category": "implementation"
+    },
+    {
+      "id": "telegram_bot_stack.cli.templates.counter.bot",
+      "name": "bot",
+      "type": "module",
+      "path": "telegram_bot_stack/cli/templates/counter/bot.py",
+      "description": "Counter bot - demonstrates state management.",
+      "lines_of_code": 134,
+      "classes": [
+        "CounterBot"
+      ],
+      "functions": [
+        "main",
+        "get_welcome_message",
+        "register_handlers"
+      ],
+      "exports": [
+        "CounterBot",
+        "main",
+        "get_welcome_message",
+        "register_handlers"
+      ],
+      "complexity_score": 1,
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium",
+      "category": "implementation"
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge_1",
+      "source": "telegram_bot_stack.cli.main",
+      "target": "telegram_bot_stack.cli.commands",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.commands"
+    },
+    {
+      "id": "edge_2",
+      "source": "telegram_bot_stack.cli.utils",
+      "target": "telegram_bot_stack.cli.utils",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.utils"
+    },
+    {
+      "id": "edge_3",
+      "source": "telegram_bot_stack.cli.utils.linting",
+      "target": "telegram_bot_stack.cli.utils.venv",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.utils.venv"
+    },
+    {
+      "id": "edge_4",
+      "source": "telegram_bot_stack.cli.utils.dependencies",
+      "target": "telegram_bot_stack.cli.utils.venv",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.utils.venv"
+    },
+    {
+      "id": "edge_5",
+      "source": "telegram_bot_stack.cli.utils.dependencies",
+      "target": "telegram_bot_stack.cli.utils.venv",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.utils.venv"
+    },
+    {
+      "id": "edge_6",
+      "source": "telegram_bot_stack.cli.commands",
+      "target": "telegram_bot_stack.cli.commands",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.commands"
+    },
+    {
+      "id": "edge_7",
+      "source": "telegram_bot_stack.cli.commands.init",
+      "target": "telegram_bot_stack.cli.utils",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.utils"
+    },
+    {
+      "id": "edge_8",
+      "source": "telegram_bot_stack.cli.commands.init",
+      "target": "telegram_bot_stack.cli.utils.ide",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.utils.ide"
+    },
+    {
+      "id": "edge_9",
+      "source": "telegram_bot_stack.cli.commands.init",
+      "target": "telegram_bot_stack.cli.utils.linting",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.utils.linting"
+    },
+    {
+      "id": "edge_10",
+      "source": "telegram_bot_stack.cli.commands.init",
+      "target": "telegram_bot_stack.cli.utils.testing",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.utils.testing"
+    },
+    {
+      "id": "edge_11",
+      "source": "telegram_bot_stack.cli.commands.init",
+      "target": "telegram_bot_stack.cli.utils",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.utils"
+    },
+    {
+      "id": "edge_12",
+      "source": "telegram_bot_stack.cli.commands.init",
+      "target": "telegram_bot_stack.cli.utils.venv",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.utils.venv"
+    },
+    {
+      "id": "edge_13",
+      "source": "telegram_bot_stack.cli.commands.init",
+      "target": "telegram_bot_stack.cli.utils.git",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.utils.git"
+    },
+    {
+      "id": "edge_14",
+      "source": "telegram_bot_stack.cli.commands.init",
+      "target": "telegram_bot_stack.cli.utils.dependencies",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.utils.dependencies"
+    }
+  ]
+}
