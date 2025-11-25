@@ -8,660 +8,537 @@
     "project_name": "telegram-bot-stack",
     "description": "CI/CD workflows, automation scripts, and tooling",
     "scope": "GitHub Actions, automation scripts, deployment",
-    "node_count": 50,
-    "edge_count": 1
+    "node_count": 51,
+    "edge_count": 0
   },
   "nodes": [
     {
       "id": ".github.PROJECT_STATUS.md",
       "name": "PROJECT_STATUS",
-      "type": "script",
+      "type": "workflow",
       "path": ".github/PROJECT_STATUS.md",
-      "description": "Configuration file PROJECT_STATUS.md"
+      "description": "File PROJECT_STATUS.md",
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium",
+      "category": "configuration"
     },
     {
       "id": ".github.pull_request_template.md",
       "name": "pull_request_template",
-      "type": "script",
+      "type": "workflow",
       "path": ".github/pull_request_template.md",
-      "description": "Configuration file pull_request_template.md"
+      "description": "File pull_request_template.md",
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium",
+      "category": "configuration"
+    },
+    {
+      "id": ".github.semantic_release.toml",
+      "name": "semantic_release",
+      "type": "workflow",
+      "path": ".github/semantic_release.toml",
+      "description": "File semantic_release.toml",
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium",
+      "category": "configuration"
     },
     {
       "id": ".github.PR_AUTOMATION.md",
       "name": "PR_AUTOMATION",
-      "type": "script",
+      "type": "workflow",
       "path": ".github/PR_AUTOMATION.md",
-      "description": "Configuration file PR_AUTOMATION.md"
+      "description": "File PR_AUTOMATION.md",
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium",
+      "category": "configuration"
     },
     {
       "id": ".github.workflows.release.yml",
       "name": "release",
       "type": "workflow",
       "path": ".github/workflows/release.yml",
-      "description": "Configuration file release.yml"
+      "description": "File release.yml",
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium",
+      "category": "configuration"
     },
     {
       "id": ".github.workflows.pypi-publish.yml",
       "name": "pypi-publish",
       "type": "workflow",
       "path": ".github/workflows/pypi-publish.yml",
-      "description": "Configuration file pypi-publish.yml"
+      "description": "File pypi-publish.yml",
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium",
+      "category": "configuration"
     },
     {
       "id": ".github.workflows.tests.yml",
       "name": "tests",
       "type": "workflow",
       "path": ".github/workflows/tests.yml",
-      "description": "Configuration file tests.yml"
+      "description": "File tests.yml",
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium",
+      "category": "configuration"
     },
     {
       "id": ".github.docs.scripts.md",
       "name": "scripts",
-      "type": "script",
+      "type": "workflow",
       "path": ".github/docs/scripts.md",
-      "description": "Configuration file scripts.md"
+      "description": "File scripts.md",
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "low",
+      "category": "configuration"
     },
     {
       "id": ".github.docs.README.md",
       "name": "README",
-      "type": "script",
+      "type": "workflow",
       "path": ".github/docs/README.md",
-      "description": "Configuration file README.md"
+      "description": "File README.md",
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "low",
+      "category": "configuration"
     },
     {
       "id": ".github.docs.DEV_TOOLS.md",
       "name": "DEV_TOOLS",
-      "type": "script",
+      "type": "workflow",
       "path": ".github/docs/DEV_TOOLS.md",
-      "description": "Configuration file DEV_TOOLS.md"
+      "description": "File DEV_TOOLS.md",
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "low",
+      "category": "configuration"
     },
     {
       "id": ".github.ISSUE_TEMPLATE.feature_request.yml",
       "name": "feature_request",
       "type": "workflow",
       "path": ".github/ISSUE_TEMPLATE/feature_request.yml",
-      "description": "Configuration file feature_request.yml"
+      "description": "File feature_request.yml",
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium",
+      "category": "configuration"
     },
     {
       "id": ".github.ISSUE_TEMPLATE.bug_report.yml",
       "name": "bug_report",
       "type": "workflow",
       "path": ".github/ISSUE_TEMPLATE/bug_report.yml",
-      "description": "Configuration file bug_report.yml"
+      "description": "File bug_report.yml",
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium",
+      "category": "configuration"
     },
     {
       "id": ".github.ISSUE_TEMPLATE.config.yml",
       "name": "config",
       "type": "workflow",
       "path": ".github/ISSUE_TEMPLATE/config.yml",
-      "description": "Configuration file config.yml"
+      "description": "File config.yml",
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium",
+      "category": "configuration"
     },
     {
       "id": ".github.docs.setup.getting-started.md",
       "name": "getting-started",
-      "type": "script",
+      "type": "workflow",
       "path": ".github/docs/setup/getting-started.md",
-      "description": "Configuration file getting-started.md"
+      "description": "File getting-started.md",
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "low",
+      "category": "configuration"
     },
     {
       "id": ".github.docs.setup.configure-workflow.md",
       "name": "configure-workflow",
-      "type": "script",
+      "type": "workflow",
       "path": ".github/docs/setup/configure-workflow.md",
-      "description": "Configuration file configure-workflow.md"
+      "description": "File configure-workflow.md",
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "low",
+      "category": "configuration"
     },
     {
       "id": ".github.docs.setup.pypi-setup.md",
       "name": "pypi-setup",
-      "type": "script",
+      "type": "workflow",
       "path": ".github/docs/setup/pypi-setup.md",
-      "description": "Configuration file pypi-setup.md"
+      "description": "File pypi-setup.md",
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "low",
+      "category": "configuration"
     },
     {
       "id": ".github.docs.setup.token-setup.md",
       "name": "token-setup",
-      "type": "script",
+      "type": "workflow",
       "path": ".github/docs/setup/token-setup.md",
-      "description": "Configuration file token-setup.md"
+      "description": "File token-setup.md",
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "low",
+      "category": "configuration"
     },
     {
       "id": ".github.docs.issue-management.CREATE_INSTRUCTIONS.md",
       "name": "CREATE_INSTRUCTIONS",
-      "type": "script",
+      "type": "workflow",
       "path": ".github/docs/issue-management/CREATE_INSTRUCTIONS.md",
-      "description": "Configuration file CREATE_INSTRUCTIONS.md"
+      "description": "File CREATE_INSTRUCTIONS.md",
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "low",
+      "category": "configuration"
     },
     {
       "id": ".github.docs.workflow.git-flow.md",
       "name": "git-flow",
-      "type": "script",
+      "type": "workflow",
       "path": ".github/docs/workflow/git-flow.md",
-      "description": "Configuration file git-flow.md"
+      "description": "File git-flow.md",
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "low",
+      "category": "configuration"
     },
     {
       "id": ".github.docs.workflow.merge-pr.md",
       "name": "merge-pr",
-      "type": "script",
+      "type": "workflow",
       "path": ".github/docs/workflow/merge-pr.md",
-      "description": "Configuration file merge-pr.md"
+      "description": "File merge-pr.md",
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "low",
+      "category": "configuration"
     },
     {
       "id": ".github.docs.workflow.issue-linking.md",
       "name": "issue-linking",
-      "type": "script",
+      "type": "workflow",
       "path": ".github/docs/workflow/issue-linking.md",
-      "description": "Configuration file issue-linking.md"
+      "description": "File issue-linking.md",
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "low",
+      "category": "configuration"
     },
     {
       "id": ".github.docs.workflow.pr-naming.md",
       "name": "pr-naming",
-      "type": "script",
+      "type": "workflow",
       "path": ".github/docs/workflow/pr-naming.md",
-      "description": "Configuration file pr-naming.md"
+      "description": "File pr-naming.md",
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "low",
+      "category": "configuration"
     },
     {
       "id": ".github.docs.workflow.branch-protection.md",
       "name": "branch-protection",
-      "type": "script",
+      "type": "workflow",
       "path": ".github/docs/workflow/branch-protection.md",
-      "description": "Configuration file branch-protection.md"
+      "description": "File branch-protection.md",
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "low",
+      "category": "configuration"
     },
     {
       "id": ".github.docs.workflow.git-flow-quick.md",
       "name": "git-flow-quick",
-      "type": "script",
+      "type": "workflow",
       "path": ".github/docs/workflow/git-flow-quick.md",
-      "description": "Configuration file git-flow-quick.md"
+      "description": "File git-flow-quick.md",
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "low",
+      "category": "configuration"
     },
     {
       "id": ".github.docs.workflow.pr-automation.md",
       "name": "pr-automation",
-      "type": "script",
+      "type": "workflow",
       "path": ".github/docs/workflow/pr-automation.md",
-      "description": "Configuration file pr-automation.md"
+      "description": "File pr-automation.md",
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "low",
+      "category": "configuration"
     },
     {
       "id": ".github.workflows.scripts.github_helper",
       "name": "github_helper",
-      "type": "script",
+      "type": "workflow",
       "path": ".github/workflows/scripts/github_helper.py",
       "description": "Unified GitHub API Helper using PyGithub.",
-      "lines_of_code": 286,
-      "exports": [
-        "load_token",
-        "get_github_client",
-        "get_repo",
-        "get_repo_from_git",
-        "format_issue_list",
-        "format_issue_detail"
-      ],
-      "classes": [],
-      "functions": [
-        "load_token",
-        "get_github_client",
-        "get_repo",
-        "get_repo_from_git",
-        "format_issue_list",
-        "format_issue_detail"
-      ]
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium",
+      "category": "configuration"
     },
     {
       "id": ".github.workflows.scripts.link_issues",
       "name": "link_issues",
-      "type": "script",
+      "type": "workflow",
       "path": ".github/workflows/scripts/link_issues.py",
       "description": "Link GitHub Issues - Create dependencies between issues.",
-      "lines_of_code": 357,
-      "exports": [
-        "format_blocked_by_comment",
-        "format_blocks_comment",
-        "format_related_comment",
-        "link_issues",
-        "main"
-      ],
-      "classes": [],
-      "functions": [
-        "format_blocked_by_comment",
-        "format_blocks_comment",
-        "format_related_comment",
-        "link_issues",
-        "main"
-      ]
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium",
+      "category": "configuration"
     },
     {
       "id": ".github.workflows.scripts.parse_command",
       "name": "parse_command",
-      "type": "script",
+      "type": "workflow",
       "path": ".github/workflows/scripts/parse_command.py",
       "description": "Parse slash commands from issue comments.",
-      "lines_of_code": 75,
-      "exports": [
-        "parse_slash_command",
-        "main"
-      ],
-      "classes": [],
-      "functions": [
-        "parse_slash_command",
-        "main"
-      ]
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "high",
+      "category": "configuration"
     },
     {
       "id": ".github.workflows.scripts.auto_label",
       "name": "auto_label",
-      "type": "script",
+      "type": "workflow",
       "path": ".github/workflows/scripts/auto_label.py",
       "description": "Automatically label issues based on content analysis.",
-      "lines_of_code": 100,
-      "exports": [
-        "load_config",
-        "analyze_and_label",
-        "main"
-      ],
-      "classes": [],
-      "functions": [
-        "load_config",
-        "analyze_and_label",
-        "main"
-      ]
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium",
+      "category": "configuration"
     },
     {
       "id": ".github.workflows.scripts.merge_pr",
       "name": "merge_pr",
-      "type": "script",
+      "type": "workflow",
       "path": ".github/workflows/scripts/merge_pr.py",
       "description": "Merge a PR with appropriate strategy and auto-cleanup.",
-      "lines_of_code": 373,
-      "exports": [
-        "get_current_branch",
-        "find_pr_by_branch",
-        "git_checkout_and_pull",
-        "delete_local_branch",
-        "delete_remote_branch",
-        "merge_pr",
-        "main"
-      ],
-      "classes": [],
-      "functions": [
-        "get_current_branch",
-        "find_pr_by_branch",
-        "git_checkout_and_pull",
-        "delete_local_branch",
-        "delete_remote_branch",
-        "merge_pr",
-        "main"
-      ]
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium",
+      "category": "configuration"
     },
     {
       "id": ".github.workflows.scripts.analyze_pr",
       "name": "analyze_pr",
-      "type": "script",
+      "type": "workflow",
       "path": ".github/workflows/scripts/analyze_pr.py",
       "description": "Analyze PR to determine if it will trigger a release.",
-      "lines_of_code": 134,
-      "exports": [
-        "analyze_commits",
-        "main"
-      ],
-      "classes": [],
-      "functions": [
-        "analyze_commits",
-        "main"
-      ]
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium",
+      "category": "configuration"
     },
     {
       "id": ".github.workflows.scripts.create_pr",
       "name": "create_pr",
-      "type": "script",
+      "type": "workflow",
       "path": ".github/workflows/scripts/create_pr.py",
       "description": "Create GitHub Pull Request - Automated Script.",
-      "lines_of_code": 502,
-      "exports": [
-        "get_current_branch",
-        "get_commit_messages",
-        "validate_pr_title",
-        "generate_pr_body",
-        "read_pr_body",
-        "create_pull_request",
-        "main"
-      ],
-      "classes": [],
-      "functions": [
-        "get_current_branch",
-        "get_commit_messages",
-        "validate_pr_title",
-        "generate_pr_body",
-        "read_pr_body",
-        "create_pull_request",
-        "main"
-      ]
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium",
+      "category": "configuration"
     },
     {
       "id": ".github.workflows.scripts",
       "name": "__init__",
-      "type": "script",
+      "type": "workflow",
       "path": ".github/workflows/scripts/__init__.py",
       "description": "Cloud Agent Scripts Package",
-      "lines_of_code": 7,
-      "exports": [],
-      "classes": [],
-      "functions": []
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "critical",
+      "category": "configuration"
     },
     {
       "id": ".github.workflows.scripts.pr_ready",
       "name": "pr_ready",
-      "type": "script",
+      "type": "workflow",
       "path": ".github/workflows/scripts/pr_ready.py",
       "description": "Check if PR is ready to merge.",
-      "lines_of_code": 211,
-      "exports": [
-        "check_pr_ready",
-        "main"
-      ],
-      "classes": [],
-      "functions": [
-        "check_pr_ready",
-        "main"
-      ]
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium",
+      "category": "configuration"
     },
     {
       "id": ".github.workflows.scripts.README.md",
       "name": "README",
-      "type": "script",
+      "type": "workflow",
       "path": ".github/workflows/scripts/README.md",
-      "description": "Configuration file README.md"
+      "description": "File README.md",
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "low",
+      "category": "configuration"
     },
     {
       "id": ".github.workflows.scripts.project_overview",
       "name": "project_overview",
-      "type": "script",
+      "type": "workflow",
       "path": ".github/workflows/scripts/project_overview.py",
       "description": "Project Overview - Quick status snapshot.",
-      "lines_of_code": 178,
-      "exports": [
-        "run_command",
-        "get_git_info",
-        "get_test_coverage",
-        "main"
-      ],
-      "classes": [],
-      "functions": [
-        "run_command",
-        "get_git_info",
-        "get_test_coverage",
-        "main"
-      ]
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium",
+      "category": "configuration"
     },
     {
       "id": ".github.workflows.scripts.common",
       "name": "common",
-      "type": "script",
+      "type": "workflow",
       "path": ".github/workflows/scripts/common.py",
       "description": "Common utilities for GitHub automation scripts.",
-      "lines_of_code": 156,
-      "exports": [
-        "get_github_token",
-        "get_github_client",
-        "get_repository_name",
-        "get_current_branch",
-        "validate_conventional_commit",
-        "parse_commit_type",
-        "get_label_for_commit_type",
-        "is_breaking_change",
-        "print_success",
-        "print_error",
-        "print_warning",
-        "print_info"
-      ],
-      "classes": [],
-      "functions": [
-        "get_github_token",
-        "get_github_client",
-        "get_repository_name",
-        "get_current_branch",
-        "validate_conventional_commit",
-        "parse_commit_type",
-        "get_label_for_commit_type",
-        "is_breaking_change",
-        "print_success",
-        "print_error",
-        "print_warning",
-        "print_info"
-      ]
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium",
+      "category": "configuration"
     },
     {
       "id": ".github.workflows.scripts.check_setup",
       "name": "check_setup",
-      "type": "script",
+      "type": "workflow",
       "path": ".github/workflows/scripts/check_setup.py",
       "description": "Check if GitHub automation setup is correct.",
-      "lines_of_code": 107,
-      "exports": [
-        "check_setup",
-        "main"
-      ],
-      "classes": [],
-      "functions": [
-        "check_setup",
-        "main"
-      ]
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium",
+      "category": "configuration"
     },
     {
       "id": ".github.workflows.scripts.analyze_context",
       "name": "analyze_context",
-      "type": "script",
+      "type": "workflow",
       "path": ".github/workflows/scripts/analyze_context.py",
       "description": "Analyze repository context and find related files/issues.",
-      "lines_of_code": 227,
-      "exports": [
-        "load_config",
-        "analyze_codebase_context",
-        "extract_keywords",
-        "is_file_related",
-        "find_similar_issues",
-        "main"
-      ],
-      "classes": [],
-      "functions": [
-        "load_config",
-        "analyze_codebase_context",
-        "extract_keywords",
-        "is_file_related",
-        "find_similar_issues",
-        "main"
-      ]
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium",
+      "category": "configuration"
     },
     {
       "id": ".github.workflows.scripts.create_issue",
       "name": "create_issue",
-      "type": "script",
+      "type": "workflow",
       "path": ".github/workflows/scripts/create_issue.py",
       "description": "Create GitHub Issue - Simple Script.",
-      "lines_of_code": 235,
-      "exports": [
-        "read_issue_body",
-        "create_issue",
-        "main"
-      ],
-      "classes": [],
-      "functions": [
-        "read_issue_body",
-        "create_issue",
-        "main"
-      ]
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium",
+      "category": "configuration"
     },
     {
       "id": ".github.workflows.scripts.check_ci",
       "name": "check_ci",
-      "type": "script",
+      "type": "workflow",
       "path": ".github/workflows/scripts/check_ci.py",
       "description": "Check CI Status - View GitHub Actions check runs.",
-      "lines_of_code": 451,
-      "exports": [
-        "format_duration",
-        "check_pr_status",
-        "check_commit_status",
-        "check_branch_status",
-        "list_recent_prs",
-        "main"
-      ],
-      "classes": [],
-      "functions": [
-        "format_duration",
-        "check_pr_status",
-        "check_commit_status",
-        "check_branch_status",
-        "list_recent_prs",
-        "main"
-      ]
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium",
+      "category": "configuration"
     },
     {
       "id": ".github.workflows.scripts.update_issue",
       "name": "update_issue",
-      "type": "script",
+      "type": "workflow",
       "path": ".github/workflows/scripts/update_issue.py",
       "description": "Update GitHub Issue - Modify labels, priority, state.",
-      "lines_of_code": 359,
-      "exports": [
-        "get_current_labels",
-        "update_priority",
-        "add_labels",
-        "remove_labels",
-        "update_issue",
-        "main"
-      ],
-      "classes": [],
-      "functions": [
-        "get_current_labels",
-        "update_priority",
-        "add_labels",
-        "remove_labels",
-        "update_issue",
-        "main"
-      ]
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium",
+      "category": "configuration"
     },
     {
       "id": ".github.workflows.scripts.add_acceptance_criteria",
       "name": "add_acceptance_criteria",
-      "type": "script",
+      "type": "workflow",
       "path": ".github/workflows/scripts/add_acceptance_criteria.py",
       "description": "Generate and add acceptance criteria to issues.",
-      "lines_of_code": 147,
-      "exports": [
-        "load_config",
-        "generate_acceptance_criteria",
-        "main"
-      ],
-      "classes": [],
-      "functions": [
-        "load_config",
-        "generate_acceptance_criteria",
-        "main"
-      ]
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium",
+      "category": "configuration"
     },
     {
       "id": ".github.workflows.scripts.pr_ready_mark",
       "name": "pr_ready_mark",
-      "type": "script",
+      "type": "workflow",
       "path": ".github/workflows/scripts/pr_ready_mark.py",
       "description": "Mark Draft PR as Ready for Review.",
-      "lines_of_code": 207,
-      "exports": [
-        "get_pr_node_id",
-        "mark_pr_ready",
-        "main"
-      ],
-      "classes": [],
-      "functions": [
-        "get_pr_node_id",
-        "mark_pr_ready",
-        "main"
-      ]
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium",
+      "category": "configuration"
     },
     {
       "id": ".github.workflows.scripts.generate_subtasks",
       "name": "generate_subtasks",
-      "type": "script",
+      "type": "workflow",
       "path": ".github/workflows/scripts/generate_subtasks.py",
       "description": "Generate subtasks for complex issues.",
-      "lines_of_code": 169,
-      "exports": [
-        "load_config",
-        "generate_subtasks",
-        "get_phase_objective",
-        "main"
-      ],
-      "classes": [],
-      "functions": [
-        "load_config",
-        "generate_subtasks",
-        "get_phase_objective",
-        "main"
-      ]
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium",
+      "category": "configuration"
     },
     {
       "id": ".github.workflows.scripts.execute_command",
       "name": "execute_command",
-      "type": "script",
+      "type": "workflow",
       "path": ".github/workflows/scripts/execute_command.py",
       "description": "Execute Cloud Agent commands.",
-      "lines_of_code": 152,
-      "exports": [
-        "execute_breakdown",
-        "execute_estimate",
-        "execute_accept",
-        "execute_relate",
-        "execute_label",
-        "execute_assign",
-        "main"
-      ],
-      "classes": [],
-      "functions": [
-        "execute_breakdown",
-        "execute_estimate",
-        "execute_accept",
-        "execute_relate",
-        "execute_label",
-        "execute_assign",
-        "main"
-      ]
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "high",
+      "category": "configuration"
     },
     {
       "id": ".github.workflows.scripts.list_prs",
       "name": "list_prs",
-      "type": "script",
+      "type": "workflow",
       "path": ".github/workflows/scripts/list_prs.py",
       "description": "List pull requests.",
-      "lines_of_code": 80,
-      "exports": [
-        "list_prs",
-        "main"
-      ],
-      "classes": [],
-      "functions": [
-        "list_prs",
-        "main"
-      ]
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium",
+      "category": "configuration"
     },
     {
       "id": ".github.workflows.scripts.read_issues",
       "name": "read_issues",
-      "type": "script",
+      "type": "workflow",
       "path": ".github/workflows/scripts/read_issues.py",
       "description": "GitHub Issues Reader Script - Modern PyGithub version.",
-      "lines_of_code": 256,
-      "exports": [
-        "get_issue",
-        "list_issues",
-        "issue_to_dict",
-        "main"
-      ],
-      "classes": [],
-      "functions": [
-        "get_issue",
-        "list_issues",
-        "issue_to_dict",
-        "main"
-      ]
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium",
+      "category": "configuration"
     },
     {
       "id": "scripts.migrate_json_to_sql",
@@ -669,22 +546,10 @@
       "type": "script",
       "path": "scripts/migrate_json_to_sql.py",
       "description": "Migration tool to convert JSON storage to SQL storage.",
-      "lines_of_code": 338,
-      "exports": [
-        "discover_json_files",
-        "load_json_data",
-        "migrate_data",
-        "verify_migration",
-        "main"
-      ],
-      "classes": [],
-      "functions": [
-        "discover_json_files",
-        "load_json_data",
-        "migrate_data",
-        "verify_migration",
-        "main"
-      ]
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium",
+      "category": "implementation"
     },
     {
       "id": "scripts.mcp_project_graph",
@@ -692,27 +557,10 @@
       "type": "script",
       "path": "scripts/mcp_project_graph.py",
       "description": "MCP Server for Project Graph Navigation.",
-      "lines_of_code": 521,
-      "exports": [
-        "ProjectGraphMCPServer",
-        "get_project_root",
-        "main",
-        "list_resources",
-        "read_resource",
-        "call_tool",
-        "list_tools"
-      ],
-      "classes": [
-        "ProjectGraphMCPServer"
-      ],
-      "functions": [
-        "get_project_root",
-        "main",
-        "list_resources",
-        "read_resource",
-        "call_tool",
-        "list_tools"
-      ]
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium",
+      "category": "implementation"
     },
     {
       "id": "scripts.mcp_github_server",
@@ -720,40 +568,11 @@
       "type": "script",
       "path": "scripts/mcp_github_server.py",
       "description": "MCP Server for GitHub Issues and Pull Requests.",
-      "lines_of_code": 1059,
-      "exports": [
-        "MCPServer",
-        "GithubException",
-        "log_debug",
-        "load_env_variables",
-        "detect_repo_from_git",
-        "main",
-        "get_repo_cached",
-        "format_github_error",
-        "list_tools"
-      ],
-      "classes": [
-        "MCPServer",
-        "GithubException"
-      ],
-      "functions": [
-        "log_debug",
-        "load_env_variables",
-        "detect_repo_from_git",
-        "main",
-        "get_repo_cached",
-        "format_github_error",
-        "list_tools"
-      ]
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium",
+      "category": "implementation"
     }
   ],
-  "edges": [
-    {
-      "id": "edge_1",
-      "source": "scripts.migrate_json_to_sql",
-      "target": "telegram_bot_stack.storage",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.storage"
-    }
-  ]
+  "edges": []
 }

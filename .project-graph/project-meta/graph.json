@@ -11,7 +11,9 @@
     "router_file": "graph-router.json",
     "related_graphs": [
       "All other graphs - this is the meta view"
-    ]
+    ],
+    "node_count": 0,
+    "edge_count": 0
   },
   "project_overview": {
     "name": "telegram-bot-stack",

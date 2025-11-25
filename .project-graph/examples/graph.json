@@ -1,7 +1,7 @@
 {
   "metadata": {
     "version": "3.0.0",
-    "generated_at": "2025-11-24",
+    "generated_at": "2025-11-25",
     "graph_id": "examples",
     "graph_name": "Example Bots",
     "graph_type": "domain",
@@ -9,7 +9,7 @@
     "description": "Example bot implementations and usage patterns",
     "scope": "Example bots demonstrating framework features",
     "node_count": 10,
-    "edge_count": 13
+    "edge_count": 7
   },
   "nodes": [
     {
@@ -19,13 +19,6 @@
       "path": "examples/reminder_bot/bot.py",
       "description": "Reminder Bot - Demonstrates scheduler usage with telegram-bot-stack.",
       "lines_of_code": 477,
-      "exports": [
-        "ReminderBot",
-        "main",
-        "register_handlers",
-        "get_welcome_message",
-        "signal_handler"
-      ],
       "classes": [
         "ReminderBot"
       ],
@@ -34,7 +27,58 @@
         "register_handlers",
         "get_welcome_message",
         "signal_handler"
-      ]
+      ],
+      "exports": [
+        "ReminderBot",
+        "main",
+        "register_handlers",
+        "get_welcome_message",
+        "signal_handler"
+      ],
+      "complexity_score": 2,
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "low",
+      "category": "examples"
+    },
+    {
+      "id": "examples.quit_smoking_bot.quotes_manager",
+      "name": "quotes_manager",
+      "type": "example_bot",
+      "path": "examples/quit_smoking_bot/quotes_manager.py",
+      "description": "Motivational quotes management for quit smoking bot.",
+      "lines_of_code": 73,
+      "classes": [
+        "QuotesManager"
+      ],
+      "functions": [
+        "get_random_quote"
+      ],
+      "exports": [
+        "QuotesManager",
+        "get_random_quote"
+      ],
+      "complexity_score": 1,
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "high",
+      "category": "examples"
+    },
+    {
+      "id": "examples.quit_smoking_bot.config",
+      "name": "config",
+      "type": "example_bot",
+      "path": "examples/quit_smoking_bot/config.py",
+      "description": "Configuration for Quit Smoking Bot.",
+      "lines_of_code": 58,
+      "classes": [],
+      "functions": [],
+      "exports": [],
+      "complexity_score": 1,
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "low",
+      "category": "examples"
     },
     {
       "id": "examples.quit_smoking_bot.bot",
@@ -43,13 +87,6 @@
       "path": "examples/quit_smoking_bot/bot.py",
       "description": "Quit Smoking Bot - Real-world example using telegram-bot-stack.",
       "lines_of_code": 150,
-      "exports": [
-        "QuitSmokingBot",
-        "main",
-        "get_welcome_message",
-        "register_handlers",
-        "signal_handler"
-      ],
       "classes": [
         "QuitSmokingBot"
       ],
@@ -58,71 +95,64 @@
         "get_welcome_message",
         "register_handlers",
         "signal_handler"
-      ]
-    },
-    {
-      "id": "examples.quit_smoking_bot.quotes_manager",
-      "name": "quotes_manager",
-      "type": "example_module",
-      "path": "examples/quit_smoking_bot/quotes_manager.py",
-      "description": "Motivational quotes management for quit smoking bot.",
-      "lines_of_code": 73,
+      ],
       "exports": [
-        "QuotesManager",
-        "get_random_quote"
+        "QuitSmokingBot",
+        "main",
+        "get_welcome_message",
+        "register_handlers",
+        "signal_handler"
       ],
-      "classes": [
-        "QuotesManager"
-      ],
-      "functions": [
-        "get_random_quote"
-      ]
-    },
-    {
-      "id": "examples.quit_smoking_bot.config",
-      "name": "config",
-      "type": "example_module",
-      "path": "examples/quit_smoking_bot/config.py",
-      "description": "Configuration for Quit Smoking Bot.",
-      "lines_of_code": 58,
-      "exports": [],
-      "classes": [],
-      "functions": []
+      "complexity_score": 1,
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "low",
+      "category": "examples"
     },
     {
       "id": "examples.quit_smoking_bot.utils",
       "name": "utils",
-      "type": "example_module",
+      "type": "example_bot",
       "path": "examples/quit_smoking_bot/utils.py",
       "description": "Utility functions for Quit Smoking Bot.",
       "lines_of_code": 60,
-      "exports": [
-        "calculate_period",
-        "calculate_prize_fund"
-      ],
       "classes": [],
       "functions": [
         "calculate_period",
         "calculate_prize_fund"
-      ]
+      ],
+      "exports": [
+        "calculate_period",
+        "calculate_prize_fund"
+      ],
+      "complexity_score": 1,
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium",
+      "category": "examples"
     },
     {
       "id": "examples.quit_smoking_bot.status_manager",
       "name": "status_manager",
-      "type": "example_module",
+      "type": "example_bot",
       "path": "examples/quit_smoking_bot/status_manager.py",
       "description": "Status management for quit smoking tracking.",
       "lines_of_code": 138,
-      "exports": [
-        "StatusManager",
-        "get_status_info"
-      ],
       "classes": [
         "StatusManager"
       ],
       "functions": [
         "get_status_info"
-      ]
+      ],
+      "exports": [
+        "StatusManager",
+        "get_status_info"
+      ],
+      "complexity_score": 1,
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "high",
+      "category": "examples"
     },
     {
       "id": "examples.echo_bot.bot",
@@ -131,13 +161,6 @@
       "path": "examples/echo_bot/bot.py",
       "description": "Echo Bot - Simplest possible telegram bot using telegram-bot-stack.",
       "lines_of_code": 108,
-      "exports": [
-        "EchoBot",
-        "main",
-        "get_welcome_message",
-        "register_handlers",
-        "signal_handler"
-      ],
       "classes": [
         "EchoBot"
       ],
@@ -146,7 +169,19 @@
         "get_welcome_message",
         "register_handlers",
         "signal_handler"
-      ]
+      ],
+      "exports": [
+        "EchoBot",
+        "main",
+        "get_welcome_message",
+        "register_handlers",
+        "signal_handler"
+      ],
+      "complexity_score": 1,
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "low",
+      "category": "examples"
     },
     {
       "id": "examples.counter_bot.bot",
@@ -155,13 +190,6 @@
       "path": "examples/counter_bot/bot.py",
       "description": "Counter Bot - Demonstrates state management with telegram-bot-stack.",
       "lines_of_code": 185,
-      "exports": [
-        "CounterBot",
-        "main",
-        "get_welcome_message",
-        "register_handlers",
-        "signal_handler"
-      ],
       "classes": [
         "CounterBot"
       ],
@@ -170,7 +198,19 @@
         "get_welcome_message",
         "register_handlers",
         "signal_handler"
-      ]
+      ],
+      "exports": [
+        "CounterBot",
+        "main",
+        "get_welcome_message",
+        "register_handlers",
+        "signal_handler"
+      ],
+      "complexity_score": 1,
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "low",
+      "category": "examples"
     },
     {
       "id": "examples.menu_bot.bot",
@@ -179,13 +219,6 @@
       "path": "examples/menu_bot/bot.py",
       "description": "Menu Bot - Demonstrates inline keyboards with telegram-bot-stack.",
       "lines_of_code": 492,
-      "exports": [
-        "MenuBot",
-        "main",
-        "register_handlers",
-        "get_welcome_message",
-        "signal_handler"
-      ],
       "classes": [
         "MenuBot"
       ],
@@ -194,7 +227,19 @@
         "register_handlers",
         "get_welcome_message",
         "signal_handler"
-      ]
+      ],
+      "exports": [
+        "MenuBot",
+        "main",
+        "register_handlers",
+        "get_welcome_message",
+        "signal_handler"
+      ],
+      "complexity_score": 2,
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "low",
+      "category": "examples"
     },
     {
       "id": "examples.poll_bot.bot",
@@ -203,12 +248,6 @@
       "path": "examples/poll_bot/bot.py",
       "description": "Poll Bot - Demonstrates SQL storage usage with telegram-bot-stack.",
       "lines_of_code": 440,
-      "exports": [
-        "PollBot",
-        "main",
-        "register_handlers",
-        "get_welcome_message"
-      ],
       "classes": [
         "PollBot"
       ],
@@ -216,100 +255,69 @@
         "main",
         "register_handlers",
         "get_welcome_message"
-      ]
+      ],
+      "exports": [
+        "PollBot",
+        "main",
+        "register_handlers",
+        "get_welcome_message"
+      ],
+      "complexity_score": 2,
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "low",
+      "category": "examples"
     }
   ],
   "edges": [
     {
       "id": "edge_1",
-      "source": "examples.reminder_bot.bot",
-      "target": "telegram_bot_stack",
+      "source": "examples.quit_smoking_bot.bot",
+      "target": "examples.quit_smoking_bot.status_manager",
       "type": "imports",
-      "description": "Imports from telegram_bot_stack"
+      "description": "Imports from examples.quit_smoking_bot.status_manager"
     },
     {
       "id": "edge_2",
-      "source": "examples.reminder_bot.bot",
-      "target": "telegram_bot_stack.storage",
+      "source": "examples.quit_smoking_bot.bot",
+      "target": "examples.quit_smoking_bot.config",
       "type": "imports",
-      "description": "Imports from telegram_bot_stack.storage"
+      "description": "Imports from examples.quit_smoking_bot.config"
     },
     {
       "id": "edge_3",
-      "source": "examples.quit_smoking_bot.quotes_manager",
-      "target": "telegram_bot_stack.storage",
+      "source": "examples.quit_smoking_bot.bot",
+      "target": "examples.quit_smoking_bot.quotes_manager",
       "type": "imports",
-      "description": "Imports from telegram_bot_stack.storage"
+      "description": "Imports from examples.quit_smoking_bot.quotes_manager"
     },
     {
       "id": "edge_4",
-      "source": "examples.quit_smoking_bot.bot",
-      "target": "telegram_bot_stack",
+      "source": "examples.quit_smoking_bot.utils",
+      "target": "examples.quit_smoking_bot.config",
       "type": "imports",
-      "description": "Imports from telegram_bot_stack"
+      "description": "Imports from examples.quit_smoking_bot.config"
     },
     {
       "id": "edge_5",
-      "source": "examples.quit_smoking_bot.bot",
-      "target": "telegram_bot_stack.storage",
+      "source": "examples.quit_smoking_bot.status_manager",
+      "target": "examples.quit_smoking_bot.quotes_manager",
       "type": "imports",
-      "description": "Imports from telegram_bot_stack.storage"
+      "description": "Imports from examples.quit_smoking_bot.quotes_manager"
     },
     {
       "id": "edge_6",
-      "source": "examples.echo_bot.bot",
-      "target": "telegram_bot_stack",
+      "source": "examples.quit_smoking_bot.status_manager",
+      "target": "examples.quit_smoking_bot.utils",
       "type": "imports",
-      "description": "Imports from telegram_bot_stack"
+      "description": "Imports from examples.quit_smoking_bot.utils"
     },
     {
       "id": "edge_7",
-      "source": "examples.echo_bot.bot",
-      "target": "telegram_bot_stack.storage",
+      "source": "examples.quit_smoking_bot.status_manager",
+      "target": "examples.quit_smoking_bot.config",
       "type": "imports",
-      "description": "Imports from telegram_bot_stack.storage"
-    },
-    {
-      "id": "edge_8",
-      "source": "examples.counter_bot.bot",
-      "target": "telegram_bot_stack",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack"
-    },
-    {
-      "id": "edge_9",
-      "source": "examples.counter_bot.bot",
-      "target": "telegram_bot_stack.storage",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.storage"
-    },
-    {
-      "id": "edge_10",
-      "source": "examples.menu_bot.bot",
-      "target": "telegram_bot_stack",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack"
-    },
-    {
-      "id": "edge_11",
-      "source": "examples.menu_bot.bot",
-      "target": "telegram_bot_stack.storage",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.storage"
-    },
-    {
-      "id": "edge_12",
-      "source": "examples.poll_bot.bot",
-      "target": "telegram_bot_stack",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack"
-    },
-    {
-      "id": "edge_13",
-      "source": "examples.poll_bot.bot",
-      "target": "telegram_bot_stack.storage",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.storage"
+      "description": "Imports from examples.quit_smoking_bot.config"
     }
   ]
 }

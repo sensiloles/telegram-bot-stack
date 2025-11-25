@@ -19,23 +19,23 @@
       "id": "telegram_bot_stack.decorators",
       "name": "decorators",
       "type": "module",
-      "category": "implementation",
       "path": "telegram_bot_stack/decorators.py",
       "description": "Rate limiting and utility decorators for telegram bot handlers.",
       "lines_of_code": 185,
-      "complexity_score": 1,
-      "exports": [
-        "rate_limit",
-        "decorator"
-      ],
       "classes": [],
       "functions": [
         "rate_limit",
         "decorator"
       ],
+      "exports": [
+        "rate_limit",
+        "decorator"
+      ],
+      "complexity_score": 1,
       "dependencies": [],
       "dependents": [],
-      "criticality": "medium"
+      "criticality": "medium",
+      "category": "implementation"
     }
   ],
   "edges": []

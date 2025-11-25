@@ -30,6 +30,8 @@ from typing import Dict, List, Optional, Set, Tuple
 # Add parent to path for imports
 sys.path.insert(0, str(Path(__file__).parent))
 
+from edge_updater import cleanup_orphan_edges, update_edges_for_file
+
 
 def get_project_root() -> Path:
     """Get project root directory."""
@@ -206,9 +208,13 @@ def determine_sub_graph_for_file(file_path: str) -> Optional[str]:
         file_path: Path to file in telegram_bot_stack/
 
     Returns:
-        Sub-graph name ('core', 'storage', 'utilities') or None
+        Sub-graph name ('core', 'storage', 'utilities', 'cli') or None
     """
     path = Path(file_path)
+
+    # CLI (has its own sub-graph with 2096 lines!)
+    if "cli/" in str(path):
+        return "cli"
 
     # Storage
     if "storage/" in str(path):
@@ -220,10 +226,6 @@ def determine_sub_graph_for_file(file_path: str) -> Optional[str]:
 
     # Utilities (decorators, etc)
     if path.name in ["decorators.py"]:
-        return "utilities"
-
-    # CLI is utilities
-    if "cli/" in str(path):
         return "utilities"
 
     return "core"  # Default to core
@@ -354,6 +356,7 @@ def find_graph_file(graph_name: str, sub_graph: Optional[str] = None) -> Optiona
             "core": "bot-framework/core-graph.json",
             "storage": "bot-framework/storage-graph.json",
             "utilities": "bot-framework/utilities-graph.json",
+            "cli": "bot-framework/cli-graph.json",
         },
         "infrastructure": "infrastructure/graph.json",
         "testing": "testing/graph.json",
@@ -559,6 +562,33 @@ def update_graph_for_file(file_path: str, dry_run: bool = False, force: bool = F
         if metadata and graph_file.exists():
             if update_node_in_graph(graph_file, file_path, metadata):
                 print(f"   ✅ Updated node in {graph_file.name}")
+
+                # Update edges if Python file
+                if file_path.endswith('.py'):
+                    try:
+                        with open(graph_file) as f:
+                            graph = json.load(f)
+
+                        added, removed = update_edges_for_file(
+                            file_path, graph, get_project_root()
+                        )
+
+                        if added > 0 or removed > 0:
+                            print(f"   🔗 Updated edges: +{added}, -{removed}")
+
+                            # Cleanup orphan edges
+                            cleanup_orphan_edges(graph)
+
+                            # Update metadata
+                            graph["metadata"]["edge_count"] = len(graph.get("edges", []))
+
+                            # Save
+                            with open(graph_file, 'w') as f:
+                                json.dump(graph, f, indent=2)
+                                f.write("\n")
+                    except Exception as e:
+                        print(f"   ⚠️  Could not update edges: {e}", file=sys.stderr)
+
                 updated_count += 1
             else:
                 # If node not found, still update metadata

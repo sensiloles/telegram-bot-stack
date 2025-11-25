@@ -17,11 +17,18 @@
       "id": "archive.conversion_plan",
       "name": "PACKAGE_CONVERSION_PLAN_RU.md",
       "type": "documentation",
-      "category": "historical_plan",
       "path": "archive/PACKAGE_CONVERSION_PLAN_RU.md",
       "description": "Master plan for converting bot to reusable framework (archived - completed)",
+      "category": "historical_plan",
+      "tags": [
+        "plan",
+        "historical",
+        "completed",
+        "russian"
+      ],
       "language": "russian",
       "status": "completed",
+      "audience": "maintainers",
       "phases": [
         "Phase 0.1: Extract framework",
         "Phase 0.2: Tests",
@@ -31,24 +38,24 @@
       ],
       "references": [],
       "referenced_by": [],
-      "tags": [
-        "plan",
-        "historical",
-        "completed",
-        "russian"
-      ],
-      "audience": "maintainers",
-      "criticality": "low",
-      "archived_date": "2025-11-19",
-      "reason": "Project completed Phase 2, plan archived for historical reference"
+      "reason": "Project completed Phase 2, plan archived for historical reference",
+      "archived_date": "2025-11-19"
     },
     {
       "id": "archive.docker_compose",
       "name": "docker-compose.yml",
       "type": "configuration",
-      "category": "docker",
       "path": "archive/docker/docker-compose.yml",
       "description": "Docker Compose configuration for running bot (deprecated)",
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "low",
+      "category": "docker",
+      "tags": [
+        "docker",
+        "deprecated",
+        "deployment"
+      ],
       "status": "deprecated",
       "format": "yaml",
       "services": [
@@ -58,63 +65,68 @@
         "archive.dockerfile",
         "archive.entrypoint"
       ],
-      "tags": [
-        "docker",
-        "deprecated",
-        "deployment"
-      ],
-      "criticality": "low",
-      "archived_date": "2025-11-19",
-      "reason": "Framework users implement their own deployment"
+      "reason": "Framework users implement their own deployment",
+      "archived_date": "2025-11-19"
     },
     {
       "id": "archive.dockerfile",
       "name": "Dockerfile",
       "type": "configuration",
-      "category": "docker",
       "path": "archive/docker/Dockerfile",
       "description": "Docker image definition for bot (deprecated)",
-      "status": "deprecated",
-      "format": "dockerfile",
-      "base_image": "python:3.13-slim",
-      "references": [
-        "archive.entrypoint"
-      ],
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "low",
+      "category": "docker",
       "tags": [
         "docker",
         "deprecated",
         "deployment"
       ],
-      "criticality": "low",
-      "archived_date": "2025-11-19",
-      "reason": "Framework users implement their own deployment"
+      "status": "deprecated",
+      "format": "dockerfile",
+      "references": [
+        "archive.entrypoint"
+      ],
+      "base_image": "python:3.13-slim",
+      "reason": "Framework users implement their own deployment",
+      "archived_date": "2025-11-19"
     },
     {
       "id": "archive.entrypoint",
       "name": "entrypoint.py",
       "type": "script",
-      "category": "docker",
       "path": "archive/docker/entrypoint.py",
       "description": "Docker container entrypoint script (deprecated)",
-      "status": "deprecated",
-      "language": "python",
-      "purpose": "Start bot in Docker container",
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "low",
+      "category": "docker",
       "tags": [
         "docker",
         "deprecated",
         "script"
       ],
-      "criticality": "low",
-      "archived_date": "2025-11-19",
-      "reason": "Framework users implement their own deployment"
+      "language": "python",
+      "status": "deprecated",
+      "reason": "Framework users implement their own deployment",
+      "archived_date": "2025-11-19"
     },
     {
       "id": "archive.docker_makefile",
       "name": "Makefile (Docker)",
       "type": "configuration",
-      "category": "docker",
       "path": "archive/docker/Makefile",
       "description": "Make targets for Docker operations (deprecated)",
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "low",
+      "category": "docker",
+      "tags": [
+        "docker",
+        "deprecated",
+        "automation"
+      ],
       "status": "deprecated",
       "format": "makefile",
       "targets": [
@@ -127,35 +139,24 @@
         "archive.docker_compose",
         "archive.dockerfile"
       ],
-      "tags": [
-        "docker",
-        "deprecated",
-        "automation"
-      ],
-      "criticality": "low",
-      "archived_date": "2025-11-19",
-      "reason": "Framework users implement their own deployment"
+      "reason": "Framework users implement their own deployment",
+      "archived_date": "2025-11-19"
     },
     {
       "id": "archive.docker_docs",
       "name": "Docker Documentation",
       "type": "documentation",
-      "category": "docker",
       "path": "archive/docker/",
       "description": "Documentation for Docker deployment (README.md, ENTRYPOINT.md)",
-      "status": "deprecated",
-      "files": [
-        "README.md",
-        "ENTRYPOINT.md"
-      ],
+      "category": "docker",
       "tags": [
         "docker",
         "deprecated",
         "documentation"
       ],
-      "criticality": "low",
-      "archived_date": "2025-11-19",
-      "reason": "Framework users implement their own deployment"
+      "status": "deprecated",
+      "reason": "Framework users implement their own deployment",
+      "archived_date": "2025-11-19"
     }
   ],
   "edges": [
