@@ -571,7 +571,32 @@
       "dependencies": [],
       "dependents": [],
       "criticality": "medium",
-      "category": "implementation"
+      "category": "implementation",
+      "lines_of_code": 1091,
+      "classes": [
+        "MCPServer",
+        "GithubException"
+      ],
+      "functions": [
+        "log_debug",
+        "load_env_variables",
+        "detect_repo_from_git",
+        "main",
+        "get_repo_cached",
+        "format_github_error",
+        "list_tools"
+      ],
+      "exports": [
+        "MCPServer",
+        "GithubException",
+        "log_debug",
+        "load_env_variables",
+        "detect_repo_from_git",
+        "main",
+        "get_repo_cached",
+        "format_github_error",
+        "list_tools"
+      ]
     }
   ],
   "edges": []

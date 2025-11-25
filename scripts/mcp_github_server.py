@@ -91,6 +91,7 @@ load_env_variables()
 from github_helper import (  # type: ignore[import-untyped]
     format_issue_detail,
     format_issue_list,
+    get_github_client,
     get_repo,
 )
 
@@ -402,6 +403,15 @@ class MCPServer:
                             "closes_issue": {
                                 "type": "integer",
                                 "description": "Issue number to close (adds 'Closes #N' to description)",
+                            },
+                            "auto_assign": {
+                                "type": "boolean",
+                                "description": "Automatically assign current user to PR (default: true)",
+                                "default": True,
+                            },
+                            "assignee": {
+                                "type": "string",
+                                "description": "Specific user to assign (defaults to current user if auto_assign=true)",
                             },
                             "repo": {
                                 "type": "string",
@@ -739,6 +749,28 @@ class MCPServer:
                     draft=arguments.get("draft", False),
                 )
 
+                # Auto-assign to user
+                assignee_info = ""
+                auto_assign = arguments.get("auto_assign", True)
+                assignee = arguments.get("assignee")
+
+                if auto_assign or assignee:
+                    try:
+                        # Get user to assign
+                        if assignee:
+                            user_to_assign = assignee
+                        else:
+                            # Get current authenticated user
+                            gh = get_github_client()
+                            current_user = gh.get_user()
+                            user_to_assign = current_user.login
+
+                        # Add assignee to PR
+                        pr.add_to_assignees(user_to_assign)
+                        assignee_info = f"\n   Assigned to: @{user_to_assign}"
+                    except Exception as e:
+                        assignee_info = f"\n   ⚠️  Could not assign user: {e}"
+
                 return {
                     "content": [
                         {
@@ -747,7 +779,7 @@ class MCPServer:
                             f"   Number: #{pr.number}\n"
                             f"   Title: {pr.title}\n"
                             f"   From: {head} → {arguments.get('base', 'main')}\n"
-                            f"   URL: {pr.html_url}",
+                            f"   URL: {pr.html_url}{assignee_info}",
                         }
                     ],
                     "isError": False,
