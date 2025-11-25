@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.16.0 (2025-11-25)
+
+### Features
+
+- **agent**: Optimize AI agent workflow - Quick Wins (67% token reduction)
+  ([`ba15e7a`](https://github.com/sensiloles/telegram-bot-stack/commit/ba15e7a066334da735f476cf546f0b9af3b2e9f9))
+
+
 ## v1.15.0 (2025-11-24)
 
 ### Bug Fixes
