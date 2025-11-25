@@ -1,5 +1,47 @@
 # Cursor Agent Rules - telegram-bot-stack
 
+## Tool Selection Order (CRITICAL - Always Follow)
+
+When multiple tools can solve the same task, use this priority:
+
+### 1. MCP Tools (Preferred)
+
+**Use first if available:**
+
+- `mcp_github-workflow_list_issues()` - List/filter issues
+- `mcp_github-workflow_get_issue()` - Get issue details
+- `mcp_github-workflow_create_issue()` - Create issues
+- `mcp_github-workflow_update_issue()` - Update issues
+- `mcp_github-workflow_create_pr()` - Create PRs
+- `mcp_github-workflow_merge_pr()` - Merge PRs
+
+**Why:** Direct integration, faster, no shell overhead
+
+### 2. CLI Scripts (Fallback)
+
+**Use if MCP unavailable:**
+
+```bash
+python3 .github/workflows/scripts/read_issues.py --list
+python3 .github/workflows/scripts/create_pr.py --title "..."
+python3 .github/workflows/scripts/merge_pr.py --cleanup
+```
+
+**Why:** Reliable fallback, rich features, automation
+
+### 3. Manual Git/GitHub (Last Resort)
+
+**Use only if both above fail:**
+
+```bash
+git commands
+gh cli commands (if available)
+```
+
+**Rule:** Try MCP → CLI → Manual. Don't mix approaches unnecessarily.
+
+---
+
 ## CRITICAL WORKFLOW (Always Follow This Order)
 
 ### 1. GitHub Flow - NEVER Push to Main
@@ -9,6 +51,7 @@ git branch --show-current # MUST NOT be 'main'
 ```
 
 If on main → create feature branch:
+
 ```bash
 git checkout -b feature/<issue>-<name> # or fix/, docs/
 ```
@@ -18,11 +61,13 @@ main branch is **protected** - direct pushes will fail.
 ### 2. Implementation
 
 Before coding:
-- Check open issues: Use MCP `list_issues` (or `python3 .github/workflows/scripts/read_issues.py --list --state open`)
+
+- Check open issues: Use MCP `list_issues` (or `read_issues.py --list`)
 - Understand task requirements
 - Plan changes
 
 During implementation:
+
 - Implement changes
 - Write tests (>=80% coverage for `telegram_bot_stack/`)
 - Update documentation if needed
@@ -36,15 +81,23 @@ git commit -m "type(scope): description" # See Conventional Commits below
 git push -u origin feature/<name>
 ```
 
-### 4. Create PR (Automated)
+### 4. Create PR
 
 ```bash
-python3 .github/workflows/scripts/create_pr.py --title "type(scope): description" --closes <issue>
+# MCP (preferred):
+mcp_github-workflow_create_pr(title="type(scope): description", closes_issue=<N>)
+
+# CLI (fallback):
+python3 .github/workflows/scripts/create_pr.py --title "..." --closes <N>
 ```
 
-### 5. Merge PR (One Command)
+### 5. Merge PR
 
 ```bash
+# MCP (preferred):
+mcp_github-workflow_merge_pr(pr_number=<N>, delete_branch=true)
+
+# CLI (fallback):
 python3 .github/workflows/scripts/merge_pr.py --cleanup
 ```
 
@@ -59,10 +112,10 @@ python3 .github/workflows/scripts/merge_pr.py --cleanup
 **Coverage:** 131 tests, 80% coverage
 
 **Key Files:**
+
 - Status: `.github/PROJECT_STATUS.md`
-- Automation: `.github/workflows/scripts/` (automation scripts)
-- MCP Server: `scripts/mcp_github_server.py` (GitHub issues integration)
-- Plan: `archive/PACKAGE_CONVERSION_PLAN_RU.md` (archived)
+- Automation: `.github/workflows/scripts/README.md`
+- MCP Setup: `docs/mcp-github-setup.md`
 
 ---
 
@@ -73,38 +126,19 @@ python3 .github/workflows/scripts/merge_pr.py --cleanup
 Format: `type(scope): description`
 
 **Version impact:**
+
 - `feat:` → MINOR bump (0.1.0 → 0.2.0)
 - `fix:` → PATCH bump (0.1.0 → 0.1.1)
 - `feat!` or `BREAKING CHANGE:` → MAJOR bump (0.x → 1.0.0)
 - `docs:`, `chore:`, `test:`, `refactor:` → No bump
 
 **Examples:**
+
 ```
 feat(storage): add Redis backend
 fix(auth): resolve token validation
 docs(readme): update quickstart
 ```
-
-### GitHub Automation
-
-**Preferred: MCP Server (if configured)**
-Use MCP tools for GitHub issues directly in chat:
-- `list_issues` - List issues with filters
-- `get_issue` - Get issue details
-- `create_issue` - Create new issue
-- `update_issue` - Update labels, priority, comments, state
-
-**Fallback: CLI Scripts**
-```bash
-python3 .github/workflows/scripts/read_issues.py --list --state open
-python3 .github/workflows/scripts/create_issue.py --title "Bug: X" --labels bug
-python3 .github/workflows/scripts/update_issue.py <N> --set-priority high
-python3 .github/workflows/scripts/create_pr.py --title "feat: X" --closes <N>
-python3 .github/workflows/scripts/merge_pr.py --cleanup
-```
-
-See: `.github/workflows/scripts/README.md` for all scripts.
-MCP Setup: `docs/mcp-github-setup.md`
 
 ### Testing
 
@@ -120,23 +154,27 @@ Threshold: >=80% for `telegram_bot_stack/`
 ## Code Quality Rules
 
 ### Security
+
 - NEVER commit tokens/passwords
 - Use `.env` (in `.gitignore`)
 
 ### Code Style
+
 - All comments/docstrings in English
 - Type hints for all new code
 - Follow ruff linting (see `pyproject.toml`)
 - Remove unused imports immediately
 
 ### Documentation
+
 - UPDATE existing docs, don't create new `.md` files
 - Update docs BEFORE committing code
 - Keep examples executable
 - Test instructions work "out of the box"
 
 ### Testing
-- >=80% coverage for `telegram_bot_stack/`
+
+- > =80% coverage for `telegram_bot_stack/`
 - Write tests for all new features
 - Use fixtures from `tests/conftest.py`
 
@@ -145,13 +183,15 @@ Threshold: >=80% for `telegram_bot_stack/`
 ## Agent Decision Tree
 
 ### On New Context:
+
 1. Read `.github/PROJECT_STATUS.md` (current state)
-2. Check open issues: Use MCP `list_issues` tool (or `read_issues.py --list --state open`)
+2. Check open issues: Use MCP `list_issues`
 3. Verify branch: `git branch --show-current` (NOT main)
 4. Understand task requirements
 5. Implement following workflow above
 
 ### On "Continue Work":
+
 1. Check `PROJECT_STATUS.md`
 2. List open issues: Use MCP `list_issues` → identify active
 3. Read issue details: Use MCP `get_issue <N>`
@@ -159,128 +199,48 @@ Threshold: >=80% for `telegram_bot_stack/`
 5. Implement → test → commit → push → PR
 
 ### Branch Strategy:
+
 - On main? → Create `feature/<issue>-<name>`
 - On feature branch? → Continue work
 - Multiple features? → Ask user about separate branches
 
 ### Commit Strategy:
+
 - One commit per logical unit
 - Batch related changes (docs + tests together)
 - Use conventional commits format
 
 ---
 
-## Reference Links
+## Quick Reference
 
-**Detailed guides:**
+**Documentation:**
+
 - GitHub Automation: `.github/workflows/scripts/README.md`
 - MCP Setup: `docs/mcp-github-setup.md`
-- PR Automation: `.github/PR_AUTOMATION.md`
-- Architecture: `README.md` (lines 155-250)
-- Testing: `README.md` (lines 80-154)
+- Architecture: `README.md`
+- Testing Guide: `README.md`
 
 **Configuration:**
+
 - Conventional Commits: https://www.conventionalcommits.org/
 - Pre-commit hooks: `.pre-commit-config.yaml`
-- Pytest config: `pyproject.toml` → `[tool.pytest.ini_options]`
-- Ruff config: `pyproject.toml` → `[tool.ruff]`
-
-**Project files:**
-- Status: `.github/PROJECT_STATUS.md`
-- Plan (archived): `archive/PACKAGE_CONVERSION_PLAN_RU.md`
-- Changelog: `CHANGELOG.md`
-
----
-
-## Quick Examples
-
-### Example 1: Add new storage backend
-
-```python
-# 1. Check existing storage implementations
-# Read: telegram_bot_stack/storage/base.py
-# Read: telegram_bot_stack/storage/sql.py (as reference)
-
-# 2. Implement: telegram_bot_stack/storage/redis.py
-
-# 3. Write tests: tests/core/test_redis_storage.py
-
-# 4. Update docs: docs/storage_guide.md
-
-# 5. Commit
-git add telegram_bot_stack/storage/redis.py tests/core/test_redis_storage.py docs/storage_guide.md
-git commit -m "feat(storage): add Redis backend"
-```
-
-### Example 2: Update documentation
-
-```python
-# 1. Identify doc to update
-# Edit: docs/api_reference.md
-
-# 2. Test examples still work
-
-# 3. Commit
-git commit -m "docs(api): update storage backend examples"
-```
-
-### Example 3: Fix bug
-
-```python
-# 1. Create issue (if not exists)
-python3 .github/workflows/scripts/create_issue.py \
---title "Bug: Connection leak in SQL storage" \
---labels bug
-
-# 2. Create branch
-git checkout -b fix/sql-connection-leak
-
-# 3. Fix code + add test
-
-# 4. Commit
-git commit -m "fix(storage): resolve SQL connection leak"
-
-# 5. Push and create PR
-git push -u origin fix/sql-connection-leak
-python3 .github/workflows/scripts/create_pr.py \
---title "fix(storage): resolve SQL connection leak" \
---closes <issue_number>
-```
-
----
-
-## Maintenance
-
-### Check Before Writing Code:
-```bash
-ls .github/workflows/scripts/ # automation scripts exist
-```
-
-Use existing tools instead of ad-hoc PyGithub code.
-
-### File Size Policy:
-This file (.cursorrules) target: <300 lines
-Current: ~290 lines ✓
-
-When updating:
-1. Add new critical rule
-2. Remove compensating verbose content
-3. Verify: `wc -l .cursorrules`
-4. Reference external docs instead of duplicating
-
-Goal: Maximum density, minimum tokens, zero ambiguity.
+- Pytest: `pyproject.toml` → `[tool.pytest.ini_options]`
+- Ruff: `pyproject.toml` → `[tool.ruff]`
 
 ---
 
 ## Summary Checklist
 
 Before EVERY implementation:
+
 - [ ] Check branch (not main)
-- [ ] Check open issues (MCP `list_issues` or CLI)
+- [ ] Check open issues (MCP or CLI)
 - [ ] Understand task requirements
 - [ ] Check existing code structure
 
 After implementation:
+
 - [ ] Write/update tests (>=80% coverage)
 - [ ] Update docs if needed
 - [ ] Run linting: `ruff check .`
@@ -289,7 +249,8 @@ After implementation:
 - [ ] Push + auto-create PR
 
 On merge:
-- [ ] Run `merge_pr.py --cleanup`
+
+- [ ] Run `merge_pr` (MCP or CLI)
 - [ ] Verify release triggered (if on main)
 - [ ] Check CI passed
 
@@ -300,48 +261,43 @@ On merge:
 ## Documentation Style Rules
 
 ### Emoji Usage
-- Use emoji in documentation ONLY when necessary for visual navigation
-- Maximum 1 emoji per section header in README files
-- NO emoji in code comments, docstrings, or commit messages
-- NO emoji in .cursorrules or technical configuration files
-- Acceptable: Section markers in user-facing docs (📖 Documentation, 🚀 Quick Start)
-- Not acceptable: Decorative emoji, multiple emoji per line, emoji in explanations
 
-**Rationale:** Emoji consume 3-4 bytes each, reduce readability in terminals, and add no semantic value to technical content.
+- Use emoji ONLY when necessary for visual navigation
+- NO emoji in code comments, docstrings, or commit messages
+- Acceptable: Section markers in user-facing docs (📖 Documentation)
 
 ### Summary Documents
-- NEVER create separate SUMMARY.md or *_SUMMARY.md files
-- Always provide summaries directly in chat/response to user
-- Summaries should be comprehensive, structured, and include:
-- What was done (with checkmarks)
-- Testing results
-- Impact assessment
-- Next steps
-- Exception: Project-level documentation (README.md, CHANGELOG.md) is acceptable
 
-**Rationale:** Summary files clutter repository, become outdated, and duplicate information already in commits/PRs/chat history.
+- NEVER create separate SUMMARY.md or \*\_SUMMARY.md files
+- Always provide summaries directly in chat/response to user
+- Exception: Project-level documentation (README.md, CHANGELOG.md)
+
+**Rationale:** Summary files clutter repository, become outdated, duplicate information.
 
 ---
 
 ## Validation on Start
 
-Before following any workflow, agent MUST verify infrastructure exists:
+Before following any workflow, verify infrastructure:
 
-### 1. Check GitHub Automation
-```bash
-ls .github/workflows/scripts/
-```
-- ✅ Exists → Use GitHub automation scripts
-- ❌ Missing → Use manual git commands
+**Check MCP:**
+Try `mcp_github-workflow_list_issues()`:
 
-### 2. Check MCP Server
-Try MCP `list_issues` tool:
 - ✅ Works → Use MCP tools
 - ❌ Fails → Use CLI scripts fallback
 
-### 3. If Infrastructure Missing
-- INFORM USER instead of silently failing
-- Suggest running setup or using alternatives
-- Continue with available tools
+**Check Automation:**
 
-**Rule:** Never assume infrastructure exists. Verify first, adapt workflow accordingly.
+```bash
+ls .github/workflows/scripts/
+```
+
+- ✅ Exists → Use automation scripts
+- ❌ Missing → Use manual git commands
+
+**Rule:** Never assume infrastructure exists. Verify first, adapt workflow accordingly. If infrastructure missing, INFORM USER instead of silently failing.
+
+---
+
+**File Size:** Target <300 lines | Current: ~270 lines ✓
+**Goal:** Maximum density, minimum tokens, zero ambiguity

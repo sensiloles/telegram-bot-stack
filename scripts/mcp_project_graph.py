@@ -82,6 +82,95 @@ class ProjectGraphMCPServer:
         if self.router is None:
             self.router = load_router()
 
+    def _get_agent_context(self) -> str:
+        """Get minimal agent context for quick orientation.
+
+        Returns:
+            JSON string with essential project info
+        """
+        import subprocess
+
+        # Get current branch
+        try:
+            branch_result = subprocess.run(
+                ["git", "branch", "--show-current"],
+                cwd=self.project_root,
+                capture_output=True,
+                text=True,
+                check=True,
+            )
+            current_branch = branch_result.stdout.strip()
+        except Exception:
+            current_branch = "unknown"
+
+        # Get project version from pyproject.toml
+        try:
+            pyproject_path = self.project_root / "pyproject.toml"
+            if pyproject_path.exists():
+                import re
+
+                content = pyproject_path.read_text()
+                version_match = re.search(r'version\s*=\s*"([^"]+)"', content)
+                version = version_match.group(1) if version_match else "unknown"
+            else:
+                version = "unknown"
+        except Exception:
+            version = "unknown"
+
+        # Build context
+        context = {
+            "current_state": {
+                "version": version,
+                "branch": current_branch,
+                "phase": "Phase 2 - PyPI Publication"
+                if "main" in current_branch
+                else "Development",
+            },
+            "quick_commands": {
+                "list_issues": "mcp_github-workflow_list_issues()",
+                "get_issue": "mcp_github-workflow_get_issue(issue_number=N)",
+                "create_pr": "mcp_github-workflow_create_pr(title='...', closes_issue=N)",
+                "merge_pr": "mcp_github-workflow_merge_pr(pr_number=N, delete_branch=true)",
+                "test": "python3 -m pytest --cov=telegram_bot_stack",
+            },
+            "critical_rules": [
+                "Use Tool Priority: MCP > CLI Scripts > Manual Git",
+                "NEVER push to main - use feature branches",
+                "Test coverage >=80% for telegram_bot_stack/",
+                "Conventional commits: type(scope): description",
+                "Update docs BEFORE committing code",
+            ],
+            "available_graphs": [
+                {"id": "router", "description": "Navigation router (783 lines)"},
+                {"id": "bot_framework", "description": "Core framework code"},
+                {"id": "infrastructure", "description": "CI/CD automation (639 lines)"},
+                {"id": "testing", "description": "Test structure (539 lines)"},
+                {"id": "examples", "description": "Example bots (471 lines)"},
+                {"id": "docs", "description": "Documentation files"},
+                {"id": "configuration", "description": "Build configs"},
+                {
+                    "id": "project_meta",
+                    "description": "Architecture overview (493 lines)",
+                },
+            ],
+            "workflow_summary": {
+                "step_1": "Check branch (not main) & open issues",
+                "step_2": "Load relevant graph: fetch_mcp_resource('project-graph', 'graph://...')",
+                "step_3": "Implement changes + tests (>=80% coverage)",
+                "step_4": "Commit with conventional format",
+                "step_5": "Create PR: mcp_github-workflow_create_pr(...)",
+                "step_6": "Merge: mcp_github-workflow_merge_pr(...)",
+            },
+            "reference_docs": {
+                "full_rules": ".cursorrules",
+                "project_status": ".github/PROJECT_STATUS.md",
+                "automation_guide": ".github/workflows/scripts/README.md",
+                "mcp_setup": "docs/mcp-github-setup.md",
+            },
+        }
+
+        return json.dumps(context, indent=2)
+
     def list_resources(self) -> List[Dict[str, str]]:
         """List all available graph resources.
 
@@ -133,6 +222,15 @@ class ProjectGraphMCPServer:
             }
         )
 
+        resources.append(
+            {
+                "uri": "graph://agent_context",
+                "name": "Agent Quick Context",
+                "description": "Minimal context for agent orientation (~100 lines)",
+                "mimeType": "application/json",
+            }
+        )
+
         return resources
 
     def read_resource(self, uri: str) -> str:
@@ -161,6 +259,10 @@ class ProjectGraphMCPServer:
         # Handle router
         if path == "router":
             return json.dumps(self.router, indent=2)
+
+        # Handle agent context
+        if path == "agent_context":
+            return self._get_agent_context()
 
         # Handle recommendation requests
         if path.startswith("recommend"):
