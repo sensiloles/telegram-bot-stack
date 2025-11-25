@@ -1,64 +1,203 @@
-# 🤖 CLI Specification: Telegram Bot Manager
+# CLI Specification: Telegram Bot Stack
+
+## Implementation Status
+
+**✅ IMPLEMENTED** - CLI tool is fully functional and tested (Issue #40)
+
+**Current Version:** `telegram-bot-stack` CLI v1.15.0
+**Commands:** `init`, `new`, `dev`, `validate`
+**Test Coverage:** 54 tests, all passing
+**Location:** `telegram_bot_stack/cli/`
 
 ## Purpose
 
-Evolution of the repository into a professional Python CLI solution for developing and deploying Telegram bots. Goal — automation of the complete lifecycle: from initialization to production deployment.
+Professional Python CLI tool for creating, developing, and managing Telegram bots. Automates the complete development lifecycle from project initialization to local development.
 
-**📊 Current Status:**
+**Key Features:**
 
-- ✅ Core CLI infrastructure (`manager.py` + `scripts/`)
-- ✅ Production-ready Docker environment
-- ⚠️ SSH client and VPS deployment (required for MVP)
+- ✅ Project initialization with full dev environment
+- ✅ Template-based bot creation
+- ✅ Development mode with auto-reload
+- ✅ Configuration validation
+- ✅ Virtual environment management
+- ✅ Linting and testing setup
+- ✅ IDE configuration (VS Code, PyCharm)
+- ✅ Git initialization
 
-**🎯 MVP Priorities:**
+## Architecture
 
-1. SSH client and automatic VPS deployment
-2. Versioning with commitizen
-3. CI/CD templates and extensions
-
-## 📊 Architecture
-
-### ✅ Implemented
+### CLI Structure
 
 **Components:**
 
-- `manager.py` — unified CLI interface
-- `scripts/` — modular system (actions, docker_utils, health, environment)
-- `src/` — production-ready Telegram bot
-- `docker/` — containerization with monitoring
-
-**Commands:**
-
-```bash
-python manager.py setup/dev-setup    # Environment setup
-python manager.py start/stop/restart # Service management
-python manager.py status/logs        # Monitoring and diagnostics
-python manager.py clean --deep       # Resource cleanup
+```
+telegram_bot_stack/
+├── cli/
+│   ├── __init__.py
+│   ├── main.py                    # CLI entry point
+│   ├── commands/
+│   │   ├── __init__.py
+│   │   ├── init.py                # Project initialization
+│   │   ├── new.py                 # Template creation
+│   │   ├── dev.py                 # Development server
+│   │   └── validate.py            # Configuration validation
+│   ├── templates/                 # Bot templates (basic, counter, menu, advanced)
+│   └── utils/
+│       ├── venv.py                # Virtual environment management
+│       ├── dependencies.py        # Dependency installation
+│       ├── git.py                 # Git initialization
+│       ├── ide.py                 # IDE configuration
+│       ├── linting.py             # Linting setup
+│       └── testing.py             # Testing setup
 ```
 
-### ⚠️ Requires Implementation
+### Entry Point
 
-**Missing Modules:**
+Configured in `pyproject.toml`:
 
-- `ssh_client.py` — secure VPS connection
-- `deploy.py` — deployment automation
-- `version.py` — semantic versioning
+```toml
+[project.scripts]
+telegram-bot-stack = "telegram_bot_stack.cli.main:main"
+```
 
-## 🎯 Target Architecture
+### Commands Overview
 
-**CLI Purpose:** `tgbot-manager` (alias: `tgm`)
+**Available Commands:**
 
-- Project and development environment initialization
-- Lifecycle management (run/stop/deploy)
-- Configuration and versioning
-- VPS deployment with automation
+```bash
+telegram-bot-stack --version        # Show version
+telegram-bot-stack --help          # Show help
 
-**Requirements:**
+telegram-bot-stack init <name>     # Initialize new bot project
+telegram-bot-stack new <name>      # Create from template
+telegram-bot-stack dev             # Run in development mode
+telegram-bot-stack validate        # Validate configuration
+```
 
-- Compatibility: macOS, Linux, WSL2
-- Docker-first approach for all environments
-- Security: no secrets in VCS, variable validation
-- Distribution: Python package → PyPI
+## Command Details
+
+### `telegram-bot-stack init`
+
+**Purpose:** Initialize a new bot project with complete development environment.
+
+**Usage:**
+
+```bash
+telegram-bot-stack init <name> [OPTIONS]
+```
+
+**Options:**
+
+- `--package-manager` [pip|poetry|pdm] - Package manager (default: pip)
+- `--python-version` TEXT - Python version (default: current)
+- `--with-linting / --no-linting` - Setup linting (default: true)
+- `--with-testing / --no-testing` - Setup testing (default: true)
+- `--ide` [vscode|pycharm|none] - IDE configuration (default: vscode)
+- `--git / --no-git` - Initialize Git repository (default: true)
+
+**What it creates:**
+
+- Project structure (bot.py, README.md, .env.example)
+- Virtual environment (venv/)
+- Dependencies (requirements.txt or pyproject.toml)
+- Linting configuration (.pre-commit-config.yaml)
+- Testing setup (tests/, pytest.ini)
+- IDE settings (.vscode/ or .idea/)
+- Git repository (.git, .gitignore)
+
+**Example:**
+
+```bash
+telegram-bot-stack init my-awesome-bot --with-linting --ide vscode --git
+cd my-awesome-bot
+source venv/bin/activate
+echo "BOT_TOKEN=your_token" > .env
+python bot.py
+```
+
+### `telegram-bot-stack new`
+
+**Purpose:** Create a bot from a template.
+
+**Usage:**
+
+```bash
+telegram-bot-stack new <name> [OPTIONS]
+```
+
+**Options:**
+
+- `--template` [basic|counter|menu|advanced] - Template to use (default: basic)
+
+**Available Templates:**
+
+- `basic` - Minimal bot with welcome message
+- `counter` - Bot with state management
+- `menu` - Interactive menu bot
+- `advanced` - Production-ready with all features
+
+**Example:**
+
+```bash
+telegram-bot-stack new analytics-bot --template advanced
+```
+
+### `telegram-bot-stack dev`
+
+**Purpose:** Run bot in development mode with auto-reload.
+
+**Usage:**
+
+```bash
+telegram-bot-stack dev [OPTIONS]
+```
+
+**Options:**
+
+- `--bot-file` PATH - Path to bot file (default: bot.py)
+- `--reload / --no-reload` - Enable auto-reload (default: false)
+- `--reload-delay` FLOAT - Reload delay in seconds (default: 1.0)
+
+**Features:**
+
+- Pretty logging with colors
+- Auto-reload on code changes (with --reload)
+- Environment validation
+- Clear error messages
+
+**Example:**
+
+```bash
+telegram-bot-stack dev --reload
+```
+
+### `telegram-bot-stack validate`
+
+**Purpose:** Validate bot configuration and environment.
+
+**Usage:**
+
+```bash
+telegram-bot-stack validate [OPTIONS]
+```
+
+**Options:**
+
+- `--strict` - Enable strict validation (fail on warnings)
+
+**Checks:**
+
+- bot.py exists
+- .env file exists
+- BOT_TOKEN is set and valid format
+- Dependencies are installed
+- Bot class inherits from BotBase
+
+**Example:**
+
+```bash
+telegram-bot-stack validate --strict
+```
 
 ## 📋 Technical Requirements
 

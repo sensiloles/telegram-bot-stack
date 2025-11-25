@@ -29,7 +29,7 @@ def create_precommit_config(project_path: Path) -> Path:
     rev: v1.17.0
     hooks:
       - id: mypy
-        additional_dependencies: [telegram-bot-stack>=2.0.0]
+        additional_dependencies: [telegram-bot-stack>=1.15.0]
         args: [--ignore-missing-imports]
 
   - repo: https://github.com/pre-commit/pre-commit-hooks

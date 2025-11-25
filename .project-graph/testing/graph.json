@@ -8,8 +8,8 @@
     "project_name": "telegram-bot-stack",
     "description": "Test suite, fixtures, and testing utilities",
     "scope": "Unit tests, integration tests, fixtures",
-    "node_count": 26,
-    "edge_count": 0
+    "node_count": 30,
+    "edge_count": 3
   },
   "nodes": [
     {
@@ -1139,7 +1139,117 @@
       "dependents": [],
       "criticality": "low",
       "category": "testing"
+    },
+    {
+      "id": "telegram_bot_stack.cli.commands.init",
+      "name": "init",
+      "type": "module",
+      "category": "implementation",
+      "path": "telegram_bot_stack/cli/commands/init.py",
+      "description": "Module init",
+      "lines_of_code": 410,
+      "complexity_score": 1,
+      "exports": [
+        "init"
+      ],
+      "classes": [],
+      "functions": [
+        "init"
+      ],
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium"
+    },
+    {
+      "id": "telegram_bot_stack.cli.utils.dependencies",
+      "name": "dependencies",
+      "type": "module",
+      "category": "implementation",
+      "path": "telegram_bot_stack/cli/utils/dependencies.py",
+      "description": "Module dependencies",
+      "lines_of_code": 179,
+      "complexity_score": 1,
+      "exports": [
+        "install_package",
+        "install_requirements",
+        "create_requirements_file",
+        "create_pyproject_toml"
+      ],
+      "classes": [],
+      "functions": [
+        "install_package",
+        "install_requirements",
+        "create_requirements_file",
+        "create_pyproject_toml"
+      ],
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium"
+    },
+    {
+      "id": "telegram_bot_stack.cli.utils.linting",
+      "name": "linting",
+      "type": "module",
+      "category": "implementation",
+      "path": "telegram_bot_stack/cli/utils/linting.py",
+      "description": "Module linting",
+      "lines_of_code": 84,
+      "complexity_score": 1,
+      "exports": [
+        "create_precommit_config",
+        "install_precommit_hooks"
+      ],
+      "classes": [],
+      "functions": [
+        "create_precommit_config",
+        "install_precommit_hooks"
+      ],
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium"
+    },
+    {
+      "id": "telegram_bot_stack.cli.utils.testing",
+      "name": "testing",
+      "type": "module",
+      "category": "implementation",
+      "path": "telegram_bot_stack/cli/utils/testing.py",
+      "description": "Module testing",
+      "lines_of_code": 102,
+      "complexity_score": 1,
+      "exports": [
+        "create_test_structure"
+      ],
+      "classes": [],
+      "functions": [
+        "create_test_structure"
+      ],
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium"
     }
   ],
-  "edges": []
+  "edges": [
+    {
+      "id": "edge_1",
+      "source": "telegram_bot_stack.cli.commands.init",
+      "target": "telegram_bot_stack.cli.utils.dependencies",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.utils.dependencies"
+    },
+    {
+      "id": "edge_2",
+      "source": "telegram_bot_stack.cli.commands.init",
+      "target": "telegram_bot_stack.cli.utils.linting",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.utils.linting"
+    },
+    {
+      "id": "edge_3",
+      "source": "telegram_bot_stack.cli.commands.init",
+      "target": "telegram_bot_stack.cli.utils.testing",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.utils.testing"
+    }
+  ]
 }

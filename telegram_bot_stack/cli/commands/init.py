@@ -109,7 +109,7 @@ def init(
         if package_manager == "pip":
             dependencies.create_requirements_file(
                 project_path,
-                packages=["telegram-bot-stack>=2.0.0"],
+                packages=["telegram-bot-stack>=1.15.0"],
                 dev_packages=[
                     "pytest>=8.0.0",
                     "pytest-asyncio>=0.23.0",
@@ -135,7 +135,7 @@ def init(
             try:
                 dependencies.install_package(
                     venv_path,
-                    "telegram-bot-stack>=2.0.0",
+                    "telegram-bot-stack>=1.15.0",
                     quiet=True,
                 )
                 click.secho("  ✅ Installed telegram-bot-stack", fg="green")

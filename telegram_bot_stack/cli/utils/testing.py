@@ -87,4 +87,16 @@ async def test_start_command(bot, mock_update, mock_context):
 
     (tests_dir / "test_bot.py").write_text(test_bot_content)
 
+    # Create pytest.ini
+    pytest_ini_content = """[pytest]
+testpaths = tests
+python_files = test_*.py
+python_classes = Test*
+python_functions = test_*
+asyncio_mode = auto
+addopts = -v --strict-markers
+"""
+
+    (project_path / "pytest.ini").write_text(pytest_ini_content)
+
     click.secho("  ✅ Created test structure", fg="green")

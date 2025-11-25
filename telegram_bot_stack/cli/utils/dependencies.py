@@ -17,7 +17,7 @@ def install_package(
 
     Args:
         venv_path: Path to the virtual environment
-        package: Package name (e.g., "telegram-bot-stack>=2.0.0")
+        package: Package name (e.g., "telegram-bot-stack>=1.15.0")
         upgrade: Whether to upgrade if already installed
         quiet: Whether to suppress output
 
@@ -90,7 +90,7 @@ def create_requirements_file(
     requirements_file = project_path / "requirements.txt"
 
     if packages is None:
-        packages = ["telegram-bot-stack>=2.0.0"]
+        packages = ["telegram-bot-stack>=1.15.0"]
 
     content = "# Production dependencies\n"
     content += "\n".join(packages)
@@ -120,14 +120,14 @@ def create_pyproject_toml(
     """
     pyproject_file = project_path / "pyproject.toml"
 
-    content = f'''[project]
+    content = f"""[project]
 name = "{project_name}"
 version = "0.1.0"
 description = "A Telegram bot built with telegram-bot-stack"
 readme = "README.md"
 requires-python = ">={python_version}"
 dependencies = [
-    "telegram-bot-stack>=2.0.0",
+    "telegram-bot-stack>=1.15.0",
 ]
 
 [project.optional-dependencies]
@@ -172,7 +172,7 @@ exclude_lines = [
     "raise NotImplementedError",
     "if __name__ == .__main__.:",
 ]
-'''
+"""
 
     pyproject_file.write_text(content)
     click.secho("  ✅ Created pyproject.toml", fg="green")
