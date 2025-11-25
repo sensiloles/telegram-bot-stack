@@ -77,7 +77,51 @@ python3 .github/workflows/scripts/read_issues.py --list --state open
 
 ## 🚀 Quick Start
 
-### ⚡ One-Command Setup (Recommended)
+### ⚡ CLI Tool (Recommended)
+
+Create a complete bot project in seconds:
+
+```bash
+# Install framework
+pip install telegram-bot-stack
+
+# Create new bot project with full dev environment
+telegram-bot-stack init my-bot \
+    --with-linting \
+    --with-testing \
+    --ide vscode \
+    --git
+
+# Navigate to project
+cd my-bot
+
+# Add your bot token
+echo "BOT_TOKEN=your_token_here" > .env
+
+# Run bot
+telegram-bot-stack dev --reload
+```
+
+**What you get:**
+
+- ✅ Complete project structure
+- ✅ Virtual environment configured
+- ✅ Dependencies installed
+- ✅ Linting setup (ruff, mypy, pre-commit hooks)
+- ✅ Testing setup (pytest with fixtures)
+- ✅ IDE configuration (VS Code/PyCharm)
+- ✅ Git initialized with .gitignore
+
+**Available CLI commands:**
+
+- `telegram-bot-stack init <name>` - Initialize new project
+- `telegram-bot-stack new --template <type>` - Create from template (basic, counter, menu, advanced)
+- `telegram-bot-stack dev --reload` - Run with auto-reload
+- `telegram-bot-stack validate` - Validate configuration
+
+See [`docs/cli-specification.md`](docs/cli-specification.md) for complete CLI documentation.
+
+### 📦 Manual Setup (Alternative)
 
 Create a complete bot project with full dev environment in **5 minutes**:
 
