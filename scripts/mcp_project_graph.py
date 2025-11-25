@@ -508,7 +508,7 @@ def main():
     @app.call_tool()
     async def handle_call_tool(name: str, arguments: Dict[str, Any]):
         result = server.call_tool(name, arguments)
-        return [{"type": "text", "text": result}]
+        return [types.TextContent(type="text", text=result)]
 
     async def run():
         async with stdio_server() as (read_stream, write_stream):

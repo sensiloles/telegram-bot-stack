@@ -14,5 +14,5 @@
   "tests/agent/__init__.py": "b339273c0738e548009da7909247cad56f3ae28044b580567e56169e7eb7244d",
   "tests/agent/test_agent_cache.py": "69fc830cc87eed1bd623138855c1026258c6d2c923dc9ae956313afba627356f",
   "tests/agent/test_agent_metrics.py": "500c7aa45c890dd7da22b4603c18d77fec707b58479a49e8fa1061ddf8170d80",
-  "scripts/mcp_project_graph.py": "1642885af75caadc692106eddcd4f695ff9f52c88b4e4a968534ea713d0d8399"
+  "scripts/mcp_project_graph.py": "ae0685d7860715a8b56c326eed96376db0dfd34967b33b19dab8cce83dfe0068"
 }
