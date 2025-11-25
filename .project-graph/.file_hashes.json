@@ -4,5 +4,6 @@
   "docs/cli-specification.md": "67e8c4eb6815b678ff49f691a3048327ef8ad7d1447696691d1e90894f8763e5",
   "telegram_bot_stack/cli/commands/init.py": "439acf7ce4086532c55a5778fdee75a37c4e1642b5146bc003c1bcae15a82ec5",
   "telegram_bot_stack/cli/utils/dependencies.py": "7d6ea1b1a2c757830745b09d63dfa928e3cf55cd1d56f1ae95ebd23c0eec4258",
-  "scripts/mcp_github_server.py": "fdbd1f5a065ff2febf3e268ba6687fd684a0502ea321c55f9a0faf14fe8dabd4"
+  "scripts/mcp_github_server.py": "fdbd1f5a065ff2febf3e268ba6687fd684a0502ea321c55f9a0faf14fe8dabd4",
+  ".github/workflows/tests.yml": "7f302575adac9cef426971b755b0af360ab2929a51df704a4b7b81e79d0fa1ce"
 }
