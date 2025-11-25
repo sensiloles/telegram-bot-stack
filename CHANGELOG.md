@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.19.0 (2025-11-25)
+
+### Features
+
+- **deploy**: Add VPS deployment CLI with one-command deployment
+  ([`c8c8f9b`](https://github.com/sensiloles/telegram-bot-stack/commit/c8c8f9bf63adf1d41a1f12cb784c2d5c8f75d8e4))
+
+
 ## v1.18.1 (2025-11-25)
 
 ### Bug Fixes
