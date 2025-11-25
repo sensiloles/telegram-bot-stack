@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.18.1 (2025-11-25)
+
+### Bug Fixes
+
+- **agent**: Add post-merge local cleanup requirement for MCP
+  ([`89f2bd0`](https://github.com/sensiloles/telegram-bot-stack/commit/89f2bd0f0ba7331056efa1f69e37820add8af668))
+
+
 ## v1.18.0 (2025-11-25)
 
 ### Features
