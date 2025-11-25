@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.17.0 (2025-11-25)
+
+### Features
+
+- **cli**: Implement full CLI tool for bot project management (Issue #40)
+  ([`1adeb75`](https://github.com/sensiloles/telegram-bot-stack/commit/1adeb75bd1e99e7b65dc37f73ed695afc8893b7e))
+
+
 ## v1.16.0 (2025-11-25)
 
 ### Features
