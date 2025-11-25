@@ -1,0 +1,426 @@
+"""
+VPS deployment commands for telegram-bot-stack.
+
+Provides one-command deployment to VPS with Docker.
+"""
+
+import shutil
+from pathlib import Path
+
+import click
+from rich.console import Console
+from rich.prompt import Confirm, Prompt
+
+from telegram_bot_stack.cli.utils.deployment import DeploymentConfig
+from telegram_bot_stack.cli.utils.vps import VPSConnection
+
+console = Console()
+
+
+@click.group()
+def deploy():
+    """Deploy bot to VPS (production deployment)."""
+    pass
+
+
+@deploy.command()
+@click.option("--host", help="VPS hostname or IP address")
+@click.option("--user", default="root", help="SSH user (default: root)")
+@click.option("--ssh-key", help="Path to SSH private key")
+@click.option("--port", default=22, help="SSH port (default: 22)")
+@click.option("--bot-name", help="Bot name (for container/image names)")
+@click.option("--bot-token-env", default="BOT_TOKEN", help="Bot token env var name")
+def init(host, user, ssh_key, port, bot_name, bot_token_env):
+    """Initialize deployment configuration (interactive setup)."""
+    console.print("🚀 [bold cyan]VPS Deployment Setup[/bold cyan]\n")
+
+    # Check if deploy.yaml already exists
+    if Path("deploy.yaml").exists():
+        if not Confirm.ask(
+            "[yellow]deploy.yaml already exists. Overwrite?[/yellow]", default=False
+        ):
+            console.print("[yellow]Setup cancelled[/yellow]")
+            return
+
+    # Interactive prompts if values not provided
+    if not host:
+        host = Prompt.ask("VPS Host (hostname or IP)")
+
+    if not user:
+        user = Prompt.ask("SSH User", default="root")
+
+    if not ssh_key:
+        default_key = "~/.ssh/id_rsa"
+        ssh_key = Prompt.ask("SSH Key Path", default=default_key)
+
+    if not bot_name:
+        # Try to detect bot name from current directory
+        default_name = Path.cwd().name
+        bot_name = Prompt.ask("Bot Name", default=default_name)
+
+    # Test SSH connection
+    console.print("\n[cyan]Testing SSH connection...[/cyan]")
+    vps = VPSConnection(host=host, user=user, ssh_key=ssh_key, port=port)
+
+    if not vps.test_connection():
+        console.print("[red]❌ SSH connection failed[/red]")
+        console.print(
+            "\n[yellow]Please check your VPS details and SSH key permissions[/yellow]"
+        )
+        return
+
+    console.print("[green]✓ SSH connection successful[/green]")
+
+    # Create deployment configuration
+    config = DeploymentConfig("deploy.yaml")
+    config.set("vps.host", host)
+    config.set("vps.user", user)
+    config.set("vps.ssh_key", ssh_key)
+    config.set("vps.port", port)
+    config.set("bot.name", bot_name)
+    config.set("bot.token_env", bot_token_env)
+    config.set("bot.entry_point", "bot.py")
+    config.set("bot.python_version", "3.11")
+    config.set("deployment.method", "docker")
+    config.set("deployment.auto_restart", True)
+    config.set("deployment.log_rotation", True)
+    config.set("resources.memory_limit", "256M")
+    config.set("resources.memory_reservation", "128M")
+    config.set("resources.cpu_limit", "0.5")
+    config.set("resources.cpu_reservation", "0.25")
+    config.set("logging.level", "INFO")
+    config.set("logging.max_size", "5m")
+    config.set("logging.max_files", "5")
+    config.set("environment.timezone", "UTC")
+
+    config.save()
+
+    # Copy example deploy.yaml for reference
+    templates_dir = Path(__file__).parent.parent / "templates" / "docker"
+    example_file = templates_dir / "deploy.yaml.example"
+    if example_file.exists():
+        shutil.copy(example_file, "deploy.yaml.example")
+        console.print("[dim]ℹ️  deploy.yaml.example copied for reference[/dim]")
+
+    console.print("\n[green]✅ Configuration saved to deploy.yaml[/green]")
+    console.print("\n[bold]Next steps:[/bold]")
+    console.print("1. Review deploy.yaml and adjust settings if needed")
+    console.print(f"2. Set {bot_token_env} environment variable")
+    console.print("3. Run: [cyan]telegram-bot-stack deploy up[/cyan]")
+    console.print("\n[dim]See deploy.yaml.example for all available options[/dim]")
+
+
+@deploy.command()
+@click.option("--config", default="deploy.yaml", help="Deployment config file")
+@click.option("--verbose", "-v", is_flag=True, help="Verbose output")
+def up(config, verbose):
+    """Deploy bot to VPS."""
+    console.print("🚀 [bold cyan]Deploying bot to VPS...[/bold cyan]\n")
+
+    # Load configuration
+    if not Path(config).exists():
+        console.print(f"[red]❌ Configuration file not found: {config}[/red]")
+        console.print("\n[yellow]Run 'telegram-bot-stack deploy init' first[/yellow]")
+        return
+
+    deploy_config = DeploymentConfig(config)
+
+    if not deploy_config.validate():
+        console.print("[red]❌ Invalid configuration[/red]")
+        return
+
+    # Connect to VPS
+    console.print("[cyan]🔧 Connecting to VPS...[/cyan]")
+    vps = VPSConnection(
+        host=deploy_config.get("vps.host"),
+        user=deploy_config.get("vps.user"),
+        ssh_key=deploy_config.get("vps.ssh_key"),
+        port=deploy_config.get("vps.port", 22),
+    )
+
+    if not vps.test_connection():
+        console.print("[red]❌ Failed to connect to VPS[/red]")
+        return
+
+    console.print("[green]✓ Connected to VPS[/green]\n")
+
+    # Check and install Docker if needed
+    console.print("[cyan]🐳 Checking Docker installation...[/cyan]")
+    if not vps.check_docker_installed():
+        console.print("[yellow]Docker not found, installing...[/yellow]")
+        if not vps.install_docker():
+            console.print("[red]❌ Failed to install Docker[/red]")
+            return
+    else:
+        console.print("[green]✓ Docker is installed[/green]\n")
+
+    # Prepare deployment directory
+    bot_name = deploy_config.get("bot.name")
+    remote_dir = f"/opt/{bot_name}"
+
+    console.print(f"[cyan]📦 Preparing deployment directory: {remote_dir}[/cyan]")
+    vps.run_command(f"mkdir -p {remote_dir}")
+
+    # Generate Docker files from templates
+    console.print("[cyan]📝 Generating Docker configuration...[/cyan]")
+    from telegram_bot_stack.cli.utils.deployment import (
+        DockerTemplateRenderer,
+        create_env_file,
+    )
+
+    temp_dir = Path(".deploy-temp")
+    temp_dir.mkdir(exist_ok=True)
+
+    try:
+        # Render templates
+        renderer = DockerTemplateRenderer(deploy_config)
+        renderer.render_all(temp_dir)
+
+        # Create .env file
+        env_file = temp_dir / ".env"
+        create_env_file(deploy_config, env_file)
+
+        console.print("[green]✓ Docker configuration generated[/green]\n")
+
+        # Transfer files to VPS
+        console.print("[cyan]📤 Transferring files to VPS...[/cyan]")
+
+        # Copy current directory files to temp
+        for item in Path.cwd().iterdir():
+            if item.name not in [
+                ".git",
+                ".venv",
+                "venv",
+                "__pycache__",
+                ".deploy-temp",
+                "logs",
+                ".pytest_cache",
+                "htmlcov",
+            ]:
+                if item.is_file():
+                    shutil.copy2(item, temp_dir)
+                elif item.is_dir():
+                    shutil.copytree(item, temp_dir / item.name, dirs_exist_ok=True)
+
+        # Transfer to VPS
+        if not vps.transfer_files(temp_dir, remote_dir):
+            console.print("[red]❌ Failed to transfer files[/red]")
+            return
+
+        console.print("[green]✓ Files transferred[/green]\n")
+
+        # Build and start bot
+        console.print("[cyan]🏗️  Building Docker image...[/cyan]")
+        if not vps.run_command(f"cd {remote_dir} && docker-compose build"):
+            console.print("[red]❌ Failed to build Docker image[/red]")
+            return
+
+        console.print("[green]✓ Docker image built[/green]\n")
+
+        console.print("[cyan]🚀 Starting bot...[/cyan]")
+        if not vps.run_command(f"cd {remote_dir} && docker-compose up -d"):
+            console.print("[red]❌ Failed to start bot[/red]")
+            return
+
+        console.print("[green]✓ Bot started[/green]\n")
+
+        # Show status
+        console.print("[cyan]📊 Checking bot status...[/cyan]")
+        vps.run_command(f"cd {remote_dir} && docker-compose ps")
+
+        console.print("\n[green]🎉 Deployment successful![/green]\n")
+        console.print("[bold]Bot Information:[/bold]")
+        console.print(f"  Name: {bot_name}")
+        console.print(f"  Host: {deploy_config.get('vps.host')}")
+        console.print(f"  Directory: {remote_dir}")
+        console.print("\n[bold]Useful commands:[/bold]")
+        console.print("  View logs:   [cyan]telegram-bot-stack deploy logs[/cyan]")
+        console.print("  Check status: [cyan]telegram-bot-stack deploy status[/cyan]")
+        console.print("  Stop bot:    [cyan]telegram-bot-stack deploy down[/cyan]")
+
+    finally:
+        # Cleanup temp directory
+        if temp_dir.exists():
+            shutil.rmtree(temp_dir)
+
+    vps.close()
+
+
+@deploy.command()
+@click.option("--config", default="deploy.yaml", help="Deployment config file")
+@click.option("--verbose", "-v", is_flag=True, help="Verbose output")
+def update(config, verbose):
+    """Update running bot on VPS."""
+    console.print("🔄 [bold cyan]Updating bot...[/bold cyan]\n")
+
+    # Load configuration
+    if not Path(config).exists():
+        console.print(f"[red]❌ Configuration file not found: {config}[/red]")
+        return
+
+    deploy_config = DeploymentConfig(config)
+
+    # Connect to VPS
+    vps = VPSConnection(
+        host=deploy_config.get("vps.host"),
+        user=deploy_config.get("vps.user"),
+        ssh_key=deploy_config.get("vps.ssh_key"),
+        port=deploy_config.get("vps.port", 22),
+    )
+
+    bot_name = deploy_config.get("bot.name")
+    remote_dir = f"/opt/{bot_name}"
+
+    # Transfer updated files
+    console.print("[cyan]📤 Transferring updated files...[/cyan]")
+
+    temp_dir = Path(".deploy-temp")
+    temp_dir.mkdir(exist_ok=True)
+
+    try:
+        # Copy current directory files to temp
+        for item in Path.cwd().iterdir():
+            if item.name not in [
+                ".git",
+                ".venv",
+                "venv",
+                "__pycache__",
+                ".deploy-temp",
+                "logs",
+                ".pytest_cache",
+                "htmlcov",
+            ]:
+                if item.is_file():
+                    shutil.copy2(item, temp_dir)
+                elif item.is_dir():
+                    shutil.copytree(item, temp_dir / item.name, dirs_exist_ok=True)
+
+        # Transfer to VPS
+        if not vps.transfer_files(temp_dir, remote_dir):
+            console.print("[red]❌ Failed to transfer files[/red]")
+            return
+
+        console.print("[green]✓ Files transferred[/green]\n")
+
+        # Rebuild and restart
+        console.print("[cyan]🏗️  Rebuilding Docker image...[/cyan]")
+        vps.run_command(f"cd {remote_dir} && docker-compose build")
+
+        console.print("[cyan]🔄 Restarting bot...[/cyan]")
+        vps.run_command(f"cd {remote_dir} && docker-compose up -d")
+
+        console.print("\n[green]✅ Bot updated successfully![/green]")
+
+    finally:
+        if temp_dir.exists():
+            shutil.rmtree(temp_dir)
+
+    vps.close()
+
+
+@deploy.command()
+@click.option("--config", default="deploy.yaml", help="Deployment config file")
+def status(config):
+    """Check bot status on VPS."""
+    console.print("📊 [bold cyan]Bot Status[/bold cyan]\n")
+
+    # Load configuration
+    if not Path(config).exists():
+        console.print(f"[red]❌ Configuration file not found: {config}[/red]")
+        return
+
+    deploy_config = DeploymentConfig(config)
+
+    # Connect to VPS
+    vps = VPSConnection(
+        host=deploy_config.get("vps.host"),
+        user=deploy_config.get("vps.user"),
+        ssh_key=deploy_config.get("vps.ssh_key"),
+        port=deploy_config.get("vps.port", 22),
+    )
+
+    bot_name = deploy_config.get("bot.name")
+    remote_dir = f"/opt/{bot_name}"
+
+    # Show container status
+    console.print("[cyan]Container Status:[/cyan]")
+    vps.run_command(f"cd {remote_dir} && docker-compose ps")
+
+    console.print("\n[cyan]Resource Usage:[/cyan]")
+    vps.run_command(f"docker stats --no-stream {bot_name}")
+
+    console.print("\n[cyan]Recent Logs:[/cyan]")
+    vps.run_command(f"cd {remote_dir} && docker-compose logs --tail=20")
+
+    vps.close()
+
+
+@deploy.command()
+@click.option("--config", default="deploy.yaml", help="Deployment config file")
+@click.option("--follow", "-f", is_flag=True, help="Follow log output")
+@click.option("--tail", default=50, help="Number of lines to show (default: 50)")
+def logs(config, follow, tail):
+    """View bot logs from VPS."""
+    console.print("📋 [bold cyan]Bot Logs[/bold cyan]\n")
+
+    # Load configuration
+    if not Path(config).exists():
+        console.print(f"[red]❌ Configuration file not found: {config}[/red]")
+        return
+
+    deploy_config = DeploymentConfig(config)
+
+    # Connect to VPS
+    vps = VPSConnection(
+        host=deploy_config.get("vps.host"),
+        user=deploy_config.get("vps.user"),
+        ssh_key=deploy_config.get("vps.ssh_key"),
+        port=deploy_config.get("vps.port", 22),
+    )
+
+    remote_dir = f"/opt/{deploy_config.get('bot.name')}"
+
+    # Stream logs
+    follow_flag = "-f" if follow else ""
+    vps.run_command(
+        f"cd {remote_dir} && docker-compose logs {follow_flag} --tail={tail}"
+    )
+
+    vps.close()
+
+
+@deploy.command()
+@click.option("--config", default="deploy.yaml", help="Deployment config file")
+@click.option("--cleanup", is_flag=True, help="Remove container and image")
+def down(config, cleanup):
+    """Stop bot on VPS."""
+    console.print("🛑 [bold cyan]Stopping bot...[/bold cyan]\n")
+
+    # Load configuration
+    if not Path(config).exists():
+        console.print(f"[red]❌ Configuration file not found: {config}[/red]")
+        return
+
+    deploy_config = DeploymentConfig(config)
+
+    # Connect to VPS
+    vps = VPSConnection(
+        host=deploy_config.get("vps.host"),
+        user=deploy_config.get("vps.user"),
+        ssh_key=deploy_config.get("vps.ssh_key"),
+        port=deploy_config.get("vps.port", 22),
+    )
+
+    remote_dir = f"/opt/{deploy_config.get('bot.name')}"
+
+    # Stop bot
+    if cleanup:
+        console.print("[cyan]Stopping and removing containers...[/cyan]")
+        vps.run_command(f"cd {remote_dir} && docker-compose down -v --rmi all")
+        console.print("[green]✓ Bot stopped and cleaned up[/green]")
+    else:
+        console.print("[cyan]Stopping bot...[/cyan]")
+        vps.run_command(f"cd {remote_dir} && docker-compose down")
+        console.print("[green]✓ Bot stopped[/green]")
+
+    vps.close()

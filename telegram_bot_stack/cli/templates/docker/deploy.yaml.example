@@ -1,0 +1,41 @@
+# VPS Deployment Configuration for telegram-bot-stack
+# Copy this file to deploy.yaml and fill in your values
+
+vps:
+# VPS connection details
+host: "your-vps.com"     # VPS hostname or IP address
+user: "root"             # SSH user (default: root)
+ssh_key: "~/.ssh/id_rsa" # Path to SSH private key
+port: 22                 # SSH port (default: 22)
+
+bot:
+# Bot configuration
+name: "my-telegram-bot" # Bot name (used for container/image names)
+token_env: "BOT_TOKEN"  # Environment variable name for bot token
+entry_point: "bot.py"   # Main bot file (default: bot.py)
+python_version: "3.11"  # Python version (3.9, 3.10, 3.11, 3.12)
+
+deployment:
+# Deployment method and options
+method: "docker"   # Deployment method: docker or systemd
+auto_restart: true # Auto-restart on failure
+log_rotation: true # Enable log rotation
+
+resources:
+# Resource limits
+memory_limit: "256M"       # Maximum memory
+memory_reservation: "128M" # Reserved memory
+cpu_limit: "0.5"           # Maximum CPU cores
+cpu_reservation: "0.25"    # Reserved CPU cores
+
+logging:
+# Logging configuration
+level: "INFO"  # Log level: DEBUG, INFO, WARNING, ERROR
+max_size: "5m" # Max log file size
+max_files: "5" # Number of log files to keep
+
+environment:
+# Additional environment variables
+timezone: "UTC" # Container timezone
+# Add custom variables here:
+# CUSTOM_VAR: "value"

@@ -1,18 +1,12 @@
 {
-  "telegram_bot_stack/cli/utils/linting.py": "8621cb16a42335dc8ec00c9c0b2f25a1338e01142a1f37a76cf016008d964023",
-  "telegram_bot_stack/cli/utils/testing.py": "456858f49165cdbcf55cf1467755425329029f0663329fb0c9c948ce4ea7b33b",
-  "docs/cli-specification.md": "67e8c4eb6815b678ff49f691a3048327ef8ad7d1447696691d1e90894f8763e5",
-  "telegram_bot_stack/cli/commands/init.py": "439acf7ce4086532c55a5778fdee75a37c4e1642b5146bc003c1bcae15a82ec5",
-  "telegram_bot_stack/cli/utils/dependencies.py": "7d6ea1b1a2c757830745b09d63dfa928e3cf55cd1d56f1ae95ebd23c0eec4258",
-  "scripts/mcp_github_server.py": "fdbd1f5a065ff2febf3e268ba6687fd684a0502ea321c55f9a0faf14fe8dabd4",
-  ".github/workflows/tests.yml": "7f302575adac9cef426971b755b0af360ab2929a51df704a4b7b81e79d0fa1ce",
-  "README.md": "87548cd4a14c7bee7f523f398e5d8d78de399fc63190c4e11fe1a5c0087c0f8b",
-  ".github/PROJECT_STATUS.md": "447323df9dc4642ba76dafd0372a6f5366322464c3101aa7f3593156e807354a",
-  ".github/workflows/scripts/agent_cache.py": "591a0be50a42580cdeef3986bfd4ae4bf7d277e2c29f60d170583366654d2360",
-  ".github/workflows/scripts/agent_metrics_dashboard.py": "7f19b49921907bc62670c75f155171eb52fd522e368b86ba7473a99fd999f57b",
-  ".github/workflows/scripts/log_agent_action.py": "b0ff423b8043cdf91172fdc9bcfcf5ef4b3d48b04e66ef83cb799b3264ef52a9",
-  "tests/agent/__init__.py": "b339273c0738e548009da7909247cad56f3ae28044b580567e56169e7eb7244d",
-  "tests/agent/test_agent_cache.py": "69fc830cc87eed1bd623138855c1026258c6d2c923dc9ae956313afba627356f",
-  "tests/agent/test_agent_metrics.py": "500c7aa45c890dd7da22b4603c18d77fec707b58479a49e8fa1061ddf8170d80",
-  "scripts/mcp_project_graph.py": "ae0685d7860715a8b56c326eed96376db0dfd34967b33b19dab8cce83dfe0068"
+  "README.md": "430ad16b437d20f416cc0c527f2b7ae0852b96f8e91d14f8ceecdcd89193ff84",
+  "docs/deployment_guide.md": "108e494ae02250ca974dd497280c9b8d8d17240fe3977723389afcebde83beef",
+  "pyproject.toml": "53aae19f66009a2aeffcc963d79decf5758e959893f328590eb6eb1363a25f6e",
+  "telegram_bot_stack/cli/commands/deploy.py": "c3cfb1af481b58b94a9456d7b830f7b4b9697ff366d34f75ecc5b7458930c0c5",
+  "telegram_bot_stack/cli/main.py": "10b93f6d7248b4d47709eaf82e9eceaac9b101c291eee521d609d0e84295c513",
+  "telegram_bot_stack/cli/utils/deployment.py": "3777fa33e5bf6ce9add86343fb8165c75df4b75f43d6f258f57fbf9c5d468a78",
+  "telegram_bot_stack/cli/utils/vps.py": "d32e91d3ebe195922465176cdfebe77927b5f33728619f00e3f3eba44dcad145",
+  "tests/cli/test_vps_utils.py": "6fb401b71b5731e6ce66821dbd4423f6cbb074379a5964e0c300084b8670fd56",
+  "tests/cli/test_deploy_command.py": "f3a98619540b649b3370f81fb1d41838e371cd5265e3eca589e7de0c6900c7fc",
+  "tests/cli/test_deployment_utils.py": "7f66ddb304305216cf9c106a6ab74a197473f138bdc38008db38df93af624afc"
 }

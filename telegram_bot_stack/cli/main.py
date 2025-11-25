@@ -4,7 +4,7 @@ import sys
 
 import click
 
-from telegram_bot_stack.cli.commands import dev, init, new, validate
+from telegram_bot_stack.cli.commands import deploy, dev, init, new, validate
 
 
 @click.group()
@@ -22,6 +22,7 @@ cli.add_command(init.init)
 cli.add_command(new.new)
 cli.add_command(dev.dev)
 cli.add_command(validate.validate)
+cli.add_command(deploy.deploy)
 
 
 def main() -> None:
