@@ -203,7 +203,7 @@ def _run_with_reload(bot_path: Path, python_executable: str = None) -> None:
             try:
                 while True:
                     line = output_queue.get_nowait()
-                    click.echo(line)
+                    click.echo(line, err=False)
             except queue.Empty:
                 pass
 
@@ -211,18 +211,18 @@ def _run_with_reload(bot_path: Path, python_executable: str = None) -> None:
             if process.poll() is not None:
                 click.secho("\n⚠️  Bot process exited", fg="yellow")
                 # Read remaining output
-                output_stopped.wait(timeout=0.5)
+                output_stopped.wait(timeout=1.0)
                 try:
                     while True:
                         line = output_queue.get_nowait()
-                        click.echo(line)
+                        click.echo(line, err=False)
                 except queue.Empty:
                     pass
                 # Also try to read any remaining output directly
                 try:
                     remaining = process.stdout.read()
                     if remaining:
-                        click.echo(remaining)
+                        click.echo(remaining, err=False)
                 except Exception:
                     pass
                 break
