@@ -180,7 +180,8 @@ jobs:
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "**Current coverage:** $COVERAGE%" >> $GITHUB_STEP_SUMMARY
             echo "**Required threshold:** $THRESHOLD%" >> $GITHUB_STEP_SUMMARY
-            echo "**Gap:** $(python -c "print(f'{$THRESHOLD - $COVERAGE:.2f}%')")" >> $GITHUB_STEP_SUMMARY
+            GAP=$(python -c "print(f'{$THRESHOLD - $COVERAGE:.2f}')")
+            echo "**Gap:** ${GAP}%" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "**Action required:** Add more tests to increase coverage." >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
