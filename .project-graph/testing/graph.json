@@ -8,7 +8,7 @@
     "project_name": "telegram-bot-stack",
     "description": "Test suite, fixtures, and testing utilities",
     "scope": "Unit tests, integration tests, fixtures",
-    "node_count": 38,
+    "node_count": 39,
     "edge_count": 16
   },
   "nodes": [
@@ -1507,6 +1507,37 @@
         "acquire_lock",
         "release_lock",
         "wrapper"
+      ],
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium"
+    },
+    {
+      "id": "telegram_bot_stack.storage.memory",
+      "name": "memory",
+      "type": "module",
+      "category": "implementation",
+      "path": "telegram_bot_stack/storage/memory.py",
+      "description": "Module memory",
+      "lines_of_code": 110,
+      "complexity_score": 1,
+      "exports": [
+        "MemoryStorage",
+        "save",
+        "load",
+        "exists",
+        "delete",
+        "clear"
+      ],
+      "classes": [
+        "MemoryStorage"
+      ],
+      "functions": [
+        "save",
+        "load",
+        "exists",
+        "delete",
+        "clear"
       ],
       "dependencies": [],
       "dependents": [],

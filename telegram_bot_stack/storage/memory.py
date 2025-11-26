@@ -2,7 +2,7 @@
 
 import logging
 from copy import deepcopy
-from typing import Any
+from typing import Any, Dict
 
 from .base import StorageBackend
 
@@ -29,7 +29,7 @@ class MemoryStorage(StorageBackend):
 
     def __init__(self):
         """Initialize empty in-memory storage."""
-        self._data: dict[str, Any] = {}
+        self._data: Dict[str, Any] = {}
         logger.debug("Initialized MemoryStorage")
 
     def save(self, key: str, data: Any) -> bool:
