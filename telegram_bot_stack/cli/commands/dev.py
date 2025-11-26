@@ -191,8 +191,10 @@ def _run_with_reload(bot_path: Path, python_executable: str = None) -> None:
                         break
                     time.sleep(0.01)  # Small sleep to avoid busy waiting
                     continue
-                # Put line in queue and also flush immediately
-                output_queue.put(line.rstrip())
+                # Put line in queue (keep newline for proper formatting)
+                line_stripped = line.rstrip()
+                if line_stripped:  # Only queue non-empty lines
+                    output_queue.put(line_stripped)
         except Exception as e:
             click.echo(f"Error reading output: {e}", err=True)
         finally:
