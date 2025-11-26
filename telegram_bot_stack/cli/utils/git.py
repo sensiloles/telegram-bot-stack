@@ -72,7 +72,7 @@ def init_git(project_path: Path, initial_commit: bool = True) -> None:
 
 
 def create_gitignore(project_path: Path) -> Path:
-    """Create a .gitignore file for Python/Telegram bot projects.
+    """Create a comprehensive .gitignore file for Python/Telegram bot projects.
 
     Args:
         project_path: Path to the project directory
@@ -82,48 +82,138 @@ def create_gitignore(project_path: Path) -> Path:
     """
     gitignore_file = project_path / ".gitignore"
 
-    content = """# Telegram bot
+    content = """# Telegram Bot - Environment & Secrets
 .env
+.env.local
+.env.*.local
+*.key
+*.pem
+
+# Telegram Bot - Data & Storage
 *.db
+*.sqlite
+*.sqlite3
 bot_data/
-logs/
 data/
+logs/
+backups/
 
 # Python
-venv/
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
-.Python
+*.py[cod]
+*$py.class
 *.so
-*.egg
-*.egg-info/
-dist/
+.Python
 build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Testing
 .pytest_cache/
 .coverage
+.coverage.*
+coverage.xml
+coverage.json
 htmlcov/
-.mypy_cache/
-.ruff_cache/
+.tox/
+.nox/
+.hypothesis/
 
-# IDE
-.vscode/
+# Linting & Type Checking
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.ruff_cache/
+.pytype/
+.pyre/
+
+# IDE - VS Code (keep useful config, ignore generated)
+.vscode/tasks.json
+.vscode/c_cpp_properties.json
+.vscode/*.code-workspace
+.vscode/.ropeproject
+
+# IDE - PyCharm
 .idea/
+*.iml
+*.iws
+*.ipr
+
+# IDE - Other
 *.swp
 *.swo
 *~
+.project
+.pydevproject
+.settings/
 
 # OS
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
 desktop.ini
 
-# Environment
-.env.local
-.env.*.local
-"""
+# Jupyter Notebook
+.ipynb_checkpoints
 
+# pyenv
+.python-version
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# Project specific
+*.log
+*.log.*
+temp/
+tmp/
+"""
     gitignore_file.write_text(content)
     click.secho("  ✅ Created .gitignore", fg="green")
     return gitignore_file

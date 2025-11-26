@@ -14,9 +14,10 @@
   ".github/workflows/tests.yml": "827b5f7398d323cde8c7bc76ad4789227cec33eae421e38ed18e1cc925a35826",
   "docs/README.md": "e04237f063541ff56a49f3987a8cc13c99a840e731d122608c703c781ac76f24",
   "telegram_bot_stack/cli/commands/dev.py": "ea95bc922713db225465278ac09266c2595d68f3b4746152e249c102bd4b7774",
-  "telegram_bot_stack/cli/commands/init.py": "86491731aaff4c3df27471d502d5c6759099b077e293271d9025b0288579b775",
+  "telegram_bot_stack/cli/commands/init.py": "5593e6d22ff0fc4906887358cd4e3191ae7df1fb161614c940e367c1684bc8e3",
   "telegram_bot_stack/cli/utils/dependencies.py": "4f5ddaaf9394d589f54c944c5a6851893bb8c3e8d54bfbe4f245cf408ffd69bf",
   "telegram_bot_stack/cli/utils/makefile.py": "4f824a9fa948bc38d99e6093c99b714b4201a18ab8eaf55df598617ec1618b31",
   "telegram_bot_stack/cli/utils/venv.py": "d17964effd5a0b791f375d0b3ab18222aaacec244252f2595b616fcc5fa29cfc",
-  "tests/cli/test_init_command.py": "4976391a53c20e92b6d4a8f191d13e2525083dd66642dc488d096b5a4f76841f"
+  "tests/cli/test_init_command.py": "4976391a53c20e92b6d4a8f191d13e2525083dd66642dc488d096b5a4f76841f",
+  "telegram_bot_stack/cli/utils/git.py": "4e7d5f4b4827684ad3c66672547a694f0a7e003779335923265b14b1edf1d801"
 }

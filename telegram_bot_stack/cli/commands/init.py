@@ -209,15 +209,18 @@ def init(
             click.echo("\n💻 Configuring PyCharm...")
             create_pycharm_settings(project_path)
 
-        # 10. Setup Git
+        # 10. Create .gitignore (always, even without git init)
+        click.echo("\n📝 Creating .gitignore...")
+        from telegram_bot_stack.cli.utils import git as git_utils
+
+        git_utils.create_gitignore(project_path)
+
+        # 11. Setup Git
         if git:
             click.echo("\n📚 Initializing Git...")
-            from telegram_bot_stack.cli.utils import git as git_utils
-
-            git_utils.create_gitignore(project_path)
             git_utils.init_git(project_path, initial_commit=True)
 
-        # 11. Success message
+        # 12. Success message
         _print_success_message(name, venv_path, with_linting, with_testing)
 
     except Exception as e:

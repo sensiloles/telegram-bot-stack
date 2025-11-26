@@ -8,7 +8,7 @@
     "project_name": "telegram-bot-stack",
     "description": "Test suite, fixtures, and testing utilities",
     "scope": "Unit tests, integration tests, fixtures",
-    "node_count": 34,
+    "node_count": 35,
     "edge_count": 13
   },
   "nodes": [
@@ -1317,7 +1317,7 @@
       "category": "implementation",
       "path": "telegram_bot_stack/cli/commands/init.py",
       "description": "Module init",
-      "lines_of_code": 497,
+      "lines_of_code": 500,
       "complexity_score": 1,
       "exports": [
         "init"
@@ -1399,6 +1399,28 @@
         "get_venv_pip",
         "get_activation_command",
         "find_venv"
+      ],
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium"
+    },
+    {
+      "id": "telegram_bot_stack.cli.utils.git",
+      "name": "git",
+      "type": "module",
+      "category": "implementation",
+      "path": "telegram_bot_stack/cli/utils/git.py",
+      "description": "Module git",
+      "lines_of_code": 219,
+      "complexity_score": 1,
+      "exports": [
+        "init_git",
+        "create_gitignore"
+      ],
+      "classes": [],
+      "functions": [
+        "init_git",
+        "create_gitignore"
       ],
       "dependencies": [],
       "dependents": [],
