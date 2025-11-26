@@ -2,7 +2,6 @@
 
 import asyncio
 import logging
-import time
 from typing import Optional
 
 from telegram import (
@@ -73,9 +72,8 @@ class BotBase:
         self._running = False
         self._shutdown_event = asyncio.Event()
         self._consecutive_conflicts = 0
-        self._ever_had_success = False  # Track if bot ever successfully polled
-        self._start_time = None  # Track when bot started
-        self._last_conflict_time = None  # Track last conflict time
+        self._successful_polls = 0  # Track successful getUpdates (200 OK)
+        self._ever_had_success = False  # Track if bot successfully established
 
         # Default commands if not provided
         self.user_commands = user_commands or ["/start", "/my_id"]
@@ -128,6 +126,21 @@ class BotBase:
             f"👋 Welcome to {self.bot_name}!\n\n"
             f"I'm a helpful bot. Use /my_id to see your user ID."
         )
+
+    # Middleware to track successful updates
+    async def _track_successful_update(
+        self, update: Update, context: ContextTypes.DEFAULT_TYPE
+    ) -> None:
+        """Track successful getUpdates to determine if bot is truly active."""
+        if update:
+            self._successful_polls += 1
+            # Reset conflict counter on successful update
+            self._consecutive_conflicts = 0
+
+            # Mark as established after 2 successful polls
+            if not self._ever_had_success and self._successful_polls >= 2:
+                self._ever_had_success = True
+                logger.info("✅ Bot successfully established polling connection")
 
     # Built-in command handlers
 
@@ -490,50 +503,37 @@ class BotBase:
 
         This is a base error handler that catches common errors like Conflict.
         Uses "first come, first served" logic - the bot that successfully
-        starts polling first keeps running, others shutdown gracefully.
+        gets 2+ updates first keeps running, others shutdown gracefully.
         """
         error = context.error
 
-        # Check if we should mark bot as successfully established
-        # Criteria: Running for 10+ seconds AND no conflicts in last 5 seconds
-        if (
-            self._start_time
-            and not self._ever_had_success
-            and time.time() - self._start_time >= 10
-        ):
-            # Check if we haven't had conflicts recently (5+ seconds ago or never)
-            if (
-                self._last_conflict_time is None
-                or time.time() - self._last_conflict_time >= 5
-            ):
-                self._ever_had_success = True
-                logger.info("✅ Bot successfully established polling connection")
-
         # Handle Conflict error (multiple bot instances running)
         if isinstance(error, Conflict):
-            # Update last conflict time
-            self._last_conflict_time = time.time()
-
-            # If this bot already successfully established connection, don't shutdown
-            # It means another instance is trying to start but WE got here first
-            if self._ever_had_success:
-                logger.warning(
-                    "⚠️  Another bot instance tried to start but this instance is "
-                    "already active and will continue running."
-                )
-                logger.info("💡 The other bot instance will shutdown automatically.")
-                return  # Don't shutdown, don't count conflicts
-
-            # This bot hasn't successfully started yet, count conflicts
             self._consecutive_conflicts += 1
 
-            if self._consecutive_conflicts >= 3:
+            # If this bot already got 2+ successful updates, it's established
+            # Occasional conflicts are OK (race condition during startup)
+            if self._ever_had_success:
+                # Log but don't shutdown - we're the established instance
+                if self._consecutive_conflicts % 5 == 0:  # Log every 5 conflicts
+                    logger.warning(
+                        f"⚠️  Detected {self._consecutive_conflicts} conflicts. "
+                        "Another bot may be trying to start. "
+                        "This instance is established and will keep running."
+                    )
+                return  # Don't shutdown
+
+            # This bot hasn't successfully polled yet
+            # High threshold to allow startup race conditions
+            if self._consecutive_conflicts >= 5:
                 logger.error(
                     "⚠️  Another bot instance is already running. "
                     "Shutting down this instance..."
                 )
                 logger.error(
-                    "💡 Tip: The other bot instance started first and will keep running."
+                    f"💡 This bot got {self._successful_polls} successful updates "
+                    f"vs {self._consecutive_conflicts} conflicts. "
+                    "The other bot is more active."
                 )
                 # Stop the application
                 if self.application:
@@ -541,7 +541,8 @@ class BotBase:
             else:
                 # Log but don't stop yet
                 logger.warning(
-                    f"⚠️  Conflict detected ({self._consecutive_conflicts}/3). "
+                    f"⚠️  Conflict detected ({self._consecutive_conflicts}/5). "
+                    f"Successful updates: {self._successful_polls}. "
                     "Checking if another instance is already active..."
                 )
             return
@@ -557,8 +558,12 @@ class BotBase:
 
         Override this in subclass to add additional handlers.
         """
-        # Mark start time for conflict detection
-        self._start_time = time.time()
+        # Register update tracking middleware (processes ALL updates)
+        from telegram.ext import TypeHandler
+
+        self.application.add_handler(
+            TypeHandler(Update, self._track_successful_update), group=-1
+        )
 
         # Base command handlers
         base_handlers = {

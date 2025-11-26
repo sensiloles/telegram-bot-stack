@@ -22,5 +22,5 @@
   "telegram_bot_stack/cli/utils/git.py": "4e7d5f4b4827684ad3c66672547a694f0a7e003779335923265b14b1edf1d801",
   "telegram_bot_stack/cli/utils/testing.py": "870880bcbc01c74e12e4638e638c1230d2e6a887df7f1e1baf1c1c915e9af3cf",
   "tests/cli/test_dev_command.py": "1d605f15d236d3206dc75663f0618cebb05e0cb8467bc7afc02da8259c3278a4",
-  "telegram_bot_stack/bot_base.py": "1a32338764f776988c44101781eef756423cde0899c279138983710b0133a8cf"
+  "telegram_bot_stack/bot_base.py": "4b6a9bc1ac1f15f1fddd4de46ccb0f559e4f25600ca0a1d00698a55dbda47096"
 }
