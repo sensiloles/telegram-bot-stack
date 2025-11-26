@@ -182,8 +182,10 @@ def _run_with_reload(bot_path: Path, python_executable: str = None) -> None:
     observer.start()
 
     # Start reading bot output in background
-    output_queue = queue.Queue(maxsize=1000)  # Large queue to avoid blocking
+    # Use queue for thread-safe communication
+    output_queue = queue.Queue(maxsize=1000)
     output_stopped = threading.Event()
+    output_lock = threading.Lock()
 
     def read_output():
         """Read and display bot output."""
@@ -193,15 +195,18 @@ def _run_with_reload(bot_path: Path, python_executable: str = None) -> None:
                 if not line:
                     if process.poll() is not None:
                         break
-                    time.sleep(0.005)  # Very small sleep to avoid busy waiting
+                    time.sleep(0.001)  # Minimal sleep
                     continue
-                # Put line in queue immediately
+                # Put line in queue (blocking to ensure it's queued)
                 line_stripped = line.rstrip()
                 if line_stripped:  # Only queue non-empty lines
-                    output_queue.put(line_stripped, block=False)
-        except queue.Full:
-            # Queue is full, skip this line (shouldn't happen with default queue)
-            pass
+                    try:
+                        output_queue.put(line_stripped, timeout=0.1)
+                    except queue.Full:
+                        # If queue is full, try to display directly (fallback)
+                        with output_lock:
+                            click.echo(line_stripped, nl=True)
+                            sys.stdout.flush()
         except Exception as e:
             click.echo(f"Error reading output: {e}", err=True)
         finally:
@@ -211,27 +216,24 @@ def _run_with_reload(bot_path: Path, python_executable: str = None) -> None:
     output_thread.start()
 
     # Give thread a moment to start reading
-    time.sleep(0.1)
+    time.sleep(0.05)
 
     try:
         while True:
             # Display any available output (non-blocking)
             displayed_any = False
-            batch_lines = []
             try:
-                # Collect multiple lines at once for efficiency
+                # Use timeout to avoid blocking too long
                 while True:
-                    line = output_queue.get_nowait()
-                    batch_lines.append(line)
-            except queue.Empty:
+                    try:
+                        line = output_queue.get_nowait()
+                        click.echo(line, nl=True)
+                        sys.stdout.flush()
+                        displayed_any = True
+                    except queue.Empty:
+                        break
+            except Exception:
                 pass
-
-            # Display collected lines
-            if batch_lines:
-                for line in batch_lines:
-                    click.echo(line, nl=True)
-                sys.stdout.flush()  # Force flush after batch
-                displayed_any = True
 
             # Check if process is still running
             exit_code = process.poll()

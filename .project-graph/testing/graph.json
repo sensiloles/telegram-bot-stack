@@ -1290,7 +1290,7 @@
       "category": "implementation",
       "path": "telegram_bot_stack/cli/commands/dev.py",
       "description": "Module dev",
-      "lines_of_code": 283,
+      "lines_of_code": 285,
       "complexity_score": 1,
       "exports": [
         "BotReloadHandler",
