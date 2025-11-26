@@ -11,6 +11,7 @@ from pathlib import Path
 import click
 
 from telegram_bot_stack.cli.utils import venv
+from telegram_bot_stack.cli.utils.bot_lock import BotLockManager
 from telegram_bot_stack.cli.utils.venv import find_venv, get_venv_python
 
 
@@ -44,6 +45,11 @@ def dev(reload: bool, bot_file: str) -> None:
     if not bot_path.exists():
         click.secho(f"❌ Error: Bot file not found: {bot_file}", fg="red")
         click.echo("\nMake sure you're in the project directory and bot.py exists.")
+        sys.exit(1)
+
+    # Check for bot lock (prevent multiple instances)
+    lock_manager = BotLockManager(Path.cwd())
+    if not lock_manager.acquire_lock():
         sys.exit(1)
 
     # Find and use venv if available
@@ -86,19 +92,23 @@ def dev(reload: bool, bot_file: str) -> None:
             click.echo("  pip install -e .[dev]")
         sys.exit(1)
 
-    if reload:
-        try:
-            # Use watchdog for auto-reload
-            _run_with_reload(bot_path, python_executable)
-        except ImportError:
-            click.secho(
-                "⚠️  Warning: watchdog not installed, running without auto-reload",
-                fg="yellow",
-            )
+    try:
+        if reload:
+            try:
+                # Use watchdog for auto-reload
+                _run_with_reload(bot_path, python_executable)
+            except ImportError:
+                click.secho(
+                    "⚠️  Warning: watchdog not installed, running without auto-reload",
+                    fg="yellow",
+                )
+                _run_bot(bot_path, python_executable)
+        else:
+            click.secho("🤖 Starting bot...\n", fg="cyan")
             _run_bot(bot_path, python_executable)
-    else:
-        click.secho("🤖 Starting bot...\n", fg="cyan")
-        _run_bot(bot_path, python_executable)
+    finally:
+        # Always release lock on exit
+        lock_manager.release_lock()
 
 
 def _run_bot(bot_path: Path, python_executable: str = None) -> None:

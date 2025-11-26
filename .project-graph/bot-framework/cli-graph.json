@@ -11,7 +11,7 @@
     "description": "CLI tool for bot project management and development",
     "scope": "CLI tool for bot project management and development",
     "root_package": "telegram_bot_stack.cli",
-    "node_count": 22,
+    "node_count": 23,
     "edge_count": 23
   },
   "nodes": [
@@ -271,7 +271,7 @@
       "type": "module",
       "path": "telegram_bot_stack/cli/commands/dev.py",
       "description": "Run bot in development mode with auto-reload.",
-      "lines_of_code": 285,
+      "lines_of_code": 295,
       "classes": [
         "BotReloadHandler"
       ],
@@ -549,6 +549,37 @@
       "classes": [],
       "functions": [
         "create_makefile"
+      ],
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium"
+    },
+    {
+      "id": "telegram_bot_stack.cli.utils.bot_lock",
+      "name": "bot_lock",
+      "type": "module",
+      "category": "implementation",
+      "path": "telegram_bot_stack/cli/utils/bot_lock.py",
+      "description": "Module bot_lock",
+      "lines_of_code": 142,
+      "complexity_score": 1,
+      "exports": [
+        "BotLockManager",
+        "with_bot_lock",
+        "is_process_running",
+        "acquire_lock",
+        "release_lock",
+        "wrapper"
+      ],
+      "classes": [
+        "BotLockManager"
+      ],
+      "functions": [
+        "with_bot_lock",
+        "is_process_running",
+        "acquire_lock",
+        "release_lock",
+        "wrapper"
       ],
       "dependencies": [],
       "dependents": [],

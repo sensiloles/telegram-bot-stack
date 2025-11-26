@@ -8,7 +8,7 @@
     "project_name": "telegram-bot-stack",
     "description": "Test suite, fixtures, and testing utilities",
     "scope": "Unit tests, integration tests, fixtures",
-    "node_count": 37,
+    "node_count": 38,
     "edge_count": 15
   },
   "nodes": [
@@ -1290,7 +1290,7 @@
       "category": "implementation",
       "path": "telegram_bot_stack/cli/commands/dev.py",
       "description": "Module dev",
-      "lines_of_code": 285,
+      "lines_of_code": 295,
       "complexity_score": 1,
       "exports": [
         "BotReloadHandler",
@@ -1468,6 +1468,37 @@
       "functions": [
         "get_welcome_message",
         "register_handlers"
+      ],
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium"
+    },
+    {
+      "id": "telegram_bot_stack.cli.utils.bot_lock",
+      "name": "bot_lock",
+      "type": "module",
+      "category": "implementation",
+      "path": "telegram_bot_stack/cli/utils/bot_lock.py",
+      "description": "Module bot_lock",
+      "lines_of_code": 142,
+      "complexity_score": 1,
+      "exports": [
+        "BotLockManager",
+        "with_bot_lock",
+        "is_process_running",
+        "acquire_lock",
+        "release_lock",
+        "wrapper"
+      ],
+      "classes": [
+        "BotLockManager"
+      ],
+      "functions": [
+        "with_bot_lock",
+        "is_process_running",
+        "acquire_lock",
+        "release_lock",
+        "wrapper"
       ],
       "dependencies": [],
       "dependents": [],
