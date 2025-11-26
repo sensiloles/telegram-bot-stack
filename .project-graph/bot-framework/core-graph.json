@@ -105,7 +105,7 @@
       "type": "module",
       "path": "telegram_bot_stack/bot_base.py",
       "description": "Base bot class with common patterns for telegram bots.",
-      "lines_of_code": 592,
+      "lines_of_code": 607,
       "classes": [
         "BotBase"
       ],

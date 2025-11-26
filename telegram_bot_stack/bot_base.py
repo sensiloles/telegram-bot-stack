@@ -71,6 +71,7 @@ class BotBase:
         self.application: Optional[Application] = None
         self._running = False
         self._shutdown_event = asyncio.Event()
+        self._consecutive_conflicts = 0
 
         # Default commands if not provided
         self.user_commands = user_commands or ["/start", "/my_id"]
@@ -490,17 +491,31 @@ class BotBase:
 
         # Handle Conflict error (multiple bot instances running)
         if isinstance(error, Conflict):
-            logger.error(
-                "⚠️  Another bot instance with the same token is running. "
-                "Shutting down this instance..."
-            )
-            logger.error(
-                "💡 Tip: Make sure only one bot instance is running at a time."
-            )
-            # Stop the application
-            if self.application:
-                self.application.stop_running()
+            self._consecutive_conflicts += 1
+
+            # Only stop if we get multiple Conflict errors in a row
+            # (1-2 conflicts might be temporary during startup)
+            if self._consecutive_conflicts >= 3:
+                logger.error(
+                    "⚠️  Another bot instance with the same token is running. "
+                    "Shutting down this instance..."
+                )
+                logger.error(
+                    "💡 Tip: Make sure only one bot instance is running at a time."
+                )
+                # Stop the application
+                if self.application:
+                    self.application.stop_running()
+            else:
+                # Log but don't stop yet
+                logger.warning(
+                    f"⚠️  Conflict detected ({self._consecutive_conflicts}/3). "
+                    "Another bot instance may be starting..."
+                )
             return
+
+        # Reset conflict counter on any other error or success
+        self._consecutive_conflicts = 0
 
         # Log other errors
         logger.error(f"Error occurred: {error}", exc_info=context.error)
