@@ -8,8 +8,8 @@
     "project_name": "telegram-bot-stack",
     "description": "Test suite, fixtures, and testing utilities",
     "scope": "Unit tests, integration tests, fixtures",
-    "node_count": 26,
-    "edge_count": 33
+    "node_count": 30,
+    "edge_count": 5
   },
   "nodes": [
     {
@@ -1188,6 +1188,127 @@
         "test_all_bots_have_main_function",
         "test_all_bots_use_post_init_wrapper"
       ]
+    },
+    {
+      "id": "telegram_bot_stack.admin_manager",
+      "name": "admin_manager",
+      "type": "module",
+      "category": "implementation",
+      "path": "telegram_bot_stack/admin_manager.py",
+      "description": "Module admin_manager",
+      "lines_of_code": 131,
+      "complexity_score": 1,
+      "exports": [
+        "AdminManager",
+        "save_admins",
+        "add_admin",
+        "remove_admin",
+        "is_admin",
+        "get_all_admins",
+        "get_admin_count",
+        "has_admins"
+      ],
+      "classes": [
+        "AdminManager"
+      ],
+      "functions": [
+        "save_admins",
+        "add_admin",
+        "remove_admin",
+        "is_admin",
+        "get_all_admins",
+        "get_admin_count",
+        "has_admins"
+      ],
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium"
+    },
+    {
+      "id": "telegram_bot_stack.bot_base",
+      "name": "bot_base",
+      "type": "module",
+      "category": "implementation",
+      "path": "telegram_bot_stack/bot_base.py",
+      "description": "Module bot_base",
+      "lines_of_code": 686,
+      "complexity_score": 1,
+      "exports": [
+        "BotBase",
+        "get_welcome_message",
+        "register_handlers"
+      ],
+      "classes": [
+        "BotBase"
+      ],
+      "functions": [
+        "get_welcome_message",
+        "register_handlers"
+      ],
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium"
+    },
+    {
+      "id": "telegram_bot_stack.cli.commands.deploy",
+      "name": "deploy",
+      "type": "module",
+      "category": "implementation",
+      "path": "telegram_bot_stack/cli/commands/deploy.py",
+      "description": "Module deploy",
+      "lines_of_code": 428,
+      "complexity_score": 1,
+      "exports": [
+        "deploy",
+        "init",
+        "up",
+        "update",
+        "status",
+        "logs",
+        "down"
+      ],
+      "classes": [],
+      "functions": [
+        "deploy",
+        "init",
+        "up",
+        "update",
+        "status",
+        "logs",
+        "down"
+      ],
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium"
+    },
+    {
+      "id": "telegram_bot_stack.cli.commands.dev",
+      "name": "dev",
+      "type": "module",
+      "category": "implementation",
+      "path": "telegram_bot_stack/cli/commands/dev.py",
+      "description": "Module dev",
+      "lines_of_code": 298,
+      "complexity_score": 1,
+      "exports": [
+        "BotReloadHandler",
+        "dev",
+        "start_bot",
+        "read_output",
+        "on_modified"
+      ],
+      "classes": [
+        "BotReloadHandler"
+      ],
+      "functions": [
+        "dev",
+        "start_bot",
+        "read_output",
+        "on_modified"
+      ],
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium"
     }
   ],
   "edges": [
@@ -1199,48 +1320,6 @@
       "description": "Imports from telegram_bot_stack.admin_manager"
     },
     {
-      "id": "edge_2",
-      "source": "tests.conftest",
-      "target": "telegram_bot_stack.storage",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.storage"
-    },
-    {
-      "id": "edge_3",
-      "source": "tests.conftest",
-      "target": "telegram_bot_stack.user_manager",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.user_manager"
-    },
-    {
-      "id": "edge_4",
-      "source": "tests.core.test_sql_storage",
-      "target": "telegram_bot_stack.storage.sql",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.storage.sql"
-    },
-    {
-      "id": "edge_5",
-      "source": "tests.core.test_sql_storage",
-      "target": "telegram_bot_stack.storage",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.storage"
-    },
-    {
-      "id": "edge_6",
-      "source": "tests.core.test_decorators",
-      "target": "telegram_bot_stack",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack"
-    },
-    {
-      "id": "edge_7",
-      "source": "tests.core.test_decorators",
-      "target": "telegram_bot_stack.storage",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.storage"
-    },
-    {
       "id": "edge_8",
       "source": "tests.core.test_admin_manager",
       "target": "telegram_bot_stack.admin_manager",
@@ -1248,46 +1327,13 @@
       "description": "Imports from telegram_bot_stack.admin_manager"
     },
     {
-      "id": "edge_9",
-      "source": "tests.core.test_admin_manager",
-      "target": "telegram_bot_stack.storage",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.storage"
-    },
-    {
-      "id": "edge_10",
-      "source": "tests.core.test_storage",
-      "target": "telegram_bot_stack.storage",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.storage"
-    },
-    {
-      "id": "edge_11",
-      "source": "tests.core.test_user_manager",
-      "target": "telegram_bot_stack.storage",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.storage"
-    },
-    {
-      "id": "edge_12",
-      "source": "tests.core.test_user_manager",
-      "target": "telegram_bot_stack.user_manager",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.user_manager"
-    },
-    {
       "id": "edge_13",
-      "source": "tests.core.test_bot_base",
+      "source": "tests.core
+      ],
+     ,
       "target": "telegram_bot_stack.bot_base",
       "type": "imports",
       "description": "Imports from telegram_bot_stack.bot_base"
-    },
-    {
-      "id": "edge_14",
-      "source": "tests.core.test_bot_base",
-      "target": "telegram_bot_stack.storage",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.storage"
     },
     {
       "id": "edge_15",
@@ -1297,130 +1343,37 @@
       "description": "Imports from telegram_bot_stack.bot_base"
     },
     {
-      "id": "edge_16",
+      "id": "edge_34",
+      "source": "telegram_bot_stack.bot_base",
+      "target": "telegram_bot_stack.admin_manager",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.admin_manager"
+    }
+  ]
+}
+pe": "imports",
+      "description": "Imports from telegram_bot_stack.admin_manager"
+    },
+    {
+      "id": "edge_13",
+      "source": "tests.core.test_bot_base",
+      "target": "telegram_bot_stack.bot_base",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.bot_base"
+    },
+    {
+      "id": "edge_15",
       "source": "tests.integration.test_full_flow",
-      "target": "telegram_bot_stack.storage",
+      "target": "telegram_bot_stack.bot_base",
       "type": "imports",
-      "description": "Imports from telegram_bot_stack.storage"
+      "description": "Imports from telegram_bot_stack.bot_base"
     },
     {
-      "id": "edge_17",
-      "source": "tests.cli.test_init_command",
-      "target": "telegram_bot_stack.cli.main",
+      "id": "edge_34",
+      "source": "telegram_bot_stack.bot_base",
+      "target": "telegram_bot_stack.admin_manager",
       "type": "imports",
-      "description": "Imports from telegram_bot_stack.cli.main"
-    },
-    {
-      "id": "edge_18",
-      "source": "tests.cli.test_utils",
-      "target": "telegram_bot_stack.cli.utils",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.cli.utils"
-    },
-    {
-      "id": "edge_19",
-      "source": "tests.cli.test_vps_utils",
-      "target": "telegram_bot_stack.cli.utils.vps",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.cli.utils.vps"
-    },
-    {
-      "id": "edge_20",
-      "source": "tests.cli.test_cli_main",
-      "target": "telegram_bot_stack.cli.main",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.cli.main"
-    },
-    {
-      "id": "edge_21",
-      "source": "tests.cli.test_dev_command",
-      "target": "telegram_bot_stack.cli.main",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.cli.main"
-    },
-    {
-      "id": "edge_22",
-      "source": "tests.cli.test_validate_command",
-      "target": "telegram_bot_stack.cli.main",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.cli.main"
-    },
-    {
-      "id": "edge_23",
-      "source": "tests.cli.test_deployment_utils",
-      "target": "telegram_bot_stack.cli.utils.deployment",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.cli.utils.deployment"
-    },
-    {
-      "id": "edge_24",
-      "source": "tests.cli.test_new_command",
-      "target": "telegram_bot_stack.cli.main",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.cli.main"
-    },
-    {
-      "id": "edge_25",
-      "source": "tests.cli.test_deploy_command",
-      "target": "telegram_bot_stack.cli.commands.deploy",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.cli.commands.deploy"
-    },
-    {
-      "id": "edge_26",
-      "source": "tests.cli.test_deploy_command",
-      "target": "telegram_bot_stack.cli.utils.deployment",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.cli.utils.deployment"
-    },
-    {
-      "id": "edge_27",
-      "source": "tests.examples.test_reminder_bot",
-      "target": "telegram_bot_stack.storage",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.storage"
-    },
-    {
-      "id": "edge_28",
-      "source": "tests.examples.test_counter_bot",
-      "target": "telegram_bot_stack.storage",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.storage"
-    },
-    {
-      "id": "edge_29",
-      "source": "tests.examples.test_poll_bot",
-      "target": "telegram_bot_stack.storage",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.storage"
-    },
-    {
-      "id": "edge_30",
-      "source": "tests.examples.test_menu_bot",
-      "target": "telegram_bot_stack.storage",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.storage"
-    },
-    {
-      "id": "edge_31",
-      "source": "tests.examples.test_echo_bot",
-      "target": "telegram_bot_stack.storage",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.storage"
-    },
-    {
-      "id": "edge_32",
-      "source": "tests.examples.test_quit_smoking_bot",
-      "target": "telegram_bot_stack.storage",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.storage"
-    },
-    {
-      "id": "edge_33",
-      "source": "tests.examples.test_examples",
-      "target": "telegram_bot_stack.storage",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.storage"
+      "description": "Imports from telegram_bot_stack.admin_manager"
     }
   ]
 }

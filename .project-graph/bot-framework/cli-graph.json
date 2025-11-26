@@ -349,7 +349,7 @@
       "category": "implementation",
       "path": "telegram_bot_stack/cli/commands/deploy.py",
       "description": "VPS deployment commands for telegram-bot-stack.",
-      "lines_of_code": 426,
+      "lines_of_code": 428,
       "complexity_score": 1,
       "exports": [
         "deploy",
@@ -437,7 +437,7 @@
       "category": "implementation",
       "path": "telegram_bot_stack/cli/commands/dev.py",
       "description": "Run bot in development mode with auto-reload.",
-      "lines_of_code": 295,
+      "lines_of_code": 298,
       "complexity_score": 1,
       "exports": [
         "BotReloadHandler",

@@ -60,9 +60,9 @@ class BotBase:
         self,
         storage: StorageBackend,
         bot_name: str = "Telegram Bot",
-        user_commands: list = None,
-        admin_commands: list = None,
-    ):
+        user_commands: Optional[list] = None,
+        admin_commands: Optional[list] = None,
+    ) -> None:
         """Initialize bot base with storage and configuration."""
         self.storage = storage
         self.bot_name = bot_name
@@ -146,6 +146,9 @@ class BotBase:
 
     async def start(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         """Handle /start command - register user and show welcome message."""
+        if not update.effective_user or not update.message:
+            return
+
         user_id = update.effective_user.id
 
         # If this is the first user ever and no admins exist, make them admin
@@ -167,6 +170,9 @@ class BotBase:
 
     async def my_id(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         """Handle /my_id command - show user their Telegram ID."""
+        if not update.effective_user or not update.message:
+            return
+
         user_id = update.effective_user.id
         user_name = update.effective_user.first_name
 
@@ -181,6 +187,9 @@ class BotBase:
         self, update: Update, context: ContextTypes.DEFAULT_TYPE
     ) -> None:
         """Handle /list_users command - list all registered users (admin only)."""
+        if not update.effective_user or not update.message:
+            return
+
         user_id = update.effective_user.id
 
         if not self.admin_manager.is_admin(user_id):
@@ -204,6 +213,9 @@ class BotBase:
         self, update: Update, context: ContextTypes.DEFAULT_TYPE
     ) -> None:
         """Handle /list_admins command - list all admins (admin only)."""
+        if not update.effective_user or not update.message:
+            return
+
         user_id = update.effective_user.id
 
         if not self.admin_manager.is_admin(user_id):
@@ -227,6 +239,9 @@ class BotBase:
         self, update: Update, context: ContextTypes.DEFAULT_TYPE
     ) -> None:
         """Handle /add_admin command - add a new admin (admin only)."""
+        if not update.effective_user or not update.message:
+            return
+
         user_id = update.effective_user.id
         admin_name = update.effective_user.first_name
 
@@ -321,6 +336,9 @@ class BotBase:
         self, update: Update, context: ContextTypes.DEFAULT_TYPE
     ) -> None:
         """Handle /remove_admin command - remove an admin (admin only)."""
+        if not update.effective_user or not update.message:
+            return
+
         user_id = update.effective_user.id
         admin_name = update.effective_user.first_name
 
@@ -391,6 +409,9 @@ class BotBase:
         self, update: Update, context: ContextTypes.DEFAULT_TYPE
     ) -> None:
         """Handle /decline_admin command - allow user to decline admin privileges."""
+        if not update.effective_user or not update.message:
+            return
+
         user_id = update.effective_user.id
 
         if not self.admin_manager.is_admin(user_id):
@@ -424,6 +445,9 @@ class BotBase:
     ) -> None:
         """Handle callback queries from inline keyboards."""
         query = update.callback_query
+        if not query:
+            return
+
         user_id = query.from_user.id
 
         await query.answer()
@@ -434,22 +458,25 @@ class BotBase:
                 self.admin_manager.get_admin_count() <= 1
                 and self.admin_manager.is_admin(user_id)
             ):
-                await query.message.reply_text(
-                    "You are the last administrator and cannot decline your privileges. "
-                    "Make someone else an admin first."
-                )
+                if query.message and hasattr(query.message, "reply_text"):
+                    await query.message.reply_text(
+                        "You are the last administrator and cannot decline your privileges. "
+                        "Make someone else an admin first."
+                    )
                 return
 
             # Check if the user is an admin
             if not self.admin_manager.is_admin(user_id):
-                await query.message.reply_text("You are not an admin.")
+                if query.message and hasattr(query.message, "reply_text"):
+                    await query.message.reply_text("You are not an admin.")
                 return
 
             # Remove admin privileges
             if self.admin_manager.remove_admin(user_id):
-                await query.message.reply_text(
-                    "You have successfully declined your administrator privileges."
-                )
+                if query.message and hasattr(query.message, "reply_text"):
+                    await query.message.reply_text(
+                        "You have successfully declined your administrator privileges."
+                    )
                 logger.info(
                     f"Admin {user_id} declined their admin privileges via inline button"
                 )
@@ -457,11 +484,14 @@ class BotBase:
                 # Update commands in Telegram UI
                 await self.update_commands_for_user(user_id, is_admin=False)
             else:
-                await query.message.reply_text(
-                    "Failed to decline administrator privileges."
-                )
+                if query.message and hasattr(query.message, "reply_text"):
+                    await query.message.reply_text(
+                        "Failed to decline administrator privileges."
+                    )
 
-    async def update_commands_for_user(self, user_id: int, is_admin: bool = True):
+    async def update_commands_for_user(
+        self, user_id: int, is_admin: bool = True
+    ) -> None:
         """Update the available commands for a specific user in Telegram UI.
 
         Args:
@@ -469,6 +499,9 @@ class BotBase:
             is_admin: Whether the user is an admin (True) or regular user (False)
         """
         try:
+            if not self.application:
+                return
+
             if is_admin:
                 # Set admin commands for the user
                 admin_commands = [
@@ -553,11 +586,14 @@ class BotBase:
         # Log other errors
         logger.error(f"Error occurred: {error}", exc_info=context.error)
 
-    def register_handlers(self):
+    def register_handlers(self) -> None:
         """Register all command handlers with the application.
 
         Override this in subclass to add additional handlers.
         """
+        if not self.application:
+            return
+
         # Register update tracking middleware (processes ALL updates)
         from telegram.ext import TypeHandler
 
@@ -589,11 +625,14 @@ class BotBase:
         self.application.add_handler(CallbackQueryHandler(self.handle_callback_query))
 
         # Add base error handler
-        self.application.add_error_handler(self.base_error_handler)
+        self.application.add_error_handler(self.base_error_handler)  # type: ignore[arg-type]
 
-    async def set_bot_commands(self):
+    async def set_bot_commands(self) -> None:
         """Set bot commands in Telegram UI to make them visible."""
         try:
+            if not self.application:
+                return
+
             # Define user commands with descriptions
             user_commands = [
                 BotCommand(command.lstrip("/"), "User command")
@@ -627,7 +666,7 @@ class BotBase:
         except Exception as e:
             logger.error(f"Error setting bot commands: {e}")
 
-    async def shutdown(self):
+    async def shutdown(self) -> None:
         """Gracefully shutdown the bot."""
         if not self._running:
             return

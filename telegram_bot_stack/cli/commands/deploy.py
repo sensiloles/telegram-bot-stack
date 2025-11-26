@@ -18,7 +18,7 @@ console = Console()
 
 
 @click.group()
-def deploy():
+def deploy() -> None:
     """Deploy bot to VPS (production deployment)."""
     pass
 
@@ -30,7 +30,9 @@ def deploy():
 @click.option("--port", default=22, help="SSH port (default: 22)")
 @click.option("--bot-name", help="Bot name (for container/image names)")
 @click.option("--bot-token-env", default="BOT_TOKEN", help="Bot token env var name")
-def init(host, user, ssh_key, port, bot_name, bot_token_env):
+def init(
+    host: str, user: str, ssh_key: str, port: int, bot_name: str, bot_token_env: str
+) -> None:
     """Initialize deployment configuration (interactive setup)."""
     console.print("🚀 [bold cyan]VPS Deployment Setup[/bold cyan]\n")
 
@@ -113,7 +115,7 @@ def init(host, user, ssh_key, port, bot_name, bot_token_env):
 @deploy.command()
 @click.option("--config", default="deploy.yaml", help="Deployment config file")
 @click.option("--verbose", "-v", is_flag=True, help="Verbose output")
-def up(config, verbose):
+def up(config: str, verbose: bool) -> None:
     """Deploy bot to VPS."""
     console.print("🚀 [bold cyan]Deploying bot to VPS...[/bold cyan]\n")
 
@@ -249,7 +251,7 @@ def up(config, verbose):
 @deploy.command()
 @click.option("--config", default="deploy.yaml", help="Deployment config file")
 @click.option("--verbose", "-v", is_flag=True, help="Verbose output")
-def update(config, verbose):
+def update(config: str, verbose: bool) -> None:
     """Update running bot on VPS."""
     console.print("🔄 [bold cyan]Updating bot...[/bold cyan]\n")
 
@@ -320,7 +322,7 @@ def update(config, verbose):
 
 @deploy.command()
 @click.option("--config", default="deploy.yaml", help="Deployment config file")
-def status(config):
+def status(config: str) -> None:
     """Check bot status on VPS."""
     console.print("📊 [bold cyan]Bot Status[/bold cyan]\n")
 
@@ -359,7 +361,7 @@ def status(config):
 @click.option("--config", default="deploy.yaml", help="Deployment config file")
 @click.option("--follow", "-f", is_flag=True, help="Follow log output")
 @click.option("--tail", default=50, help="Number of lines to show (default: 50)")
-def logs(config, follow, tail):
+def logs(config: str, follow: bool, tail: int) -> None:
     """View bot logs from VPS."""
     console.print("📋 [bold cyan]Bot Logs[/bold cyan]\n")
 
@@ -392,7 +394,7 @@ def logs(config, follow, tail):
 @deploy.command()
 @click.option("--config", default="deploy.yaml", help="Deployment config file")
 @click.option("--cleanup", is_flag=True, help="Remove container and image")
-def down(config, cleanup):
+def down(config: str, cleanup: bool) -> None:
     """Stop bot on VPS."""
     console.print("🛑 [bold cyan]Stopping bot...[/bold cyan]\n")
 

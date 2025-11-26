@@ -3,7 +3,7 @@
 import logging
 import time
 from functools import wraps
-from typing import Callable, Literal, Optional
+from typing import Any, Callable, Literal, Optional
 
 from telegram import Update
 from telegram.ext import ContextTypes
@@ -16,7 +16,7 @@ def rate_limit(
     period: int,
     scope: Literal["user", "global"] = "user",
     message: Optional[str] = None,
-):
+) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
     """Rate limit decorator for bot command handlers.
 
     Limits how often a command can be called within a time period.
@@ -56,11 +56,11 @@ def rate_limit(
         - If storage fails, allows the call (fail-open for availability)
     """
 
-    def decorator(func: Callable) -> Callable:
+    def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
         @wraps(func)
         async def wrapper(
-            self, update: Update, context: ContextTypes.DEFAULT_TYPE
-        ) -> None:
+            self: Any, update: Update, context: ContextTypes.DEFAULT_TYPE
+        ) -> Any:
             # Check if bot has required attributes
             if not hasattr(self, "storage"):
                 logger.warning(

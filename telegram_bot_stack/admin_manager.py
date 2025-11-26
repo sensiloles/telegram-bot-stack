@@ -39,7 +39,7 @@ class AdminManager:
 
     def _load_admins(self) -> List[int]:
         """Load admin users from storage."""
-        admins = self.storage.load(self.storage_key, [])
+        admins: List[int] = self.storage.load(self.storage_key, [])
         if not admins:
             logger.warning(
                 "Admins list is empty, first user to interact will become admin"

@@ -114,7 +114,7 @@ class BotLockManager:
                     pass
 
 
-def with_bot_lock(func):
+def with_bot_lock(func):  # type: ignore[no-untyped-def]
     """Decorator to wrap function with bot lock management.
 
     Usage:
@@ -124,7 +124,7 @@ def with_bot_lock(func):
             pass
     """
 
-    def wrapper(*args, **kwargs):
+    def wrapper(*args, **kwargs):  # type: ignore[no-untyped-def]
         bot_dir = Path.cwd()
         lock_manager = BotLockManager(bot_dir)
 

@@ -12,7 +12,7 @@
     "scope": "Core bot framework components",
     "root_package": "telegram_bot_stack",
     "node_count": 4,
-    "edge_count": 0
+    "edge_count": 5
   },
   "nodes": [
     {
@@ -106,7 +106,7 @@
       "category": "implementation",
       "path": "telegram_bot_stack/bot_base.py",
       "description": "Base bot class with common patterns for telegram bots.",
-      "lines_of_code": 647,
+      "lines_of_code": 686,
       "complexity_score": 1,
       "exports": [
         "BotBase",
@@ -125,5 +125,41 @@
       "criticality": "medium"
     }
   ],
-  "edges": []
+  "edges": [
+    {
+      "id": "edge_1",
+      "source": "telegram_bot_stack.admin_manager",
+      "target": "telegram_bot_stack",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack"
+    },
+    {
+      "id": "edge_2",
+      "source": "telegram_bot_stack.bot_base",
+      "target": "telegram_bot_stack.admin_manager",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.admin_manager"
+    },
+    {
+      "id": "edge_3",
+      "source": "telegram_bot_stack.bot_base",
+      "target": "telegram_bot_stack",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack"
+    },
+    {
+      "id": "edge_4",
+      "source": "telegram_bot_stack.bot_base",
+      "target": "telegram_bot_stack.user_manager",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.user_manager"
+    },
+    {
+      "id": "edge_5",
+      "source": "telegram_bot_stack.user_manager",
+      "target": "telegram_bot_stack",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack"
+    }
+  ]
 }

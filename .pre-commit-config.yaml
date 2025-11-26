@@ -2,15 +2,15 @@
 # See https://pre-commit.com/hooks.html for more hooks
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: 3e8a8703264a2f4a69428a0aa4dcb512790b2c8c  # frozen: v6.0.0
+    rev: 3e8a8703264a2f4a69428a0aa4dcb512790b2c8c # frozen: v6.0.0
     hooks:
       - id: trailing-whitespace
       - id: check-yaml
       - id: check-json
-        exclude: '^\.vscode/(settings\.json|settings\.recommended\.json)$'  # JSONC with comments
+        exclude: '^\.vscode/(settings\.json|settings\.recommended\.json)$' # JSONC with comments
       - id: pretty-format-json
-        args: ['--autofix', '--indent=2', '--no-sort-keys']
-        exclude: '^\.vscode/(settings\.json|settings\.recommended\.json)$'  # JSONC with comments
+        args: ["--autofix", "--indent=2", "--no-sort-keys"]
+        exclude: '^\.vscode/(settings\.json|settings\.recommended\.json)$' # JSONC with comments
       - id: end-of-file-fixer
       - id: check-added-large-files
 
@@ -26,8 +26,17 @@ repos:
         name: "🎨 Ruff Formatter"
         # Uses config from pyproject.toml
 
+  - repo: local
+    hooks:
+      - id: mypy
+        name: "🔍 Mypy Type Checker"
+        entry: bash -c 'python3 -m mypy telegram_bot_stack --exclude="telegram_bot_stack/cli/templates" --config-file=pyproject.toml'
+        language: system
+        types: [python]
+        exclude: ^(tests/|examples/|scripts/|\.github/|\.project-graph/|telegram_bot_stack/cli/templates/)
+
   - repo: https://github.com/commitizen-tools/commitizen
-    rev: 9f3ec868c0429155a46b4819b625d47a8522a3d5  # frozen: v4.10.0
+    rev: 9f3ec868c0429155a46b4819b625d47a8522a3d5 # frozen: v4.10.0
     hooks:
       - id: commitizen
         name: "📝 Conventional Commits"

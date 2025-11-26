@@ -7,6 +7,7 @@ import sys
 import threading
 import time
 from pathlib import Path
+from typing import Any, Optional
 
 import click
 
@@ -111,7 +112,7 @@ def dev(reload: bool, bot_file: str) -> None:
         lock_manager.release_lock()
 
 
-def _run_bot(bot_path: Path, python_executable: str = None) -> None:
+def _run_bot(bot_path: Path, python_executable: Optional[str] = None) -> None:
     """Run the bot without auto-reload.
 
     Args:
@@ -130,7 +131,7 @@ def _run_bot(bot_path: Path, python_executable: str = None) -> None:
         sys.exit(e.returncode)
 
 
-def _run_with_reload(bot_path: Path, python_executable: str = None) -> None:
+def _run_with_reload(bot_path: Path, python_executable: Optional[str] = None) -> None:
     """Run the bot with auto-reload using watchdog.
 
     Args:
@@ -155,7 +156,7 @@ def _run_with_reload(bot_path: Path, python_executable: str = None) -> None:
     class BotReloadHandler(FileSystemEventHandler):
         """Handler for file changes."""
 
-        def on_modified(self, event):
+        def on_modified(self, event: Any) -> None:
             """Handle file modification."""
             nonlocal restart_requested
 
@@ -163,7 +164,7 @@ def _run_with_reload(bot_path: Path, python_executable: str = None) -> None:
             if event.src_path.endswith(".py"):
                 restart_requested = True
 
-    def start_bot():
+    def start_bot() -> Any:
         """Start the bot process."""
         env = os.environ.copy()
         env["PYTHONUNBUFFERED"] = "1"
@@ -188,14 +189,16 @@ def _run_with_reload(bot_path: Path, python_executable: str = None) -> None:
 
     # Start reading bot output in background
     # Use queue for thread-safe communication
-    output_queue = queue.Queue(maxsize=1000)
+    output_queue: queue.Queue[str] = queue.Queue(maxsize=1000)
     output_stopped = threading.Event()
     output_lock = threading.Lock()
 
-    def read_output():
+    def read_output() -> None:
         """Read and display bot output."""
         try:
             while True:
+                if process is None or process.stdout is None:
+                    break
                 line = process.stdout.readline()
                 if not line:
                     if process.poll() is not None:

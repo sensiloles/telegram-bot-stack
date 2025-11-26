@@ -3,7 +3,7 @@
 import json
 import logging
 from pathlib import Path
-from typing import Any, Union
+from typing import Any, Optional, Union
 
 from .base import StorageBackend
 
@@ -26,7 +26,7 @@ class JSONStorage(StorageBackend):
         {"user1": {"name": "John"}}
     """
 
-    def __init__(self, base_dir: Union[str, Path] = None):
+    def __init__(self, base_dir: Optional[Union[str, Path]] = None) -> None:
         """Initialize JSON storage with a base directory."""
         self.base_dir = Path(base_dir) if base_dir else Path.cwd()
         self.base_dir.mkdir(parents=True, exist_ok=True)
