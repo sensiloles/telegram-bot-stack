@@ -3,5 +3,6 @@
   "telegram_bot_stack/storage/json.py": "51d88b0bd25a9e467a1e4a30a66ad838c04a942ce062dcdcc789a91c904c068c",
   "telegram_bot_stack/storage/memory.py": "848435c00c9706b124ad89ad2f6dd7418a2d396bab7146c3aa500c4b4eba6f35",
   "telegram_bot_stack/storage/sql.py": "7d6a7101a3f45642e58d14c5644846b0aae017fd0d78953849e88ce56e2a748a",
-  "telegram_bot_stack/user_manager.py": "992c901e97fa6f59789149c915d815b0b13f1fd3fea40e6b5c7cfb9f6fc6fda8"
+  "telegram_bot_stack/user_manager.py": "992c901e97fa6f59789149c915d815b0b13f1fd3fea40e6b5c7cfb9f6fc6fda8",
+  ".github/workflows/tests.yml": "b623b50af8078db86a1924a417a1985e470552aea20cf4b65db1ec844ae2c496"
 }
