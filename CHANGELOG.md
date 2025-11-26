@@ -2,6 +2,27 @@
 
 <!-- version list -->
 
+## v1.21.1 (2025-11-26)
+
+### Bug Fixes
+
+- **ci**: Add mypy type checking to pre-commit hooks
+  ([`847152c`](https://github.com/sensiloles/telegram-bot-stack/commit/847152cd922f25d1b2c1921f3481706f874db570))
+
+### Documentation
+
+- **readme**: Simplify and focus on framework users
+  ([`eb90eac`](https://github.com/sensiloles/telegram-bot-stack/commit/eb90eac75915132a2e5ad1d5cdbc99a8b2ad2509))
+
+- **status**: Update PROJECT_STATUS with deployment hardening roadmap
+  ([`0951c24`](https://github.com/sensiloles/telegram-bot-stack/commit/0951c24d2addffead73a61cd079c745ff9156f1f))
+
+### Refactoring
+
+- Consolidate code and optimize project graphs
+  ([`919e4fa`](https://github.com/sensiloles/telegram-bot-stack/commit/919e4fa7c427406abaccba6fea6cf5d1bf39f10c))
+
+
 ## v1.21.0 (2025-11-26)
 
 ### Documentation
