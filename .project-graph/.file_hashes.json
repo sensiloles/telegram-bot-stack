@@ -4,6 +4,6 @@
   "docs/quickstart.md": "882690b104234fb6a275b9047216333e3af52cc91b76fcc8386dc4696f45a9e2",
   "telegram_bot_stack/cli/commands/init.py": "97980ca20268cc7beb8865f59915c30b8a2c40c5fac2a9de96f38c58dc5fde30",
   "telegram_bot_stack/cli/utils/testing.py": "79de429defc45b3bd78b57bc2475777f6952ac420fd058b823451b814ec5fa70",
-  "pyproject.toml": "3723c97de826ca8354a983a2bbce23100aedccc7b77f1750b390649a974fe3e3",
+  "pyproject.toml": "0fc88428fc94b817f790c14e1a9b8a30e38ec495713e08269dd099a0abd9c132",
   "tests/cli/test_init_command.py": "d094c780a4463b01d027407e69da32f455f73b4b6dfb11a990f8362b104927e9"
 }
