@@ -2,10 +2,16 @@
 
 Complete documentation for GitHub workflows, automation, and project management.
 
+> **Note:** This directory contains **contributor documentation** for developers working on the project.
+>
+> For **user-facing documentation** (framework usage, API reference), see [`docs/`](../../docs/).
+
 ## 📂 Structure
 
 ### [`workflow/`](workflow/) - Git Workflow & Automation
+
 Complete guides for Git Flow, Pull Requests, and Issue management:
+
 - `git-flow.md` - GitHub Flow with semantic releases
 - `pr-automation.md` - Automated PR creation
 - `pr-naming.md` - PR naming conventions
@@ -13,13 +19,17 @@ Complete guides for Git Flow, Pull Requests, and Issue management:
 - `branch-protection.md` - Branch protection setup
 
 ### [`setup/`](setup/) - Project Setup Guides
+
 Step-by-step setup instructions:
+
 - `getting-started.md` - Quick start guide
 - `token-setup.md` - GitHub token configuration
 - `development.md` - Development environment
 
 ### [`scripts/`](../workflows/scripts/) - Automation Scripts
+
 Python scripts for GitHub automation (in `workflows/scripts/`):
+
 - `create_pr.py` - Create Pull Requests
 - `check_ci.py` - Check CI status
 - `create_issue.py` - Create issues
@@ -45,6 +55,7 @@ New to the project? Start here:
 See [`.cursorrules`](../../.cursorrules) for complete agent workflow rules.
 
 Key files to read on start:
+
 1. `PROJECT_STATUS.md` - Current state
 2. `workflow/git-flow.md` - Git workflow
 3. `scripts/README.md` - Available automation

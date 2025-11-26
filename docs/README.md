@@ -2,6 +2,10 @@
 
 Complete documentation for `telegram-bot-stack` framework.
 
+> **Note:** This directory contains **user-facing documentation** for framework users.
+>
+> For **contributor documentation** (GitHub workflows, automation, development process), see [`.github/docs/`](../.github/docs/).
+
 ## Quick Navigation
 
 ### Getting Started

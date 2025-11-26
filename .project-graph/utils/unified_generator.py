@@ -187,6 +187,8 @@ class GraphGenerator:
             Number of edges created
         """
         count = 0
+        # Track existing edges to avoid duplicates
+        existing_edges = set()
 
         for node in self.nodes:
             if not node.get('path', '').endswith('.py'):
@@ -200,12 +202,21 @@ class GraphGenerator:
             # Extract imports
             imports = self._extract_imports(file_path)
 
-            # Create edges
+            # Create edges (deduplicated)
             for imported_module in imports:
                 # Find target node
                 target_id = self._find_node_id_by_module(imported_module)
 
                 if target_id and target_id != node['id']:
+                    # Create edge key for deduplication
+                    edge_key = (node['id'], target_id, edge_type)
+
+                    # Skip if edge already exists
+                    if edge_key in existing_edges:
+                        continue
+
+                    existing_edges.add(edge_key)
+
                     edge = {
                         'id': f'edge_{self._edge_counter}',
                         'source': node['id'],
