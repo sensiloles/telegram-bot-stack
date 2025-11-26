@@ -64,7 +64,7 @@ jobs:
         run: exit 1
 
       - name: Upload coverage to Codecov
-        if: matrix.python-version == '3.11'
+        if: matrix.python-version == '3.12'
         uses: codecov/codecov-action@v4
         with:
           file: ./coverage.xml
@@ -73,7 +73,7 @@ jobs:
           fail_ci_if_error: false
 
       - name: Upload coverage reports as artifacts
-        if: matrix.python-version == '3.11'
+        if: matrix.python-version == '3.12'
         uses: actions/upload-artifact@v4
         with:
           name: coverage-reports
@@ -82,7 +82,7 @@ jobs:
             htmlcov/
 
       - name: Check coverage threshold
-        if: matrix.python-version == '3.11'
+        if: matrix.python-version == '3.12'
         run: |
           COVERAGE=$(python -c "import xml.etree.ElementTree as ET; tree = ET.parse('coverage.xml'); root = tree.getroot(); print(float(root.attrib['line-rate']) * 100)")
           echo "Coverage: $COVERAGE%"
@@ -104,7 +104,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.12"
           cache: "pip"
 
       - name: Install dependencies
@@ -131,7 +131,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.12"
           cache: "pip"
 
       - name: Install dependencies
@@ -166,7 +166,7 @@ jobs:
 
           # Check test results
           if [ "${{ needs.test.result }}" == "success" ]; then
-            echo "| 🧪 **Tests** | ✅ Passed | All Python versions (3.9, 3.10, 3.11, 3.12) |" >> $GITHUB_STEP_SUMMARY
+            echo "| 🧪 **Tests** | ✅ Passed | All Python versions (3.9, 3.10, 3.11, 3.12) - 3.12 is primary |" >> $GITHUB_STEP_SUMMARY
           else
             echo "| 🧪 **Tests** | ❌ Failed | Check individual jobs for details |" >> $GITHUB_STEP_SUMMARY
             EXIT_CODE=1
@@ -193,7 +193,7 @@ jobs:
           if [ $EXIT_CODE -eq 0 ]; then
             echo "### ✅ All checks passed!" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
-            echo "**Note:** To see detailed test results with individual test names, click on the specific test jobs above (e.g., 'Test Python 3.11')." >> $GITHUB_STEP_SUMMARY
+            echo "**Note:** To see detailed test results with individual test names, click on the specific test jobs above (e.g., 'Test Python 3.12')." >> $GITHUB_STEP_SUMMARY
           else
             echo "### ❌ Some checks failed" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY

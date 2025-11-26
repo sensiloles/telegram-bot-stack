@@ -95,7 +95,7 @@ include = ["telegram_bot_stack*"]
 exclude = ["tests*", "scripts*", "examples*", "src*"]
 
 [tool.mypy]
-python_version = "3.9"
+python_version = "3.12"
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true
@@ -109,7 +109,7 @@ exclude = [
 
 [tool.ruff]
 line-length = 88
-target-version = "py39"
+target-version = "py312"
 exclude = [
 ".project-graph/",
 "venv/",
