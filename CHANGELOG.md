@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.20.0 (2025-11-26)
+
+### Features
+
+- **config**: Set Python 3.12 as primary development version
+  ([`8662afb`](https://github.com/sensiloles/telegram-bot-stack/commit/8662afbfe0de8723fee7b30469c6acd6edc04021))
+
+
 ## v1.19.0 (2025-11-25)
 
 ### Features
