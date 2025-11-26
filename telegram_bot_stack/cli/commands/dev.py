@@ -176,25 +176,55 @@ def _run_with_reload(bot_path: Path, python_executable: str = None) -> None:
     observer.start()
 
     # Start reading bot output in background
+    import queue
     import threading
+
+    output_queue = queue.Queue()
+    output_stopped = threading.Event()
 
     def read_output():
         """Read and display bot output."""
-        for line in process.stdout:
-            click.echo(line.rstrip())
+        try:
+            for line in iter(process.stdout.readline, ""):
+                if not line:
+                    break
+                output_queue.put(line.rstrip())
+        except Exception:
+            pass
+        finally:
+            output_stopped.set()
 
     output_thread = threading.Thread(target=read_output, daemon=True)
     output_thread.start()
 
     try:
         while True:
+            # Display any available output
+            try:
+                while True:
+                    line = output_queue.get_nowait()
+                    click.echo(line)
+            except queue.Empty:
+                pass
+
             # Check if process is still running
             if process.poll() is not None:
                 click.secho("\n⚠️  Bot process exited", fg="yellow")
                 # Read remaining output
-                remaining_output = process.stdout.read()
-                if remaining_output:
-                    click.echo(remaining_output)
+                output_stopped.wait(timeout=0.5)
+                try:
+                    while True:
+                        line = output_queue.get_nowait()
+                        click.echo(line)
+                except queue.Empty:
+                    pass
+                # Also try to read any remaining output directly
+                try:
+                    remaining = process.stdout.read()
+                    if remaining:
+                        click.echo(remaining)
+                except Exception:
+                    pass
                 break
 
             # Check if restart requested
