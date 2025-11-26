@@ -1,5 +1,6 @@
 """Run bot in development mode with auto-reload."""
 
+import os
 import queue
 import subprocess
 import sys
@@ -159,12 +160,15 @@ def _run_with_reload(bot_path: Path, python_executable: str = None) -> None:
 
     def start_bot():
         """Start the bot process."""
+        env = os.environ.copy()
+        env["PYTHONUNBUFFERED"] = "1"
         return subprocess.Popen(
             [python_executable, "-u", str(bot_path)],  # -u for unbuffered output
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             text=True,
             bufsize=0,  # Unbuffered
+            env=env,
         )
 
     # Start initial bot process
