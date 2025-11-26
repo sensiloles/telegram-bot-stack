@@ -13,7 +13,7 @@
   ".github/workflows/release.yml": "a0aa904b6d13ba3675ccce74b7091a3d08658da75400f915a382a3bba58eb8c5",
   ".github/workflows/tests.yml": "827b5f7398d323cde8c7bc76ad4789227cec33eae421e38ed18e1cc925a35826",
   "docs/README.md": "e04237f063541ff56a49f3987a8cc13c99a840e731d122608c703c781ac76f24",
-  "telegram_bot_stack/cli/commands/dev.py": "8111b898ee8e891ae1ba49fd4e57917314a36774d71b5bd8de2638a3a05998b6",
+  "telegram_bot_stack/cli/commands/dev.py": "3bcc81da7a364bf92ff2782b1435d2b07d909d6f343c492ca6d8dcdf3717f4c6",
   "telegram_bot_stack/cli/commands/init.py": "5b3fb945ec4466d25cf69252fae85dc4b8c6672249620d4074d16aa74a9363d4",
   "telegram_bot_stack/cli/utils/dependencies.py": "7e1fbcf15618d4b1ed6b81bc671db20531bffe27183ddb0865c6116d5049ce2d",
   "telegram_bot_stack/cli/utils/makefile.py": "4f824a9fa948bc38d99e6093c99b714b4201a18ab8eaf55df598617ec1618b31",

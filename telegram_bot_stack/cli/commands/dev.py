@@ -210,18 +210,28 @@ def _run_with_reload(bot_path: Path, python_executable: str = None) -> None:
     output_thread = threading.Thread(target=read_output, daemon=True)
     output_thread.start()
 
+    # Give thread a moment to start reading
+    time.sleep(0.1)
+
     try:
         while True:
             # Display any available output (non-blocking)
             displayed_any = False
+            batch_lines = []
             try:
+                # Collect multiple lines at once for efficiency
                 while True:
                     line = output_queue.get_nowait()
-                    click.echo(line, nl=True)
-                    displayed_any = True
-                    sys.stdout.flush()  # Force flush
+                    batch_lines.append(line)
             except queue.Empty:
                 pass
+
+            # Display collected lines
+            if batch_lines:
+                for line in batch_lines:
+                    click.echo(line, nl=True)
+                sys.stdout.flush()  # Force flush after batch
+                displayed_any = True
 
             # Check if process is still running
             exit_code = process.poll()
