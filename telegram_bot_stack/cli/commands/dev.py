@@ -167,7 +167,7 @@ def _run_with_reload(bot_path: Path, python_executable: str = None) -> None:
         )
 
     # Start initial bot process
-    click.secho("🤖 Updating bot...\n", fg="cyan")
+    click.secho("🤖 Starting bot...\n", fg="cyan")
     process = start_bot()
 
     # Setup file watcher
@@ -264,7 +264,7 @@ def _run_with_reload(bot_path: Path, python_executable: str = None) -> None:
                 click.echo("")  # Empty line for separation
                 process.terminate()
                 process.wait(timeout=5)
-                click.secho("🤖 Starting bot...\n", fg="cyan")
+                click.secho("🤖 Updating bot...\n", fg="cyan")
                 process = start_bot()
                 restart_requested = False
                 # Restart output thread

@@ -8,7 +8,7 @@
     "project_name": "telegram-bot-stack",
     "description": "Test suite, fixtures, and testing utilities",
     "scope": "Unit tests, integration tests, fixtures",
-    "node_count": 36,
+    "node_count": 37,
     "edge_count": 15
   },
   "nodes": [
@@ -1443,6 +1443,31 @@
       "classes": [],
       "functions": [
         "create_test_structure"
+      ],
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium"
+    },
+    {
+      "id": "telegram_bot_stack.bot_base",
+      "name": "bot_base",
+      "type": "module",
+      "category": "implementation",
+      "path": "telegram_bot_stack/bot_base.py",
+      "description": "Module bot_base",
+      "lines_of_code": 592,
+      "complexity_score": 1,
+      "exports": [
+        "BotBase",
+        "get_welcome_message",
+        "register_handlers"
+      ],
+      "classes": [
+        "BotBase"
+      ],
+      "functions": [
+        "get_welcome_message",
+        "register_handlers"
       ],
       "dependencies": [],
       "dependents": [],

@@ -11,6 +11,7 @@ from telegram import (
     InlineKeyboardMarkup,
     Update,
 )
+from telegram.error import Conflict
 from telegram.ext import (
     Application,
     CallbackQueryHandler,
@@ -477,6 +478,33 @@ class BotBase:
 
     # Bot lifecycle methods
 
+    async def base_error_handler(
+        self, update: Optional[Update], context: ContextTypes.DEFAULT_TYPE
+    ) -> None:
+        """Handle errors from the telegram bot.
+
+        This is a base error handler that catches common errors like Conflict.
+        Subclasses can override this to add custom error handling.
+        """
+        error = context.error
+
+        # Handle Conflict error (multiple bot instances running)
+        if isinstance(error, Conflict):
+            logger.error(
+                "⚠️  Another bot instance with the same token is running. "
+                "Shutting down this instance..."
+            )
+            logger.error(
+                "💡 Tip: Make sure only one bot instance is running at a time."
+            )
+            # Stop the application
+            if self.application:
+                self.application.stop_running()
+            return
+
+        # Log other errors
+        logger.error(f"Error occurred: {error}", exc_info=context.error)
+
     def register_handlers(self):
         """Register all command handlers with the application.
 
@@ -504,6 +532,9 @@ class BotBase:
 
         # Add callback query handler for inline buttons
         self.application.add_handler(CallbackQueryHandler(self.handle_callback_query))
+
+        # Add base error handler
+        self.application.add_error_handler(self.base_error_handler)
 
     async def set_bot_commands(self):
         """Set bot commands in Telegram UI to make them visible."""
