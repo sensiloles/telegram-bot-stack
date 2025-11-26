@@ -258,7 +258,9 @@ def test_init_with_package_manager_poetry(tmp_path):
     runner = CliRunner()
 
     with runner.isolated_filesystem(temp_dir=tmp_path):
-        with patch("subprocess.run") as mock_subprocess:
+        with patch(
+            "telegram_bot_stack.cli.commands.init.subprocess.run"
+        ) as mock_subprocess:
             mock_subprocess.return_value = MagicMock(returncode=0)
 
             result = runner.invoke(
@@ -282,7 +284,9 @@ def test_init_with_package_manager_pdm(tmp_path):
     runner = CliRunner()
 
     with runner.isolated_filesystem(temp_dir=tmp_path):
-        with patch("subprocess.run") as mock_subprocess:
+        with patch(
+            "telegram_bot_stack.cli.commands.init.subprocess.run"
+        ) as mock_subprocess:
             mock_subprocess.return_value = MagicMock(returncode=0)
 
             result = runner.invoke(

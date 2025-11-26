@@ -5,5 +5,6 @@
   "telegram_bot_stack/cli/commands/init.py": "97980ca20268cc7beb8865f59915c30b8a2c40c5fac2a9de96f38c58dc5fde30",
   "telegram_bot_stack/cli/utils/testing.py": "79de429defc45b3bd78b57bc2475777f6952ac420fd058b823451b814ec5fa70",
   "pyproject.toml": "0fc88428fc94b817f790c14e1a9b8a30e38ec495713e08269dd099a0abd9c132",
-  "tests/cli/test_init_command.py": "d094c780a4463b01d027407e69da32f455f73b4b6dfb11a990f8362b104927e9"
+  "tests/cli/test_init_command.py": "ea843c370a4f25be48142d64cc50cd105b524f1ebd92244432d31ee3ede1853b",
+  ".github/workflows/tests.yml": "1a32120d805d849c91a848d568bb91723070f1da92e5d9ba1ab9474b448b4061"
 }

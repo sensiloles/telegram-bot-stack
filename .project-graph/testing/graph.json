@@ -590,7 +590,7 @@
       "type": "test_module",
       "path": "tests/cli/test_init_command.py",
       "description": "Tests for init command.",
-      "lines_of_code": 301,
+      "lines_of_code": 305,
       "exports": [
         "test_init_basic",
         "test_init_with_linting",
