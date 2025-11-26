@@ -9,7 +9,7 @@
     "description": "Test suite, fixtures, and testing utilities",
     "scope": "Unit tests, integration tests, fixtures",
     "node_count": 36,
-    "edge_count": 14
+    "edge_count": 15
   },
   "nodes": [
     {
@@ -1290,12 +1290,13 @@
       "category": "implementation",
       "path": "telegram_bot_stack/cli/commands/dev.py",
       "description": "Module dev",
-      "lines_of_code": 202,
+      "lines_of_code": 218,
       "complexity_score": 1,
       "exports": [
         "BotReloadHandler",
         "dev",
         "start_bot",
+        "read_output",
         "on_modified"
       ],
       "classes": [
@@ -1304,6 +1305,7 @@
       "functions": [
         "dev",
         "start_bot",
+        "read_output",
         "on_modified"
       ],
       "dependencies": [],
@@ -1545,6 +1547,13 @@
       "target": "telegram_bot_stack.cli.utils.git",
       "type": "imports",
       "description": "Imports from telegram_bot_stack.cli.utils.git"
+    },
+    {
+      "id": "edge_44",
+      "source": "telegram_bot_stack.cli.commands.dev",
+      "target": "telegram_bot_stack.cli.utils.venv",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.utils.venv"
     }
   ]
 }

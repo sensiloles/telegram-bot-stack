@@ -162,6 +162,7 @@ def _run_with_reload(bot_path: Path, python_executable: str = None) -> None:
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             text=True,
+            bufsize=1,  # Line buffered
         )
 
     # Start initial bot process
@@ -174,11 +175,26 @@ def _run_with_reload(bot_path: Path, python_executable: str = None) -> None:
     observer.schedule(event_handler, path=str(bot_path.parent), recursive=True)
     observer.start()
 
+    # Start reading bot output in background
+    import threading
+
+    def read_output():
+        """Read and display bot output."""
+        for line in process.stdout:
+            click.echo(line.rstrip())
+
+    output_thread = threading.Thread(target=read_output, daemon=True)
+    output_thread.start()
+
     try:
         while True:
             # Check if process is still running
             if process.poll() is not None:
                 click.secho("\n⚠️  Bot process exited", fg="yellow")
+                # Read remaining output
+                remaining_output = process.stdout.read()
+                if remaining_output:
+                    click.echo(remaining_output)
                 break
 
             # Check if restart requested
