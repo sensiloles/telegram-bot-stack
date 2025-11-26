@@ -87,11 +87,6 @@ def dev(reload: bool, bot_file: str) -> None:
         sys.exit(1)
 
     if reload:
-        click.secho(
-            "🤖 Starting bot in development mode (auto-reload enabled)...\n", fg="cyan"
-        )
-        click.echo("Press Ctrl+C to stop\n")
-
         try:
             # Use watchdog for auto-reload
             _run_with_reload(bot_path, python_executable)
@@ -172,8 +167,8 @@ def _run_with_reload(bot_path: Path, python_executable: str = None) -> None:
         )
 
     # Start initial bot process
+    click.secho("🤖 Updating bot...\n", fg="cyan")
     process = start_bot()
-    click.secho("✅ Bot started", fg="green")
 
     # Setup file watcher
     event_handler = BotReloadHandler()
@@ -266,12 +261,17 @@ def _run_with_reload(bot_path: Path, python_executable: str = None) -> None:
 
             # Check if restart requested
             if restart_requested:
-                click.echo("\n🔄 Code changed, restarting bot...")
+                click.echo("")  # Empty line for separation
                 process.terminate()
                 process.wait(timeout=5)
+                click.secho("🤖 Starting bot...\n", fg="cyan")
                 process = start_bot()
-                click.secho("✅ Bot restarted", fg="green")
                 restart_requested = False
+                # Restart output thread
+                output_stopped.clear()
+                output_thread = threading.Thread(target=read_output, daemon=True)
+                output_thread.start()
+                time.sleep(0.05)
 
             time.sleep(0.5)
 

@@ -95,7 +95,7 @@ def test_dev_reload_mode(tmp_path, monkeypatch):
 
         result = runner.invoke(cli, ["dev", "--reload"])
 
-        assert "auto-reload enabled" in result.output
+        # Verify _run_with_reload was called
         mock_reload.assert_called_once()
 
 

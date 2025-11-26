@@ -13,12 +13,13 @@
   ".github/workflows/release.yml": "a0aa904b6d13ba3675ccce74b7091a3d08658da75400f915a382a3bba58eb8c5",
   ".github/workflows/tests.yml": "827b5f7398d323cde8c7bc76ad4789227cec33eae421e38ed18e1cc925a35826",
   "docs/README.md": "e04237f063541ff56a49f3987a8cc13c99a840e731d122608c703c781ac76f24",
-  "telegram_bot_stack/cli/commands/dev.py": "fb00ba21f7525ad557dc4d66783c6e7165f8a3a701114cb6ac56d9f45d77fde2",
+  "telegram_bot_stack/cli/commands/dev.py": "80ae1fd240928ecd46f471635c80c84c11f42aa81b6ebe45713a90373d9de84f",
   "telegram_bot_stack/cli/commands/init.py": "5b3fb945ec4466d25cf69252fae85dc4b8c6672249620d4074d16aa74a9363d4",
   "telegram_bot_stack/cli/utils/dependencies.py": "7e1fbcf15618d4b1ed6b81bc671db20531bffe27183ddb0865c6116d5049ce2d",
   "telegram_bot_stack/cli/utils/makefile.py": "4f824a9fa948bc38d99e6093c99b714b4201a18ab8eaf55df598617ec1618b31",
   "telegram_bot_stack/cli/utils/venv.py": "d17964effd5a0b791f375d0b3ab18222aaacec244252f2595b616fcc5fa29cfc",
   "tests/cli/test_init_command.py": "4976391a53c20e92b6d4a8f191d13e2525083dd66642dc488d096b5a4f76841f",
   "telegram_bot_stack/cli/utils/git.py": "4e7d5f4b4827684ad3c66672547a694f0a7e003779335923265b14b1edf1d801",
-  "telegram_bot_stack/cli/utils/testing.py": "870880bcbc01c74e12e4638e638c1230d2e6a887df7f1e1baf1c1c915e9af3cf"
+  "telegram_bot_stack/cli/utils/testing.py": "870880bcbc01c74e12e4638e638c1230d2e6a887df7f1e1baf1c1c915e9af3cf",
+  "tests/cli/test_dev_command.py": "1d605f15d236d3206dc75663f0618cebb05e0cb8467bc7afc02da8259c3278a4"
 }
