@@ -98,6 +98,9 @@ data/
 logs/
 backups/
 
+# Telegram Bot - Dev Lock
+.bot.lock
+
 # Python
 __pycache__/
 *.py[cod]

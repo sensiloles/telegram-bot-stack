@@ -59,7 +59,7 @@
       "type": "module",
       "path": "telegram_bot_stack/cli/utils/git.py",
       "description": "Git initialization utilities.",
-      "lines_of_code": 219,
+      "lines_of_code": 222,
       "classes": [],
       "functions": [
         "init_git",
