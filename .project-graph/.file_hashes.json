@@ -16,7 +16,7 @@
   "telegram_bot_stack/cli/commands/dev.py": "80ae1fd240928ecd46f471635c80c84c11f42aa81b6ebe45713a90373d9de84f",
   "telegram_bot_stack/cli/commands/init.py": "5b3fb945ec4466d25cf69252fae85dc4b8c6672249620d4074d16aa74a9363d4",
   "telegram_bot_stack/cli/utils/dependencies.py": "7e1fbcf15618d4b1ed6b81bc671db20531bffe27183ddb0865c6116d5049ce2d",
-  "telegram_bot_stack/cli/utils/makefile.py": "4f824a9fa948bc38d99e6093c99b714b4201a18ab8eaf55df598617ec1618b31",
+  "telegram_bot_stack/cli/utils/makefile.py": "6a1e6431dd0d54aff6442c88ac8c72829780e220d6ae6f727d0d382604e3c4c9",
   "telegram_bot_stack/cli/utils/venv.py": "d17964effd5a0b791f375d0b3ab18222aaacec244252f2595b616fcc5fa29cfc",
   "tests/cli/test_init_command.py": "4976391a53c20e92b6d4a8f191d13e2525083dd66642dc488d096b5a4f76841f",
   "telegram_bot_stack/cli/utils/git.py": "4e7d5f4b4827684ad3c66672547a694f0a7e003779335923265b14b1edf1d801",

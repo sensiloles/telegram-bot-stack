@@ -44,10 +44,10 @@ type-check: ## Type checking
 	@venv/bin/mypy .
 
 dev: ## Run bot in development mode
-	@telegram-bot-stack dev
+	@venv/bin/telegram-bot-stack dev
 
 validate: ## Validate project configuration
-	@telegram-bot-stack validate
+	@venv/bin/telegram-bot-stack validate
 
 install: ## Install dependencies
 	@venv/bin/pip install -e .[dev]
