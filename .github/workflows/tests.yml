@@ -79,8 +79,6 @@ jobs:
       - name: Analyze test failures
         if: always() && steps.pytest.outcome != 'success'
         run: |
-          echo "::group::🔍 Analyzing test failures"
-
           # Extract failed tests
           FAILED_TESTS=$(grep "FAILED" pytest_output.log | head -20 || echo "No specific test failures found")
 
@@ -90,9 +88,42 @@ jobs:
           # Extract type errors
           TYPE_ERRORS=$(grep -A 3 "TypeError\|AttributeError" pytest_output.log | head -20 || echo "")
 
-          echo "::endgroup::"
+          # Print to console with error annotation
+          echo "::error::❌ Tests failed on Python ${{ matrix.python-version }}"
+          echo ""
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "🔍 TEST FAILURE ANALYSIS - Python ${{ matrix.python-version }}"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo ""
 
-          # Write to summary
+          if [ -n "$SYNTAX_ERRORS" ]; then
+            echo "🚨 SYNTAX/IMPORT ERRORS DETECTED:"
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            echo "$SYNTAX_ERRORS"
+            echo ""
+            echo "💡 LIKELY CAUSE: Python version incompatibility"
+            echo "   Using Python 3.10+ syntax on Python 3.9"
+            echo "   Common issues: dict[str, Any], list[int], X | Y union types"
+            echo ""
+            echo "🔧 FIX: Use typing module imports (Dict, List, Union, Optional)"
+            echo ""
+          fi
+
+          if [ -n "$TYPE_ERRORS" ]; then
+            echo "⚠️  TYPE ERRORS DETECTED:"
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            echo "$TYPE_ERRORS"
+            echo ""
+          fi
+
+          echo "📋 FAILED TESTS:"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "$FAILED_TESTS"
+          echo ""
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo ""
+
+          # Also write to summary for Summary tab
           echo "### ❌ Test Failures on Python ${{ matrix.python-version }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
 
@@ -138,6 +169,18 @@ jobs:
         if: steps.pytest.outcome != 'success'
         run: |
           echo "::error::Tests failed on Python ${{ matrix.python-version }}"
+          echo ""
+          echo "╔════════════════════════════════════════════════════════════════════════════════╗"
+          echo "║                                                                                ║"
+          echo "║  ❌ TESTS FAILED ON PYTHON ${{ matrix.python-version }}                                                ║"
+          echo "║                                                                                ║"
+          echo "║  Check the 'Analyze test failures' step above for:                            ║"
+          echo "║  • Syntax/Import errors (Python compatibility issues)                         ║"
+          echo "║  • Type errors                                                                 ║"
+          echo "║  • List of failed tests                                                        ║"
+          echo "║                                                                                ║"
+          echo "╚════════════════════════════════════════════════════════════════════════════════╝"
+          echo ""
           exit 1
 
       - name: Upload coverage to Codecov
@@ -230,18 +273,31 @@ jobs:
       - name: Analyze linting errors
         if: always() && steps.ruff_lint.outcome != 'success'
         run: |
-          echo "### ❌ Linting Errors Detected" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-
           # Count errors by type
           ERROR_COUNT=$(grep -c "error:" ruff_lint.log || echo "0")
           WARNING_COUNT=$(grep -c "warning:" ruff_lint.log || echo "0")
 
+          # Print to console
+          echo "::error::❌ Linting errors detected"
+          echo ""
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "🎨 LINTING ERRORS"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "Errors: $ERROR_COUNT | Warnings: $WARNING_COUNT"
+          echo ""
+          echo "Top 20 issues:"
+          head -20 ruff_lint.log
+          echo ""
+          echo "🔧 FIX: Run 'ruff check . --fix' locally to auto-fix issues"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo ""
+
+          # Also write to summary
+          echo "### ❌ Linting Errors Detected" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Errors:** $ERROR_COUNT" >> $GITHUB_STEP_SUMMARY
           echo "**Warnings:** $WARNING_COUNT" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-
-          # Show first 20 errors
           echo "#### Top Issues" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
@@ -263,11 +319,26 @@ jobs:
       - name: Analyze formatting errors
         if: always() && steps.ruff_format.outcome != 'success'
         run: |
-          echo "### ❌ Formatting Issues Detected" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-
           # Extract files that need formatting
           UNFORMATTED_FILES=$(grep "Would reformat:" ruff_format.log || echo "")
+
+          # Print to console
+          echo "::error::❌ Formatting issues detected"
+          echo ""
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "🎨 FORMATTING ISSUES"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          if [ -n "$UNFORMATTED_FILES" ]; then
+            echo "$UNFORMATTED_FILES"
+          fi
+          echo ""
+          echo "🔧 FIX: Run 'ruff format .' locally to format code"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo ""
+
+          # Also write to summary
+          echo "### ❌ Formatting Issues Detected" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
 
           if [ -n "$UNFORMATTED_FILES" ]; then
             echo "#### Files needing formatting:" >> $GITHUB_STEP_SUMMARY

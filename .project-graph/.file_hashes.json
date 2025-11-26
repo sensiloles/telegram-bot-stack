@@ -6,6 +6,6 @@
   "telegram_bot_stack/cli/utils/testing.py": "79de429defc45b3bd78b57bc2475777f6952ac420fd058b823451b814ec5fa70",
   "pyproject.toml": "0fc88428fc94b817f790c14e1a9b8a30e38ec495713e08269dd099a0abd9c132",
   "tests/cli/test_init_command.py": "ea843c370a4f25be48142d64cc50cd105b524f1ebd92244432d31ee3ede1853b",
-  ".github/workflows/tests.yml": "30b5fe71b288f61c1a6f87920d6bdc8d89b5c78e2e3034e951d969f14a69c65c",
+  ".github/workflows/tests.yml": "0212aa4858004b2d4c6b0643286a60677fd89c9dd9c8deb5e8a39f25130bb259",
   "telegram_bot_stack/storage/memory.py": "8cc73ae0460d66caaed9e2f95a273adc7d4222155fe1e6d51316999874df35c3"
 }
