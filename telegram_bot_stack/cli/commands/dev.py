@@ -182,7 +182,7 @@ def _run_with_reload(bot_path: Path, python_executable: str = None) -> None:
     observer.start()
 
     # Start reading bot output in background
-    output_queue = queue.Queue()
+    output_queue = queue.Queue(maxsize=1000)  # Large queue to avoid blocking
     output_stopped = threading.Event()
 
     def read_output():
@@ -193,12 +193,15 @@ def _run_with_reload(bot_path: Path, python_executable: str = None) -> None:
                 if not line:
                     if process.poll() is not None:
                         break
-                    time.sleep(0.01)  # Small sleep to avoid busy waiting
+                    time.sleep(0.005)  # Very small sleep to avoid busy waiting
                     continue
-                # Put line in queue (keep newline for proper formatting)
+                # Put line in queue immediately
                 line_stripped = line.rstrip()
                 if line_stripped:  # Only queue non-empty lines
-                    output_queue.put(line_stripped)
+                    output_queue.put(line_stripped, block=False)
+        except queue.Full:
+            # Queue is full, skip this line (shouldn't happen with default queue)
+            pass
         except Exception as e:
             click.echo(f"Error reading output: {e}", err=True)
         finally:

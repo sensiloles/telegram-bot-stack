@@ -271,7 +271,7 @@
       "type": "module",
       "path": "telegram_bot_stack/cli/commands/dev.py",
       "description": "Run bot in development mode with auto-reload.",
-      "lines_of_code": 270,
+      "lines_of_code": 273,
       "classes": [
         "BotReloadHandler"
       ],
