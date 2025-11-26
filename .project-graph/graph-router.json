@@ -1,6 +1,6 @@
 {
   "version": "3.0.0",
-  "generated_at": "2025-11-25",
+  "generated_at": "2025-11-26",
   "description": "Router for selecting appropriate dependency graph based on task type",
   "architecture": "Multi-graph system for efficient AI agent navigation",
   "metadata": {
@@ -177,7 +177,7 @@
       "description": "Project documentation files",
       "node_count": 11,
       "edge_count": 0,
-      "lines": 105,
+      "lines": 125,
       "scope": "User guides, API reference, setup instructions",
       "coverage": {
         "directories": [
@@ -213,7 +213,7 @@
       "description": "Example bot implementations and usage patterns",
       "node_count": 10,
       "edge_count": 7,
-      "lines": 323,
+      "lines": 315,
       "scope": "Example bots demonstrating framework features",
       "coverage": {
         "directories": [
@@ -252,7 +252,7 @@
       "description": "CI/CD workflows, automation scripts, and tooling",
       "node_count": 51,
       "edge_count": 0,
-      "lines": 578,
+      "lines": 816,
       "scope": "GitHub Actions, automation scripts, deployment",
       "coverage": {
         "directories": [
@@ -331,7 +331,7 @@
       "description": "Test suite, fixtures, and testing utilities",
       "node_count": 26,
       "edge_count": 0,
-      "lines": 1145,
+      "lines": 1461,
       "scope": "Unit tests, integration tests, fixtures",
       "coverage": {
         "directories": [

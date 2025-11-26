@@ -157,10 +157,12 @@ def find_imports_in_files(
         project_root: Project root path
 
     Returns:
-        List of edges (import relationships)
+        List of edges (import relationships) - deduplicated
     """
     edges = []
     edge_id = 1
+    # Track existing edges to avoid duplicates
+    seen_edges = set()
 
     for file_path in files:
         if not file_path.suffix == ".py":
@@ -191,6 +193,16 @@ def find_imports_in_files(
                             "examples",
                         ]:
                             target_id = node.module
+
+                            # Create edge key for deduplication
+                            edge_key = (source_id, target_id, "imports")
+
+                            # Skip if edge already exists
+                            if edge_key in seen_edges:
+                                continue
+
+                            seen_edges.add(edge_key)
+
                             edges.append(
                                 {
                                     "id": f"edge_{edge_id}",

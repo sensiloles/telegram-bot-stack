@@ -8,8 +8,8 @@
     "project_name": "telegram-bot-stack",
     "description": "Test suite, fixtures, and testing utilities",
     "scope": "Unit tests, integration tests, fixtures",
-    "node_count": 39,
-    "edge_count": 16
+    "node_count": 26,
+    "edge_count": 33
   },
   "nodes": [
     {
@@ -694,6 +694,48 @@
       ]
     },
     {
+      "id": "tests.cli.test_vps_utils",
+      "name": "test_vps_utils",
+      "type": "test_module",
+      "path": "tests/cli/test_vps_utils.py",
+      "description": "Tests for VPS utilities.",
+      "lines_of_code": 161,
+      "exports": [
+        "TestVPSConnection",
+        "TestCheckDockerComposeInstalled",
+        "test_init",
+        "test_test_connection_success",
+        "test_test_connection_failure",
+        "test_run_command_success",
+        "test_run_command_failure",
+        "test_check_docker_installed_true",
+        "test_check_docker_installed_false",
+        "test_install_docker_success",
+        "test_install_docker_failure",
+        "test_close_connection",
+        "test_docker_compose_installed",
+        "test_docker_compose_not_installed"
+      ],
+      "classes": [
+        "TestVPSConnection",
+        "TestCheckDockerComposeInstalled"
+      ],
+      "functions": [
+        "test_init",
+        "test_test_connection_success",
+        "test_test_connection_failure",
+        "test_run_command_success",
+        "test_run_command_failure",
+        "test_check_docker_installed_true",
+        "test_check_docker_installed_false",
+        "test_install_docker_success",
+        "test_install_docker_failure",
+        "test_close_connection",
+        "test_docker_compose_installed",
+        "test_docker_compose_not_installed"
+      ]
+    },
+    {
       "id": "tests.cli.test_cli_main",
       "name": "test_cli_main",
       "type": "test_module",
@@ -767,6 +809,48 @@
       ]
     },
     {
+      "id": "tests.cli.test_deployment_utils",
+      "name": "test_deployment_utils",
+      "type": "test_module",
+      "path": "tests/cli/test_deployment_utils.py",
+      "description": "Tests for deployment utilities.",
+      "lines_of_code": 177,
+      "exports": [
+        "TestDeploymentConfig",
+        "TestDockerTemplateRenderer",
+        "TestCreateEnvFile",
+        "test_create_new_config",
+        "test_load_existing_config",
+        "test_nested_keys",
+        "test_get_with_default",
+        "test_validate_valid_config",
+        "test_validate_invalid_config",
+        "test_render_dockerfile",
+        "test_render_compose",
+        "test_render_all",
+        "test_create_env_file_with_token",
+        "test_create_env_file_without_token"
+      ],
+      "classes": [
+        "TestDeploymentConfig",
+        "TestDockerTemplateRenderer",
+        "TestCreateEnvFile"
+      ],
+      "functions": [
+        "test_create_new_config",
+        "test_load_existing_config",
+        "test_nested_keys",
+        "test_get_with_default",
+        "test_validate_valid_config",
+        "test_validate_invalid_config",
+        "test_render_dockerfile",
+        "test_render_compose",
+        "test_render_all",
+        "test_create_env_file_with_token",
+        "test_create_env_file_without_token"
+      ]
+    },
+    {
       "id": "tests.cli.test_new_command",
       "name": "test_new_command",
       "type": "test_module",
@@ -791,6 +875,62 @@
         "test_new_existing_directory",
         "test_new_default_template",
         "test_new_help"
+      ]
+    },
+    {
+      "id": "tests.cli.test_deploy_command",
+      "name": "test_deploy_command",
+      "type": "test_module",
+      "path": "tests/cli/test_deploy_command.py",
+      "description": "Tests for deploy command.",
+      "lines_of_code": 286,
+      "exports": [
+        "TestDeployInit",
+        "TestDeployUp",
+        "TestDeployStatus",
+        "TestDeployLogs",
+        "TestDeployDown",
+        "TestDeployUpdate",
+        "runner",
+        "temp_deploy_config",
+        "test_init_with_options",
+        "test_init_connection_failure",
+        "test_up_without_config",
+        "test_up_with_valid_config",
+        "test_status_without_config",
+        "test_status_with_config",
+        "test_logs_without_config",
+        "test_logs_with_config",
+        "test_down_without_config",
+        "test_down_with_config",
+        "test_down_with_cleanup",
+        "test_update_without_config",
+        "test_update_with_config"
+      ],
+      "classes": [
+        "TestDeployInit",
+        "TestDeployUp",
+        "TestDeployStatus",
+        "TestDeployLogs",
+        "TestDeployDown",
+        "TestDeployUpdate"
+      ],
+      "functions": [
+        "runner",
+        "temp_deploy_config",
+        "test_init_with_options",
+        "test_init_connection_failure",
+        "test_up_without_config",
+        "test_up_with_valid_config",
+        "test_status_without_config",
+        "test_status_with_config",
+        "test_logs_without_config",
+        "test_logs_with_config",
+        "test_down_without_config",
+        "test_down_with_config",
+        "test_down_with_cleanup",
+        "test_update_without_config",
+        "test_update_with_config"
       ]
     },
     {
@@ -1048,616 +1188,239 @@
         "test_all_bots_have_main_function",
         "test_all_bots_use_post_init_wrapper"
       ]
-    },
-    {
-      "id": "telegram_bot_stack.cli.commands.deploy",
-      "name": "deploy",
-      "type": "module",
-      "category": "implementation",
-      "path": "telegram_bot_stack/cli/commands/deploy.py",
-      "description": "Module deploy",
-      "lines_of_code": 426,
-      "complexity_score": 1,
-      "exports": [
-        "deploy",
-        "init",
-        "up",
-        "update",
-        "status",
-        "logs",
-        "down"
-      ],
-      "classes": [],
-      "functions": [
-        "deploy",
-        "init",
-        "up",
-        "update",
-        "status",
-        "logs",
-        "down"
-      ],
-      "dependencies": [],
-      "dependents": [],
-      "criticality": "medium"
-    },
-    {
-      "id": "telegram_bot_stack.cli.main",
-      "name": "main",
-      "type": "module",
-      "category": "implementation",
-      "path": "telegram_bot_stack/cli/main.py",
-      "description": "Module main",
-      "lines_of_code": 41,
-      "complexity_score": 1,
-      "exports": [
-        "cli",
-        "main"
-      ],
-      "classes": [],
-      "functions": [
-        "cli",
-        "main"
-      ],
-      "dependencies": [],
-      "dependents": [],
-      "criticality": "medium"
-    },
-    {
-      "id": "telegram_bot_stack.cli.utils.deployment",
-      "name": "deployment",
-      "type": "module",
-      "category": "implementation",
-      "path": "telegram_bot_stack/cli/utils/deployment.py",
-      "description": "Module deployment",
-      "lines_of_code": 245,
-      "complexity_score": 1,
-      "exports": [
-        "DeploymentConfig",
-        "DockerTemplateRenderer",
-        "create_env_file",
-        "load",
-        "save",
-        "get",
-        "set",
-        "validate",
-        "render_dockerfile",
-        "render_compose",
-        "render_dockerignore",
-        "render_makefile",
-        "render_all"
-      ],
-      "classes": [
-        "DeploymentConfig",
-        "DockerTemplateRenderer"
-      ],
-      "functions": [
-        "create_env_file",
-        "load",
-        "save",
-        "get",
-        "set",
-        "validate",
-        "render_dockerfile",
-        "render_compose",
-        "render_dockerignore",
-        "render_makefile",
-        "render_all"
-      ],
-      "dependencies": [],
-      "dependents": [],
-      "criticality": "medium"
-    },
-    {
-      "id": "telegram_bot_stack.cli.utils.vps",
-      "name": "vps",
-      "type": "module",
-      "category": "implementation",
-      "path": "telegram_bot_stack/cli/utils/vps.py",
-      "description": "Module vps",
-      "lines_of_code": 200,
-      "complexity_score": 1,
-      "exports": [
-        "VPSConnection",
-        "check_docker_compose_installed",
-        "test_connection",
-        "connect",
-        "run_command",
-        "check_docker_installed",
-        "install_docker",
-        "transfer_files",
-        "close"
-      ],
-      "classes": [
-        "VPSConnection"
-      ],
-      "functions": [
-        "check_docker_compose_installed",
-        "test_connection",
-        "connect",
-        "run_command",
-        "check_docker_installed",
-        "install_docker",
-        "transfer_files",
-        "close"
-      ],
-      "dependencies": [],
-      "dependents": [],
-      "criticality": "medium"
-    },
-    {
-      "id": "tests.cli.test_deploy_command",
-      "name": "test_deploy_command",
-      "type": "test_module",
-      "category": "implementation",
-      "path": "tests/cli/test_deploy_command.py",
-      "description": "Module test_deploy_command",
-      "lines_of_code": 286,
-      "complexity_score": 1,
-      "exports": [
-        "TestDeployInit",
-        "TestDeployUp",
-        "TestDeployStatus",
-        "TestDeployLogs",
-        "TestDeployDown",
-        "TestDeployUpdate",
-        "runner",
-        "temp_deploy_config",
-        "test_init_with_options",
-        "test_init_connection_failure",
-        "test_up_without_config",
-        "test_up_with_valid_config",
-        "test_status_without_config",
-        "test_status_with_config",
-        "test_logs_without_config",
-        "test_logs_with_config",
-        "test_down_without_config",
-        "test_down_with_config",
-        "test_down_with_cleanup",
-        "test_update_without_config",
-        "test_update_with_config"
-      ],
-      "classes": [
-        "TestDeployInit",
-        "TestDeployUp",
-        "TestDeployStatus",
-        "TestDeployLogs",
-        "TestDeployDown",
-        "TestDeployUpdate"
-      ],
-      "functions": [
-        "runner",
-        "temp_deploy_config",
-        "test_init_with_options",
-        "test_init_connection_failure",
-        "test_up_without_config",
-        "test_up_with_valid_config",
-        "test_status_without_config",
-        "test_status_with_config",
-        "test_logs_without_config",
-        "test_logs_with_config",
-        "test_down_without_config",
-        "test_down_with_config",
-        "test_down_with_cleanup",
-        "test_update_without_config",
-        "test_update_with_config"
-      ],
-      "dependencies": [],
-      "dependents": [],
-      "criticality": "medium"
-    },
-    {
-      "id": "tests.cli.test_deployment_utils",
-      "name": "test_deployment_utils",
-      "type": "test_module",
-      "category": "implementation",
-      "path": "tests/cli/test_deployment_utils.py",
-      "description": "Module test_deployment_utils",
-      "lines_of_code": 177,
-      "complexity_score": 1,
-      "exports": [
-        "TestDeploymentConfig",
-        "TestDockerTemplateRenderer",
-        "TestCreateEnvFile",
-        "test_create_new_config",
-        "test_load_existing_config",
-        "test_nested_keys",
-        "test_get_with_default",
-        "test_validate_valid_config",
-        "test_validate_invalid_config",
-        "test_render_dockerfile",
-        "test_render_compose",
-        "test_render_all",
-        "test_create_env_file_with_token",
-        "test_create_env_file_without_token"
-      ],
-      "classes": [
-        "TestDeploymentConfig",
-        "TestDockerTemplateRenderer",
-        "TestCreateEnvFile"
-      ],
-      "functions": [
-        "test_create_new_config",
-        "test_load_existing_config",
-        "test_nested_keys",
-        "test_get_with_default",
-        "test_validate_valid_config",
-        "test_validate_invalid_config",
-        "test_render_dockerfile",
-        "test_render_compose",
-        "test_render_all",
-        "test_create_env_file_with_token",
-        "test_create_env_file_without_token"
-      ],
-      "dependencies": [],
-      "dependents": [],
-      "criticality": "medium"
-    },
-    {
-      "id": "telegram_bot_stack.cli.commands.dev",
-      "name": "dev",
-      "type": "module",
-      "category": "implementation",
-      "path": "telegram_bot_stack/cli/commands/dev.py",
-      "description": "Module dev",
-      "lines_of_code": 295,
-      "complexity_score": 1,
-      "exports": [
-        "BotReloadHandler",
-        "dev",
-        "start_bot",
-        "read_output",
-        "on_modified"
-      ],
-      "classes": [
-        "BotReloadHandler"
-      ],
-      "functions": [
-        "dev",
-        "start_bot",
-        "read_output",
-        "on_modified"
-      ],
-      "dependencies": [],
-      "dependents": [],
-      "criticality": "medium"
-    },
-    {
-      "id": "telegram_bot_stack.cli.commands.init",
-      "name": "init",
-      "type": "module",
-      "category": "implementation",
-      "path": "telegram_bot_stack/cli/commands/init.py",
-      "description": "Module init",
-      "lines_of_code": 812,
-      "complexity_score": 1,
-      "exports": [
-        "init"
-      ],
-      "classes": [],
-      "functions": [
-        "init"
-      ],
-      "dependencies": [],
-      "dependents": [],
-      "criticality": "medium"
-    },
-    {
-      "id": "telegram_bot_stack.cli.utils.dependencies",
-      "name": "dependencies",
-      "type": "module",
-      "category": "implementation",
-      "path": "telegram_bot_stack/cli/utils/dependencies.py",
-      "description": "Module dependencies",
-      "lines_of_code": 215,
-      "complexity_score": 1,
-      "exports": [
-        "install_package",
-        "install_requirements",
-        "create_requirements_file",
-        "create_pyproject_toml"
-      ],
-      "classes": [],
-      "functions": [
-        "install_package",
-        "install_requirements",
-        "create_requirements_file",
-        "create_pyproject_toml"
-      ],
-      "dependencies": [],
-      "dependents": [],
-      "criticality": "medium"
-    },
-    {
-      "id": "telegram_bot_stack.cli.utils.makefile",
-      "name": "makefile",
-      "type": "module",
-      "category": "implementation",
-      "path": "telegram_bot_stack/cli/utils/makefile.py",
-      "description": "Module makefile",
-      "lines_of_code": 64,
-      "complexity_score": 1,
-      "exports": [
-        "create_makefile"
-      ],
-      "classes": [],
-      "functions": [
-        "create_makefile"
-      ],
-      "dependencies": [],
-      "dependents": [],
-      "criticality": "medium"
-    },
-    {
-      "id": "telegram_bot_stack.cli.utils.venv",
-      "name": "venv",
-      "type": "module",
-      "category": "implementation",
-      "path": "telegram_bot_stack/cli/utils/venv.py",
-      "description": "Module venv",
-      "lines_of_code": 138,
-      "complexity_score": 1,
-      "exports": [
-        "create_virtualenv",
-        "get_venv_python",
-        "get_venv_pip",
-        "get_activation_command",
-        "find_venv"
-      ],
-      "classes": [],
-      "functions": [
-        "create_virtualenv",
-        "get_venv_python",
-        "get_venv_pip",
-        "get_activation_command",
-        "find_venv"
-      ],
-      "dependencies": [],
-      "dependents": [],
-      "criticality": "medium"
-    },
-    {
-      "id": "telegram_bot_stack.cli.utils.git",
-      "name": "git",
-      "type": "module",
-      "category": "implementation",
-      "path": "telegram_bot_stack/cli/utils/git.py",
-      "description": "Module git",
-      "lines_of_code": 222,
-      "complexity_score": 1,
-      "exports": [
-        "init_git",
-        "create_gitignore"
-      ],
-      "classes": [],
-      "functions": [
-        "init_git",
-        "create_gitignore"
-      ],
-      "dependencies": [],
-      "dependents": [],
-      "criticality": "medium"
-    },
-    {
-      "id": "telegram_bot_stack.cli.utils.testing",
-      "name": "testing",
-      "type": "module",
-      "category": "implementation",
-      "path": "telegram_bot_stack/cli/utils/testing.py",
-      "description": "Module testing",
-      "lines_of_code": 104,
-      "complexity_score": 1,
-      "exports": [
-        "create_test_structure"
-      ],
-      "classes": [],
-      "functions": [
-        "create_test_structure"
-      ],
-      "dependencies": [],
-      "dependents": [],
-      "criticality": "medium"
-    },
-    {
-      "id": "telegram_bot_stack.bot_base",
-      "name": "bot_base",
-      "type": "module",
-      "category": "implementation",
-      "path": "telegram_bot_stack/bot_base.py",
-      "description": "Module bot_base",
-      "lines_of_code": 647,
-      "complexity_score": 1,
-      "exports": [
-        "BotBase",
-        "get_welcome_message",
-        "register_handlers"
-      ],
-      "classes": [
-        "BotBase"
-      ],
-      "functions": [
-        "get_welcome_message",
-        "register_handlers"
-      ],
-      "dependencies": [],
-      "dependents": [],
-      "criticality": "medium"
-    },
-    {
-      "id": "telegram_bot_stack.cli.utils.bot_lock",
-      "name": "bot_lock",
-      "type": "module",
-      "category": "implementation",
-      "path": "telegram_bot_stack/cli/utils/bot_lock.py",
-      "description": "Module bot_lock",
-      "lines_of_code": 142,
-      "complexity_score": 1,
-      "exports": [
-        "BotLockManager",
-        "with_bot_lock",
-        "is_process_running",
-        "acquire_lock",
-        "release_lock",
-        "wrapper"
-      ],
-      "classes": [
-        "BotLockManager"
-      ],
-      "functions": [
-        "with_bot_lock",
-        "is_process_running",
-        "acquire_lock",
-        "release_lock",
-        "wrapper"
-      ],
-      "dependencies": [],
-      "dependents": [],
-      "criticality": "medium"
-    },
-    {
-      "id": "telegram_bot_stack.storage.memory",
-      "name": "memory",
-      "type": "module",
-      "category": "implementation",
-      "path": "telegram_bot_stack/storage/memory.py",
-      "description": "Module memory",
-      "lines_of_code": 110,
-      "complexity_score": 1,
-      "exports": [
-        "MemoryStorage",
-        "save",
-        "load",
-        "exists",
-        "delete",
-        "clear"
-      ],
-      "classes": [
-        "MemoryStorage"
-      ],
-      "functions": [
-        "save",
-        "load",
-        "exists",
-        "delete",
-        "clear"
-      ],
-      "dependencies": [],
-      "dependents": [],
-      "criticality": "medium"
     }
   ],
   "edges": [
     {
-      "id": "edge_22",
+      "id": "edge_1",
+      "source": "tests.conftest",
+      "target": "telegram_bot_stack.admin_manager",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.admin_manager"
+    },
+    {
+      "id": "edge_2",
+      "source": "tests.conftest",
+      "target": "telegram_bot_stack.storage",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.storage"
+    },
+    {
+      "id": "edge_3",
+      "source": "tests.conftest",
+      "target": "telegram_bot_stack.user_manager",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.user_manager"
+    },
+    {
+      "id": "edge_4",
+      "source": "tests.core.test_sql_storage",
+      "target": "telegram_bot_stack.storage.sql",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.storage.sql"
+    },
+    {
+      "id": "edge_5",
+      "source": "tests.core.test_sql_storage",
+      "target": "telegram_bot_stack.storage",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.storage"
+    },
+    {
+      "id": "edge_6",
+      "source": "tests.core.test_decorators",
+      "target": "telegram_bot_stack",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack"
+    },
+    {
+      "id": "edge_7",
+      "source": "tests.core.test_decorators",
+      "target": "telegram_bot_stack.storage",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.storage"
+    },
+    {
+      "id": "edge_8",
+      "source": "tests.core.test_admin_manager",
+      "target": "telegram_bot_stack.admin_manager",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.admin_manager"
+    },
+    {
+      "id": "edge_9",
+      "source": "tests.core.test_admin_manager",
+      "target": "telegram_bot_stack.storage",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.storage"
+    },
+    {
+      "id": "edge_10",
+      "source": "tests.core.test_storage",
+      "target": "telegram_bot_stack.storage",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.storage"
+    },
+    {
+      "id": "edge_11",
+      "source": "tests.core.test_user_manager",
+      "target": "telegram_bot_stack.storage",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.storage"
+    },
+    {
+      "id": "edge_12",
+      "source": "tests.core.test_user_manager",
+      "target": "telegram_bot_stack.user_manager",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.user_manager"
+    },
+    {
+      "id": "edge_13",
+      "source": "tests.core.test_bot_base",
+      "target": "telegram_bot_stack.bot_base",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.bot_base"
+    },
+    {
+      "id": "edge_14",
+      "source": "tests.core.test_bot_base",
+      "target": "telegram_bot_stack.storage",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.storage"
+    },
+    {
+      "id": "edge_15",
+      "source": "tests.integration.test_full_flow",
+      "target": "telegram_bot_stack.bot_base",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.bot_base"
+    },
+    {
+      "id": "edge_16",
+      "source": "tests.integration.test_full_flow",
+      "target": "telegram_bot_stack.storage",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.storage"
+    },
+    {
+      "id": "edge_17",
       "source": "tests.cli.test_init_command",
       "target": "telegram_bot_stack.cli.main",
       "type": "imports",
       "description": "Imports from telegram_bot_stack.cli.main"
     },
     {
-      "id": "edge_24",
+      "id": "edge_18",
+      "source": "tests.cli.test_utils",
+      "target": "telegram_bot_stack.cli.utils",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.utils"
+    },
+    {
+      "id": "edge_19",
+      "source": "tests.cli.test_vps_utils",
+      "target": "telegram_bot_stack.cli.utils.vps",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.utils.vps"
+    },
+    {
+      "id": "edge_20",
       "source": "tests.cli.test_cli_main",
       "target": "telegram_bot_stack.cli.main",
       "type": "imports",
       "description": "Imports from telegram_bot_stack.cli.main"
     },
     {
-      "id": "edge_25",
+      "id": "edge_21",
       "source": "tests.cli.test_dev_command",
       "target": "telegram_bot_stack.cli.main",
       "type": "imports",
       "description": "Imports from telegram_bot_stack.cli.main"
     },
     {
-      "id": "edge_26",
+      "id": "edge_22",
       "source": "tests.cli.test_validate_command",
       "target": "telegram_bot_stack.cli.main",
       "type": "imports",
       "description": "Imports from telegram_bot_stack.cli.main"
     },
     {
-      "id": "edge_27",
-      "source": "tests.cli.test_new_command",
-      "target": "telegram_bot_stack.cli.main",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.cli.main"
-    },
-    {
-      "id": "edge_35",
-      "source": "telegram_bot_stack.cli.main",
-      "target": "telegram_bot_stack.cli.commands.deploy",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.cli.commands.deploy"
-    },
-    {
-      "id": "edge_36",
-      "source": "tests.cli.test_deploy_command",
-      "target": "telegram_bot_stack.cli.utils.deployment",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.cli.utils.deployment"
-    },
-    {
-      "id": "edge_37",
-      "source": "tests.cli.test_deploy_command",
-      "target": "telegram_bot_stack.cli.commands.deploy",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.cli.commands.deploy"
-    },
-    {
-      "id": "edge_38",
+      "id": "edge_23",
       "source": "tests.cli.test_deployment_utils",
       "target": "telegram_bot_stack.cli.utils.deployment",
       "type": "imports",
       "description": "Imports from telegram_bot_stack.cli.utils.deployment"
     },
     {
-      "id": "edge_39",
-      "source": "telegram_bot_stack.cli.utils.dependencies",
-      "target": "telegram_bot_stack.cli.utils.venv",
+      "id": "edge_24",
+      "source": "tests.cli.test_new_command",
+      "target": "telegram_bot_stack.cli.main",
       "type": "imports",
-      "description": "Imports from telegram_bot_stack.cli.utils.venv"
+      "description": "Imports from telegram_bot_stack.cli.main"
     },
     {
-      "id": "edge_40",
-      "source": "telegram_bot_stack.cli.commands.init",
-      "target": "telegram_bot_stack.cli.utils.venv",
+      "id": "edge_25",
+      "source": "tests.cli.test_deploy_command",
+      "target": "telegram_bot_stack.cli.commands.deploy",
       "type": "imports",
-      "description": "Imports from telegram_bot_stack.cli.utils.venv"
+      "description": "Imports from telegram_bot_stack.cli.commands.deploy"
     },
     {
-      "id": "edge_41",
-      "source": "telegram_bot_stack.cli.commands.init",
-      "target": "telegram_bot_stack.cli.utils.makefile",
+      "id": "edge_26",
+      "source": "tests.cli.test_deploy_command",
+      "target": "telegram_bot_stack.cli.utils.deployment",
       "type": "imports",
-      "description": "Imports from telegram_bot_stack.cli.utils.makefile"
+      "description": "Imports from telegram_bot_stack.cli.utils.deployment"
     },
     {
-      "id": "edge_42",
-      "source": "telegram_bot_stack.cli.commands.init",
-      "target": "telegram_bot_stack.cli.utils.dependencies",
+      "id": "edge_27",
+      "source": "tests.examples.test_reminder_bot",
+      "target": "telegram_bot_stack.storage",
       "type": "imports",
-      "description": "Imports from telegram_bot_stack.cli.utils.dependencies"
+      "description": "Imports from telegram_bot_stack.storage"
     },
     {
-      "id": "edge_43",
-      "source": "telegram_bot_stack.cli.commands.init",
-      "target": "telegram_bot_stack.cli.utils.git",
+      "id": "edge_28",
+      "source": "tests.examples.test_counter_bot",
+      "target": "telegram_bot_stack.storage",
       "type": "imports",
-      "description": "Imports from telegram_bot_stack.cli.utils.git"
+      "description": "Imports from telegram_bot_stack.storage"
     },
     {
-      "id": "edge_44",
-      "source": "telegram_bot_stack.cli.commands.dev",
-      "target": "telegram_bot_stack.cli.utils.venv",
+      "id": "edge_29",
+      "source": "tests.examples.test_poll_bot",
+      "target": "telegram_bot_stack.storage",
       "type": "imports",
-      "description": "Imports from telegram_bot_stack.cli.utils.venv"
+      "description": "Imports from telegram_bot_stack.storage"
     },
     {
-      "id": "edge_45",
-      "source": "telegram_bot_stack.cli.commands.init",
-      "target": "telegram_bot_stack.cli.utils.testing",
+      "id": "edge_30",
+      "source": "tests.examples.test_menu_bot",
+      "target": "telegram_bot_stack.storage",
       "type": "imports",
-      "description": "Imports from telegram_bot_stack.cli.utils.testing"
+      "description": "Imports from telegram_bot_stack.storage"
+    },
+    {
+      "id": "edge_31",
+      "source": "tests.examples.test_echo_bot",
+      "target": "telegram_bot_stack.storage",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.storage"
+    },
+    {
+      "id": "edge_32",
+      "source": "tests.examples.test_quit_smoking_bot",
+      "target": "telegram_bot_stack.storage",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.storage"
+    },
+    {
+      "id": "edge_33",
+      "source": "tests.examples.test_examples",
+      "target": "telegram_bot_stack.storage",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.storage"
     }
   ]
 }

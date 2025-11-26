@@ -149,6 +149,11 @@ def get_repo_from_git() -> str:
     """
     import subprocess
 
+    # Try environment variable first
+    repo = os.getenv("GITHUB_REPOSITORY")
+    if repo:
+        return repo
+
     try:
         result = subprocess.run(
             ["git", "remote", "get-url", "origin"],
@@ -183,6 +188,132 @@ def get_repo_from_git() -> str:
         print(f"❌ Error: {e}", file=sys.stderr)
         print("Please specify repository with --repo owner/repo", file=sys.stderr)
         sys.exit(1)
+
+
+def get_current_branch(default: Optional[str] = None) -> Optional[str]:
+    """Get current git branch name.
+
+    Args:
+        default: Value to return if branch detection fails
+
+    Returns:
+        Branch name or default value
+
+    Examples:
+        >>> branch = get_current_branch()  # Returns None if not in git repo
+        >>> branch = get_current_branch(default="unknown")  # Returns "unknown" if fails
+    """
+    import subprocess
+
+    try:
+        result = subprocess.run(
+            ["git", "branch", "--show-current"],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        branch = result.stdout.strip()
+        return branch if branch else default
+    except subprocess.CalledProcessError:
+        return default
+
+
+def validate_conventional_commit(title: str) -> bool:
+    """Validate conventional commit format.
+
+    Args:
+        title: Commit title to validate
+
+    Returns:
+        True if valid conventional commit format
+
+    Examples:
+        >>> validate_conventional_commit("feat: add new feature")
+        True
+        >>> validate_conventional_commit("feat(scope): add feature")
+        True
+        >>> validate_conventional_commit("feat!: breaking change")
+        True
+        >>> validate_conventional_commit("invalid commit")
+        False
+    """
+    import re
+
+    pattern = r"^(feat|fix|docs|style|refactor|perf|test|chore|ci)(\(.+\))?!?: .+"
+    return bool(re.match(pattern, title))
+
+
+def parse_commit_type(title: str) -> Optional[str]:
+    """Parse commit type from conventional commit title.
+
+    Args:
+        title: Commit title
+
+    Returns:
+        Commit type (feat, fix, docs, etc.) or None
+
+    Examples:
+        >>> parse_commit_type("feat: add feature")
+        'feat'
+        >>> parse_commit_type("fix(api): fix bug")
+        'fix'
+    """
+    import re
+
+    match = re.match(r"^(feat|fix|docs|style|refactor|perf|test|chore|ci)", title)
+    if match:
+        return match.group(1)
+    return None
+
+
+def get_label_for_commit_type(commit_type: str) -> Optional[str]:
+    """Get GitHub label for commit type.
+
+    Args:
+        commit_type: Commit type (feat, fix, docs, etc.)
+
+    Returns:
+        GitHub label name or None
+
+    Examples:
+        >>> get_label_for_commit_type("feat")
+        'enhancement'
+        >>> get_label_for_commit_type("fix")
+        'bug'
+    """
+    label_map = {
+        "feat": "enhancement",
+        "fix": "bug",
+        "docs": "documentation",
+        "test": "testing",
+        "perf": "performance",
+    }
+    return label_map.get(commit_type)
+
+
+def is_breaking_change(title: str) -> bool:
+    """Check if commit is a breaking change.
+
+    Args:
+        title: Commit title
+
+    Returns:
+        True if breaking change
+
+    Examples:
+        >>> is_breaking_change("feat!: breaking change")
+        True
+        >>> is_breaking_change("feat: BREAKING CHANGE: something")
+        True
+        >>> is_breaking_change("feat: normal change")
+        False
+    """
+    return "!" in title.split(":")[0] or "BREAKING CHANGE:" in title
+
+
+# Aliases for backward compatibility
+get_repository_name = get_repo_from_git  # Alias for common.py compatibility
+get_github_token = load_token  # Alias for common.py compatibility
 
 
 def format_issue_list(issues, show_labels: bool = True) -> str:

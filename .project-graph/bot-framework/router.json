@@ -1,7 +1,7 @@
 {
   "metadata": {
     "version": "3.0.0",
-    "generated_at": "2025-11-24",
+    "generated_at": "2025-11-26",
     "graph_id": "bot_framework",
     "graph_name": "Bot Framework",
     "graph_type": "domain_router",
@@ -16,8 +16,8 @@
       "graph_id": "bot_framework_cli",
       "name": "CLI",
       "description": "CLI tool for bot project management and development",
-      "modules": 18,
-      "lines_of_code": 2096,
+      "modules": 23,
+      "lines_of_code": 3904,
       "recommended_for": [
         "CLI command development",
         "Project scaffolding changes",
@@ -31,7 +31,7 @@
       "name": "Core",
       "description": "Core bot framework components",
       "modules": 4,
-      "lines_of_code": 863,
+      "lines_of_code": 949,
       "recommended_for": [
         "Adding new bot features",
         "Customizing bot behavior",
@@ -96,8 +96,10 @@
   ],
   "statistics": {
     "total_sub_graphs": 4,
-    "total_modules": 28,
-    "total_lines_of_code": 3825,
-    "cross_graph_edges": 3
+    "total_modules": 33,
+    "total_lines_of_code": 5719,
+    "cross_graph_edges": 3,
+    "total_nodes": 33,
+    "total_edges": 23
   }
 }

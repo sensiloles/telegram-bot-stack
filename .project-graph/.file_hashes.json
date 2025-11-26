@@ -1,11 +1,7 @@
 {
-  "README.md": "2d1c1bfc935d0b135678a84f457c38549c54a812d968751eb0c63fc103a77ca2",
-  "docs/cli-specification.md": "d7e792696f216ffde6319efc30b3f2fbe6c5c89f076fb0e3cb15a1818f47949b",
-  "docs/quickstart.md": "882690b104234fb6a275b9047216333e3af52cc91b76fcc8386dc4696f45a9e2",
-  "telegram_bot_stack/cli/commands/init.py": "97980ca20268cc7beb8865f59915c30b8a2c40c5fac2a9de96f38c58dc5fde30",
-  "telegram_bot_stack/cli/utils/testing.py": "79de429defc45b3bd78b57bc2475777f6952ac420fd058b823451b814ec5fa70",
-  "pyproject.toml": "596d81640f1b6a7d9463d5d8aac9592333f635aff46022f184f9b7e82288aeba",
-  "tests/cli/test_init_command.py": "a0202e9c1b6e866462c1868dbebf362f7f779fad5c2242250dec09d86e725772",
-  ".github/workflows/tests.yml": "0212aa4858004b2d4c6b0643286a60677fd89c9dd9c8deb5e8a39f25130bb259",
-  "telegram_bot_stack/storage/memory.py": "8cc73ae0460d66caaed9e2f95a273adc7d4222155fe1e6d51316999874df35c3"
+  "docs/README.md": "837c0505a92f5f5a4b0634e026932843f8ec1889317b7577de89f1eb79a08a61",
+  ".github/docs/README.md": "c3206990107229a03a14f225c0c4a2dff25111362996ce1d0498f742512aeca1",
+  ".github/workflows/scripts/common.py": "779ad2f6b87c2ee9377f500f746138af91bbeef8652a288a47f1e5a489a1de05",
+  ".github/workflows/scripts/github_helper.py": "913c48fef59d672b3b8d1f4e892df9cbaf9fce2cca24861d94df5eb2e876aa07",
+  "archive/README.md": "7e4c09539b2812da11346face74044e44ffd1b6b60d80c40ad42ce53d71afa32"
 }
