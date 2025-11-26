@@ -590,7 +590,7 @@
       "type": "test_module",
       "path": "tests/cli/test_init_command.py",
       "description": "Tests for init command.",
-      "lines_of_code": 200,
+      "lines_of_code": 301,
       "exports": [
         "test_init_basic",
         "test_init_with_linting",
@@ -600,7 +600,11 @@
         "test_init_with_git",
         "test_init_pyproject_toml",
         "test_init_existing_directory",
-        "test_init_minimal"
+        "test_init_minimal",
+        "test_init_with_install_deps_success",
+        "test_init_with_install_deps_failure",
+        "test_init_with_package_manager_poetry",
+        "test_init_with_package_manager_pdm"
       ],
       "classes": [],
       "functions": [
@@ -612,7 +616,11 @@
         "test_init_with_git",
         "test_init_pyproject_toml",
         "test_init_existing_directory",
-        "test_init_minimal"
+        "test_init_minimal",
+        "test_init_with_install_deps_success",
+        "test_init_with_install_deps_failure",
+        "test_init_with_package_manager_poetry",
+        "test_init_with_package_manager_pdm"
       ]
     },
     {

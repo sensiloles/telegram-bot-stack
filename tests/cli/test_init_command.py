@@ -1,6 +1,7 @@
 """Tests for init command."""
 
 from pathlib import Path
+from unittest.mock import MagicMock, patch
 
 from click.testing import CliRunner
 
@@ -198,3 +199,103 @@ def test_init_minimal(tmp_path):
         assert not (project_path / ".vscode").exists()
         assert not (project_path / ".idea").exists()
         assert not (project_path / ".gitignore").exists()
+
+
+def test_init_with_install_deps_success(tmp_path):
+    """Test project initialization with dependency installation (mocked)."""
+    runner = CliRunner()
+
+    with runner.isolated_filesystem(temp_dir=tmp_path):
+        with patch(
+            "telegram_bot_stack.cli.commands.init.subprocess.run"
+        ) as mock_subprocess:
+            # Mock successful pip install - first call for local repo, second for project
+            mock_result = MagicMock(returncode=0, stderr="", stdout="")
+            mock_subprocess.return_value = mock_result
+
+            result = runner.invoke(
+                cli,
+                ["init", "test-bot", "--no-git"],
+            )
+
+            # Should succeed
+            assert result.exit_code == 0
+            project_path = Path("test-bot")
+            assert project_path.exists()
+
+
+def test_init_with_install_deps_failure(tmp_path):
+    """Test project initialization handles dependency installation failure."""
+    runner = CliRunner()
+
+    with runner.isolated_filesystem(temp_dir=tmp_path):
+        with patch(
+            "telegram_bot_stack.cli.commands.init.subprocess.run"
+        ) as mock_subprocess:
+            # Mock failed pip install - simulate telegram-bot-stack not found
+            mock_result = MagicMock(
+                returncode=1,
+                stderr="ERROR: Could not find a version that satisfies the requirement telegram-bot-stack",
+                stdout="",
+            )
+            mock_subprocess.return_value = mock_result
+
+            result = runner.invoke(
+                cli,
+                ["init", "test-bot", "--no-git"],
+            )
+
+            # Should still succeed but show warning
+            assert result.exit_code == 0
+            project_path = Path("test-bot")
+            assert project_path.exists()
+            # Should show warning about installation failure
+            assert "Warning" in result.output or "PyPI" in result.output
+
+
+def test_init_with_package_manager_poetry(tmp_path):
+    """Test project initialization with poetry package manager."""
+    runner = CliRunner()
+
+    with runner.isolated_filesystem(temp_dir=tmp_path):
+        with patch("subprocess.run") as mock_subprocess:
+            mock_subprocess.return_value = MagicMock(returncode=0)
+
+            result = runner.invoke(
+                cli,
+                [
+                    "init",
+                    "test-bot",
+                    "--package-manager",
+                    "poetry",
+                    "--no-git",
+                ],
+            )
+
+            assert result.exit_code == 0
+            project_path = Path("test-bot")
+            assert project_path.exists()
+
+
+def test_init_with_package_manager_pdm(tmp_path):
+    """Test project initialization with pdm package manager."""
+    runner = CliRunner()
+
+    with runner.isolated_filesystem(temp_dir=tmp_path):
+        with patch("subprocess.run") as mock_subprocess:
+            mock_subprocess.return_value = MagicMock(returncode=0)
+
+            result = runner.invoke(
+                cli,
+                [
+                    "init",
+                    "test-bot",
+                    "--package-manager",
+                    "pdm",
+                    "--no-git",
+                ],
+            )
+
+            assert result.exit_code == 0
+            project_path = Path("test-bot")
+            assert project_path.exists()

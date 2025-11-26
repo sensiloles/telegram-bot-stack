@@ -3,5 +3,7 @@
   "docs/cli-specification.md": "d7e792696f216ffde6319efc30b3f2fbe6c5c89f076fb0e3cb15a1818f47949b",
   "docs/quickstart.md": "882690b104234fb6a275b9047216333e3af52cc91b76fcc8386dc4696f45a9e2",
   "telegram_bot_stack/cli/commands/init.py": "a440c1dce86fd80ab71b9e121d95312e31fe0e7d12edfaeafea0c09e8bafe271",
-  "telegram_bot_stack/cli/utils/testing.py": "79de429defc45b3bd78b57bc2475777f6952ac420fd058b823451b814ec5fa70"
+  "telegram_bot_stack/cli/utils/testing.py": "79de429defc45b3bd78b57bc2475777f6952ac420fd058b823451b814ec5fa70",
+  "pyproject.toml": "3723c97de826ca8354a983a2bbce23100aedccc7b77f1750b390649a974fe3e3",
+  "tests/cli/test_init_command.py": "d094c780a4463b01d027407e69da32f455f73b4b6dfb11a990f8362b104927e9"
 }

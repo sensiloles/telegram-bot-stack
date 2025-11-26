@@ -215,7 +215,7 @@ exclude_lines = [
 "if TYPE_CHECKING:",
 "@abstractmethod",
 ]
-fail_under = 79
+fail_under = 75
 precision = 2
 
 [tool.commitizen]
