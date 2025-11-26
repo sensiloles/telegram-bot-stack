@@ -74,6 +74,69 @@ telegram-bot-stack dev             # Run in development mode
 telegram-bot-stack validate        # Validate configuration
 ```
 
+## How to Initialize a Bot (Step-by-Step)
+
+### Complete Setup Process
+
+**Step 1: Install telegram-bot-stack**
+
+```bash
+pip install telegram-bot-stack
+```
+
+**Step 2: Create New Bot Project**
+
+```bash
+telegram-bot-stack init my-bot
+```
+
+This command automatically:
+
+- ✅ Creates project directory with all necessary files
+- ✅ Sets up virtual environment (`venv/`)
+- ✅ Installs all dependencies (including `python-dotenv` - no need to install separately!)
+- ✅ Configures linting (ruff, mypy, pre-commit)
+- ✅ Sets up testing (pytest with fixtures)
+- ✅ Configures IDE (VS Code by default)
+- ✅ Initializes Git repository
+
+**Step 3: Navigate to Project**
+
+```bash
+cd my-bot
+```
+
+**Step 4: Create `.env` File with Bot Token**
+
+Get your bot token from [@BotFather](https://t.me/BotFather), then:
+
+```bash
+echo "BOT_TOKEN=your_token_here" > .env
+```
+
+**Step 5: Run Your Bot**
+
+Use the CLI development command (recommended):
+
+```bash
+telegram-bot-stack dev --reload
+```
+
+Or run manually:
+
+```bash
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+python bot.py
+```
+
+**That's it!** Your bot is now running. 🎉
+
+### Important Notes
+
+- **Dependencies:** All required dependencies (including `python-dotenv`) are automatically installed when you run `telegram-bot-stack init`. You don't need to install anything manually.
+- **Virtual Environment:** The CLI automatically creates and uses a virtual environment. You can activate it manually if needed.
+- **Environment Variables:** The bot template uses `python-dotenv` to load variables from `.env` file. Make sure your `.env` file is in the project root.
+
 ## Command Details
 
 ### `telegram-bot-stack init`
@@ -94,12 +157,13 @@ telegram-bot-stack init <name> [OPTIONS]
 - `--with-testing / --no-testing` - Setup testing (default: true)
 - `--ide` [vscode|pycharm|none] - IDE configuration (default: vscode)
 - `--git / --no-git` - Initialize Git repository (default: true)
+- `--install-deps / --no-install-deps` - Install dependencies after setup (default: true)
 
 **What it creates:**
 
 - Project structure (bot.py, README.md, .env.example)
 - Virtual environment (venv/)
-- Dependencies (requirements.txt or pyproject.toml)
+- Dependencies configuration (pyproject.toml with all dependencies)
 - Linting configuration (.pre-commit-config.yaml)
 - Testing setup (tests/, pytest.ini)
 - IDE settings (.vscode/ or .idea/)
@@ -108,11 +172,17 @@ telegram-bot-stack init <name> [OPTIONS]
 **Example:**
 
 ```bash
+# Full setup with all features
 telegram-bot-stack init my-awesome-bot --with-linting --ide vscode --git
+
+# Navigate to project
 cd my-awesome-bot
-source venv/bin/activate
-echo "BOT_TOKEN=your_token" > .env
-python bot.py
+
+# Create .env file with bot token
+echo "BOT_TOKEN=your_token_here" > .env
+
+# Run bot in development mode
+telegram-bot-stack dev --reload
 ```
 
 ### `telegram-bot-stack new`
@@ -155,21 +225,35 @@ telegram-bot-stack dev [OPTIONS]
 **Options:**
 
 - `--bot-file` PATH - Path to bot file (default: bot.py)
-- `--reload / --no-reload` - Enable auto-reload (default: false)
-- `--reload-delay` FLOAT - Reload delay in seconds (default: 1.0)
+- `--reload / --no-reload` - Enable auto-reload (default: true)
 
 **Features:**
 
+- Automatically detects and uses virtual environment
 - Pretty logging with colors
-- Auto-reload on code changes (with --reload)
-- Environment validation
-- Clear error messages
+- Auto-reload on code changes (with `--reload`, enabled by default)
+- Environment validation (checks for .env file and BOT_TOKEN)
+- Clear error messages with helpful suggestions
 
 **Example:**
 
 ```bash
-telegram-bot-stack dev --reload
+# Run with auto-reload (default)
+telegram-bot-stack dev
+
+# Run without auto-reload
+telegram-bot-stack dev --no-reload
+
+# Run specific bot file
+telegram-bot-stack dev --bot-file my_custom_bot.py
 ```
+
+**Note:** The `dev` command automatically:
+
+- Finds and uses the virtual environment in the project
+- Checks if `.env` file exists and warns if missing
+- Validates that `telegram-bot-stack` is installed
+- Uses the correct Python interpreter from the virtual environment
 
 ### `telegram-bot-stack validate`
 

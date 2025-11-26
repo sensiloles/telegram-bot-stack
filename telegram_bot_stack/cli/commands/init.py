@@ -128,17 +128,69 @@ def init(
 
                 # Install project in editable mode with dependencies
                 if package_manager == "pip":
+                    # First, try to install telegram-bot-stack if available locally
+                    # Check if we're in the telegram-bot-stack repo itself
+                    stack_repo = Path(__file__).parent.parent.parent.parent
+                    if (stack_repo / "pyproject.toml").exists():
+                        try:
+                            # Install telegram-bot-stack from local repo first
+                            subprocess.run(
+                                [str(pip), "install", "-e", str(stack_repo), "--quiet"],
+                                check=True,
+                                capture_output=True,
+                            )
+                            click.secho(
+                                "  ✅ Installed telegram-bot-stack from local repo",
+                                fg="green",
+                            )
+                        except subprocess.CalledProcessError:
+                            # If local install fails, try PyPI
+                            pass
+
                     # Use pip to install from pyproject.toml
                     cmd = [str(pip), "install", "-e", ".", "--quiet"]
                     if with_linting or with_testing:
                         cmd.append(".[dev]")
 
-                    subprocess.run(
-                        cmd, cwd=project_path, check=True, capture_output=True
+                    result = subprocess.run(
+                        cmd,
+                        cwd=project_path,
+                        check=False,
+                        capture_output=True,
+                        text=True,
                     )
-                    click.secho(
-                        "  ✅ Installed dependencies from pyproject.toml", fg="green"
-                    )
+
+                    if result.returncode != 0:
+                        # Check if error is about telegram-bot-stack not found
+                        if (
+                            "telegram-bot-stack" in result.stderr
+                            or "No matching distribution" in result.stderr
+                        ):
+                            click.secho(
+                                "  ⚠️  Warning: Could not install telegram-bot-stack from PyPI",
+                                fg="yellow",
+                            )
+                            click.echo("  This usually means:")
+                            click.echo("    • Package is not published to PyPI yet")
+                            click.echo(
+                                "    • You need to install it manually from source"
+                            )
+                            click.echo("\n  To fix this, run:")
+                            click.echo(f"    cd {name}")
+                            click.echo(f"    {venv.get_activation_command(venv_path)}")
+                            click.echo("    pip install telegram-bot-stack")
+                            click.echo("    # Or if you have the source:")
+                            click.echo("    pip install -e /path/to/telegram-bot-stack")
+                            click.echo("    pip install -e '.[dev]'")
+                        else:
+                            raise subprocess.CalledProcessError(
+                                result.returncode, cmd, result.stderr
+                            )
+                    else:
+                        click.secho(
+                            "  ✅ Installed dependencies from pyproject.toml",
+                            fg="green",
+                        )
                 elif package_manager == "poetry":
                     # Use poetry
                     subprocess.run(
@@ -168,7 +220,8 @@ def init(
                 click.echo(f"    cd {name}")
                 click.echo(f"    {venv.get_activation_command(venv_path)}")
                 if package_manager == "pip":
-                    click.echo("    pip install -e .[dev]")
+                    click.echo("    pip install telegram-bot-stack")
+                    click.echo("    pip install -e '.[dev]'")
                 elif package_manager == "poetry":
                     click.echo("    poetry install")
                 elif package_manager == "pdm":
@@ -209,14 +262,13 @@ def init(
             click.echo("\n💻 Configuring PyCharm...")
             create_pycharm_settings(project_path)
 
-        # 10. Create .gitignore (always, even without git init)
-        click.echo("\n📝 Creating .gitignore...")
-        from telegram_bot_stack.cli.utils import git as git_utils
-
-        git_utils.create_gitignore(project_path)
-
-        # 11. Setup Git
+        # 10. Setup Git (only if --git flag is set)
         if git:
+            click.echo("\n📝 Creating .gitignore...")
+            from telegram_bot_stack.cli.utils import git as git_utils
+
+            git_utils.create_gitignore(project_path)
+
             click.echo("\n📚 Initializing Git...")
             git_utils.init_git(project_path, initial_commit=True)
 
@@ -341,6 +393,14 @@ A Telegram bot built with [telegram-bot-stack](https://github.com/sensiloles/tel
 
 ## Quick Start
 
+### Prerequisites
+
+- ✅ All dependencies are already installed (including `python-dotenv`)
+- ✅ Virtual environment is set up and ready to use
+- ✅ Development tools are configured (linting, testing, IDE settings)
+
+### Getting Started
+
 1. **Get your bot token** from [@BotFather](https://t.me/BotFather)
 
 2. **Create `.env` file** with your token:
@@ -348,16 +408,22 @@ A Telegram bot built with [telegram-bot-stack](https://github.com/sensiloles/tel
    echo "BOT_TOKEN=your_token_here" > .env
    ```
 
-3. **Run the bot**:
+3. **Run the bot** (recommended - automatically uses virtual environment):
    ```bash
    telegram-bot-stack dev
    ```
 
-   Or manually:
+   Or run manually:
    ```bash
    source venv/bin/activate  # On Windows: venv\\Scripts\\activate
    python bot.py
    ```
+
+**Note:** The `telegram-bot-stack dev` command automatically:
+- Detects and uses the virtual environment
+- Validates your `.env` file
+- Provides auto-reload on code changes (enabled by default)
+- Shows clear error messages with helpful suggestions
 
 ## Development
 
@@ -366,8 +432,11 @@ A Telegram bot built with [telegram-bot-stack](https://github.com/sensiloles/tel
 The project includes convenient CLI commands:
 
 ```bash
-# Run bot in development mode (auto-reload on code changes)
+# Run bot in development mode (auto-reload enabled by default)
 telegram-bot-stack dev
+
+# Run without auto-reload
+telegram-bot-stack dev --no-reload
 
 # Validate project configuration
 telegram-bot-stack validate
@@ -434,19 +503,60 @@ mypy .
 ```
 {bot_name}/
 ├── bot.py              # Main bot implementation
-├── .env                # Environment variables (not in git)
+├── .env                # Environment variables (not in git) - create this file!
 ├── .env.example        # Example environment variables
 ├── pyproject.toml      # Project config, dependencies, and tool settings
 ├── Makefile            # Development commands
+├── venv/               # Virtual environment (auto-created)
 ├── tests/              # Test files
 │   ├── conftest.py     # Pytest fixtures
 │   └── test_bot.py     # Bot tests
 └── README.md           # This file
 ```
 
+## Dependencies
+
+All dependencies are automatically installed when you create the project:
+
+- **telegram-bot-stack** - Main framework
+- **python-dotenv** - Environment variable loading (included automatically)
+- **python-telegram-bot** - Telegram Bot API wrapper
+- **Development tools** - ruff, mypy, pytest, pre-commit (if enabled)
+
+You don't need to install anything manually! If you need to reinstall dependencies:
+
+```bash
+source venv/bin/activate  # On Windows: venv\\Scripts\\activate
+pip install -e .
+```
+
+## Common Issues
+
+### ModuleNotFoundError: No module named 'dotenv'
+
+If you see this error, it means dependencies weren't installed correctly. Fix it with:
+
+```bash
+source venv/bin/activate  # On Windows: venv\\Scripts\\activate
+pip install --upgrade telegram-bot-stack
+# Or reinstall project dependencies
+pip install -e .
+```
+
+**Note:** `python-dotenv` is automatically included when you install `telegram-bot-stack`. You don't need to install it separately.
+
+### BOT_TOKEN not found
+
+Make sure you've created the `.env` file in the project root:
+
+```bash
+echo "BOT_TOKEN=your_token_here" > .env
+```
+
 ## Documentation
 
 - [telegram-bot-stack Documentation](https://github.com/sensiloles/telegram-bot-stack)
+- [CLI Specification](https://github.com/sensiloles/telegram-bot-stack/blob/main/docs/cli-specification.md)
 - [python-telegram-bot Documentation](https://docs.python-telegram-bot.org/)
 
 ## License
