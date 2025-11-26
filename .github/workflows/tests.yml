@@ -33,35 +33,112 @@ jobs:
           git config --global user.name "GitHub CI"
 
       - name: Install dependencies
+        id: install_deps
+        continue-on-error: true
         run: |
+          echo "::group::📦 Installing dependencies"
           python -m pip install --upgrade pip
           pip install -e ".[dev,database]"
+          echo "::endgroup::"
+
+          echo "::group::📋 Installed packages"
+          pip list
+          echo "::endgroup::"
+
+      - name: Check dependency installation
+        if: steps.install_deps.outcome != 'success'
+        run: |
+          echo "::error::❌ Dependency installation failed!"
+          echo "### ❌ Dependency Installation Failed (Python ${{ matrix.python-version }})" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Error:** Failed to install project dependencies." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Possible causes:**" >> $GITHUB_STEP_SUMMARY
+          echo "- Missing or incompatible dependencies in pyproject.toml" >> $GITHUB_STEP_SUMMARY
+          echo "- Python version incompatibility (current: ${{ matrix.python-version }})" >> $GITHUB_STEP_SUMMARY
+          echo "- Network issues or PyPI unavailability" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Check the logs above for specific error messages.**" >> $GITHUB_STEP_SUMMARY
+          exit 1
 
       - name: Run tests with coverage
         id: pytest
         continue-on-error: true
         run: |
+          echo "::group::🧪 Running tests"
           pytest --cov=telegram_bot_stack \
                  --cov-report=xml \
                  --cov-report=term-missing \
                  --cov-report=html \
                  -v \
-                 --tb=short
+                 --tb=short 2>&1 | tee pytest_output.log
+          PYTEST_EXIT_CODE=${PIPESTATUS[0]}
+          echo "::endgroup::"
+          exit $PYTEST_EXIT_CODE
+
+      - name: Analyze test failures
+        if: always() && steps.pytest.outcome != 'success'
+        run: |
+          echo "::group::🔍 Analyzing test failures"
+
+          # Extract failed tests
+          FAILED_TESTS=$(grep "FAILED" pytest_output.log | head -20 || echo "No specific test failures found")
+
+          # Extract syntax errors or import errors
+          SYNTAX_ERRORS=$(grep -A 5 "SyntaxError\|ImportError\|ModuleNotFoundError" pytest_output.log | head -30 || echo "")
+
+          # Extract type errors
+          TYPE_ERRORS=$(grep -A 3 "TypeError\|AttributeError" pytest_output.log | head -20 || echo "")
+
+          echo "::endgroup::"
+
+          # Write to summary
+          echo "### ❌ Test Failures on Python ${{ matrix.python-version }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ -n "$SYNTAX_ERRORS" ]; then
+            echo "#### 🚨 Syntax/Import Errors Detected" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "$SYNTAX_ERRORS" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Likely cause:** Python version incompatibility (e.g., using Python 3.10+ syntax on Python 3.9)" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          if [ -n "$TYPE_ERRORS" ]; then
+            echo "#### ⚠️ Type Errors Detected" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "$TYPE_ERRORS" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "#### 📋 Failed Tests" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "$FAILED_TESTS" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**See full logs above for detailed error messages and tracebacks.**" >> $GITHUB_STEP_SUMMARY
 
       - name: Display test summary
-        if: always()
+        if: always() && steps.pytest.outcome == 'success'
         run: |
-          echo "### 🧪 Tests on Python ${{ matrix.python-version }}" >> $GITHUB_STEP_SUMMARY
+          echo "### ✅ Tests Passed on Python ${{ matrix.python-version }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          if [ "${{ steps.pytest.outcome }}" == "success" ]; then
-            echo "✅ All tests passed" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "❌ Some tests failed - check logs above" >> $GITHUB_STEP_SUMMARY
-          fi
+
+          # Extract test count
+          TEST_COUNT=$(grep -o "[0-9]* passed" pytest_output.log | head -1 || echo "All tests passed")
+          echo "**Result:** $TEST_COUNT" >> $GITHUB_STEP_SUMMARY
 
       - name: Fail job if tests failed
         if: steps.pytest.outcome != 'success'
-        run: exit 1
+        run: |
+          echo "::error::Tests failed on Python ${{ matrix.python-version }}"
+          exit 1
 
       - name: Upload coverage to Codecov
         if: matrix.python-version == '3.12'
@@ -83,14 +160,39 @@ jobs:
 
       - name: Check coverage threshold
         if: matrix.python-version == '3.12'
+        id: coverage_check
+        continue-on-error: true
         run: |
+          echo "::group::📊 Checking coverage"
+
           COVERAGE=$(python -c "import xml.etree.ElementTree as ET; tree = ET.parse('coverage.xml'); root = tree.getroot(); print(float(root.attrib['line-rate']) * 100)")
+          THRESHOLD=50
+
           echo "Coverage: $COVERAGE%"
-          if (( $(echo "$COVERAGE < 50" | bc -l) )); then
-            echo "❌ Coverage $COVERAGE% is below 50% threshold"
+          echo "Threshold: $THRESHOLD%"
+
+          echo "::endgroup::"
+
+          if (( $(echo "$COVERAGE < $THRESHOLD" | bc -l) )); then
+            echo "::error::Coverage $COVERAGE% is below $THRESHOLD% threshold"
+
+            echo "### ❌ Coverage Below Threshold" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Current coverage:** $COVERAGE%" >> $GITHUB_STEP_SUMMARY
+            echo "**Required threshold:** $THRESHOLD%" >> $GITHUB_STEP_SUMMARY
+            echo "**Gap:** $(python -c "print(f'{$THRESHOLD - $COVERAGE:.2f}%')")" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Action required:** Add more tests to increase coverage." >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Tip:** Check the coverage report artifact for uncovered lines." >> $GITHUB_STEP_SUMMARY
+
             exit 1
           else
-            echo "✅ Coverage $COVERAGE% meets 50% threshold"
+            echo "✅ Coverage $COVERAGE% meets $THRESHOLD% threshold"
+
+            echo "### ✅ Coverage Check Passed" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Coverage:** $COVERAGE% (threshold: $THRESHOLD%)" >> $GITHUB_STEP_SUMMARY
           fi
 
   lint:
@@ -109,16 +211,79 @@ jobs:
 
       - name: Install dependencies
         run: |
+          echo "::group::📦 Installing dependencies"
           python -m pip install --upgrade pip
           pip install -e ".[dev]"
+          echo "::endgroup::"
 
       - name: Run Ruff linter
+        id: ruff_lint
+        continue-on-error: true
         run: |
-          ruff check .
+          echo "::group::🔍 Running Ruff linter"
+          ruff check . --output-format=github 2>&1 | tee ruff_lint.log
+          LINT_EXIT_CODE=${PIPESTATUS[0]}
+          echo "::endgroup::"
+          exit $LINT_EXIT_CODE
+
+      - name: Analyze linting errors
+        if: always() && steps.ruff_lint.outcome != 'success'
+        run: |
+          echo "### ❌ Linting Errors Detected" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Count errors by type
+          ERROR_COUNT=$(grep -c "error:" ruff_lint.log || echo "0")
+          WARNING_COUNT=$(grep -c "warning:" ruff_lint.log || echo "0")
+
+          echo "**Errors:** $ERROR_COUNT" >> $GITHUB_STEP_SUMMARY
+          echo "**Warnings:** $WARNING_COUNT" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Show first 20 errors
+          echo "#### Top Issues" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          head -20 ruff_lint.log >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Fix:** Run \`ruff check . --fix\` locally to auto-fix issues." >> $GITHUB_STEP_SUMMARY
 
       - name: Run Ruff formatter check
+        id: ruff_format
+        continue-on-error: true
         run: |
-          ruff format --check .
+          echo "::group::🎨 Checking code formatting"
+          ruff format --check . 2>&1 | tee ruff_format.log
+          FORMAT_EXIT_CODE=${PIPESTATUS[0]}
+          echo "::endgroup::"
+          exit $FORMAT_EXIT_CODE
+
+      - name: Analyze formatting errors
+        if: always() && steps.ruff_format.outcome != 'success'
+        run: |
+          echo "### ❌ Formatting Issues Detected" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Extract files that need formatting
+          UNFORMATTED_FILES=$(grep "Would reformat:" ruff_format.log || echo "")
+
+          if [ -n "$UNFORMATTED_FILES" ]; then
+            echo "#### Files needing formatting:" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "$UNFORMATTED_FILES" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Fix:** Run \`ruff format .\` locally to format code." >> $GITHUB_STEP_SUMMARY
+
+      - name: Fail if linting or formatting failed
+        if: steps.ruff_lint.outcome != 'success' || steps.ruff_format.outcome != 'success'
+        run: |
+          echo "::error::Linting or formatting checks failed"
+          exit 1
 
   type-check:
     name: Type Check with mypy
@@ -136,15 +301,43 @@ jobs:
 
       - name: Install dependencies
         run: |
+          echo "::group::📦 Installing dependencies"
           python -m pip install --upgrade pip
           pip install -e ".[dev]"
+          echo "::endgroup::"
 
       - name: Run mypy
+        id: mypy_check
         # Note: continue-on-error allows the job to show warnings without failing CI
         # TODO: Fix type errors and remove this flag
         continue-on-error: true
         run: |
-          mypy telegram_bot_stack
+          echo "::group::🔍 Running mypy type checker"
+          mypy telegram_bot_stack 2>&1 | tee mypy_output.log
+          MYPY_EXIT_CODE=${PIPESTATUS[0]}
+          echo "::endgroup::"
+          exit $MYPY_EXIT_CODE
+
+      - name: Analyze type errors
+        if: always() && steps.mypy_check.outcome != 'success'
+        run: |
+          echo "### ⚠️ Type Check Issues (Non-blocking)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Count errors
+          ERROR_COUNT=$(grep -c "error:" mypy_output.log || echo "0")
+
+          echo "**Type errors found:** $ERROR_COUNT" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Show summary by error type
+          echo "#### Common Issues" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          head -30 mypy_output.log >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Note:** Type checking is currently non-blocking. These are warnings only." >> $GITHUB_STEP_SUMMARY
 
   summary:
     name: Test Summary
