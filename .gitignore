@@ -74,3 +74,6 @@ backups/
 .cursor/agent_cache.json
 .cursor/agent_metrics.jsonl
 .cursor/infrastructure_status.json
+
+# Bot lock files (dev mode)
+.bot.lock

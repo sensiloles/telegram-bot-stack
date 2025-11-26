@@ -1,7 +1,7 @@
 {
   "metadata": {
     "version": "3.0.0",
-    "generated_at": "2025-11-25",
+    "generated_at": "2025-11-26",
     "graph_id": "bot_framework_cli",
     "graph_name": "Bot Framework - CLI",
     "graph_type": "sub_graph",
@@ -11,8 +11,8 @@
     "description": "CLI tool for bot project management and development",
     "scope": "CLI tool for bot project management and development",
     "root_package": "telegram_bot_stack.cli",
-    "node_count": 21,
-    "edge_count": 20
+    "node_count": 23,
+    "edge_count": 23
   },
   "nodes": [
     {
@@ -59,7 +59,7 @@
       "type": "module",
       "path": "telegram_bot_stack/cli/utils/git.py",
       "description": "Git initialization utilities.",
-      "lines_of_code": 129,
+      "lines_of_code": 222,
       "classes": [],
       "functions": [
         "init_git",
@@ -97,19 +97,21 @@
       "type": "module",
       "path": "telegram_bot_stack/cli/utils/venv.py",
       "description": "Virtual environment management utilities.",
-      "lines_of_code": 90,
+      "lines_of_code": 138,
       "classes": [],
       "functions": [
         "create_virtualenv",
         "get_venv_python",
         "get_venv_pip",
-        "get_activation_command"
+        "get_activation_command",
+        "find_venv"
       ],
       "exports": [
         "create_virtualenv",
         "get_venv_python",
         "get_venv_pip",
-        "get_activation_command"
+        "get_activation_command",
+        "find_venv"
       ],
       "complexity_score": 1,
       "dependencies": [],
@@ -167,7 +169,7 @@
       "type": "module",
       "path": "telegram_bot_stack/cli/utils/testing.py",
       "description": "Testing setup utilities.",
-      "lines_of_code": 102,
+      "lines_of_code": 104,
       "classes": [],
       "functions": [
         "create_test_structure"
@@ -187,7 +189,7 @@
       "type": "module",
       "path": "telegram_bot_stack/cli/utils/dependencies.py",
       "description": "Dependency management utilities.",
-      "lines_of_code": 179,
+      "lines_of_code": 215,
       "classes": [],
       "functions": [
         "install_package",
@@ -269,19 +271,21 @@
       "type": "module",
       "path": "telegram_bot_stack/cli/commands/dev.py",
       "description": "Run bot in development mode with auto-reload.",
-      "lines_of_code": 158,
+      "lines_of_code": 295,
       "classes": [
         "BotReloadHandler"
       ],
       "functions": [
         "dev",
         "start_bot",
+        "read_output",
         "on_modified"
       ],
       "exports": [
         "BotReloadHandler",
         "dev",
         "start_bot",
+        "read_output",
         "on_modified"
       ],
       "complexity_score": 1,
@@ -296,7 +300,7 @@
       "type": "module",
       "path": "telegram_bot_stack/cli/commands/init.py",
       "description": "Initialize a new bot project with full dev environment.",
-      "lines_of_code": 410,
+      "lines_of_code": 812,
       "classes": [],
       "functions": [
         "init"
@@ -529,6 +533,57 @@
       "dependencies": [],
       "dependents": [],
       "criticality": "medium"
+    },
+    {
+      "id": "telegram_bot_stack.cli.utils.makefile",
+      "name": "makefile",
+      "type": "module",
+      "category": "implementation",
+      "path": "telegram_bot_stack/cli/utils/makefile.py",
+      "description": "Module makefile",
+      "lines_of_code": 64,
+      "complexity_score": 1,
+      "exports": [
+        "create_makefile"
+      ],
+      "classes": [],
+      "functions": [
+        "create_makefile"
+      ],
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium"
+    },
+    {
+      "id": "telegram_bot_stack.cli.utils.bot_lock",
+      "name": "bot_lock",
+      "type": "module",
+      "category": "implementation",
+      "path": "telegram_bot_stack/cli/utils/bot_lock.py",
+      "description": "Module bot_lock",
+      "lines_of_code": 142,
+      "complexity_score": 1,
+      "exports": [
+        "BotLockManager",
+        "with_bot_lock",
+        "is_process_running",
+        "acquire_lock",
+        "release_lock",
+        "wrapper"
+      ],
+      "classes": [
+        "BotLockManager"
+      ],
+      "functions": [
+        "with_bot_lock",
+        "is_process_running",
+        "acquire_lock",
+        "release_lock",
+        "wrapper"
+      ],
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium"
     }
   ],
   "edges": [
@@ -671,6 +726,27 @@
       "target": "telegram_bot_stack.cli.commands.new",
       "type": "imports",
       "description": "Imports from telegram_bot_stack.cli.commands.new"
+    },
+    {
+      "id": "edge_21",
+      "source": "telegram_bot_stack.cli.commands.dev",
+      "target": "telegram_bot_stack.cli.utils",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.utils"
+    },
+    {
+      "id": "edge_22",
+      "source": "telegram_bot_stack.cli.commands.dev",
+      "target": "telegram_bot_stack.cli.utils.venv",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.utils.venv"
+    },
+    {
+      "id": "edge_23",
+      "source": "telegram_bot_stack.cli.commands.init",
+      "target": "telegram_bot_stack.cli.utils.makefile",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.utils.makefile"
     }
   ]
 }

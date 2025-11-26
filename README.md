@@ -87,6 +87,7 @@ python3 .github/workflows/scripts/read_issues.py --list --state open
 pip install telegram-bot-stack
 
 # Create new bot project with full dev environment
+# This automatically installs all dependencies (including python-dotenv)
 telegram-bot-stack init my-bot \
     --with-linting \
     --with-testing \
@@ -96,12 +97,14 @@ telegram-bot-stack init my-bot \
 # Navigate to project
 cd my-bot
 
-# Add your bot token
+# Add your bot token (get it from @BotFather)
 echo "BOT_TOKEN=your_token_here" > .env
 
-# Run bot
-telegram-bot-stack dev --reload
+# Run bot in development mode (auto-reload enabled by default)
+telegram-bot-stack dev
 ```
+
+**Important:** All dependencies (including `python-dotenv`) are automatically installed when you run `init`. You don't need to install anything manually!
 
 **What you get:**
 
@@ -135,8 +138,13 @@ telegram-bot-stack init my-awesome-bot
 
 # Get started
 cd my-awesome-bot
+echo "BOT_TOKEN=your_token_here" > .env  # Get token from @BotFather
+
+# Run bot (CLI automatically uses virtual environment)
+telegram-bot-stack dev
+
+# Or run manually
 source venv/bin/activate  # On Windows: venv\Scripts\activate
-echo "BOT_TOKEN=your_token_here" > .env
 python bot.py
 ```
 

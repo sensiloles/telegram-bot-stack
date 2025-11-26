@@ -19,6 +19,7 @@ telegram-bot-stack init my-awesome-bot
 ```
 
 This creates a complete bot project with:
+
 - ✅ Virtual environment
 - ✅ Dependencies installed
 - ✅ Linting configured (ruff, mypy, pre-commit)
@@ -117,8 +118,10 @@ echo "BOT_TOKEN=your_token_here" > .env
 ### Step 4: Install Dependencies
 
 ```bash
-pip install telegram-bot-stack python-dotenv
+pip install telegram-bot-stack
 ```
+
+**Note:** `python-dotenv` is already included as a dependency of `telegram-bot-stack`, so you don't need to install it separately.
 
 ### Step 5: Run Your Bot
 
@@ -190,9 +193,31 @@ Error: BOT_TOKEN environment variable not set!
 ```
 
 **Solution:** Create a `.env` file with your bot token:
+
 ```bash
 echo "BOT_TOKEN=your_token_here" > .env
 ```
+
+**Note:** Make sure the `.env` file is in the project root directory (same directory as `bot.py`).
+
+### ModuleNotFoundError: No module named 'dotenv'
+
+```
+ModuleNotFoundError: No module named 'dotenv'
+```
+
+**Solution:** This usually happens if dependencies weren't installed properly. Try:
+
+```bash
+# If using virtual environment
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+pip install --upgrade telegram-bot-stack
+
+# Or reinstall project dependencies
+pip install -e .
+```
+
+**Note:** `python-dotenv` is automatically included when you install `telegram-bot-stack`. If you see this error, it means dependencies weren't installed correctly during project initialization.
 
 ### Import Errors
 
@@ -201,8 +226,16 @@ ModuleNotFoundError: No module named 'telegram_bot_stack'
 ```
 
 **Solution:** Install the package:
+
 ```bash
 pip install telegram-bot-stack
+```
+
+Or if you're in a project created with `init`:
+
+```bash
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+pip install -e .
 ```
 
 ### Permission Denied (Virtual Environment)
@@ -212,8 +245,15 @@ Permission denied: venv/bin/activate
 ```
 
 **Solution:** Activate virtual environment:
+
 ```bash
 source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
+
+Or use the CLI command which handles this automatically:
+
+```bash
+telegram-bot-stack dev
 ```
 
 ## Getting Help

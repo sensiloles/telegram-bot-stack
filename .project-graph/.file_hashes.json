@@ -1,16 +1,11 @@
 {
-  "README.md": "b0f21cd2433fc2df29135eab72f3f32504e17addcf2f15bae635ec750d04f4da",
-  "docs/deployment_guide.md": "fc7764dbb415eea1d81343ced862f859020bf0f55fc82687fb85c27f93a2dd18",
-  "pyproject.toml": "987123c0dd9fed3c9598b65a11097a31a6b291f62358051e392effd0b69bb113",
-  "telegram_bot_stack/cli/commands/deploy.py": "c3cfb1af481b58b94a9456d7b830f7b4b9697ff366d34f75ecc5b7458930c0c5",
-  "telegram_bot_stack/cli/main.py": "10b93f6d7248b4d47709eaf82e9eceaac9b101c291eee521d609d0e84295c513",
-  "telegram_bot_stack/cli/utils/deployment.py": "3777fa33e5bf6ce9add86343fb8165c75df4b75f43d6f258f57fbf9c5d468a78",
-  "telegram_bot_stack/cli/utils/vps.py": "d32e91d3ebe195922465176cdfebe77927b5f33728619f00e3f3eba44dcad145",
-  "tests/cli/test_vps_utils.py": "6fb401b71b5731e6ce66821dbd4423f6cbb074379a5964e0c300084b8670fd56",
-  "tests/cli/test_deploy_command.py": "f3a98619540b649b3370f81fb1d41838e371cd5265e3eca589e7de0c6900c7fc",
-  "tests/cli/test_deployment_utils.py": "7f66ddb304305216cf9c106a6ab74a197473f138bdc38008db38df93af624afc",
-  ".github/workflows/pypi-publish.yml": "bb8b8afc36c7fa569847a68105de46662b8e80be159fc3e3f140720579fb4da2",
-  ".github/workflows/release.yml": "a0aa904b6d13ba3675ccce74b7091a3d08658da75400f915a382a3bba58eb8c5",
-  ".github/workflows/tests.yml": "827b5f7398d323cde8c7bc76ad4789227cec33eae421e38ed18e1cc925a35826",
-  "docs/README.md": "e04237f063541ff56a49f3987a8cc13c99a840e731d122608c703c781ac76f24"
+  "README.md": "2d1c1bfc935d0b135678a84f457c38549c54a812d968751eb0c63fc103a77ca2",
+  "docs/cli-specification.md": "d7e792696f216ffde6319efc30b3f2fbe6c5c89f076fb0e3cb15a1818f47949b",
+  "docs/quickstart.md": "882690b104234fb6a275b9047216333e3af52cc91b76fcc8386dc4696f45a9e2",
+  "telegram_bot_stack/cli/commands/init.py": "97980ca20268cc7beb8865f59915c30b8a2c40c5fac2a9de96f38c58dc5fde30",
+  "telegram_bot_stack/cli/utils/testing.py": "79de429defc45b3bd78b57bc2475777f6952ac420fd058b823451b814ec5fa70",
+  "pyproject.toml": "596d81640f1b6a7d9463d5d8aac9592333f635aff46022f184f9b7e82288aeba",
+  "tests/cli/test_init_command.py": "a0202e9c1b6e866462c1868dbebf362f7f779fad5c2242250dec09d86e725772",
+  ".github/workflows/tests.yml": "0212aa4858004b2d4c6b0643286a60677fd89c9dd9c8deb5e8a39f25130bb259",
+  "telegram_bot_stack/storage/memory.py": "8cc73ae0460d66caaed9e2f95a273adc7d4222155fe1e6d51316999874df35c3"
 }

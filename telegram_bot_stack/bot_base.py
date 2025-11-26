@@ -11,6 +11,7 @@ from telegram import (
     InlineKeyboardMarkup,
     Update,
 )
+from telegram.error import Conflict
 from telegram.ext import (
     Application,
     CallbackQueryHandler,
@@ -70,6 +71,9 @@ class BotBase:
         self.application: Optional[Application] = None
         self._running = False
         self._shutdown_event = asyncio.Event()
+        self._consecutive_conflicts = 0
+        self._successful_polls = 0  # Track successful getUpdates (200 OK)
+        self._ever_had_success = False  # Track if bot successfully established
 
         # Default commands if not provided
         self.user_commands = user_commands or ["/start", "/my_id"]
@@ -122,6 +126,21 @@ class BotBase:
             f"👋 Welcome to {self.bot_name}!\n\n"
             f"I'm a helpful bot. Use /my_id to see your user ID."
         )
+
+    # Middleware to track successful updates
+    async def _track_successful_update(
+        self, update: Update, context: ContextTypes.DEFAULT_TYPE
+    ) -> None:
+        """Track successful getUpdates to determine if bot is truly active."""
+        if update:
+            self._successful_polls += 1
+            # Reset conflict counter on successful update
+            self._consecutive_conflicts = 0
+
+            # Mark as established after 2 successful polls
+            if not self._ever_had_success and self._successful_polls >= 2:
+                self._ever_had_success = True
+                logger.info("✅ Bot successfully established polling connection")
 
     # Built-in command handlers
 
@@ -477,11 +496,75 @@ class BotBase:
 
     # Bot lifecycle methods
 
+    async def base_error_handler(
+        self, update: Optional[Update], context: ContextTypes.DEFAULT_TYPE
+    ) -> None:
+        """Handle errors from the telegram bot.
+
+        This is a base error handler that catches common errors like Conflict.
+        Uses "first come, first served" logic - the bot that successfully
+        gets 2+ updates first keeps running, others shutdown gracefully.
+        """
+        error = context.error
+
+        # Handle Conflict error (multiple bot instances running)
+        if isinstance(error, Conflict):
+            self._consecutive_conflicts += 1
+
+            # If this bot already got 2+ successful updates, it's established
+            # Occasional conflicts are OK (race condition during startup)
+            if self._ever_had_success:
+                # Log but don't shutdown - we're the established instance
+                if self._consecutive_conflicts % 5 == 0:  # Log every 5 conflicts
+                    logger.warning(
+                        f"⚠️  Detected {self._consecutive_conflicts} conflicts. "
+                        "Another bot may be trying to start. "
+                        "This instance is established and will keep running."
+                    )
+                return  # Don't shutdown
+
+            # This bot hasn't successfully polled yet
+            # High threshold to allow startup race conditions
+            if self._consecutive_conflicts >= 5:
+                logger.error(
+                    "⚠️  Another bot instance is already running. "
+                    "Shutting down this instance..."
+                )
+                logger.error(
+                    f"💡 This bot got {self._successful_polls} successful updates "
+                    f"vs {self._consecutive_conflicts} conflicts. "
+                    "The other bot is more active."
+                )
+                # Stop the application
+                if self.application:
+                    self.application.stop_running()
+            else:
+                # Log but don't stop yet
+                logger.warning(
+                    f"⚠️  Conflict detected ({self._consecutive_conflicts}/5). "
+                    f"Successful updates: {self._successful_polls}. "
+                    "Checking if another instance is already active..."
+                )
+            return
+
+        # Reset conflict counter on any other error
+        self._consecutive_conflicts = 0
+
+        # Log other errors
+        logger.error(f"Error occurred: {error}", exc_info=context.error)
+
     def register_handlers(self):
         """Register all command handlers with the application.
 
         Override this in subclass to add additional handlers.
         """
+        # Register update tracking middleware (processes ALL updates)
+        from telegram.ext import TypeHandler
+
+        self.application.add_handler(
+            TypeHandler(Update, self._track_successful_update), group=-1
+        )
+
         # Base command handlers
         base_handlers = {
             "start": self.start,
@@ -504,6 +587,9 @@ class BotBase:
 
         # Add callback query handler for inline buttons
         self.application.add_handler(CallbackQueryHandler(self.handle_callback_query))
+
+        # Add base error handler
+        self.application.add_error_handler(self.base_error_handler)
 
     async def set_bot_commands(self):
         """Set bot commands in Telegram UI to make them visible."""

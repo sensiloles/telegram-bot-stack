@@ -1,7 +1,7 @@
 {
   "metadata": {
     "version": "3.0.0",
-    "generated_at": "2025-11-24",
+    "generated_at": "2025-11-26",
     "graph_id": "bot_framework_core",
     "graph_name": "Bot Framework - Core",
     "graph_type": "sub_graph",
@@ -12,7 +12,7 @@
     "scope": "Core bot framework components",
     "root_package": "telegram_bot_stack",
     "node_count": 4,
-    "edge_count": 0
+    "edge_count": 3
   },
   "nodes": [
     {
@@ -105,7 +105,7 @@
       "type": "module",
       "path": "telegram_bot_stack/bot_base.py",
       "description": "Base bot class with common patterns for telegram bots.",
-      "lines_of_code": 561,
+      "lines_of_code": 647,
       "classes": [
         "BotBase"
       ],
@@ -125,5 +125,27 @@
       "category": "implementation"
     }
   ],
-  "edges": []
+  "edges": [
+    {
+      "id": "edge_1",
+      "source": "telegram_bot_stack.bot_base",
+      "target": "telegram_bot_stack.user_manager",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.user_manager"
+    },
+    {
+      "id": "edge_2",
+      "source": "telegram_bot_stack.bot_base",
+      "target": "telegram_bot_stack",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack"
+    },
+    {
+      "id": "edge_3",
+      "source": "telegram_bot_stack.bot_base",
+      "target": "telegram_bot_stack.admin_manager",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.admin_manager"
+    }
+  ]
 }

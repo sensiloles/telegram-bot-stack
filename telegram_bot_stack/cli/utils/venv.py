@@ -88,3 +88,51 @@ def get_activation_command(venv_path: Path) -> str:
     if sys.platform == "win32":
         return f"{venv_path}\\Scripts\\activate"
     return f"source {venv_path}/bin/activate"
+
+
+def find_venv(project_path: Optional[Path] = None) -> Optional[Path]:
+    """Find virtual environment in current directory or parent directories.
+
+    Searches for venv in:
+    1. Current directory (venv/)
+    2. Parent directories (up to 3 levels)
+
+    Args:
+        project_path: Optional starting path. Defaults to current directory.
+
+    Returns:
+        Path to venv if found, None otherwise
+    """
+    if project_path is None:
+        project_path = Path.cwd()
+
+    # Check current directory
+    venv_path = project_path / "venv"
+    if venv_path.exists() and _is_valid_venv(venv_path):
+        return venv_path
+
+    # Check parent directories (up to 3 levels)
+    for _ in range(3):
+        project_path = project_path.parent
+        venv_path = project_path / "venv"
+        if venv_path.exists() and _is_valid_venv(venv_path):
+            return venv_path
+
+    return None
+
+
+def _is_valid_venv(venv_path: Path) -> bool:
+    """Check if path is a valid virtual environment.
+
+    Args:
+        venv_path: Path to check
+
+    Returns:
+        True if valid venv, False otherwise
+    """
+    if sys.platform == "win32":
+        python_exe = venv_path / "Scripts" / "python.exe"
+    else:
+        python_exe = venv_path / "bin" / "python"
+
+    return python_exe.exists()

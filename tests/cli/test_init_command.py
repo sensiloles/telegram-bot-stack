@@ -1,7 +1,11 @@
 """Tests for init command."""
 
+import subprocess
+import sys
 from pathlib import Path
+from unittest.mock import MagicMock, patch
 
+import pytest
 from click.testing import CliRunner
 
 from telegram_bot_stack.cli.main import cli
@@ -26,7 +30,8 @@ def test_init_basic(tmp_path):
         assert (project_path / "bot.py").exists()
         assert (project_path / "README.md").exists()
         assert (project_path / ".env.example").exists()
-        assert (project_path / "requirements.txt").exists()
+        assert (project_path / "pyproject.toml").exists()
+        assert (project_path / "Makefile").exists()
         assert (project_path / "venv").exists()
 
 
@@ -117,7 +122,7 @@ def test_init_with_git(tmp_path):
 
 
 def test_init_pyproject_toml(tmp_path):
-    """Test project initialization with pyproject.toml."""
+    """Test project initialization creates pyproject.toml (always)."""
     runner = CliRunner()
 
     with runner.isolated_filesystem(temp_dir=tmp_path):
@@ -126,8 +131,6 @@ def test_init_pyproject_toml(tmp_path):
             [
                 "init",
                 "test-bot",
-                "--package-manager",
-                "poetry",
                 "--no-install-deps",
                 "--no-git",
             ],
@@ -141,8 +144,10 @@ def test_init_pyproject_toml(tmp_path):
         # Check pyproject.toml content
         content = (project_path / "pyproject.toml").read_text()
         assert "telegram-bot-stack" in content
+        assert "[project]" in content
         assert "[tool.ruff]" in content
         assert "[tool.mypy]" in content
+        assert "[tool.pytest.ini_options]" in content
 
 
 def test_init_existing_directory(tmp_path):
@@ -187,9 +192,130 @@ def test_init_minimal(tmp_path):
         assert (project_path / "bot.py").exists()
         assert (project_path / "venv").exists()
 
+        # Should have pyproject.toml and Makefile (always created)
+        assert (project_path / "pyproject.toml").exists()
+        assert (project_path / "Makefile").exists()
+
         # Should not have extras
         assert not (project_path / ".pre-commit-config.yaml").exists()
         assert not (project_path / "tests").exists()
         assert not (project_path / ".vscode").exists()
         assert not (project_path / ".idea").exists()
         assert not (project_path / ".gitignore").exists()
+
+
+@pytest.mark.skipif(
+    sys.version_info < (3, 10),
+    reason="subprocess mocking behaves differently in Python 3.9",
+)
+def test_init_with_install_deps_success(tmp_path):
+    """Test project initialization with dependency installation (mocked)."""
+    runner = CliRunner()
+
+    with runner.isolated_filesystem(temp_dir=tmp_path):
+        # Mock subprocess.run at module level to catch all calls
+        with patch("subprocess.run") as mock_subprocess:
+            # Mock successful subprocess calls (venv creation, pip install, etc.)
+            mock_result = MagicMock(returncode=0, stderr="", stdout="")
+            mock_subprocess.return_value = mock_result
+
+            result = runner.invoke(
+                cli,
+                ["init", "test-bot", "--no-git"],
+            )
+
+            # Should succeed
+            assert result.exit_code == 0
+            project_path = Path("test-bot")
+            assert project_path.exists()
+
+
+@pytest.mark.skipif(
+    sys.version_info < (3, 10),
+    reason="subprocess mocking behaves differently in Python 3.9",
+)
+def test_init_with_install_deps_failure(tmp_path):
+    """Test project initialization handles dependency installation failure."""
+    runner = CliRunner()
+
+    with runner.isolated_filesystem(temp_dir=tmp_path):
+        # Mock subprocess.run at module level
+        with patch("subprocess.run") as mock_subprocess:
+            # Make subprocess raise CalledProcessError for pip install
+            def side_effect_func(*args, **kwargs):
+                # Check if this is a pip install command
+                if args and len(args[0]) > 2 and "pip" in str(args[0]):
+                    raise subprocess.CalledProcessError(
+                        1,
+                        args[0],
+                        stderr="ERROR: Could not find a version that satisfies the requirement telegram-bot-stack",
+                    )
+                # Otherwise return success (for venv creation, etc.)
+                return MagicMock(returncode=0, stderr="", stdout="")
+
+            mock_subprocess.side_effect = side_effect_func
+
+            result = runner.invoke(
+                cli,
+                ["init", "test-bot", "--no-git"],
+            )
+
+            # Should still succeed but show warning
+            assert result.exit_code == 0
+            project_path = Path("test-bot")
+            assert project_path.exists()
+            # Should show warning about installation failure
+            assert (
+                "Warning" in result.output
+                or "install dependencies later" in result.output
+            )
+
+
+def test_init_with_package_manager_poetry(tmp_path):
+    """Test project initialization with poetry package manager."""
+    runner = CliRunner()
+
+    with runner.isolated_filesystem(temp_dir=tmp_path):
+        # Mock subprocess.run at module level
+        with patch("subprocess.run") as mock_subprocess:
+            mock_subprocess.return_value = MagicMock(returncode=0, stderr="", stdout="")
+
+            result = runner.invoke(
+                cli,
+                [
+                    "init",
+                    "test-bot",
+                    "--package-manager",
+                    "poetry",
+                    "--no-git",
+                ],
+            )
+
+            assert result.exit_code == 0
+            project_path = Path("test-bot")
+            assert project_path.exists()
+
+
+def test_init_with_package_manager_pdm(tmp_path):
+    """Test project initialization with pdm package manager."""
+    runner = CliRunner()
+
+    with runner.isolated_filesystem(temp_dir=tmp_path):
+        # Mock subprocess.run at module level
+        with patch("subprocess.run") as mock_subprocess:
+            mock_subprocess.return_value = MagicMock(returncode=0, stderr="", stdout="")
+
+            result = runner.invoke(
+                cli,
+                [
+                    "init",
+                    "test-bot",
+                    "--package-manager",
+                    "pdm",
+                    "--no-git",
+                ],
+            )
+
+            assert result.exit_code == 0
+            project_path = Path("test-bot")
+            assert project_path.exists()

@@ -1,7 +1,7 @@
 {
   "metadata": {
     "version": "3.0.0",
-    "generated_at": "2025-11-25",
+    "generated_at": "2025-11-26",
     "graph_id": "bot_framework_storage",
     "graph_name": "Bot Framework - Storage",
     "graph_type": "sub_graph",
@@ -12,7 +12,7 @@
     "scope": "Storage abstraction layer and implementations",
     "root_package": "telegram_bot_stack.storage",
     "node_count": 5,
-    "edge_count": 1
+    "edge_count": 2
   },
   "nodes": [
     {
@@ -162,6 +162,13 @@
     {
       "id": "edge_1",
       "source": "telegram_bot_stack.storage.sql",
+      "target": "telegram_bot_stack.storage.base",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.storage.base"
+    },
+    {
+      "id": "edge_2",
+      "source": "telegram_bot_stack.storage.memory",
       "target": "telegram_bot_stack.storage.base",
       "type": "imports",
       "description": "Imports from telegram_bot_stack.storage.base"

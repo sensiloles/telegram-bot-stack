@@ -1,11 +1,18 @@
 """Run bot in development mode with auto-reload."""
 
+import os
+import queue
 import subprocess
 import sys
+import threading
 import time
 from pathlib import Path
 
 import click
+
+from telegram_bot_stack.cli.utils import venv
+from telegram_bot_stack.cli.utils.bot_lock import BotLockManager
+from telegram_bot_stack.cli.utils.venv import find_venv, get_venv_python
 
 
 @click.command()
@@ -40,6 +47,31 @@ def dev(reload: bool, bot_file: str) -> None:
         click.echo("\nMake sure you're in the project directory and bot.py exists.")
         sys.exit(1)
 
+    # Check for bot lock (prevent multiple instances)
+    lock_manager = BotLockManager(Path.cwd())
+    if not lock_manager.acquire_lock():
+        sys.exit(1)
+
+    # Find and use venv if available
+    venv_path = find_venv()
+    python_executable = sys.executable
+
+    if venv_path:
+        venv_python = get_venv_python(venv_path)
+        if venv_python.exists():
+            python_executable = str(venv_python)
+            click.echo(f"📦 Using virtual environment: {venv_path}\n")
+        else:
+            click.secho(
+                "⚠️  Warning: venv found but Python executable not found", fg="yellow"
+            )
+    else:
+        click.secho(
+            "⚠️  Warning: No virtual environment found. Using system Python.",
+            fg="yellow",
+        )
+        click.echo("  Consider running: python -m venv venv\n")
+
     # Check for .env file
     env_file = Path.cwd() / ".env"
     if not env_file.exists():
@@ -47,34 +79,50 @@ def dev(reload: bool, bot_file: str) -> None:
         click.echo("Create .env with your BOT_TOKEN:")
         click.echo('  echo "BOT_TOKEN=your_token_here" > .env\n')
 
-    if reload:
-        click.secho(
-            "🤖 Starting bot in development mode (auto-reload enabled)...\n", fg="cyan"
-        )
-        click.echo("Press Ctrl+C to stop\n")
+    # Check if telegram-bot-stack is installed
+    try:
+        import telegram_bot_stack  # noqa: F401
+    except ImportError:
+        click.secho("❌ Error: telegram-bot-stack is not installed", fg="red")
+        click.echo("\nInstall dependencies:")
+        if venv_path:
+            click.echo(f"  {venv.get_activation_command(venv_path)}")
+            click.echo("  pip install -e .[dev]")
+        else:
+            click.echo("  pip install -e .[dev]")
+        sys.exit(1)
 
-        try:
-            # Use watchdog for auto-reload
-            _run_with_reload(bot_path)
-        except ImportError:
-            click.secho(
-                "⚠️  Warning: watchdog not installed, running without auto-reload",
-                fg="yellow",
-            )
-            _run_bot(bot_path)
-    else:
-        click.secho("🤖 Starting bot...\n", fg="cyan")
-        _run_bot(bot_path)
+    try:
+        if reload:
+            try:
+                # Use watchdog for auto-reload
+                _run_with_reload(bot_path, python_executable)
+            except ImportError:
+                click.secho(
+                    "⚠️  Warning: watchdog not installed, running without auto-reload",
+                    fg="yellow",
+                )
+                _run_bot(bot_path, python_executable)
+        else:
+            click.secho("🤖 Starting bot...\n", fg="cyan")
+            _run_bot(bot_path, python_executable)
+    finally:
+        # Always release lock on exit
+        lock_manager.release_lock()
 
 
-def _run_bot(bot_path: Path) -> None:
+def _run_bot(bot_path: Path, python_executable: str = None) -> None:
     """Run the bot without auto-reload.
 
     Args:
         bot_path: Path to the bot file
+        python_executable: Python executable to use (defaults to sys.executable)
     """
+    if python_executable is None:
+        python_executable = sys.executable
+
     try:
-        subprocess.run([sys.executable, str(bot_path)], check=True)
+        subprocess.run([python_executable, str(bot_path)], check=True)
     except KeyboardInterrupt:
         click.echo("\n\n👋 Bot stopped")
     except subprocess.CalledProcessError as e:
@@ -82,12 +130,16 @@ def _run_bot(bot_path: Path) -> None:
         sys.exit(e.returncode)
 
 
-def _run_with_reload(bot_path: Path) -> None:
+def _run_with_reload(bot_path: Path, python_executable: str = None) -> None:
     """Run the bot with auto-reload using watchdog.
 
     Args:
         bot_path: Path to the bot file
+        python_executable: Python executable to use (defaults to sys.executable)
     """
+    if python_executable is None:
+        python_executable = sys.executable
+
     try:
         from watchdog.events import FileSystemEventHandler
         from watchdog.observers import Observer
@@ -113,16 +165,20 @@ def _run_with_reload(bot_path: Path) -> None:
 
     def start_bot():
         """Start the bot process."""
+        env = os.environ.copy()
+        env["PYTHONUNBUFFERED"] = "1"
         return subprocess.Popen(
-            [sys.executable, str(bot_path)],
+            [python_executable, "-u", str(bot_path)],  # -u for unbuffered output
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             text=True,
+            bufsize=0,  # Unbuffered
+            env=env,
         )
 
     # Start initial bot process
+    click.secho("🤖 Starting bot...\n", fg="cyan")
     process = start_bot()
-    click.secho("✅ Bot started", fg="green")
 
     # Setup file watcher
     event_handler = BotReloadHandler()
@@ -130,21 +186,102 @@ def _run_with_reload(bot_path: Path) -> None:
     observer.schedule(event_handler, path=str(bot_path.parent), recursive=True)
     observer.start()
 
+    # Start reading bot output in background
+    # Use queue for thread-safe communication
+    output_queue = queue.Queue(maxsize=1000)
+    output_stopped = threading.Event()
+    output_lock = threading.Lock()
+
+    def read_output():
+        """Read and display bot output."""
+        try:
+            while True:
+                line = process.stdout.readline()
+                if not line:
+                    if process.poll() is not None:
+                        break
+                    time.sleep(0.001)  # Minimal sleep
+                    continue
+                # Put line in queue (blocking to ensure it's queued)
+                line_stripped = line.rstrip()
+                if line_stripped:  # Only queue non-empty lines
+                    try:
+                        output_queue.put(line_stripped, timeout=0.1)
+                    except queue.Full:
+                        # If queue is full, try to display directly (fallback)
+                        with output_lock:
+                            click.echo(line_stripped, nl=True)
+                            sys.stdout.flush()
+        except Exception as e:
+            click.echo(f"Error reading output: {e}", err=True)
+        finally:
+            output_stopped.set()
+
+    output_thread = threading.Thread(target=read_output, daemon=True)
+    output_thread.start()
+
+    # Give thread a moment to start reading
+    time.sleep(0.05)
+
     try:
         while True:
+            # Display any available output (non-blocking)
+            displayed_any = False
+            try:
+                # Use timeout to avoid blocking too long
+                while True:
+                    try:
+                        line = output_queue.get_nowait()
+                        click.echo(line, nl=True)
+                        sys.stdout.flush()
+                        displayed_any = True
+                    except queue.Empty:
+                        break
+            except Exception:
+                pass
+
             # Check if process is still running
-            if process.poll() is not None:
+            exit_code = process.poll()
+            if exit_code is not None:
                 click.secho("\n⚠️  Bot process exited", fg="yellow")
+                # Wait a bit for remaining output
+                output_stopped.wait(timeout=2.0)
+                # Read all remaining output from queue
+                try:
+                    while True:
+                        line = output_queue.get_nowait()
+                        click.echo(line, nl=True)
+                        sys.stdout.flush()
+                except queue.Empty:
+                    pass
+                # Also try to read any remaining output directly
+                try:
+                    remaining = process.stdout.read()
+                    if remaining:
+                        click.echo(remaining, nl=False)
+                        sys.stdout.flush()
+                except Exception:
+                    pass
+                if exit_code != 0:
+                    click.secho(f"Exit code: {exit_code}", fg="red")
                 break
+
+            # Smaller sleep for better responsiveness
+            time.sleep(0.02 if displayed_any else 0.05)
 
             # Check if restart requested
             if restart_requested:
-                click.echo("\n🔄 Code changed, restarting bot...")
+                click.echo("")  # Empty line for separation
                 process.terminate()
                 process.wait(timeout=5)
+                click.secho("🤖 Updating bot...\n", fg="cyan")
                 process = start_bot()
-                click.secho("✅ Bot restarted", fg="green")
                 restart_requested = False
+                # Restart output thread
+                output_stopped.clear()
+                output_thread = threading.Thread(target=read_output, daemon=True)
+                output_thread.start()
+                time.sleep(0.05)
 
             time.sleep(0.5)
 
