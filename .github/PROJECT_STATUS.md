@@ -1,16 +1,16 @@
 # Project Status - telegram-bot-stack
 
-**Version:** v1.17.0 → v2.0.0 MVP
-**Updated:** 2025-11-25
-**Status:** 🎯 Phase 2 - MVP Development
+**Version:** v1.21.0 → v2.0.0 MVP
+**Updated:** 2025-11-26
+**Status:** 🏗️ Phase 2 - Hardening Killer Feature
 
 ---
 
-## Current Phase: Product-First MVP
+## Current Phase: Production-Ready Deployment
 
-**Strategy:** Product-first approach (changed from engineering-first)
-**Timeline:** 8 weeks to MVP
-**Focus:** Ship TWO killer features, add scaling later
+**Strategy:** Killer feature (auto-deploy) is LIVE but needs hardening
+**Timeline:** 2-3 weeks to production-ready
+**Focus:** Make deployment bulletproof for v2.0.0 MVP
 
 ### The Vision
 
@@ -19,7 +19,7 @@ From idea to production in 10 minutes
 
 1. CREATE  → telegram-bot-stack init my-bot           (5 min)  ✅ DONE
 2. CODE    → telegram-bot-stack dev --reload          (instant) ✅ DONE
-3. DEPLOY  → telegram-bot-stack deploy up             (1 cmd)  ⏳ NEXT
+3. DEPLOY  → telegram-bot-stack deploy up             (1 cmd)  🏗️ LIVE (needs hardening)
 
 Total: ~10 minutes to live bot 🚀
 ```
@@ -43,125 +43,348 @@ Total: ~10 minutes to live bot 🚀
 
 ---
 
-### ⏳ Sprint 2 Next: VPS Deployment (#27, #28)
+### 🏗️ Sprint 2 In Progress: VPS Deployment (Killer Feature #2)
 
 **Timeline:** Week 4-8
-**Status:** Ready to start
+**Status:** 🏗️ BASE DEPLOYED (v1.19.0, v1.21.0) → Now hardening
 **Dependencies:** #40 complete ✅
 
-**Commands:**
+#### ✅ Phase 2.1: Basic Deployment (DONE)
 
-- `telegram-bot-stack deploy up` - Deploy to VPS
-- `telegram-bot-stack deploy status` - Check deployment
-- `telegram-bot-stack deploy logs` - View logs
-- `telegram-bot-stack deploy down` - Teardown
+**Shipped:** v1.19.0, v1.21.0
 
-**Auto-configures:**
+- ✅ `telegram-bot-stack deploy init` - Setup deployment
+- ✅ `telegram-bot-stack deploy up` - Deploy to VPS
+- ✅ `telegram-bot-stack deploy down` - Teardown
+- ✅ `telegram-bot-stack deploy status` - Check status
+- ✅ `telegram-bot-stack deploy logs` - View logs
+- ✅ `telegram-bot-stack deploy update` - Update bot
+- ✅ SSH + Docker automation
+- ✅ Production templates (#28)
+- ✅ Comprehensive deployment guide
 
-- SSH + Docker setup
-- Production templates (#28)
-- Health monitoring + logging
-- Zero-downtime deployment
+**Result:** Basic deployment works, but NOT production-ready
 
-**Result:** Code to production in 1 command
+#### ⏳ Phase 2.2: Production Hardening (IN PROGRESS)
+
+**Goal:** Make deployment bulletproof for real production use
+
+**CRITICAL Issues (must fix before v2.0.0):**
+
+| #       | Issue                         | Part of Deploy | Status  | Time  | Blocks |
+| ------- | ----------------------------- | -------------- | ------- | ----- | ------ |
+| **#76** | Rollback mechanism            | ✅ YES         | ⏳ TODO | 3-4h  | -      |
+| **#77** | Health checks + auto-recovery | ✅ YES         | ⏳ TODO | 4-5h  | #78    |
+| **#79** | Secrets management            | ✅ YES         | ⏳ TODO | 5-6h  | -      |
+| **#81** | Backup/restore                | ✅ YES         | ⏳ TODO | 5-6h  | -      |
+| **#84** | Troubleshooting guide         | ✅ YES (docs)  | ⏳ TODO | 3-4h  | -      |
+| **#85** | Integration tests             | ✅ YES (tests) | ⏳ TODO | 8-10h | -      |
+| **#88** | Doctor command                | 🔧 CLI tool    | ⏳ TODO | 6-8h  | -      |
+
+**Total Critical Path:** ~35-43 hours (5-6 days)
+
+**IMPORTANT Issues (do after critical):**
+
+| #       | Issue                   | Part of Deploy   | Status  | Time   | Depends  |
+| ------- | ----------------------- | ---------------- | ------- | ------ | -------- |
+| **#78** | Zero-downtime deploy    | ✅ YES           | ⏳ TODO | 6-8h   | #77      |
+| **#80** | Deployment verification | ✅ YES           | ⏳ TODO | 4-5h   | -        |
+| **#82** | Monitoring + alerting   | ✅ YES           | ⏳ TODO | 8-10h  | #77      |
+| **#83** | Multi-environment       | ✅ YES           | ⏳ TODO | 4-5h   | -        |
+| **#86** | Upgrade command         | 🔧 CLI tool      | ⏳ TODO | 5-6h   | -        |
+| **#87** | Redis storage           | 🔧 Scaling       | ⏳ TODO | 6-8h   | -        |
+| **#89** | Production example      | 📖 Demo          | ⏳ TODO | 12-16h | multiple |
+| **#90** | Structured logging      | 🔧 Observability | ⏳ TODO | 5-6h   | -        |
+
+**Total Important Path:** ~50-64 hours (7-9 days)
+
+**Result:** Production-ready deployment system
 
 ---
 
 ## Issue Status Matrix
 
-### 🔴 CRITICAL (Active)
+### 🔴 CRITICAL - Killer Feature Hardening (v2.0.0 MVP)
 
-| #   | Title          | Status         | Sprint | Blocks   |
-| --- | -------------- | -------------- | ------ | -------- |
-| #40 | Full Dev Setup | ✅ Complete    | 1      | #27      |
-| #27 | VPS Deploy CLI | ⏳ Ready       | 2      | #29, #31 |
-| #28 | Docker Tpl     | ⏳ Ready       | 2      | #29      |
-| #60 | Agent Optimize | 🏗️ In Progress | 1-2    | -        |
+**Deployment Core (must complete for v2.0.0):**
 
-### 🟠 HIGH (Post-MVP)
+| #   | Issue                  | Category | Status            | Depends | Blocks   |
+| --- | ---------------------- | -------- | ----------------- | ------- | -------- |
+| #27 | VPS Deploy CLI         | Deploy   | ✅ DONE (v1.19.0) | #40     | #76-#85  |
+| #28 | Docker Templates       | Deploy   | ✅ DONE (v1.21.0) | #27     | #76-#85  |
+| #76 | **Rollback mechanism** | Deploy   | ⏳ TODO           | #27     | -        |
+| #77 | **Health checks**      | Deploy   | ⏳ TODO           | #27     | #78, #80 |
+| #79 | **Secrets management** | Deploy   | ⏳ TODO           | #27     | -        |
+| #81 | **Backup/restore**     | Deploy   | ⏳ TODO           | #27     | -        |
+| #84 | **Troubleshooting**    | Docs     | ⏳ TODO           | #27     | -        |
+| #85 | **Deploy tests**       | Tests    | ⏳ TODO           | #27     | -        |
+| #88 | **Doctor command**     | CLI      | ⏳ TODO           | -       | -        |
 
-| #   | Title         | Week  | Notes            |
-| --- | ------------- | ----- | ---------------- |
-| #29 | Deploy Docs   | 8     | After #27, #28   |
-| #41 | Redis Storage | 9-10  | Post-MVP scaling |
-| #42 | Observability | 9-10  | Post-MVP         |
-| #43 | Security      | 11-12 | Post-MVP         |
-| #44 | Multi-inst    | 11-12 | Needs #41        |
+**Other Critical:**
 
-### 🟡 MEDIUM (v2.0.1+)
+| #   | Issue          | Status            | Notes             |
+| --- | -------------- | ----------------- | ----------------- |
+| #40 | Full Dev Setup | ✅ DONE (v1.17.0) | Killer Feature #1 |
+| #60 | Agent Optimize | 🏗️ In Progress    | Ongoing           |
 
-#19 (Webhooks), #46 (Retry), #47 (Migration), #45 (i18n), #30 (MyPy), #33 (Auto Graphs)
-
-### 🟢 LOW (v3.0+)
-
-#31 (PyPI Auto), #48 (Benchmarks), #49 (Examples), #50 (Load Test), #51 (Plugins)
+**Total Critical: 9 TODO + 3 DONE = 12 issues**
 
 ---
 
-## Critical Path
+### 🟠 HIGH - Production Features (v2.0.1)
+
+**Deployment Advanced:**
+
+| #   | Issue                   | Category | Depends | Notes               |
+| --- | ----------------------- | -------- | ------- | ------------------- |
+| #78 | Zero-downtime deploy    | Deploy   | #77     | Blue-green strategy |
+| #80 | Deployment verification | Deploy   | #77     | Smoke tests         |
+| #82 | Monitoring + alerting   | Deploy   | #77     | Observability       |
+| #83 | Multi-environment       | Deploy   | #27     | Dev/staging/prod    |
+
+**Infrastructure:**
+
+| #   | Issue              | Category | Depends | Notes                     |
+| --- | ------------------ | -------- | ------- | ------------------------- |
+| #86 | Upgrade command    | CLI      | -       | Framework updates         |
+| #87 | Redis storage      | Storage  | -       | Scaling (was #41)         |
+| #90 | Structured logging | Logging  | -       | Production logs (was #42) |
+
+**Documentation:**
+
+| #   | Issue              | Category | Depends  | Notes            |
+| --- | ------------------ | -------- | -------- | ---------------- |
+| #29 | Deploy Docs        | Docs     | #27, #28 | Extended guide   |
+| #89 | Production example | Examples | multiple | Task manager bot |
+
+**Legacy High Priority:**
+
+| #   | Issue              | Notes             |
+| --- | ------------------ | ----------------- |
+| #43 | Security hardening | Post-MVP          |
+| #44 | Multi-instance     | Needs #87 (Redis) |
+
+**Total High: 11 issues**
+
+---
+
+### 🟡 MEDIUM - Future Enhancements (v2.1.0+)
+
+**Retry & Resilience:**
+
+- #19 Webhooks support
+- #46 Retry mechanism
+- #47 Migration tools
+
+**Developer Experience:**
+
+- #45 i18n support
+- #30 MyPy strict mode
+- #33 Auto graph generation
+
+**Total Medium: 6 issues**
+
+---
+
+### 🟢 LOW - Long-term Vision (v3.0+)
+
+**Infrastructure:**
+
+- #31 PyPI auto-publish
+- #48 Benchmarking tools
+- #50 Load testing
+
+**Extensibility:**
+
+- #49 Advanced examples
+- #51 Plugin system
+- #52 Admin dashboard
+- #74 Extract project-graph package
+- #75 Extract GitHub automation package
+
+**Testing:**
+
+- #71 Python 3.9 subprocess mocking
+- #67 Pre-commit/CI sync
+
+**Total Low: 9 issues**
+
+---
+
+## Critical Path to v2.0.0 MVP
+
+### Timeline Overview
 
 ```
-✅ Week 1-3:  #40  Full Dev Environment (DONE)
-⏳ Week 4-7:  #27 + #28  VPS Deployment (NEXT)
-   Week 8:    #29  Documentation + Marketing
+✅ Week 1-3:   #40  Full Dev Environment (DONE v1.17.0)
+✅ Week 4-6:   #27 + #28  Basic VPS Deployment (DONE v1.19.0, v1.21.0)
+🏗️ Week 7-8:   #76-#85, #88  Production Hardening (IN PROGRESS)
+⏳ Week 9:     #78, #80, #82, #83  Advanced Features
+⏳ Week 10:    #29, #89  Documentation + Examples
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-✅ v2.0.0 MVP READY (Week 8)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ v2.0.0 MVP LAUNCH (Week 10)
+"From idea to production in 10 minutes" 🚀
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-   Week 9-14: Redis + Observability + Security
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   Week 11-14: #86, #87, #90  Scaling + Observability
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ✅ v2.0.1 PRODUCTION-HARDENED (Week 14)
+```
+
+### Dependency Graph
+
+```
+Killer Feature #2: VPS Deployment
+├── ✅ #27 VPS Deploy CLI (v1.19.0)
+├── ✅ #28 Docker Templates (v1.21.0)
+│
+├── Critical Hardening (parallel work):
+│   ├── #76 Rollback ← #27
+│   ├── #77 Health checks ← #27 → blocks #78, #80
+│   ├── #79 Secrets ← #27
+│   ├── #81 Backup ← #27
+│   ├── #84 Troubleshooting ← #27
+│   ├── #85 Deploy tests ← #27
+│   └── #88 Doctor (independent)
+│
+└── Advanced Features (sequential):
+    ├── #78 Zero-downtime ← #77
+    ├── #80 Verification ← #77
+    ├── #82 Monitoring ← #77
+    └── #83 Multi-env ← #27
+
+Supporting Infrastructure (parallel):
+├── #86 Upgrade command (independent)
+├── #87 Redis storage (independent)
+├── #89 Production example ← #76, #77, #81
+└── #90 Structured logging (independent)
 ```
 
 ---
 
 ## Next Actions
 
-### Immediate (Sprint 2)
+### ⚡ IMMEDIATE (Week 7-8): Production Hardening
+
+**Phase 1: Critical Security & Safety (3-4 days)**
 
 ```bash
-# 1. Start Sprint 2
-git checkout -b feature/27-vps-deployment
+# Work order for maximum safety:
 
-# 2. Review deployment spec
-python3 .github/workflows/scripts/read_issues.py 27
+1. #79 Secrets management (5-6h) ← FIRST (security)
+   → Secure token storage before anything else
 
-# 3. Begin implementation
-# - Deploy commands (deploy up/down/status/logs)
-# - SSH + Docker automation
-# - Production templates (#28)
-# - Health monitoring
+2. #81 Backup/restore (5-6h) ← SECOND (data safety)
+   → Protect data before making changes
+
+3. #76 Rollback mechanism (3-4h) ← THIRD (recovery)
+   → Safety net for deployments
+
+4. #77 Health checks (4-5h) ← FOURTH (reliability)
+   → Auto-recovery for production
 ```
 
-### Week Goals
+**Phase 2: Testing & Documentation (2-3 days)**
 
-**Week 4-5:** VPS deploy commands + SSH automation
-**Week 6:** Docker production templates (#28)
-**Week 7:** Health monitoring + zero-downtime
-**Week 8:** Documentation (#29) + v2.0.0 MVP release 🎉
+```bash
+5. #85 Integration tests (8-10h)
+   → Ensure deployment reliability
+
+6. #84 Troubleshooting guide (3-4h)
+   → Support users when things break
+
+7. #88 Doctor command (6-8h)
+   → Auto-diagnose common issues
+```
+
+**Total: 35-43 hours (~1 week)**
+
+### 🎯 Week 7-8 Goals
+
+**Monday-Tuesday:** Security (#79 Secrets)
+**Wednesday-Thursday:** Data Safety (#81 Backup, #76 Rollback)
+**Friday:** Reliability (#77 Health checks)
+**Weekend:** Testing & Docs (#85, #84, #88)
+
+**Milestone:** Production-safe deployment ✅
+
+### 🚀 Week 9: Advanced Features
+
+```bash
+# After critical hardening is done:
+
+1. #78 Zero-downtime (6-8h) ← depends on #77
+2. #80 Verification (4-5h)
+3. #82 Monitoring (8-10h) ← depends on #77
+4. #83 Multi-environment (4-5h)
+
+# Parallel work:
+5. #86 Upgrade command (5-6h)
+6. #87 Redis storage (6-8h)
+7. #90 Structured logging (5-6h)
+```
+
+**Milestone:** Professional deployment system ✅
+
+### 📖 Week 10: Polish & Examples
+
+```bash
+1. #29 Extended deploy docs
+2. #89 Production example bot (task manager)
+3. Final testing and bug fixes
+4. Release notes and marketing prep
+```
+
+**Milestone:** v2.0.0 MVP READY FOR LAUNCH 🎉
 
 ---
 
 ## Success Metrics
 
-### v2.0.0 MVP (Week 8)
+### v2.0.0 MVP (Week 10)
 
 **Developer Experience:**
 
-- ⏱️ `pip install` → first bot: < 5 min ✅
-- ⏱️ Code → production: 1 command ⏳
-- ⏱️ Total: < 10 minutes end-to-end
+- ⏱️ `pip install` → first bot: < 5 min ✅ DONE
+- ⏱️ Code → production: 1 command 🏗️ BASIC WORKS
+- ⏱️ Total: < 10 minutes end-to-end ⏳ HARDENING
+- 🔒 Production-safe deployment ⏳ IN PROGRESS
+  - Rollback on failure (#76)
+  - Auto-recovery (#77)
+  - Secure secrets (#79)
+  - Data backups (#81)
+  - Auto-diagnostics (#88)
 
-**Technical:**
+**Technical Requirements:**
 
 - ✅ Zero manual configuration
 - ✅ Cross-platform (Linux, macOS, Windows)
-- ✅ Test coverage ≥80%
+- ✅ Test coverage ≥80% (current: 84%)
+- ⏳ Deployment test coverage ≥80% (#85)
+- ⏳ Production-grade error handling (#77, #84)
+- ⏳ Comprehensive documentation (#84)
 
-**Marketing:**
+**Production Readiness Checklist:**
+
+- [x] Basic deployment works
+- [x] Deployment guide exists
+- [ ] Rollback mechanism (#76)
+- [ ] Health checks (#77)
+- [ ] Secrets management (#79)
+- [ ] Backup/restore (#81)
+- [ ] Troubleshooting guide (#84)
+- [ ] Integration tests (#85)
+- [ ] Doctor command (#88)
+- [ ] Zero-downtime updates (#78)
+- [ ] Monitoring (#82)
+
+**Marketing Messages:**
 
 - 🎯 "From idea to production in 10 minutes"
-- 🚀 Best-in-class developer experience
+- 🔒 "Production-safe from day one"
+- 🚀 "Best-in-class developer experience"
+- ⚡ "Deploy with confidence"
 
 ---
 
@@ -169,55 +392,139 @@ python3 .github/workflows/scripts/read_issues.py 27
 
 ### Storage Strategy
 
-- **MVP:** JSON/SQL (1k-10k users)
-- **v2.0.1:** Add Redis (100k+ users)
+- **v2.0.0 MVP:** JSON/SQL (1k-10k users) ✅
+- **v2.0.1:** Add Redis (#87) for caching (100k+ users)
+- **Future:** Distributed storage (multi-instance support)
 
 ### Deployment Strategy
 
-- **MVP:** VPS with Docker (most flexible)
-- **Future:** Serverless/K8s (if demand exists)
+- **v2.0.0 MVP:** VPS with Docker 🏗️
+  - Basic deployment ✅ DONE
+  - Production hardening ⏳ IN PROGRESS (#76-#85)
+  - Zero-downtime updates (#78)
+  - Multi-environment (#83)
+- **v2.0.1:** Advanced deployment
+  - Monitoring & alerting (#82)
+  - Auto-scaling (future)
+- **Future:** Multi-platform
+  - Kubernetes (if demand exists)
+  - Serverless (AWS Lambda, Cloud Functions)
 
 ### CLI Design
 
-- **Phase 1:** Core commands ✅
-- **Phase 2:** Deploy commands ⏳
-- **Phase 3:** Advanced tooling (migrate, benchmark)
+- **Phase 1:** Core commands ✅ DONE (v1.17.0)
+  - init, new, dev, validate
+- **Phase 2:** Deploy commands 🏗️ IN PROGRESS
+  - ✅ Basic: init, up, down, status, logs, update
+  - ⏳ Production: secrets (#79), backup (#81), health (#77)
+  - ⏳ Advanced: rollback (#76), verify (#80), monitor (#82)
+- **Phase 3:** Advanced tooling (v2.1.0+)
+  - upgrade (#86), migrate (#47), doctor (#88)
+  - benchmark (#48), profile, analyze
+
+### Observability Strategy
+
+- **v2.0.0:** Basic logging ✅
+- **v2.0.1:** Structured logging (#90), metrics (#82)
+- **Future:** Distributed tracing, profiling
 
 ---
 
 ## References
 
-**Full Roadmap:** `.github/CONSOLIDATED_ROADMAP.md`
+### Documentation
 
-**Key Issues:**
+- **Full Roadmap:** `.github/CONSOLIDATED_ROADMAP.md`
+- **Deployment Guide:** `docs/deployment_guide.md` ✅
+- **CLI Specification:** `docs/cli-specification.md` ✅
+- **Architecture:** `docs/architecture.md` ✅
 
-- #40: Full Dev Setup (✅ Complete)
-- #27: VPS Deployment (⏳ Next)
-- #28: Docker Templates (⏳ Next)
-- #60: Agent Optimization (🏗️ In Progress)
+### Key Issues (Killer Feature #2)
 
-**GitHub:** https://github.com/sensiloles/telegram-bot-stack
-**PyPI:** https://pypi.org/project/telegram-bot-stack/ (v1.17.0)
+**Deployed:**
+
+- #27: VPS Deploy CLI ✅ DONE (v1.19.0)
+- #28: Docker Templates ✅ DONE (v1.21.0)
+
+**In Progress (Hardening):**
+
+- #76: Rollback mechanism ⏳
+- #77: Health checks + auto-recovery ⏳
+- #79: Secrets management ⏳
+- #81: Backup/restore ⏳
+- #84: Troubleshooting guide ⏳
+- #85: Integration tests ⏳
+- #88: Doctor command ⏳
+
+**Planned (Advanced):**
+
+- #78: Zero-downtime deploy
+- #80: Deployment verification
+- #82: Monitoring + alerting
+- #83: Multi-environment
+
+**Other:**
+
+- #40: Full Dev Setup ✅ DONE (v1.17.0)
+- #60: Agent Optimization 🏗️ In Progress
+
+### Links
+
+- **GitHub:** https://github.com/sensiloles/telegram-bot-stack
+- **PyPI:** https://pypi.org/project/telegram-bot-stack/ (v1.21.0)
+- **Issues:** https://github.com/sensiloles/telegram-bot-stack/issues
+- **Documentation:** https://github.com/sensiloles/telegram-bot-stack#readme
 
 ---
 
 ## Quick Stats
 
-**Current State:**
+### Current State (v1.21.0)
 
-- ✅ 137+ tests, 80%+ coverage
-- ✅ CLI tool (init, new, dev, validate)
-- ✅ 4 bot templates
+**Code Quality:**
+
+- ✅ 137+ tests, 84% coverage
+- ✅ Python 3.9-3.12 support
 - ✅ CI/CD with automated releases
+- ✅ Ruff linting + MyPy type checking
+- ✅ Pre-commit hooks
+
+**Features:**
+
+- ✅ CLI tool: init, new, dev, validate, deploy
+- ✅ 6 bot templates (echo, counter, menu, poll, reminder, quit-smoking)
+- ✅ 3 storage backends (JSON, SQL, Memory)
+- ✅ Rate limiting, admin system, user management
+- ✅ VPS deployment with Docker 🏗️ BASIC
+
+**Infrastructure:**
+
 - ✅ 17 automation scripts
+- ✅ MCP GitHub workflow server
 - ✅ MCP project graph system
+- ✅ Comprehensive documentation
 
-**Ready to Ship:**
+### Open Issues by Priority
 
-- Week 8: v2.0.0 MVP (Killer Features #1 + #2)
-- Week 14: v2.0.1 (Production-hardened)
+- 🔴 **CRITICAL:** 9 issues (deployment hardening)
+- 🟠 **HIGH:** 11 issues (advanced features)
+- 🟡 **MEDIUM:** 6 issues (future enhancements)
+- 🟢 **LOW:** 9 issues (long-term vision)
+
+**Total:** 35 open issues
+
+### Milestones
+
+- ✅ Week 0-3: v1.17.0 - CLI + Dev Environment (DONE)
+- ✅ Week 4-6: v1.19.0-v1.21.0 - Basic Deployment (DONE)
+- 🏗️ Week 7-8: Critical Hardening (IN PROGRESS)
+- ⏳ Week 9: Advanced Features
+- ⏳ Week 10: v2.0.0 MVP Launch 🚀
+- ⏳ Week 11-14: v2.0.1 Production-Hardened
 
 ---
 
-**Status:** 🏗️ Sprint 1 complete, Sprint 2 starting
-**Next Review:** After completing #27 (Week 7)
+**Status:** 🏗️ Killer Feature #2 deployed, now hardening for production
+**Current Focus:** Production safety (#76, #77, #79, #81, #84, #85, #88)
+**Next Milestone:** v2.0.0 MVP (Week 10)
+**Next Review:** After completing critical hardening (Week 8)
