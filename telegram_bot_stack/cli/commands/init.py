@@ -247,10 +247,14 @@ import logging
 import os
 import signal
 
+from dotenv import load_dotenv
 from telegram import Update
 from telegram.ext import Application
 
 from telegram_bot_stack import BotBase, MemoryStorage
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Configure logging
 logging.basicConfig(

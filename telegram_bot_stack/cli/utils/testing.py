@@ -22,6 +22,7 @@ def create_test_structure(project_path: Path, bot_name: str) -> None:
     conftest_content = '''"""Pytest configuration and fixtures."""
 
 import pytest
+
 from telegram_bot_stack import MemoryStorage
 
 

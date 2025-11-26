@@ -177,6 +177,9 @@ target-version = "py{python_version.replace(".", "")}"
 select = ["E", "F", "I", "N", "W", "UP"]
 ignore = []
 
+[tool.ruff.lint.isort]
+known-first-party = ["telegram_bot_stack"]
+
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"

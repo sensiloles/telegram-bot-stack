@@ -8,8 +8,8 @@
     "project_name": "telegram-bot-stack",
     "description": "Test suite, fixtures, and testing utilities",
     "scope": "Unit tests, integration tests, fixtures",
-    "node_count": 35,
-    "edge_count": 13
+    "node_count": 36,
+    "edge_count": 14
   },
   "nodes": [
     {
@@ -1317,7 +1317,7 @@
       "category": "implementation",
       "path": "telegram_bot_stack/cli/commands/init.py",
       "description": "Module init",
-      "lines_of_code": 500,
+      "lines_of_code": 504,
       "complexity_score": 1,
       "exports": [
         "init"
@@ -1337,7 +1337,7 @@
       "category": "implementation",
       "path": "telegram_bot_stack/cli/utils/dependencies.py",
       "description": "Module dependencies",
-      "lines_of_code": 212,
+      "lines_of_code": 215,
       "complexity_score": 1,
       "exports": [
         "install_package",
@@ -1421,6 +1421,26 @@
       "functions": [
         "init_git",
         "create_gitignore"
+      ],
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium"
+    },
+    {
+      "id": "telegram_bot_stack.cli.utils.testing",
+      "name": "testing",
+      "type": "module",
+      "category": "implementation",
+      "path": "telegram_bot_stack/cli/utils/testing.py",
+      "description": "Module testing",
+      "lines_of_code": 103,
+      "complexity_score": 1,
+      "exports": [
+        "create_test_structure"
+      ],
+      "classes": [],
+      "functions": [
+        "create_test_structure"
       ],
       "dependencies": [],
       "dependents": [],
@@ -1518,6 +1538,13 @@
       "target": "telegram_bot_stack.cli.utils.dependencies",
       "type": "imports",
       "description": "Imports from telegram_bot_stack.cli.utils.dependencies"
+    },
+    {
+      "id": "edge_43",
+      "source": "telegram_bot_stack.cli.commands.init",
+      "target": "telegram_bot_stack.cli.utils.git",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.utils.git"
     }
   ]
 }
