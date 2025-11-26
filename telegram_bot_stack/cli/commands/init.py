@@ -240,9 +240,12 @@ def _create_project_structure(project_path: Path, bot_name: str) -> None:
     # Create bot.py
     bot_content = '''"""Main bot implementation."""
 
-import asyncio
 import logging
 import os
+import signal
+
+from telegram import Update
+from telegram.ext import Application
 
 from telegram_bot_stack import BotBase, MemoryStorage
 
@@ -279,11 +282,33 @@ def main() -> None:
 
     # Initialize bot with storage
     storage = MemoryStorage()
-    bot = Bot(storage=storage)
+    bot = Bot(storage=storage, bot_name="My Bot")
 
-    # Run bot
+    # Create and configure application
+    application = Application.builder().token(token).build()
+    bot.application = application
+
+    # Register handlers
+    bot.register_handlers()
+
+    # Set bot commands in Telegram UI
+    async def post_init_wrapper(app):
+        await bot.set_bot_commands()
+
+    application.post_init = post_init_wrapper
+
+    # Setup signal handlers for graceful shutdown
+    def signal_handler(signum, frame):
+        logger.info(f"Received signal {signum}, initiating graceful shutdown...")
+        application.stop_running()
+
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
+
+    # Run the bot
+    logger.info("Press Ctrl+C to stop")
     logger.info("Starting bot...")
-    asyncio.run(bot.run())
+    application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 
 if __name__ == "__main__":

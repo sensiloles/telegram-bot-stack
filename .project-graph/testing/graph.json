@@ -9,7 +9,7 @@
     "description": "Test suite, fixtures, and testing utilities",
     "scope": "Unit tests, integration tests, fixtures",
     "node_count": 34,
-    "edge_count": 10
+    "edge_count": 13
   },
   "nodes": [
     {
@@ -1317,7 +1317,7 @@
       "category": "implementation",
       "path": "telegram_bot_stack/cli/commands/init.py",
       "description": "Module init",
-      "lines_of_code": 472,
+      "lines_of_code": 497,
       "complexity_score": 1,
       "exports": [
         "init"
@@ -1475,6 +1475,27 @@
       "target": "telegram_bot_stack.cli.utils.venv",
       "type": "imports",
       "description": "Imports from telegram_bot_stack.cli.utils.venv"
+    },
+    {
+      "id": "edge_40",
+      "source": "telegram_bot_stack.cli.commands.init",
+      "target": "telegram_bot_stack.cli.utils.venv",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.utils.venv"
+    },
+    {
+      "id": "edge_41",
+      "source": "telegram_bot_stack.cli.commands.init",
+      "target": "telegram_bot_stack.cli.utils.makefile",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.utils.makefile"
+    },
+    {
+      "id": "edge_42",
+      "source": "telegram_bot_stack.cli.commands.init",
+      "target": "telegram_bot_stack.cli.utils.dependencies",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.utils.dependencies"
     }
   ]
 }

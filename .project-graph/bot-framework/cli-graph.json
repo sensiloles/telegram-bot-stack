@@ -12,7 +12,7 @@
     "scope": "CLI tool for bot project management and development",
     "root_package": "telegram_bot_stack.cli",
     "node_count": 22,
-    "edge_count": 22
+    "edge_count": 23
   },
   "nodes": [
     {
@@ -298,7 +298,7 @@
       "type": "module",
       "path": "telegram_bot_stack/cli/commands/init.py",
       "description": "Initialize a new bot project with full dev environment.",
-      "lines_of_code": 472,
+      "lines_of_code": 497,
       "classes": [],
       "functions": [
         "init"
@@ -707,6 +707,13 @@
       "target": "telegram_bot_stack.cli.utils.venv",
       "type": "imports",
       "description": "Imports from telegram_bot_stack.cli.utils.venv"
+    },
+    {
+      "id": "edge_23",
+      "source": "telegram_bot_stack.cli.commands.init",
+      "target": "telegram_bot_stack.cli.utils.makefile",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.utils.makefile"
     }
   ]
 }
