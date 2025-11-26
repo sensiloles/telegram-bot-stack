@@ -214,7 +214,7 @@ def _run_with_reload(bot_path: Path, python_executable: str = None) -> None:
             try:
                 while True:
                     line = output_queue.get_nowait()
-                    click.echo(line)
+                    click.echo(line, nl=True)
                     displayed_any = True
                     sys.stdout.flush()  # Force flush
             except queue.Empty:
@@ -225,12 +225,12 @@ def _run_with_reload(bot_path: Path, python_executable: str = None) -> None:
             if exit_code is not None:
                 click.secho("\n⚠️  Bot process exited", fg="yellow")
                 # Wait a bit for remaining output
-                output_stopped.wait(timeout=1.5)
+                output_stopped.wait(timeout=2.0)
                 # Read all remaining output from queue
                 try:
                     while True:
                         line = output_queue.get_nowait()
-                        click.echo(line)
+                        click.echo(line, nl=True)
                         sys.stdout.flush()
                 except queue.Empty:
                     pass
@@ -238,7 +238,7 @@ def _run_with_reload(bot_path: Path, python_executable: str = None) -> None:
                 try:
                     remaining = process.stdout.read()
                     if remaining:
-                        click.echo(remaining)
+                        click.echo(remaining, nl=False)
                         sys.stdout.flush()
                 except Exception:
                     pass
@@ -246,8 +246,8 @@ def _run_with_reload(bot_path: Path, python_executable: str = None) -> None:
                     click.secho(f"Exit code: {exit_code}", fg="red")
                 break
 
-            # Small sleep to avoid busy waiting, but shorter if we displayed output
-            time.sleep(0.05 if displayed_any else 0.1)
+            # Smaller sleep for better responsiveness
+            time.sleep(0.02 if displayed_any else 0.05)
 
             # Check if restart requested
             if restart_requested:
