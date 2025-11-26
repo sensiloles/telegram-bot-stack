@@ -1,12 +1,15 @@
 {
-  "README.md": "430ad16b437d20f416cc0c527f2b7ae0852b96f8e91d14f8ceecdcd89193ff84",
+  "README.md": "b0f21cd2433fc2df29135eab72f3f32504e17addcf2f15bae635ec750d04f4da",
   "docs/deployment_guide.md": "108e494ae02250ca974dd497280c9b8d8d17240fe3977723389afcebde83beef",
-  "pyproject.toml": "53aae19f66009a2aeffcc963d79decf5758e959893f328590eb6eb1363a25f6e",
+  "pyproject.toml": "987123c0dd9fed3c9598b65a11097a31a6b291f62358051e392effd0b69bb113",
   "telegram_bot_stack/cli/commands/deploy.py": "c3cfb1af481b58b94a9456d7b830f7b4b9697ff366d34f75ecc5b7458930c0c5",
   "telegram_bot_stack/cli/main.py": "10b93f6d7248b4d47709eaf82e9eceaac9b101c291eee521d609d0e84295c513",
   "telegram_bot_stack/cli/utils/deployment.py": "3777fa33e5bf6ce9add86343fb8165c75df4b75f43d6f258f57fbf9c5d468a78",
   "telegram_bot_stack/cli/utils/vps.py": "d32e91d3ebe195922465176cdfebe77927b5f33728619f00e3f3eba44dcad145",
   "tests/cli/test_vps_utils.py": "6fb401b71b5731e6ce66821dbd4423f6cbb074379a5964e0c300084b8670fd56",
   "tests/cli/test_deploy_command.py": "f3a98619540b649b3370f81fb1d41838e371cd5265e3eca589e7de0c6900c7fc",
-  "tests/cli/test_deployment_utils.py": "7f66ddb304305216cf9c106a6ab74a197473f138bdc38008db38df93af624afc"
+  "tests/cli/test_deployment_utils.py": "7f66ddb304305216cf9c106a6ab74a197473f138bdc38008db38df93af624afc",
+  ".github/workflows/pypi-publish.yml": "bb8b8afc36c7fa569847a68105de46662b8e80be159fc3e3f140720579fb4da2",
+  ".github/workflows/release.yml": "a0aa904b6d13ba3675ccce74b7091a3d08658da75400f915a382a3bba58eb8c5",
+  ".github/workflows/tests.yml": "827b5f7398d323cde8c7bc76ad4789227cec33eae421e38ed18e1cc925a35826"
 }

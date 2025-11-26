@@ -332,7 +332,7 @@ tests/
 
 Tests run automatically on every push and pull request via GitHub Actions:
 
-- ✅ Tests on Python 3.9, 3.10, 3.11, 3.12
+- ✅ Tests on Python 3.9, 3.10, 3.11, 3.12 (Python 3.12 is the primary development version)
 - ✅ Code linting with Ruff
 - ✅ Type checking with mypy
 - ✅ Coverage reporting with automated threshold checks
@@ -958,9 +958,11 @@ BOT_TIMEZONE = ZoneInfo("Europe/Moscow")  # Change as needed
 
 ## 📋 Requirements
 
-- Python 3.9+
+- Python 3.9+ (Python 3.12 LTS recommended for development)
 - Docker and Docker Compose
 - Telegram bot token from [@BotFather](https://t.me/BotFather)
+
+> **Note:** The project uses Python 3.12 as the primary development version. All linting, type checking, and release workflows use Python 3.12. Compatibility with Python 3.9-3.11 is maintained through CI testing.
 
 ### Dependencies Management
 
