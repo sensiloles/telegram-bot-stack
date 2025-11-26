@@ -7,6 +7,9 @@ from pathlib import Path
 
 import click
 
+from telegram_bot_stack.cli.utils import venv
+from telegram_bot_stack.cli.utils.venv import find_venv, get_venv_python
+
 
 @click.command()
 @click.option(
@@ -40,12 +43,45 @@ def dev(reload: bool, bot_file: str) -> None:
         click.echo("\nMake sure you're in the project directory and bot.py exists.")
         sys.exit(1)
 
+    # Find and use venv if available
+    venv_path = find_venv()
+    python_executable = sys.executable
+
+    if venv_path:
+        venv_python = get_venv_python(venv_path)
+        if venv_python.exists():
+            python_executable = str(venv_python)
+            click.echo(f"📦 Using virtual environment: {venv_path}\n")
+        else:
+            click.secho(
+                "⚠️  Warning: venv found but Python executable not found", fg="yellow"
+            )
+    else:
+        click.secho(
+            "⚠️  Warning: No virtual environment found. Using system Python.",
+            fg="yellow",
+        )
+        click.echo("  Consider running: python -m venv venv\n")
+
     # Check for .env file
     env_file = Path.cwd() / ".env"
     if not env_file.exists():
         click.secho("⚠️  Warning: .env file not found", fg="yellow")
         click.echo("Create .env with your BOT_TOKEN:")
         click.echo('  echo "BOT_TOKEN=your_token_here" > .env\n')
+
+    # Check if telegram-bot-stack is installed
+    try:
+        import telegram_bot_stack  # noqa: F401
+    except ImportError:
+        click.secho("❌ Error: telegram-bot-stack is not installed", fg="red")
+        click.echo("\nInstall dependencies:")
+        if venv_path:
+            click.echo(f"  {venv.get_activation_command(venv_path)}")
+            click.echo("  pip install -e .[dev]")
+        else:
+            click.echo("  pip install -e .[dev]")
+        sys.exit(1)
 
     if reload:
         click.secho(
@@ -55,26 +91,30 @@ def dev(reload: bool, bot_file: str) -> None:
 
         try:
             # Use watchdog for auto-reload
-            _run_with_reload(bot_path)
+            _run_with_reload(bot_path, python_executable)
         except ImportError:
             click.secho(
                 "⚠️  Warning: watchdog not installed, running without auto-reload",
                 fg="yellow",
             )
-            _run_bot(bot_path)
+            _run_bot(bot_path, python_executable)
     else:
         click.secho("🤖 Starting bot...\n", fg="cyan")
-        _run_bot(bot_path)
+        _run_bot(bot_path, python_executable)
 
 
-def _run_bot(bot_path: Path) -> None:
+def _run_bot(bot_path: Path, python_executable: str = None) -> None:
     """Run the bot without auto-reload.
 
     Args:
         bot_path: Path to the bot file
+        python_executable: Python executable to use (defaults to sys.executable)
     """
+    if python_executable is None:
+        python_executable = sys.executable
+
     try:
-        subprocess.run([sys.executable, str(bot_path)], check=True)
+        subprocess.run([python_executable, str(bot_path)], check=True)
     except KeyboardInterrupt:
         click.echo("\n\n👋 Bot stopped")
     except subprocess.CalledProcessError as e:
@@ -82,12 +122,16 @@ def _run_bot(bot_path: Path) -> None:
         sys.exit(e.returncode)
 
 
-def _run_with_reload(bot_path: Path) -> None:
+def _run_with_reload(bot_path: Path, python_executable: str = None) -> None:
     """Run the bot with auto-reload using watchdog.
 
     Args:
         bot_path: Path to the bot file
+        python_executable: Python executable to use (defaults to sys.executable)
     """
+    if python_executable is None:
+        python_executable = sys.executable
+
     try:
         from watchdog.events import FileSystemEventHandler
         from watchdog.observers import Observer
@@ -114,7 +158,7 @@ def _run_with_reload(bot_path: Path) -> None:
     def start_bot():
         """Start the bot process."""
         return subprocess.Popen(
-            [sys.executable, str(bot_path)],
+            [python_executable, str(bot_path)],
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             text=True,

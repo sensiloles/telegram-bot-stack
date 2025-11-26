@@ -107,18 +107,43 @@ def create_pyproject_toml(
     project_path: Path,
     project_name: str,
     python_version: str = "3.9",
+    with_linting: bool = True,
+    with_testing: bool = True,
 ) -> Path:
-    """Create a pyproject.toml file with modern Python packaging.
+    """Create a pyproject.toml file with modern Python packaging (PEP 621).
 
     Args:
         project_path: Path to the project directory
         project_name: Name of the project
         python_version: Minimum Python version
+        with_linting: Whether to include linting tools
+        with_testing: Whether to include testing tools
 
     Returns:
         Path to the created pyproject.toml
     """
     pyproject_file = project_path / "pyproject.toml"
+
+    # Build dev dependencies list
+    dev_deps = []
+    if with_testing:
+        dev_deps.extend(
+            [
+                "pytest>=8.0.0",
+                "pytest-asyncio>=0.23.0",
+                "pytest-mock>=3.12.0",
+                "pytest-cov>=4.1.0",
+            ]
+        )
+    if with_linting:
+        dev_deps.extend(
+            [
+                "ruff>=0.8.0",
+                "mypy>=1.17.0",
+            ]
+        )
+
+    dev_deps_str = ",\n    ".join(f'"{dep}"' for dep in dev_deps) if dev_deps else ""
 
     content = f"""[project]
 name = "{project_name}"
@@ -129,15 +154,20 @@ requires-python = ">={python_version}"
 dependencies = [
     "telegram-bot-stack>=1.15.0",
 ]
+"""
 
+    if dev_deps:
+        content += f"""
 [project.optional-dependencies]
 dev = [
-    "pytest>=8.0.0",
-    "pytest-asyncio>=0.23.0",
-    "pytest-cov>=4.1.0",
-    "ruff>=0.8.0",
-    "mypy>=1.17.0",
+    {dev_deps_str},
 ]
+"""
+
+    content += f"""
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
 
 [tool.ruff]
 line-length = 100
@@ -147,31 +177,28 @@ target-version = "py{python_version.replace(".", "")}"
 select = ["E", "F", "I", "N", "W", "UP"]
 ignore = []
 
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
 [tool.mypy]
 python_version = "{python_version}"
-strict = true
 warn_return_any = true
 warn_unused_configs = true
+disallow_untyped_defs = false
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "telegram.*"
+ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-python_files = "test_*.py"
-python_classes = "Test*"
-python_functions = "test_*"
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
 asyncio_mode = "auto"
-
-[tool.coverage.run]
-source = ["."]
-omit = ["tests/*", "venv/*"]
-
-[tool.coverage.report]
-exclude_lines = [
-    "pragma: no cover",
-    "def __repr__",
-    "raise AssertionError",
-    "raise NotImplementedError",
-    "if __name__ == .__main__.:",
-]
+addopts = "-v --strict-markers"
 """
 
     pyproject_file.write_text(content)

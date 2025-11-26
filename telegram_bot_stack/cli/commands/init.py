@@ -1,5 +1,6 @@
 """Initialize a new bot project with full dev environment."""
 
+import subprocess
 import sys
 from pathlib import Path
 from typing import Optional
@@ -15,6 +16,7 @@ from telegram_bot_stack.cli.utils.linting import (
     create_precommit_config,
     install_precommit_hooks,
 )
+from telegram_bot_stack.cli.utils.makefile import create_makefile
 from telegram_bot_stack.cli.utils.testing import create_test_structure
 
 
@@ -104,73 +106,80 @@ def init(
         click.echo("\n📦 Setting up virtual environment...")
         venv_path = venv.create_virtualenv(project_path, python_version)
 
-        # 4. Create dependency files
+        # 4. Create dependency files (always use pyproject.toml - PEP 621)
         click.echo("\n📝 Creating dependency configuration...")
-        if package_manager == "pip":
-            dependencies.create_requirements_file(
-                project_path,
-                packages=["telegram-bot-stack>=1.15.0"],
-                dev_packages=[
-                    "pytest>=8.0.0",
-                    "pytest-asyncio>=0.23.0",
-                    "pytest-mock>=3.12.0",
-                    "pytest-cov>=4.1.0",
-                    "ruff>=0.8.0",
-                    "mypy>=1.17.0",
-                ]
-                if (with_linting or with_testing)
-                else None,
-            )
-            click.secho("  ✅ Created requirements.txt", fg="green")
-        else:
-            py_version = (
-                python_version or f"{sys.version_info.major}.{sys.version_info.minor}"
-            )
-            dependencies.create_pyproject_toml(project_path, name, py_version)
+        py_version = (
+            python_version or f"{sys.version_info.major}.{sys.version_info.minor}"
+        )
+
+        # Always create pyproject.toml (modern standard, works with pip, poetry, pdm)
+        dependencies.create_pyproject_toml(
+            project_path, name, py_version, with_linting, with_testing
+        )
 
         # 5. Install dependencies
         if install_deps:
             click.echo("\n📦 Installing dependencies...")
             click.echo("  (This may take a minute...)")
             try:
-                dependencies.install_package(
-                    venv_path,
-                    "telegram-bot-stack>=1.15.0",
-                    quiet=True,
-                )
-                click.secho("  ✅ Installed telegram-bot-stack", fg="green")
+                from telegram_bot_stack.cli.utils.venv import get_venv_pip
 
-                if with_linting or with_testing:
-                    dev_packages = []
-                    if with_testing:
-                        dev_packages.extend(
-                            [
-                                "pytest>=8.0.0",
-                                "pytest-asyncio>=0.23.0",
-                                "pytest-mock>=3.12.0",
-                                "pytest-cov>=4.1.0",
-                            ]
-                        )
-                    if with_linting:
-                        dev_packages.extend(
-                            [
-                                "ruff>=0.8.0",
-                                "mypy>=1.17.0",
-                            ]
-                        )
+                pip = get_venv_pip(venv_path)
 
-                    for pkg in dev_packages:
-                        dependencies.install_package(venv_path, pkg, quiet=True)
-                    click.secho("  ✅ Installed development dependencies", fg="green")
+                # Install project in editable mode with dependencies
+                if package_manager == "pip":
+                    # Use pip to install from pyproject.toml
+                    cmd = [str(pip), "install", "-e", ".", "--quiet"]
+                    if with_linting or with_testing:
+                        cmd.append(".[dev]")
 
-            except RuntimeError as e:
+                    subprocess.run(
+                        cmd, cwd=project_path, check=True, capture_output=True
+                    )
+                    click.secho(
+                        "  ✅ Installed dependencies from pyproject.toml", fg="green"
+                    )
+                elif package_manager == "poetry":
+                    # Use poetry
+                    subprocess.run(
+                        ["poetry", "install"],
+                        cwd=project_path,
+                        check=True,
+                        capture_output=True,
+                    )
+                    click.secho("  ✅ Installed dependencies with Poetry", fg="green")
+                elif package_manager == "pdm":
+                    # Use pdm
+                    subprocess.run(
+                        ["pdm", "install"],
+                        cwd=project_path,
+                        check=True,
+                        capture_output=True,
+                    )
+                    click.secho("  ✅ Installed dependencies with PDM", fg="green")
+
+            except (
+                RuntimeError,
+                subprocess.CalledProcessError,
+                FileNotFoundError,
+            ) as e:
                 click.secho(f"  ⚠️  Warning: {e}", fg="yellow")
                 click.echo("  You can install dependencies later with:")
                 click.echo(f"    cd {name}")
                 click.echo(f"    {venv.get_activation_command(venv_path)}")
-                click.echo("    pip install -r requirements.txt")
+                if package_manager == "pip":
+                    click.echo("    pip install -e .[dev]")
+                elif package_manager == "poetry":
+                    click.echo("    poetry install")
+                elif package_manager == "pdm":
+                    click.echo("    pdm install")
 
-        # 6. Setup linting
+        # 6. Create Makefile
+        click.echo("\n📋 Creating development configuration...")
+        create_makefile(project_path)
+        # Note: pyproject.toml already created in step 4 with all tool configs
+
+        # 7. Setup linting
         if with_linting:
             click.echo("\n🔍 Setting up linting...")
 
@@ -200,7 +209,7 @@ def init(
             click.echo("\n💻 Configuring PyCharm...")
             create_pycharm_settings(project_path)
 
-        # 9. Setup Git
+        # 10. Setup Git
         if git:
             click.echo("\n📚 Initializing Git...")
             from telegram_bot_stack.cli.utils import git as git_utils
@@ -208,7 +217,7 @@ def init(
             git_utils.create_gitignore(project_path)
             git_utils.init_git(project_path, initial_commit=True)
 
-        # 10. Success message
+        # 11. Success message
         _print_success_message(name, venv_path, with_linting, with_testing)
 
     except Exception as e:
@@ -307,27 +316,77 @@ A Telegram bot built with [telegram-bot-stack](https://github.com/sensiloles/tel
    echo "BOT_TOKEN=your_token_here" > .env
    ```
 
-3. **Activate virtual environment**:
+3. **Run the bot**:
    ```bash
-   source venv/bin/activate  # On Windows: venv\\Scripts\\activate
+   telegram-bot-stack dev
    ```
 
-4. **Run the bot**:
+   Or manually:
    ```bash
+   source venv/bin/activate  # On Windows: venv\\Scripts\\activate
    python bot.py
    ```
 
 ## Development
 
-### Running Tests
+### Using CLI Commands
+
+The project includes convenient CLI commands:
 
 ```bash
-pytest
+# Run bot in development mode (auto-reload on code changes)
+telegram-bot-stack dev
+
+# Validate project configuration
+telegram-bot-stack validate
+
+# Run tests
+make test
+
+# Format code
+make format
+
+# Lint code
+make lint
+
+# Type checking
+make type-check
+
+# Run all CI checks
+make ci
 ```
 
-### Code Quality
+### Using Makefile
+
+The project includes a Makefile with common development commands:
 
 ```bash
+make help        # Show all available commands
+make test        # Run tests
+make test-cov    # Run tests with coverage
+make lint        # Run linter
+make lint-fix    # Run linter and auto-fix issues
+make format      # Format code
+make format-check # Check code formatting
+make type-check  # Type checking
+make dev         # Run bot in development mode
+make validate    # Validate project configuration
+make install     # Install dependencies
+make clean       # Clean cache files
+make ci          # Run all CI checks (lint, type-check, test)
+```
+
+### Manual Commands
+
+If you prefer to run commands manually:
+
+```bash
+# Activate virtual environment
+source venv/bin/activate  # On Windows: venv\\Scripts\\activate
+
+# Run tests
+pytest
+
 # Format code
 ruff format .
 
@@ -345,7 +404,8 @@ mypy .
 ├── bot.py              # Main bot implementation
 ├── .env                # Environment variables (not in git)
 ├── .env.example        # Example environment variables
-├── requirements.txt    # Python dependencies
+├── pyproject.toml      # Project config, dependencies, and tool settings
+├── Makefile            # Development commands
 ├── tests/              # Test files
 │   ├── conftest.py     # Pytest fixtures
 │   └── test_bot.py     # Bot tests
@@ -398,13 +458,15 @@ def _print_success_message(
     click.echo("\n💡 Tips:\n")
     click.echo("  • Get your bot token from @BotFather")
     click.echo("  • Edit bot.py to customize your bot")
+    click.echo("  • Use 'telegram-bot-stack dev' to run bot with auto-reload")
+    click.echo("  • Use 'make help' to see all available commands")
 
     if with_testing:
-        click.echo("  • Run tests: pytest")
+        click.echo("  • Run tests: make test or pytest")
 
     if with_linting:
-        click.echo("  • Format code: ruff format .")
-        click.echo("  • Lint code: ruff check .")
+        click.echo("  • Format code: make format or ruff format .")
+        click.echo("  • Lint code: make lint or ruff check .")
 
     click.echo("\n📚 Documentation:")
     click.echo("  https://github.com/sensiloles/telegram-bot-stack\n")

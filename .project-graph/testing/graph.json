@@ -1,14 +1,14 @@
 {
   "metadata": {
     "version": "3.0.0",
-    "generated_at": "2025-11-25",
+    "generated_at": "2025-11-26",
     "graph_id": "testing",
     "graph_name": "Testing Infrastructure",
     "graph_type": "domain",
     "project_name": "telegram-bot-stack",
     "description": "Test suite, fixtures, and testing utilities",
     "scope": "Unit tests, integration tests, fixtures",
-    "node_count": 29,
+    "node_count": 34,
     "edge_count": 9
   },
   "nodes": [
@@ -590,7 +590,7 @@
       "type": "test_module",
       "path": "tests/cli/test_init_command.py",
       "description": "Tests for init command.",
-      "lines_of_code": 195,
+      "lines_of_code": 200,
       "exports": [
         "test_init_basic",
         "test_init_with_linting",
@@ -1278,6 +1278,127 @@
         "test_render_all",
         "test_create_env_file_with_token",
         "test_create_env_file_without_token"
+      ],
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium"
+    },
+    {
+      "id": "telegram_bot_stack.cli.commands.dev",
+      "name": "dev",
+      "type": "module",
+      "category": "implementation",
+      "path": "telegram_bot_stack/cli/commands/dev.py",
+      "description": "Module dev",
+      "lines_of_code": 202,
+      "complexity_score": 1,
+      "exports": [
+        "BotReloadHandler",
+        "dev",
+        "start_bot",
+        "on_modified"
+      ],
+      "classes": [
+        "BotReloadHandler"
+      ],
+      "functions": [
+        "dev",
+        "start_bot",
+        "on_modified"
+      ],
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium"
+    },
+    {
+      "id": "telegram_bot_stack.cli.commands.init",
+      "name": "init",
+      "type": "module",
+      "category": "implementation",
+      "path": "telegram_bot_stack/cli/commands/init.py",
+      "description": "Module init",
+      "lines_of_code": 472,
+      "complexity_score": 1,
+      "exports": [
+        "init"
+      ],
+      "classes": [],
+      "functions": [
+        "init"
+      ],
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium"
+    },
+    {
+      "id": "telegram_bot_stack.cli.utils.dependencies",
+      "name": "dependencies",
+      "type": "module",
+      "category": "implementation",
+      "path": "telegram_bot_stack/cli/utils/dependencies.py",
+      "description": "Module dependencies",
+      "lines_of_code": 206,
+      "complexity_score": 1,
+      "exports": [
+        "install_package",
+        "install_requirements",
+        "create_requirements_file",
+        "create_pyproject_toml"
+      ],
+      "classes": [],
+      "functions": [
+        "install_package",
+        "install_requirements",
+        "create_requirements_file",
+        "create_pyproject_toml"
+      ],
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium"
+    },
+    {
+      "id": "telegram_bot_stack.cli.utils.makefile",
+      "name": "makefile",
+      "type": "module",
+      "category": "implementation",
+      "path": "telegram_bot_stack/cli/utils/makefile.py",
+      "description": "Module makefile",
+      "lines_of_code": 64,
+      "complexity_score": 1,
+      "exports": [
+        "create_makefile"
+      ],
+      "classes": [],
+      "functions": [
+        "create_makefile"
+      ],
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium"
+    },
+    {
+      "id": "telegram_bot_stack.cli.utils.venv",
+      "name": "venv",
+      "type": "module",
+      "category": "implementation",
+      "path": "telegram_bot_stack/cli/utils/venv.py",
+      "description": "Module venv",
+      "lines_of_code": 138,
+      "complexity_score": 1,
+      "exports": [
+        "create_virtualenv",
+        "get_venv_python",
+        "get_venv_pip",
+        "get_activation_command",
+        "find_venv"
+      ],
+      "classes": [],
+      "functions": [
+        "create_virtualenv",
+        "get_venv_python",
+        "get_venv_pip",
+        "get_activation_command",
+        "find_venv"
       ],
       "dependencies": [],
       "dependents": [],

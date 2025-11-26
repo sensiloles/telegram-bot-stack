@@ -26,7 +26,8 @@ def test_init_basic(tmp_path):
         assert (project_path / "bot.py").exists()
         assert (project_path / "README.md").exists()
         assert (project_path / ".env.example").exists()
-        assert (project_path / "requirements.txt").exists()
+        assert (project_path / "pyproject.toml").exists()
+        assert (project_path / "Makefile").exists()
         assert (project_path / "venv").exists()
 
 
@@ -117,7 +118,7 @@ def test_init_with_git(tmp_path):
 
 
 def test_init_pyproject_toml(tmp_path):
-    """Test project initialization with pyproject.toml."""
+    """Test project initialization creates pyproject.toml (always)."""
     runner = CliRunner()
 
     with runner.isolated_filesystem(temp_dir=tmp_path):
@@ -126,8 +127,6 @@ def test_init_pyproject_toml(tmp_path):
             [
                 "init",
                 "test-bot",
-                "--package-manager",
-                "poetry",
                 "--no-install-deps",
                 "--no-git",
             ],
@@ -141,8 +140,10 @@ def test_init_pyproject_toml(tmp_path):
         # Check pyproject.toml content
         content = (project_path / "pyproject.toml").read_text()
         assert "telegram-bot-stack" in content
+        assert "[project]" in content
         assert "[tool.ruff]" in content
         assert "[tool.mypy]" in content
+        assert "[tool.pytest.ini_options]" in content
 
 
 def test_init_existing_directory(tmp_path):
@@ -186,6 +187,10 @@ def test_init_minimal(tmp_path):
         project_path = Path("test-bot")
         assert (project_path / "bot.py").exists()
         assert (project_path / "venv").exists()
+
+        # Should have pyproject.toml and Makefile (always created)
+        assert (project_path / "pyproject.toml").exists()
+        assert (project_path / "Makefile").exists()
 
         # Should not have extras
         assert not (project_path / ".pre-commit-config.yaml").exists()
