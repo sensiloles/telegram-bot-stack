@@ -75,6 +75,7 @@ class BotBase:
         self._consecutive_conflicts = 0
         self._ever_had_success = False  # Track if bot ever successfully polled
         self._start_time = None  # Track when bot started
+        self._last_conflict_time = None  # Track last conflict time
 
         # Default commands if not provided
         self.user_commands = user_commands or ["/start", "/my_id"]
@@ -493,15 +494,26 @@ class BotBase:
         """
         error = context.error
 
-        # Mark as successfully started if we've been running for 10+ seconds
-        # (means we successfully connected and have been polling)
-        if self._start_time and time.time() - self._start_time >= 10:
-            if not self._ever_had_success:
+        # Check if we should mark bot as successfully established
+        # Criteria: Running for 10+ seconds AND no conflicts in last 5 seconds
+        if (
+            self._start_time
+            and not self._ever_had_success
+            and time.time() - self._start_time >= 10
+        ):
+            # Check if we haven't had conflicts recently (5+ seconds ago or never)
+            if (
+                self._last_conflict_time is None
+                or time.time() - self._last_conflict_time >= 5
+            ):
                 self._ever_had_success = True
                 logger.info("✅ Bot successfully established polling connection")
 
         # Handle Conflict error (multiple bot instances running)
         if isinstance(error, Conflict):
+            # Update last conflict time
+            self._last_conflict_time = time.time()
+
             # If this bot already successfully established connection, don't shutdown
             # It means another instance is trying to start but WE got here first
             if self._ever_had_success:

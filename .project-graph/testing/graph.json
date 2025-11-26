@@ -1455,7 +1455,7 @@
       "category": "implementation",
       "path": "telegram_bot_stack/bot_base.py",
       "description": "Module bot_base",
-      "lines_of_code": 630,
+      "lines_of_code": 642,
       "complexity_score": 1,
       "exports": [
         "BotBase",
