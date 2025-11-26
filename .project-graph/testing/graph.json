@@ -1327,7 +1327,7 @@
       "category": "implementation",
       "path": "telegram_bot_stack/cli/commands/init.py",
       "description": "Module init",
-      "lines_of_code": 614,
+      "lines_of_code": 812,
       "complexity_score": 1,
       "exports": [
         "init"

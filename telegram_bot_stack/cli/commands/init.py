@@ -3,7 +3,7 @@
 import subprocess
 import sys
 from pathlib import Path
-from typing import Optional
+from typing import Callable, Optional
 
 import click
 
@@ -18,6 +18,333 @@ from telegram_bot_stack.cli.utils.linting import (
 )
 from telegram_bot_stack.cli.utils.makefile import create_makefile
 from telegram_bot_stack.cli.utils.testing import create_test_structure
+
+# Constants
+PROJECT_NAME = "telegram-bot-stack"
+DEV_EXTRA = "[dev]"
+
+
+def _find_stack_repo() -> Optional[Path]:
+    """Find telegram-bot-stack repository path.
+
+    Checks current file location and parent directories to find
+    the telegram-bot-stack repository by looking for pyproject.toml
+    with matching project name.
+
+    Returns:
+        Path to stack repository if found, None otherwise
+    """
+    current = Path(__file__).resolve()
+    # Check current directory and parents up to 5 levels
+    for path in [current.parent] + list(current.parents[:5]):
+        pyproject = path / "pyproject.toml"
+        if pyproject.exists():
+            try:
+                # Try to read and verify it's the right project
+                content = pyproject.read_text()
+                if PROJECT_NAME in content and "[project]" in content:
+                    return path
+            except Exception:
+                continue
+    return None
+
+
+def _validate_project_path(name: str) -> Path:
+    """Validate and prepare project path.
+
+    Args:
+        name: Project name
+
+    Returns:
+        Path to project directory
+
+    Raises:
+        SystemExit: If path already exists or is invalid
+    """
+    project_path = Path.cwd() / name
+
+    if project_path.exists():
+        if project_path.is_file():
+            click.secho(f"❌ Error: '{name}' is a file, not a directory", fg="red")
+        else:
+            click.secho(f"❌ Error: Directory '{name}' already exists", fg="red")
+        sys.exit(1)
+
+    return project_path
+
+
+def _install_from_local_repo(
+    pip_path: Path, stack_repo: Path, run_subprocess: Callable = subprocess.run
+) -> bool:
+    """Try to install telegram-bot-stack from local repository.
+
+    Args:
+        pip_path: Path to pip executable
+        stack_repo: Path to telegram-bot-stack repository
+        run_subprocess: Function to run subprocess (for testing)
+
+    Returns:
+        True if installation succeeded, False otherwise
+    """
+    try:
+        result = run_subprocess(
+            [str(pip_path), "install", "-e", str(stack_repo), "--quiet"],
+            check=True,
+            capture_output=True,
+        )
+        click.secho(
+            "  ✅ Installed telegram-bot-stack from local repo",
+            fg="green",
+        )
+        return True
+    except (subprocess.CalledProcessError, Exception) as e:
+        # Log debug info but don't fail - will try PyPI
+        if hasattr(e, "stderr") and e.stderr:
+            # Only show if there's actual error info
+            pass
+        return False
+
+
+def _install_with_pip(
+    project_path: Path,
+    venv_path: Path,
+    name: str,
+    with_linting: bool,
+    with_testing: bool,
+    run_subprocess: Callable = subprocess.run,
+) -> bool:
+    """Install dependencies using pip.
+
+    Args:
+        project_path: Path to project directory
+        venv_path: Path to virtual environment
+        name: Project name
+        with_linting: Whether linting dependencies are needed
+        with_testing: Whether testing dependencies are needed
+        run_subprocess: Function to run subprocess (for testing)
+
+    Returns:
+        True if installation succeeded, False otherwise
+    """
+    from telegram_bot_stack.cli.utils.venv import get_venv_pip
+
+    pip = get_venv_pip(venv_path)
+
+    # Try to install from local repo first
+    stack_repo = _find_stack_repo()
+    if stack_repo:
+        _install_from_local_repo(pip, stack_repo, run_subprocess)
+
+    # Install project in editable mode
+    cmd = [str(pip), "install", "-e", ".", "--quiet"]
+    if with_linting or with_testing:
+        cmd.append(DEV_EXTRA)
+
+    result = run_subprocess(
+        cmd,
+        cwd=project_path,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    if result.returncode != 0:
+        # Check if error is about telegram-bot-stack not found
+        if PROJECT_NAME in result.stderr or "No matching distribution" in result.stderr:
+            click.secho(
+                "  ⚠️  Warning: Could not install telegram-bot-stack from PyPI",
+                fg="yellow",
+            )
+            click.echo("  This usually means:")
+            click.echo("    • Package is not published to PyPI yet")
+            click.echo("    • You need to install it manually from source")
+            click.echo("\n  To fix this, run:")
+            click.echo(f"    cd {name}")
+            click.echo(f"    {venv.get_activation_command(venv_path)}")
+            click.echo(f"    pip install {PROJECT_NAME}")
+            click.echo("    # Or if you have the source:")
+            click.echo(f"    pip install -e /path/to/{PROJECT_NAME}")
+            click.echo(f"    pip install -e '{DEV_EXTRA}'")
+        else:
+            raise subprocess.CalledProcessError(result.returncode, cmd, result.stderr)
+        return False
+
+    click.secho(
+        "  ✅ Installed dependencies from pyproject.toml",
+        fg="green",
+    )
+    return True
+
+
+def _install_with_poetry(
+    project_path: Path, run_subprocess: Callable = subprocess.run
+) -> bool:
+    """Install dependencies using poetry.
+
+    Args:
+        project_path: Path to project directory
+        run_subprocess: Function to run subprocess (for testing)
+
+    Returns:
+        True if installation succeeded, False otherwise
+    """
+    try:
+        run_subprocess(
+            ["poetry", "install"],
+            cwd=project_path,
+            check=True,
+            capture_output=True,
+        )
+        click.secho("  ✅ Installed dependencies with Poetry", fg="green")
+        return True
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        return False
+
+
+def _install_with_pdm(
+    project_path: Path, run_subprocess: Callable = subprocess.run
+) -> bool:
+    """Install dependencies using pdm.
+
+    Args:
+        project_path: Path to project directory
+        run_subprocess: Function to run subprocess (for testing)
+
+    Returns:
+        True if installation succeeded, False otherwise
+    """
+    try:
+        run_subprocess(
+            ["pdm", "install"],
+            cwd=project_path,
+            check=True,
+            capture_output=True,
+        )
+        click.secho("  ✅ Installed dependencies with PDM", fg="green")
+        return True
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        return False
+
+
+def _install_dependencies(
+    project_path: Path,
+    venv_path: Path,
+    name: str,
+    package_manager: str,
+    with_linting: bool,
+    with_testing: bool,
+    run_subprocess: Callable = subprocess.run,
+) -> None:
+    """Install project dependencies.
+
+    Args:
+        project_path: Path to project directory
+        venv_path: Path to virtual environment
+        name: Project name
+        package_manager: Package manager to use (pip, poetry, pdm)
+        with_linting: Whether linting dependencies are needed
+        with_testing: Whether testing dependencies are needed
+        run_subprocess: Function to run subprocess (for testing)
+    """
+    click.echo("\n📦 Installing dependencies...")
+    click.echo("  (This may take a minute...)")
+
+    try:
+        if package_manager == "pip":
+            _install_with_pip(
+                project_path,
+                venv_path,
+                name,
+                with_linting,
+                with_testing,
+                run_subprocess,
+            )
+        elif package_manager == "poetry":
+            _install_with_poetry(project_path, run_subprocess)
+        elif package_manager == "pdm":
+            _install_with_pdm(project_path, run_subprocess)
+
+    except (
+        RuntimeError,
+        subprocess.CalledProcessError,
+        FileNotFoundError,
+    ) as e:
+        click.secho(f"  ⚠️  Warning: {e}", fg="yellow")
+        click.echo("  You can install dependencies later with:")
+        click.echo(f"    cd {name}")
+        click.echo(f"    {venv.get_activation_command(venv_path)}")
+        if package_manager == "pip":
+            click.echo(f"    pip install {PROJECT_NAME}")
+            click.echo(f"    pip install -e '{DEV_EXTRA}'")
+        elif package_manager == "poetry":
+            click.echo("    poetry install")
+        elif package_manager == "pdm":
+            click.echo("    pdm install")
+
+
+def _setup_linting(project_path: Path, venv_path: Path, install_deps: bool) -> None:
+    """Setup linting configuration.
+
+    Args:
+        project_path: Path to project directory
+        venv_path: Path to virtual environment
+        install_deps: Whether dependencies are installed
+    """
+    click.echo("\n🔍 Setting up linting...")
+    create_precommit_config(project_path)
+
+    if install_deps:
+        try:
+            install_precommit_hooks(project_path, venv_path)
+        except RuntimeError as e:
+            click.secho(f"  ⚠️  Warning: {e}", fg="yellow")
+            click.echo("  You can install hooks later with:")
+            click.echo("    pre-commit install")
+
+
+def _setup_testing(project_path: Path, name: str) -> None:
+    """Setup testing configuration.
+
+    Args:
+        project_path: Path to project directory
+        name: Project name
+    """
+    click.echo("\n🧪 Setting up testing...")
+    create_test_structure(project_path, name)
+
+
+def _setup_ide(project_path: Path, ide: str, python_version: Optional[str]) -> None:
+    """Setup IDE configuration.
+
+    Args:
+        project_path: Path to project directory
+        ide: IDE to configure (vscode, pycharm, none)
+        python_version: Python version
+    """
+    if ide == "vscode":
+        click.echo("\n💻 Configuring VS Code...")
+        py_version = (
+            python_version or f"{sys.version_info.major}.{sys.version_info.minor}"
+        )
+        create_vscode_settings(project_path, py_version)
+    elif ide == "pycharm":
+        click.echo("\n💻 Configuring PyCharm...")
+        create_pycharm_settings(project_path)
+
+
+def _setup_git(project_path: Path) -> None:
+    """Setup Git repository.
+
+    Args:
+        project_path: Path to project directory
+    """
+    click.echo("\n📝 Creating .gitignore...")
+    from telegram_bot_stack.cli.utils import git as git_utils
+
+    git_utils.create_gitignore(project_path)
+
+    click.echo("\n📚 Initializing Git...")
+    git_utils.init_git(project_path, initial_commit=True)
 
 
 @click.command()
@@ -85,12 +412,7 @@ def init(
 
         telegram-bot-stack init my-bot --with-linting --ide vscode --git
     """
-    project_path = Path.cwd() / name
-
-    # Check if project already exists
-    if project_path.exists():
-        click.secho(f"❌ Error: Directory '{name}' already exists", fg="red")
-        sys.exit(1)
+    project_path = _validate_project_path(name)
 
     click.secho(f"\n🚀 Creating bot project: {name}\n", fg="cyan", bold=True)
 
@@ -119,160 +441,36 @@ def init(
 
         # 5. Install dependencies
         if install_deps:
-            click.echo("\n📦 Installing dependencies...")
-            click.echo("  (This may take a minute...)")
-            try:
-                from telegram_bot_stack.cli.utils.venv import get_venv_pip
-
-                pip = get_venv_pip(venv_path)
-
-                # Install project in editable mode with dependencies
-                if package_manager == "pip":
-                    # First, try to install telegram-bot-stack if available locally
-                    # Check if we're in the telegram-bot-stack repo itself
-                    stack_repo = Path(__file__).parent.parent.parent.parent
-                    if (stack_repo / "pyproject.toml").exists():
-                        try:
-                            # Install telegram-bot-stack from local repo first
-                            subprocess.run(
-                                [str(pip), "install", "-e", str(stack_repo), "--quiet"],
-                                check=True,
-                                capture_output=True,
-                            )
-                            click.secho(
-                                "  ✅ Installed telegram-bot-stack from local repo",
-                                fg="green",
-                            )
-                        except subprocess.CalledProcessError:
-                            # If local install fails, try PyPI
-                            pass
-
-                    # Use pip to install from pyproject.toml
-                    cmd = [str(pip), "install", "-e", ".", "--quiet"]
-                    if with_linting or with_testing:
-                        cmd.append(".[dev]")
-
-                    result = subprocess.run(
-                        cmd,
-                        cwd=project_path,
-                        check=False,
-                        capture_output=True,
-                        text=True,
-                    )
-
-                    if result.returncode != 0:
-                        # Check if error is about telegram-bot-stack not found
-                        if (
-                            "telegram-bot-stack" in result.stderr
-                            or "No matching distribution" in result.stderr
-                        ):
-                            click.secho(
-                                "  ⚠️  Warning: Could not install telegram-bot-stack from PyPI",
-                                fg="yellow",
-                            )
-                            click.echo("  This usually means:")
-                            click.echo("    • Package is not published to PyPI yet")
-                            click.echo(
-                                "    • You need to install it manually from source"
-                            )
-                            click.echo("\n  To fix this, run:")
-                            click.echo(f"    cd {name}")
-                            click.echo(f"    {venv.get_activation_command(venv_path)}")
-                            click.echo("    pip install telegram-bot-stack")
-                            click.echo("    # Or if you have the source:")
-                            click.echo("    pip install -e /path/to/telegram-bot-stack")
-                            click.echo("    pip install -e '.[dev]'")
-                        else:
-                            raise subprocess.CalledProcessError(
-                                result.returncode, cmd, result.stderr
-                            )
-                    else:
-                        click.secho(
-                            "  ✅ Installed dependencies from pyproject.toml",
-                            fg="green",
-                        )
-                elif package_manager == "poetry":
-                    # Use poetry
-                    subprocess.run(
-                        ["poetry", "install"],
-                        cwd=project_path,
-                        check=True,
-                        capture_output=True,
-                    )
-                    click.secho("  ✅ Installed dependencies with Poetry", fg="green")
-                elif package_manager == "pdm":
-                    # Use pdm
-                    subprocess.run(
-                        ["pdm", "install"],
-                        cwd=project_path,
-                        check=True,
-                        capture_output=True,
-                    )
-                    click.secho("  ✅ Installed dependencies with PDM", fg="green")
-
-            except (
-                RuntimeError,
-                subprocess.CalledProcessError,
-                FileNotFoundError,
-            ) as e:
-                click.secho(f"  ⚠️  Warning: {e}", fg="yellow")
-                click.echo("  You can install dependencies later with:")
-                click.echo(f"    cd {name}")
-                click.echo(f"    {venv.get_activation_command(venv_path)}")
-                if package_manager == "pip":
-                    click.echo("    pip install telegram-bot-stack")
-                    click.echo("    pip install -e '.[dev]'")
-                elif package_manager == "poetry":
-                    click.echo("    poetry install")
-                elif package_manager == "pdm":
-                    click.echo("    pdm install")
+            _install_dependencies(
+                project_path,
+                venv_path,
+                name,
+                package_manager,
+                with_linting,
+                with_testing,
+            )
 
         # 6. Create Makefile
         click.echo("\n📋 Creating development configuration...")
         create_makefile(project_path)
-        # Note: pyproject.toml already created in step 4 with all tool configs
 
         # 7. Setup linting
         if with_linting:
-            click.echo("\n🔍 Setting up linting...")
+            _setup_linting(project_path, venv_path, install_deps)
 
-            create_precommit_config(project_path)
-
-            if install_deps:
-                try:
-                    install_precommit_hooks(project_path, venv_path)
-                except RuntimeError as e:
-                    click.secho(f"  ⚠️  Warning: {e}", fg="yellow")
-                    click.echo("  You can install hooks later with:")
-                    click.echo("    pre-commit install")
-
-        # 7. Setup testing
+        # 8. Setup testing
         if with_testing:
-            click.echo("\n🧪 Setting up testing...")
-            create_test_structure(project_path, name)
+            _setup_testing(project_path, name)
 
-        # 8. Setup IDE
-        if ide == "vscode":
-            click.echo("\n💻 Configuring VS Code...")
-            py_version = (
-                python_version or f"{sys.version_info.major}.{sys.version_info.minor}"
-            )
-            create_vscode_settings(project_path, py_version)
-        elif ide == "pycharm":
-            click.echo("\n💻 Configuring PyCharm...")
-            create_pycharm_settings(project_path)
+        # 9. Setup IDE
+        if ide != "none":
+            _setup_ide(project_path, ide, python_version)
 
         # 10. Setup Git (only if --git flag is set)
         if git:
-            click.echo("\n📝 Creating .gitignore...")
-            from telegram_bot_stack.cli.utils import git as git_utils
+            _setup_git(project_path)
 
-            git_utils.create_gitignore(project_path)
-
-            click.echo("\n📚 Initializing Git...")
-            git_utils.init_git(project_path, initial_commit=True)
-
-        # 12. Success message
+        # 11. Success message
         _print_success_message(name, venv_path, with_linting, with_testing)
 
     except Exception as e:
@@ -290,7 +488,7 @@ def _create_project_structure(project_path: Path, bot_name: str) -> None:
 
     Args:
         project_path: Path to the project directory
-        bot_name: Name of the bot
+        bot_name: Name of the bot (used in README and bot.py)
     """
     # Create bot.py
     bot_content = '''"""Main bot implementation."""

@@ -300,7 +300,7 @@
       "type": "module",
       "path": "telegram_bot_stack/cli/commands/init.py",
       "description": "Initialize a new bot project with full dev environment.",
-      "lines_of_code": 614,
+      "lines_of_code": 812,
       "classes": [],
       "functions": [
         "init"
