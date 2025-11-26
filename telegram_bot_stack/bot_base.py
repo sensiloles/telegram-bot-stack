@@ -2,6 +2,7 @@
 
 import asyncio
 import logging
+import time
 from typing import Optional
 
 from telegram import (
@@ -72,6 +73,8 @@ class BotBase:
         self._running = False
         self._shutdown_event = asyncio.Event()
         self._consecutive_conflicts = 0
+        self._ever_had_success = False  # Track if bot ever successfully polled
+        self._start_time = None  # Track when bot started
 
         # Default commands if not provided
         self.user_commands = user_commands or ["/start", "/my_id"]
@@ -485,23 +488,40 @@ class BotBase:
         """Handle errors from the telegram bot.
 
         This is a base error handler that catches common errors like Conflict.
-        Subclasses can override this to add custom error handling.
+        Uses "first come, first served" logic - the bot that successfully
+        starts polling first keeps running, others shutdown gracefully.
         """
         error = context.error
 
+        # Mark as successfully started if we've been running for 10+ seconds
+        # (means we successfully connected and have been polling)
+        if self._start_time and time.time() - self._start_time >= 10:
+            if not self._ever_had_success:
+                self._ever_had_success = True
+                logger.info("✅ Bot successfully established polling connection")
+
         # Handle Conflict error (multiple bot instances running)
         if isinstance(error, Conflict):
+            # If this bot already successfully established connection, don't shutdown
+            # It means another instance is trying to start but WE got here first
+            if self._ever_had_success:
+                logger.warning(
+                    "⚠️  Another bot instance tried to start but this instance is "
+                    "already active and will continue running."
+                )
+                logger.info("💡 The other bot instance will shutdown automatically.")
+                return  # Don't shutdown, don't count conflicts
+
+            # This bot hasn't successfully started yet, count conflicts
             self._consecutive_conflicts += 1
 
-            # Only stop if we get multiple Conflict errors in a row
-            # (1-2 conflicts might be temporary during startup)
             if self._consecutive_conflicts >= 3:
                 logger.error(
-                    "⚠️  Another bot instance with the same token is running. "
+                    "⚠️  Another bot instance is already running. "
                     "Shutting down this instance..."
                 )
                 logger.error(
-                    "💡 Tip: Make sure only one bot instance is running at a time."
+                    "💡 Tip: The other bot instance started first and will keep running."
                 )
                 # Stop the application
                 if self.application:
@@ -510,11 +530,11 @@ class BotBase:
                 # Log but don't stop yet
                 logger.warning(
                     f"⚠️  Conflict detected ({self._consecutive_conflicts}/3). "
-                    "Another bot instance may be starting..."
+                    "Checking if another instance is already active..."
                 )
             return
 
-        # Reset conflict counter on any other error or success
+        # Reset conflict counter on any other error
         self._consecutive_conflicts = 0
 
         # Log other errors
@@ -525,6 +545,9 @@ class BotBase:
 
         Override this in subclass to add additional handlers.
         """
+        # Mark start time for conflict detection
+        self._start_time = time.time()
+
         # Base command handlers
         base_handlers = {
             "start": self.start,
