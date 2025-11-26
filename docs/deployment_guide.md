@@ -186,6 +186,151 @@ These will be automatically added to the `.env` file on VPS.
 - **Storage:** 10 GB
 - **OS:** Ubuntu 20.04+ / Debian 11+
 
+## Provider-Specific Guides
+
+### DigitalOcean Deployment
+
+DigitalOcean is the recommended provider for beginners due to its simplicity and excellent documentation.
+
+#### Step 1: Create Droplet
+
+1. Go to [DigitalOcean](https://www.digitalocean.com/)
+2. Click "Create" → "Droplets"
+3. Choose:
+   - **Image:** Ubuntu 22.04 LTS
+   - **Plan:** Basic ($5/month - 1 GB RAM, 1 vCPU, 25 GB SSD)
+   - **Region:** Choose nearest to your users
+   - **Authentication:** Add your SSH key
+4. Click "Create Droplet"
+
+#### Step 2: Get Droplet IP
+
+After creation, you'll see the droplet IP address. Copy it:
+
+```bash
+export VPS_IP=xxx.xxx.xxx.xxx
+```
+
+#### Step 3: Deploy Bot
+
+```bash
+# Initialize deployment
+telegram-bot-stack deploy init
+# Enter VPS_IP when prompted for "VPS Host"
+
+# Deploy
+export BOT_TOKEN="your-bot-token"
+telegram-bot-stack deploy up
+```
+
+**Cost:** $5/month
+**Performance:** Handles 1000+ users easily
+**Support:** Excellent documentation and community
+
+### Hetzner Cloud Deployment
+
+Hetzner offers the best price/performance ratio, especially for European users.
+
+#### Step 1: Create Server
+
+1. Go to [Hetzner Cloud](https://www.hetzner.com/cloud)
+2. Click "Add Server"
+3. Choose:
+   - **Location:** Choose nearest data center
+   - **Image:** Ubuntu 22.04
+   - **Type:** CX11 (€3.79/month - 2 GB RAM, 1 vCPU, 20 GB SSD)
+   - **SSH Key:** Add your SSH key
+4. Click "Create & Buy"
+
+#### Step 2: Deploy Bot
+
+```bash
+# Initialize deployment
+telegram-bot-stack deploy init
+# Enter server IP when prompted
+
+# Deploy
+export BOT_TOKEN="your-bot-token"
+telegram-bot-stack deploy up
+```
+
+**Cost:** €3.79/month (cheapest option)
+**Performance:** Excellent value, 2 GB RAM
+**Support:** Good documentation, European data centers
+
+### AWS Lightsail Deployment
+
+AWS Lightsail is ideal if you're already using AWS services or need global data centers.
+
+#### Step 1: Launch Instance
+
+1. Go to [AWS Lightsail](https://lightsail.aws.amazon.com/)
+2. Click "Create instance"
+3. Choose:
+   - **Platform:** Linux/Unix
+   - **Blueprint:** Ubuntu 22.04 LTS
+   - **Instance plan:** $3.50/month (512 MB RAM, 1 vCPU, 20 GB SSD)
+   - **Region:** Choose nearest to your users
+   - **SSH key pair:** Create new or use existing
+4. Click "Create instance"
+
+#### Step 2: Configure Security Group
+
+1. Go to instance → "Networking" tab
+2. Add firewall rule:
+   - **Application:** Custom
+   - **Protocol:** TCP
+   - **Port:** 22 (SSH)
+   - **Source:** Your IP address
+
+#### Step 3: Deploy Bot
+
+```bash
+# Initialize deployment
+telegram-bot-stack deploy init
+# Enter Lightsail public IP
+
+# Deploy
+export BOT_TOKEN="your-bot-token"
+telegram-bot-stack deploy up
+```
+
+**Cost:** $3.50/month (free tier eligible for 12 months)
+**Performance:** Good for small bots
+**Support:** Integrated with AWS ecosystem
+
+### AWS EC2 Deployment
+
+For more control and scalability, use AWS EC2.
+
+#### Step 1: Launch Instance
+
+1. Go to [AWS EC2 Console](https://console.aws.amazon.com/ec2/)
+2. Click "Launch Instance"
+3. Configure:
+   - **Name:** telegram-bot
+   - **AMI:** Ubuntu Server 22.04 LTS (Free tier eligible)
+   - **Instance type:** t3.micro (free tier) or t3.small
+   - **Key pair:** Create new or use existing
+   - **Security group:** Allow SSH (port 22) from your IP
+4. Click "Launch instance"
+
+#### Step 2: Deploy Bot
+
+```bash
+# Initialize deployment
+telegram-bot-stack deploy init
+# Enter EC2 public IPv4 address
+
+# Deploy
+export BOT_TOKEN="your-bot-token"
+telegram-bot-stack deploy up
+```
+
+**Cost:** Free tier (12 months), then ~$10/month
+**Performance:** Highly scalable
+**Support:** Full AWS ecosystem integration
+
 ## SSH Setup
 
 ### Generate SSH Key (if you don't have one)
@@ -212,7 +357,16 @@ cat ~/.ssh/id_rsa.pub | ssh root@your-vps-ip "mkdir -p ~/.ssh && cat >> ~/.ssh/a
 ssh root@your-vps-ip
 ```
 
-## Docker Setup
+## Deployment Methods
+
+### Docker Deployment (Recommended)
+
+Docker is the default and recommended deployment method. It provides:
+
+- Isolation from system dependencies
+- Easy updates and rollbacks
+- Consistent environment across servers
+- Built-in health checks and auto-restart
 
 Docker is automatically installed during first deployment. If you want to install manually:
 
@@ -226,34 +380,450 @@ sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-
 sudo chmod +x /usr/local/bin/docker-compose
 ```
 
+### Systemd Deployment (Alternative)
+
+Systemd deployment is a lightweight alternative to Docker, suitable for:
+
+- Simple VPS setups without Docker
+- Direct system integration
+- Lower resource overhead
+- Native Linux service management
+
+#### When to Use Systemd
+
+- You prefer native Linux services over containers
+- You have limited resources (very small VPS)
+- You need direct system integration
+- You're comfortable with systemd configuration
+
+#### Systemd Setup
+
+**Note:** Systemd deployment is not yet fully automated via CLI. Manual setup required:
+
+1. **Create systemd service file** (`/etc/systemd/system/telegram-bot.service`):
+
+```ini
+[Unit]
+Description=Telegram Bot Service
+After=network.target
+
+[Service]
+Type=simple
+User=botuser
+WorkingDirectory=/opt/telegram-bot
+Environment="BOT_TOKEN=your-bot-token"
+Environment="PYTHONPATH=/opt/telegram-bot"
+ExecStart=/usr/bin/python3 /opt/telegram-bot/bot.py
+Restart=always
+RestartSec=10
+
+# Resource limits
+MemoryLimit=256M
+CPUQuota=50%
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=telegram-bot
+
+[Install]
+WantedBy=multi-user.target
+```
+
+2. **Create bot user:**
+
+```bash
+sudo adduser --system --group --home /opt/telegram-bot botuser
+sudo mkdir -p /opt/telegram-bot
+sudo chown botuser:botuser /opt/telegram-bot
+```
+
+3. **Deploy bot files:**
+
+```bash
+# Transfer files to /opt/telegram-bot
+rsync -avz --exclude '.git' --exclude 'venv' ./ botuser@vps:/opt/telegram-bot/
+```
+
+4. **Install dependencies:**
+
+```bash
+sudo -u botuser python3 -m pip install --user -r /opt/telegram-bot/requirements.txt
+```
+
+5. **Enable and start service:**
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable telegram-bot
+sudo systemctl start telegram-bot
+```
+
+6. **Check status:**
+
+```bash
+sudo systemctl status telegram-bot
+sudo journalctl -u telegram-bot -f  # View logs
+```
+
+#### Systemd vs Docker Comparison
+
+| Feature               | Docker                   | Systemd                      |
+| --------------------- | ------------------------ | ---------------------------- |
+| **Isolation**         | Full container isolation | Process-level                |
+| **Resource Overhead** | ~50-100 MB               | ~10-20 MB                    |
+| **Setup Complexity**  | Automated via CLI        | Manual configuration         |
+| **Portability**       | High (works anywhere)    | Medium (OS-specific)         |
+| **Updates**           | Easy (rebuild image)     | Manual (restart service)     |
+| **Health Checks**     | Built-in                 | Manual setup                 |
+| **Best For**          | Production, scalability  | Simple setups, low resources |
+
+**Recommendation:** Use Docker for production deployments. Use Systemd only if you have specific requirements or constraints.
+
 ## Advanced Usage
 
 ### Custom Dockerfile
 
 If you need custom Docker configuration, create `Dockerfile` in your project root. It will be used instead of the template.
 
-### Multiple Bots
+**Example custom Dockerfile:**
 
-Deploy multiple bots to the same VPS:
+```dockerfile
+FROM python:3.11-slim
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Install Python dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy bot code
+COPY . .
+
+# Run bot
+CMD ["python", "bot.py"]
+```
+
+### Multiple Bots on Same VPS
+
+Deploy multiple bots to the same VPS efficiently:
+
+**Step 1: Create separate configs for each bot**
 
 ```bash
 # Bot 1
+cd bot1/
 telegram-bot-stack deploy init --bot-name bot1
-telegram-bot-stack deploy up --config deploy-bot1.yaml
+# Creates deploy.yaml
 
 # Bot 2
+cd bot2/
 telegram-bot-stack deploy init --bot-name bot2
-telegram-bot-stack deploy up --config deploy-bot2.yaml
+# Creates deploy.yaml
 ```
 
-### Custom Domain
+**Step 2: Deploy each bot**
 
-Add custom domain to your bot (for webhooks):
+```bash
+# Deploy bot1
+cd bot1/
+export BOT_TOKEN="bot1-token"
+telegram-bot-stack deploy up
 
-1. Point domain to VPS IP
-2. Install nginx on VPS
-3. Configure reverse proxy
-4. Add SSL certificate (Let's Encrypt)
+# Deploy bot2
+cd bot2/
+export BOT_TOKEN="bot2-token"
+telegram-bot-stack deploy up
+```
+
+**Step 3: Manage bots independently**
+
+```bash
+# Check status of bot1
+cd bot1/
+telegram-bot-stack deploy status
+
+# Update bot2
+cd bot2/
+telegram-bot-stack deploy update
+
+# View logs of bot1
+cd bot1/
+telegram-bot-stack deploy logs
+```
+
+**Resource allocation:** Each bot runs in its own container with separate resource limits. Ensure your VPS has enough resources (RAM, CPU) for all bots.
+
+### Custom Domain with HTTPS
+
+Add custom domain to your bot for webhook support:
+
+**Step 1: Point domain to VPS**
+
+1. Go to your domain registrar
+2. Add A record: `bot.yourdomain.com` → `your-vps-ip`
+3. Wait for DNS propagation (5-60 minutes)
+
+**Step 2: Install Nginx and Certbot**
+
+```bash
+# SSH to VPS
+ssh root@your-vps-ip
+
+# Install Nginx
+apt update
+apt install -y nginx certbot python3-certbot-nginx
+
+# Get SSL certificate
+certbot --nginx -d bot.yourdomain.com
+```
+
+**Step 3: Configure Nginx reverse proxy**
+
+Create `/etc/nginx/sites-available/telegram-bot`:
+
+```nginx
+server {
+    listen 80;
+    server_name bot.yourdomain.com;
+
+    location / {
+        proxy_pass http://localhost:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+
+**Step 4: Enable site and reload**
+
+```bash
+ln -s /etc/nginx/sites-available/telegram-bot /etc/nginx/sites-enabled/
+nginx -t  # Test configuration
+systemctl reload nginx
+```
+
+**Step 5: Configure bot for webhooks**
+
+Update your bot code to use webhooks:
+
+```python
+from telegram_bot_stack import BotBase
+
+bot = BotBase(token="your-token")
+
+# Set webhook
+bot.set_webhook(url="https://bot.yourdomain.com/webhook")
+
+# Your bot handlers...
+```
+
+### PostgreSQL Database Setup
+
+Deploy bot with PostgreSQL for production-grade data storage:
+
+**Step 1: Update deploy.yaml**
+
+```yaml
+storage:
+  backend: "postgres"
+  postgres_host: "postgres" # Docker service name
+  postgres_port: 5432
+  postgres_db: "bot_db"
+  postgres_user: "bot"
+  postgres_password_env: "DB_PASSWORD"
+```
+
+**Step 2: Create docker-compose.yml with PostgreSQL**
+
+Create `docker-compose.override.yml` in your project:
+
+```yaml
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: ${BOT_NAME}-postgres
+    environment:
+      POSTGRES_DB: bot_db
+      POSTGRES_USER: bot
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - bot-network
+    restart: always
+
+  bot:
+    depends_on:
+      - postgres
+    environment:
+      - DB_PASSWORD=${DB_PASSWORD}
+
+volumes:
+  postgres_data:
+
+networks:
+  bot-network:
+    external: true
+    name: ${BOT_NAME}-network
+```
+
+**Step 3: Set database password**
+
+```bash
+export DB_PASSWORD="secure-password-here"
+```
+
+**Step 4: Deploy**
+
+```bash
+telegram-bot-stack deploy up
+```
+
+**Step 5: Initialize database**
+
+The bot will automatically create tables on first run. To verify:
+
+```bash
+# SSH to VPS
+ssh root@your-vps-ip
+
+# Connect to PostgreSQL
+docker exec -it bot-name-postgres psql -U bot -d bot_db
+
+# List tables
+\dt
+```
+
+### Redis Caching Setup
+
+Add Redis for session caching and improved performance:
+
+**Step 1: Add Redis to docker-compose.override.yml**
+
+```yaml
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: ${BOT_NAME}-redis
+    volumes:
+      - redis_data:/data
+    networks:
+      - bot-network
+    restart: always
+    command: redis-server --appendonly yes
+
+  bot:
+    depends_on:
+      - redis
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+
+volumes:
+  redis_data:
+```
+
+**Step 2: Update bot code to use Redis**
+
+```python
+from telegram_bot_stack import BotBase
+from telegram_bot_stack.storage import get_storage
+
+# Use Redis storage
+storage = get_storage("redis", host="redis", port=6379)
+bot = BotBase(token="your-token", storage=storage)
+```
+
+**Step 3: Deploy**
+
+```bash
+telegram-bot-stack deploy up
+```
+
+### CI/CD Integration
+
+Automate deployments with GitHub Actions:
+
+**Create `.github/workflows/deploy.yml`:**
+
+```yaml
+name: Deploy to VPS
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install telegram-bot-stack
+        run: pip install telegram-bot-stack
+
+      - name: Deploy to VPS
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+        run: |
+          telegram-bot-stack deploy up
+```
+
+**Setup secrets in GitHub:**
+
+1. Go to repository → Settings → Secrets
+2. Add `BOT_TOKEN` secret
+3. Push to `main` branch triggers deployment
+
+### Backup and Restore
+
+**Backup bot data:**
+
+```bash
+# SSH to VPS
+ssh root@your-vps-ip
+
+# Backup data directory
+tar -czf bot-backup-$(date +%Y%m%d).tar.gz /opt/bot-name/data/
+
+# Download backup
+scp root@your-vps-ip:/root/bot-backup-*.tar.gz ./
+```
+
+**Restore from backup:**
+
+```bash
+# Upload backup to VPS
+scp bot-backup-20250101.tar.gz root@your-vps-ip:/root/
+
+# SSH to VPS
+ssh root@your-vps-ip
+
+# Stop bot
+cd /opt/bot-name
+docker-compose down
+
+# Restore data
+tar -xzf /root/bot-backup-20250101.tar.gz -C /
+
+# Start bot
+docker-compose up -d
+```
 
 ### Health Monitoring
 

@@ -15,6 +15,7 @@ New to the framework? Start here:
 
 In-depth guides for specific topics:
 
+- **[Deployment Guide](deployment_guide.md)** - Deploy bots to VPS in one command
 - **[Storage Guide](storage_guide.md)** - Storage backends and data persistence
 - **[Migration Guide](migration_guide.md)** - Upgrade between versions
 - **[Private Installation](private_installation.md)** - Install from private sources
@@ -40,6 +41,7 @@ docs/
 ├── README.md                    # This file - navigation hub
 ├── installation.md             # Getting Started
 ├── quickstart.md               # Getting Started
+├── deployment_guide.md         # Guides - VPS deployment
 ├── storage_guide.md            # Guides
 ├── migration_guide.md          # Guides
 ├── private_installation.md     # Guides
@@ -61,6 +63,7 @@ Essential documentation for new users:
 
 Detailed guides for specific use cases:
 
+- **Deployment Guide** - Deploy bots to production (VPS, Docker, Systemd)
 - **Storage Guide** - Choose and use storage backends
 - **Migration Guide** - Upgrade your bot
 - **Private Installation** - Install from private repositories
@@ -84,7 +87,7 @@ Historical and deprecated documentation:
 ### Quick Start Flow
 
 ```
-installation.md → quickstart.md → api_reference.md
+installation.md → quickstart.md → deployment_guide.md → api_reference.md
                               → architecture.md
 ```
 
