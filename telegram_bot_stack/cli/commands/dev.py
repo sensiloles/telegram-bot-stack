@@ -158,11 +158,11 @@ def _run_with_reload(bot_path: Path, python_executable: str = None) -> None:
     def start_bot():
         """Start the bot process."""
         return subprocess.Popen(
-            [python_executable, str(bot_path)],
+            [python_executable, "-u", str(bot_path)],  # -u for unbuffered output
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             text=True,
-            bufsize=1,  # Line buffered
+            bufsize=0,  # Unbuffered
         )
 
     # Start initial bot process
@@ -185,9 +185,12 @@ def _run_with_reload(bot_path: Path, python_executable: str = None) -> None:
     def read_output():
         """Read and display bot output."""
         try:
-            for line in iter(process.stdout.readline, ""):
+            while True:
+                line = process.stdout.readline()
                 if not line:
-                    break
+                    if process.poll() is not None:
+                        break
+                    continue
                 output_queue.put(line.rstrip())
         except Exception:
             pass
@@ -199,7 +202,7 @@ def _run_with_reload(bot_path: Path, python_executable: str = None) -> None:
 
     try:
         while True:
-            # Display any available output
+            # Display any available output (non-blocking)
             try:
                 while True:
                     line = output_queue.get_nowait()
@@ -208,10 +211,12 @@ def _run_with_reload(bot_path: Path, python_executable: str = None) -> None:
                 pass
 
             # Check if process is still running
-            if process.poll() is not None:
+            exit_code = process.poll()
+            if exit_code is not None:
                 click.secho("\n⚠️  Bot process exited", fg="yellow")
-                # Read remaining output
+                # Wait a bit for remaining output
                 output_stopped.wait(timeout=1.0)
+                # Read all remaining output from queue
                 try:
                     while True:
                         line = output_queue.get_nowait()
@@ -225,7 +230,12 @@ def _run_with_reload(bot_path: Path, python_executable: str = None) -> None:
                         click.echo(remaining, err=False)
                 except Exception:
                     pass
+                if exit_code != 0:
+                    click.secho(f"Exit code: {exit_code}", fg="red")
                 break
+
+            # Small sleep to avoid busy waiting
+            time.sleep(0.1)
 
             # Check if restart requested
             if restart_requested:
