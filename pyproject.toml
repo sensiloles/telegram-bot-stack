@@ -155,7 +155,7 @@ ignore = [
 # Import organization - will fix later
 "E402",
 # Modern typing - will fix later
-"UP035", "UP006",
+"UP035", "UP006", "UP007",
 # Long lines - formatter will handle
 "E501"
 ]

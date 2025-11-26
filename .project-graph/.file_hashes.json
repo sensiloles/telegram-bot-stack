@@ -1,7 +1,7 @@
 {
   "README.md": "b0f21cd2433fc2df29135eab72f3f32504e17addcf2f15bae635ec750d04f4da",
   "docs/deployment_guide.md": "108e494ae02250ca974dd497280c9b8d8d17240fe3977723389afcebde83beef",
-  "pyproject.toml": "f1b8fc43d5ccf3ea652252c5834ab88ce79da7c3c82bb45d17a09289c76c0f03",
+  "pyproject.toml": "987123c0dd9fed3c9598b65a11097a31a6b291f62358051e392effd0b69bb113",
   "telegram_bot_stack/cli/commands/deploy.py": "c3cfb1af481b58b94a9456d7b830f7b4b9697ff366d34f75ecc5b7458930c0c5",
   "telegram_bot_stack/cli/main.py": "10b93f6d7248b4d47709eaf82e9eceaac9b101c291eee521d609d0e84295c513",
   "telegram_bot_stack/cli/utils/deployment.py": "3777fa33e5bf6ce9add86343fb8165c75df4b75f43d6f258f57fbf9c5d468a78",
