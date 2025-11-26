@@ -189,7 +189,7 @@
       "type": "module",
       "path": "telegram_bot_stack/cli/utils/dependencies.py",
       "description": "Dependency management utilities.",
-      "lines_of_code": 206,
+      "lines_of_code": 212,
       "classes": [],
       "functions": [
         "install_package",

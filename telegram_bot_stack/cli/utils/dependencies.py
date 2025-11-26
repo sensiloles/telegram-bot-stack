@@ -187,6 +187,12 @@ warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = false
 ignore_missing_imports = true
+exclude = [
+    "build/",
+    "dist/",
+    ".*egg-info/",
+    "venv/",
+]
 
 [[tool.mypy.overrides]]
 module = "telegram.*"

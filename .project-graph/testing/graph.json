@@ -9,7 +9,7 @@
     "description": "Test suite, fixtures, and testing utilities",
     "scope": "Unit tests, integration tests, fixtures",
     "node_count": 34,
-    "edge_count": 9
+    "edge_count": 10
   },
   "nodes": [
     {
@@ -1337,7 +1337,7 @@
       "category": "implementation",
       "path": "telegram_bot_stack/cli/utils/dependencies.py",
       "description": "Module dependencies",
-      "lines_of_code": 206,
+      "lines_of_code": 212,
       "complexity_score": 1,
       "exports": [
         "install_package",
@@ -1468,6 +1468,13 @@
       "target": "telegram_bot_stack.cli.utils.deployment",
       "type": "imports",
       "description": "Imports from telegram_bot_stack.cli.utils.deployment"
+    },
+    {
+      "id": "edge_39",
+      "source": "telegram_bot_stack.cli.utils.dependencies",
+      "target": "telegram_bot_stack.cli.utils.venv",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.utils.venv"
     }
   ]
 }
