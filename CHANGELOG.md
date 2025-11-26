@@ -2,6 +2,19 @@
 
 <!-- version list -->
 
+## v1.21.0 (2025-11-26)
+
+### Documentation
+
+- **deployment**: Expand deployment documentation with provider guides and advanced scenarios
+  ([`3e1bc1a`](https://github.com/sensiloles/telegram-bot-stack/commit/3e1bc1a49b797abcfa35562c82cd7eea29f993d6))
+
+### Features
+
+- **cli**: Use pyproject.toml only, add Makefile and improve dev env
+  ([`8129f72`](https://github.com/sensiloles/telegram-bot-stack/commit/8129f7273f761a82e14fcb905af989c2d130a63b))
+
+
 ## v1.20.0 (2025-11-26)
 
 ### Features
