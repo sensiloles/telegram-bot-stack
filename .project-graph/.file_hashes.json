@@ -5,7 +5,7 @@
   "telegram_bot_stack/cli/commands/init.py": "97980ca20268cc7beb8865f59915c30b8a2c40c5fac2a9de96f38c58dc5fde30",
   "telegram_bot_stack/cli/utils/testing.py": "79de429defc45b3bd78b57bc2475777f6952ac420fd058b823451b814ec5fa70",
   "pyproject.toml": "7840e2c797507b8d01c45eee40bea8015089463c7ee2ae29016a7398883cc820",
-  "tests/cli/test_init_command.py": "ea843c370a4f25be48142d64cc50cd105b524f1ebd92244432d31ee3ede1853b",
+  "tests/cli/test_init_command.py": "30895ff30142238dfbd31e10b48148f8a7d1d4b3f77710e4c28133b949b34283",
   ".github/workflows/tests.yml": "0212aa4858004b2d4c6b0643286a60677fd89c9dd9c8deb5e8a39f25130bb259",
   "telegram_bot_stack/storage/memory.py": "8cc73ae0460d66caaed9e2f95a273adc7d4222155fe1e6d51316999874df35c3"
 }

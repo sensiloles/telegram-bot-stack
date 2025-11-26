@@ -1,5 +1,6 @@
 """Tests for init command."""
 
+import subprocess
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
@@ -206,10 +207,9 @@ def test_init_with_install_deps_success(tmp_path):
     runner = CliRunner()
 
     with runner.isolated_filesystem(temp_dir=tmp_path):
-        with patch(
-            "telegram_bot_stack.cli.commands.init.subprocess.run"
-        ) as mock_subprocess:
-            # Mock successful pip install - first call for local repo, second for project
+        # Mock subprocess.run at module level to catch all calls
+        with patch("subprocess.run") as mock_subprocess:
+            # Mock successful subprocess calls (venv creation, pip install, etc.)
             mock_result = MagicMock(returncode=0, stderr="", stdout="")
             mock_subprocess.return_value = mock_result
 
@@ -229,16 +229,21 @@ def test_init_with_install_deps_failure(tmp_path):
     runner = CliRunner()
 
     with runner.isolated_filesystem(temp_dir=tmp_path):
-        with patch(
-            "telegram_bot_stack.cli.commands.init.subprocess.run"
-        ) as mock_subprocess:
-            # Mock failed pip install - simulate telegram-bot-stack not found
-            mock_result = MagicMock(
-                returncode=1,
-                stderr="ERROR: Could not find a version that satisfies the requirement telegram-bot-stack",
-                stdout="",
-            )
-            mock_subprocess.return_value = mock_result
+        # Mock subprocess.run at module level
+        with patch("subprocess.run") as mock_subprocess:
+            # Make subprocess raise CalledProcessError for pip install
+            def side_effect_func(*args, **kwargs):
+                # Check if this is a pip install command
+                if args and len(args[0]) > 2 and "pip" in str(args[0]):
+                    raise subprocess.CalledProcessError(
+                        1,
+                        args[0],
+                        stderr="ERROR: Could not find a version that satisfies the requirement telegram-bot-stack",
+                    )
+                # Otherwise return success (for venv creation, etc.)
+                return MagicMock(returncode=0, stderr="", stdout="")
+
+            mock_subprocess.side_effect = side_effect_func
 
             result = runner.invoke(
                 cli,
@@ -250,7 +255,10 @@ def test_init_with_install_deps_failure(tmp_path):
             project_path = Path("test-bot")
             assert project_path.exists()
             # Should show warning about installation failure
-            assert "Warning" in result.output or "PyPI" in result.output
+            assert (
+                "Warning" in result.output
+                or "install dependencies later" in result.output
+            )
 
 
 def test_init_with_package_manager_poetry(tmp_path):
@@ -258,10 +266,9 @@ def test_init_with_package_manager_poetry(tmp_path):
     runner = CliRunner()
 
     with runner.isolated_filesystem(temp_dir=tmp_path):
-        with patch(
-            "telegram_bot_stack.cli.commands.init.subprocess.run"
-        ) as mock_subprocess:
-            mock_subprocess.return_value = MagicMock(returncode=0)
+        # Mock subprocess.run at module level
+        with patch("subprocess.run") as mock_subprocess:
+            mock_subprocess.return_value = MagicMock(returncode=0, stderr="", stdout="")
 
             result = runner.invoke(
                 cli,
@@ -284,10 +291,9 @@ def test_init_with_package_manager_pdm(tmp_path):
     runner = CliRunner()
 
     with runner.isolated_filesystem(temp_dir=tmp_path):
-        with patch(
-            "telegram_bot_stack.cli.commands.init.subprocess.run"
-        ) as mock_subprocess:
-            mock_subprocess.return_value = MagicMock(returncode=0)
+        # Mock subprocess.run at module level
+        with patch("subprocess.run") as mock_subprocess:
+            mock_subprocess.return_value = MagicMock(returncode=0, stderr="", stdout="")
 
             result = runner.invoke(
                 cli,
