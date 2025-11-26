@@ -27,7 +27,7 @@ class MemoryStorage(StorageBackend):
         {"user1": {"name": "John"}}
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize empty in-memory storage."""
         self._data: Dict[str, Any] = {}
         logger.debug("Initialized MemoryStorage")

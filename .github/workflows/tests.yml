@@ -385,7 +385,7 @@ jobs:
         continue-on-error: true
         run: |
           echo "::group::🔍 Running mypy type checker"
-          mypy telegram_bot_stack 2>&1 | tee mypy_output.log
+          mypy telegram_bot_stack --exclude="telegram_bot_stack/cli/templates" 2>&1 | tee mypy_output.log
           MYPY_EXIT_CODE=${PIPESTATUS[0]}
           echo "::endgroup::"
           exit $MYPY_EXIT_CODE

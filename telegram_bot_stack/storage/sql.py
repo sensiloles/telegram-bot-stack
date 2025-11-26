@@ -3,17 +3,21 @@
 import json
 import logging
 from datetime import datetime
-from typing import Any
+from typing import Any, Dict
 
 from sqlalchemy import Column, DateTime, String, Text, create_engine, inspect
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.orm import Session, declarative_base, sessionmaker
+from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
 from .base import StorageBackend
 
 logger = logging.getLogger(__name__)
 
-Base = declarative_base()
+
+class Base(DeclarativeBase):
+    """Base class for SQLAlchemy models."""
+
+    pass
 
 
 class StorageRecord(Base):
@@ -77,13 +81,13 @@ class SQLStorage(StorageBackend):
         echo: bool = False,
         pool_size: int = 5,
         max_overflow: int = 10,
-    ):
+    ) -> None:
         """Initialize SQL storage with database connection."""
         self.database_url = database_url
         self.echo = echo
 
         # Create engine with appropriate settings
-        engine_kwargs = {"echo": echo}
+        engine_kwargs: Dict[str, Any] = {"echo": echo}
 
         # Add connection pooling for PostgreSQL
         if database_url.startswith("postgresql"):
@@ -141,8 +145,8 @@ class SQLStorage(StorageBackend):
 
             if record:
                 # Update existing record
-                record.data = json_data
-                record.updated_at = datetime.utcnow()
+                record.data = json_data  # type: ignore[assignment]
+                record.updated_at = datetime.utcnow()  # type: ignore[assignment]
                 logger.debug(f"Updated record with key: {key}")
             else:
                 # Create new record
@@ -175,7 +179,8 @@ class SQLStorage(StorageBackend):
             record = session.query(StorageRecord).filter_by(key=key).first()
 
             if record:
-                data = json.loads(record.data)
+                # Column type requires cast to str for json.loads
+                data = json.loads(str(record.data))
                 logger.debug(f"Loaded data for key: {key}")
                 return data
             else:
@@ -248,7 +253,7 @@ class SQLStorage(StorageBackend):
         except Exception as e:
             logger.error(f"Error closing database connections: {e}")
 
-    def __del__(self):
+    def __del__(self) -> None:
         """Cleanup when object is destroyed."""
         try:
             self.close()

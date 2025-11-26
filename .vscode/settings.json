@@ -55,6 +55,35 @@
   "ruff.path": [
     "./venv/bin/ruff"
   ],
+  // Python interpreter and type checking configuration
+  "python.defaultInterpreterPath": "./venv/bin/python3",
+  // Python type checking with Cursor Pyright (built-in, matches CI mypy checks)
+  // Note: Cursor Pyright automatically manages python.languageServer setting
+  "python.analysis.typeCheckingMode": "strict",
+  "python.analysis.diagnosticMode": "workspace",
+  "python.analysis.diagnosticSeverityOverrides": {
+    "reportGeneralTypeIssues": "error",
+    "reportOptionalSubscript": "error",
+    "reportOptionalMemberAccess": "error",
+    "reportOptionalCall": "error",
+    "reportOptionalIterable": "error",
+    "reportOptionalContextManager": "error",
+    "reportOptionalOperand": "error",
+    "reportMissingTypeStubs": "warning",
+    "reportUnknownParameterType": "warning",
+    "reportUnknownArgumentType": "warning",
+    "reportUnknownMemberType": "warning",
+    "reportMissingTypeArgument": "warning",
+    "reportIncompatibleVariableOverride": "error",
+    "reportIncompatibleMethodOverride": "error",
+    "reportAssignmentType": "error",
+    "reportArgumentType": "error",
+    "reportReturnType": "error"
+  },
+  "python.analysis.inlayHints.functionReturnTypes": true,
+  "python.analysis.inlayHints.variableTypes": true,
+  "python.analysis.autoImportCompletions": true,
+  "python.analysis.useLibraryCodeForTypes": true,
   // Disable other formatters/linters to avoid conflicts
   "python.linting.enabled": false,
   "python.linting.pylintEnabled": false,

@@ -12,7 +12,7 @@
     "scope": "Storage abstraction layer and implementations",
     "root_package": "telegram_bot_stack.storage",
     "node_count": 5,
-    "edge_count": 0
+    "edge_count": 3
   },
   "nodes": [
     {
@@ -73,9 +73,10 @@
       "category": "implementation",
       "path": "telegram_bot_stack/storage/sql.py",
       "description": "SQL-based storage backend using SQLAlchemy.",
-      "lines_of_code": 256,
+      "lines_of_code": 261,
       "complexity_score": 1,
       "exports": [
+        "Base",
         "StorageRecord",
         "SQLStorage",
         "save",
@@ -85,6 +86,7 @@
         "close"
       ],
       "classes": [
+        "Base",
         "StorageRecord",
         "SQLStorage"
       ],
@@ -158,5 +160,27 @@
       "criticality": "medium"
     }
   ],
-  "edges": []
+  "edges": [
+    {
+      "id": "edge_1",
+      "source": "telegram_bot_stack.storage.json",
+      "target": "telegram_bot_stack.storage.base",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.storage.base"
+    },
+    {
+      "id": "edge_2",
+      "source": "telegram_bot_stack.storage.memory",
+      "target": "telegram_bot_stack.storage.base",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.storage.base"
+    },
+    {
+      "id": "edge_3",
+      "source": "telegram_bot_stack.storage.sql",
+      "target": "telegram_bot_stack.storage.base",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.storage.base"
+    }
+  ]
 }

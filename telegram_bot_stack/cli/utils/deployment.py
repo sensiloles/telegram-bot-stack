@@ -6,7 +6,7 @@ import os
 from pathlib import Path
 from typing import Any, Dict
 
-import yaml
+import yaml  # type: ignore[import-untyped]
 from jinja2 import Environment, FileSystemLoader
 from rich.console import Console
 
@@ -58,7 +58,7 @@ class DeploymentConfig:
             Configuration value or default
         """
         keys = key.split(".")
-        value = self.config
+        value: Any = self.config
 
         for k in keys:
             if isinstance(value, dict):

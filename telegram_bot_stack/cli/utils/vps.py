@@ -6,7 +6,7 @@ Handles SSH connections, file transfers, and remote command execution.
 
 import os
 from pathlib import Path
-from typing import Optional
+from typing import Any, Dict, Optional
 
 from fabric import Connection
 from rich.console import Console
@@ -48,7 +48,7 @@ class VPSConnection:
             with console.status("[cyan]Testing SSH connection..."):
                 conn = self._create_connection()
                 result = conn.run("echo 'Connection test'", hide=True)
-                return result.ok
+                return bool(result.ok)
         except Exception as e:
             console.print(f"[red]Connection failed: {e}[/red]")
             return False
@@ -72,7 +72,7 @@ class VPSConnection:
         Returns:
             Fabric Connection object
         """
-        connect_kwargs = {}
+        connect_kwargs: Dict[str, Any] = {}
 
         if self.ssh_key:
             connect_kwargs["key_filename"] = self.ssh_key
@@ -100,7 +100,7 @@ class VPSConnection:
         try:
             conn = self.connect()
             result = conn.run(command, hide=hide)
-            return result.ok
+            return bool(result.ok)
         except Exception as e:
             console.print(f"[red]Command failed: {e}[/red]")
             return False
@@ -195,6 +195,6 @@ def check_docker_compose_installed(conn: Connection) -> bool:
     """
     try:
         result = conn.run("docker-compose --version", hide=True)
-        return result.ok
+        return bool(result.ok)
     except Exception:
         return False

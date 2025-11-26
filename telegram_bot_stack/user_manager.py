@@ -39,7 +39,7 @@ class UserManager:
 
     def _load_users(self) -> List[int]:
         """Load registered users from storage."""
-        users = self.storage.load(self.storage_key, [])
+        users: List[int] = self.storage.load(self.storage_key, [])
         if users:
             logger.info(f"Loaded {len(users)} users from storage")
         return users
