@@ -1,7 +1,9 @@
 """Run bot in development mode with auto-reload."""
 
+import queue
 import subprocess
 import sys
+import threading
 import time
 from pathlib import Path
 
@@ -176,9 +178,6 @@ def _run_with_reload(bot_path: Path, python_executable: str = None) -> None:
     observer.start()
 
     # Start reading bot output in background
-    import queue
-    import threading
-
     output_queue = queue.Queue()
     output_stopped = threading.Event()
 
@@ -190,10 +189,12 @@ def _run_with_reload(bot_path: Path, python_executable: str = None) -> None:
                 if not line:
                     if process.poll() is not None:
                         break
+                    time.sleep(0.01)  # Small sleep to avoid busy waiting
                     continue
+                # Put line in queue and also flush immediately
                 output_queue.put(line.rstrip())
-        except Exception:
-            pass
+        except Exception as e:
+            click.echo(f"Error reading output: {e}", err=True)
         finally:
             output_stopped.set()
 
@@ -203,10 +204,13 @@ def _run_with_reload(bot_path: Path, python_executable: str = None) -> None:
     try:
         while True:
             # Display any available output (non-blocking)
+            displayed_any = False
             try:
                 while True:
                     line = output_queue.get_nowait()
-                    click.echo(line, err=False)
+                    click.echo(line)
+                    displayed_any = True
+                    sys.stdout.flush()  # Force flush
             except queue.Empty:
                 pass
 
@@ -215,27 +219,29 @@ def _run_with_reload(bot_path: Path, python_executable: str = None) -> None:
             if exit_code is not None:
                 click.secho("\n⚠️  Bot process exited", fg="yellow")
                 # Wait a bit for remaining output
-                output_stopped.wait(timeout=1.0)
+                output_stopped.wait(timeout=1.5)
                 # Read all remaining output from queue
                 try:
                     while True:
                         line = output_queue.get_nowait()
-                        click.echo(line, err=False)
+                        click.echo(line)
+                        sys.stdout.flush()
                 except queue.Empty:
                     pass
                 # Also try to read any remaining output directly
                 try:
                     remaining = process.stdout.read()
                     if remaining:
-                        click.echo(remaining, err=False)
+                        click.echo(remaining)
+                        sys.stdout.flush()
                 except Exception:
                     pass
                 if exit_code != 0:
                     click.secho(f"Exit code: {exit_code}", fg="red")
                 break
 
-            # Small sleep to avoid busy waiting
-            time.sleep(0.1)
+            # Small sleep to avoid busy waiting, but shorter if we displayed output
+            time.sleep(0.05 if displayed_any else 0.1)
 
             # Check if restart requested
             if restart_requested:
