@@ -120,6 +120,61 @@ mcp_github-workflow_merge_pr(pr_number=<N>, delete_branch=true)
 python3 .github/workflows/scripts/merge_pr.py --cleanup
 ```
 
+### 6. Update Project Status (MANDATORY)
+
+**CRITICAL:** After completing ANY task that closes an issue or changes the roadmap, ALWAYS update `.github/PROJECT_STATUS.md`.
+
+**When to update:**
+
+- ✅ After closing an issue (especially from roadmap)
+- ✅ After creating a new issue that affects the roadmap
+- ✅ After completing a major feature
+- ✅ When status changes (TODO → DONE, In Progress → Complete)
+- ✅ After merging a PR that implements a tracked feature
+
+**What to update:**
+
+1. **Issue Status Tables:** Change status from ⏳ TODO to ✅ DONE
+2. **Progress Counters:** Update "X/Y issues completed" counts
+3. **Checklists:** Check off completed items [x]
+4. **Phase Status:** Update phase descriptions
+5. **Next Actions:** Update current focus and remaining tasks
+6. **Last Updated Date:** Update date at top of file
+7. **Current Progress Section:** Update progress summary at bottom
+
+**Example updates:**
+
+```markdown
+# Before
+
+| **#76** | Rollback mechanism | ✅ YES | ⏳ TODO | 3-4h | - |
+
+# After
+
+| **#76** | Rollback mechanism | ✅ YES | ✅ DONE | 3-4h | - |
+
+# Update progress counter
+
+**Progress:** 2/7 → 3/7 critical hardening tasks completed
+
+# Update date
+
+**Updated:** 2025-01-27 → 2025-01-28
+
+# Update checklist
+
+- [ ] Rollback mechanism (#76) → - [x] Rollback mechanism (#76) ✅
+```
+
+**How to remember:**
+
+1. **Before starting:** Read PROJECT_STATUS.md to understand current state
+2. **After finishing:** Update PROJECT_STATUS.md before committing
+3. **Include in commit:** Commit PROJECT_STATUS.md changes with feature code
+4. **Double-check:** Review PROJECT_STATUS.md in every PR
+
+**If you forget:** The project roadmap becomes outdated and misleading. ALWAYS update it!
+
 ---
 
 ## Project Context
@@ -211,11 +266,13 @@ Threshold: >=80% for `telegram_bot_stack/`
 
 ### On "Continue Work":
 
-1. Check `PROJECT_STATUS.md`
+1. Check `PROJECT_STATUS.md` (understand current state)
 2. List open issues: Use MCP `list_issues` → identify active
 3. Read issue details: Use MCP `get_issue <N>`
 4. Check current branch
 5. Implement → test → commit → push → PR
+6. **UPDATE `PROJECT_STATUS.md`** (mark task as DONE, update progress)
+7. Commit status changes with feature code
 
 ### Branch Strategy:
 
@@ -262,9 +319,10 @@ After implementation:
 
 - [ ] Write/update tests (>=80% coverage)
 - [ ] Update docs if needed
+- [ ] **UPDATE `.github/PROJECT_STATUS.md`** (mark issue as DONE, update progress)
 - [ ] Run linting: `ruff check .`
 - [ ] Run tests: `pytest`
-- [ ] Commit with conventional format
+- [ ] Commit with conventional format (include PROJECT_STATUS.md)
 - [ ] Push + auto-create PR
 
 On merge:
@@ -272,6 +330,7 @@ On merge:
 - [ ] Run `merge_pr` (MCP or CLI)
 - [ ] Verify release triggered (if on main)
 - [ ] Check CI passed
+- [ ] Verify PROJECT_STATUS.md is up-to-date in main
 
 **Remember:** GitHub Flow → Implementation → Testing → Docs → Commit → PR → Merge
 

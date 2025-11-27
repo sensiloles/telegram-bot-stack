@@ -6,7 +6,7 @@
   ".vscode/README.md": "604518c008aed67939b76d51056f46e5ba0008b7424a2fa8189cd23b50ff97f0",
   "CHANGELOG.md": "d0d2314d4c37c189f319c18282bfb530e1ddb110675a077fa42a12c18c97fcc5",
   "pyproject.toml": "0627eddadd86a82aed2ba88935bf849f08e0a9c8713f2402b309919d565467ab",
-  ".github/PROJECT_STATUS.md": "24f5e9e6fe9fc55b71ccbbeb5a7816caaee05e310be8242fe4e847d4494179bc",
+  ".github/PROJECT_STATUS.md": "76f91015c1e04a9e82c2eb9944f5a5d1b3f8ef85ae3e2d35e9c3811a828d0d4d",
   "telegram_bot_stack/cli/utils/backup.py": "62766fbd4184202674cceda4558e66419e6e7c61beba78f69edcfaada60c0de6",
   "telegram_bot_stack/cli/commands/__init__.py": "3b764f345a2072de9f943abefc5d5b512cfd8f41d5349f9bae327fd061ff36eb",
   "telegram_bot_stack/cli/commands/deploy/__init__.py": "b4a1f0ce2319325d572aa2b9c4a5c5201b649961c8c42113e796709d6276e428",
