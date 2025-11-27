@@ -2,10 +2,12 @@
   "docs/deployment_guide.md": "40aa8d23bb7c492b636220db4481861ca0234073ec4ed9d8dc9af7f4a01e0373",
   "telegram_bot_stack/cli/commands/deploy/__init__.py": "9ffaee12493adce3d58d6ebf4bbd91d771dbe5023924adb884fdb1b14ff387c7",
   "telegram_bot_stack/cli/commands/deploy/monitoring.py": "127e5537212504b7e00f4c25a65f29c4bbd7d6e155bbd1b40aa6803b575b23a2",
-  "telegram_bot_stack/cli/utils/vps.py": "3f31e15ade7284588370c749ecaaec5027d7d27f990471849fe08681ccb4c332",
+  "telegram_bot_stack/cli/utils/vps.py": "2fd51d65531aa1d5fb3ce7f2bfed9437892bee9e35483b5edaef36d17b1257b2",
   ".github/PROJECT_STATUS.md": "1258f9b2ab52339987e7356fe421e44621d3c76673b8dfbc532c3a7bcc95c81d",
   ".github/workflows/docs.yml": "0aa605badab2318f39aa4f960f4f21f81d597c832f2b1fd7e9d027a7e171b36f",
   ".github/workflows/tests.yml": "03c8a68f7a01995d6df3423db0112397e10e555249da90c68f4857a9032a4e41",
   ".github/workflows/pypi-publish.yml": "c5b9dec1244ea8c8feb2424d35bf641ec95d88f112596d7fb878ebcc0fcf39a4",
-  "telegram_bot_stack/cli/utils/git.py": "470f80b9d6e22854bed39b53a884e0d94381e141d6b7f06933942ce70fc500d6"
+  "telegram_bot_stack/cli/utils/git.py": "470f80b9d6e22854bed39b53a884e0d94381e141d6b7f06933942ce70fc500d6",
+  "telegram_bot_stack/cli/commands/deploy/operations.py": "056d64efca0ca3be3526c9ae1d80293e0a96fca5bfa4934d4c06546524c33af8",
+  "telegram_bot_stack/cli/utils/deployment.py": "37e837e28fd4e4f0409d7498492b776b76cde5a077635622b516cd3871f0c0b8"
 }

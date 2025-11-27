@@ -12,7 +12,7 @@
     "scope": "CLI tool for bot project management and development",
     "root_package": "telegram_bot_stack.cli",
     "node_count": 30,
-    "edge_count": 35
+    "edge_count": 37
   },
   "nodes": [
     {
@@ -113,11 +113,12 @@
       "category": "implementation",
       "path": "telegram_bot_stack/cli/utils/deployment.py",
       "description": "Deployment configuration and template rendering utilities.",
-      "lines_of_code": 313,
+      "lines_of_code": 484,
       "complexity_score": 1,
       "exports": [
         "DeploymentConfig",
         "DockerTemplateRenderer",
+        "SystemdTemplateRenderer",
         "escape_env_value",
         "create_env_file",
         "load",
@@ -129,11 +130,14 @@
         "render_compose",
         "render_dockerignore",
         "render_makefile",
+        "render_all",
+        "render_service_file",
         "render_all"
       ],
       "classes": [
         "DeploymentConfig",
-        "DockerTemplateRenderer"
+        "DockerTemplateRenderer",
+        "SystemdTemplateRenderer"
       ],
       "functions": [
         "escape_env_value",
@@ -147,6 +151,8 @@
         "render_compose",
         "render_dockerignore",
         "render_makefile",
+        "render_all",
+        "render_service_file",
         "render_all"
       ],
       "dependencies": [],
@@ -248,7 +254,7 @@
       "category": "implementation",
       "path": "telegram_bot_stack/cli/utils/vps.py",
       "description": "VPS operations utilities for deployment.",
-      "lines_of_code": 368,
+      "lines_of_code": 552,
       "complexity_score": 1,
       "exports": [
         "VPSConnection",
@@ -260,6 +266,10 @@
         "run_command",
         "check_docker_installed",
         "install_docker",
+        "check_python_version",
+        "install_python",
+        "check_systemd_available",
+        "validate_vps_requirements",
         "transfer_files",
         "write_file",
         "close"
@@ -276,6 +286,10 @@
         "run_command",
         "check_docker_installed",
         "install_docker",
+        "check_python_version",
+        "install_python",
+        "check_systemd_available",
+        "validate_vps_requirements",
         "transfer_files",
         "write_file",
         "close"
@@ -600,7 +614,7 @@
       "category": "implementation",
       "path": "telegram_bot_stack/cli/commands/deploy/operations.py",
       "description": "Deployment operations (up, update, down).",
-      "lines_of_code": 682,
+      "lines_of_code": 813,
       "complexity_score": 1,
       "exports": [
         "up",
@@ -1046,6 +1060,20 @@
       "target": "telegram_bot_stack.cli.commands.deploy.secrets",
       "type": "imports",
       "description": "Imports from telegram_bot_stack.cli.commands.deploy.secrets"
+    },
+    {
+      "id": "edge_40",
+      "source": "telegram_bot_stack.cli.commands.deploy.operations",
+      "target": "telegram_bot_stack.cli.utils.version_tracking",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.utils.version_tracking"
+    },
+    {
+      "id": "edge_41",
+      "source": "telegram_bot_stack.cli.utils.deployment",
+      "target": "telegram_bot_stack.cli",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli"
     }
   ]
 }

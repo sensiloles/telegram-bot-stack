@@ -2,6 +2,7 @@
 
 import shutil
 from pathlib import Path
+from typing import Any, Optional
 
 import click
 from rich.console import Console
@@ -10,6 +11,7 @@ from telegram_bot_stack.cli.utils.backup import BackupManager
 from telegram_bot_stack.cli.utils.deployment import (
     DeploymentConfig,
     DockerTemplateRenderer,
+    SystemdTemplateRenderer,
     create_env_file,
 )
 from telegram_bot_stack.cli.utils.secrets import SecretsManager
@@ -54,15 +56,20 @@ def up(config: str, verbose: bool) -> None:
 
         console.print("[green]✓ Connected to VPS[/green]\n")
 
-        # Check and install Docker if needed
-        console.print("[cyan]🐳 Checking Docker installation...[/cyan]")
-        if not vps.check_docker_installed():
-            console.print("[yellow]Docker not found, installing...[/yellow]")
-            if not vps.install_docker():
-                console.print("[red]❌ Failed to install Docker[/red]")
-                return
-        else:
-            console.print("[green]✓ Docker is installed[/green]\n")
+        # Get deployment method from config
+        deployment_method = deploy_config.get("deployment.method", "docker")
+        console.print(f"[cyan]📋 Deployment method: {deployment_method}[/cyan]\n")
+
+        # Get minimum Python version from config or use default
+        min_python_version = deploy_config.get("bot.python_version", "3.9")
+        if isinstance(min_python_version, str) and min_python_version.startswith("3."):
+            # Extract major.minor (e.g., "3.11" from "3.11.0")
+            min_python_version = ".".join(min_python_version.split(".")[:2])
+
+        # Validate VPS requirements and install dependencies
+        if not vps.validate_vps_requirements(deployment_method, min_python_version):
+            console.print("[red]❌ VPS validation failed[/red]")
+            return
 
         # Prepare deployment directory
         bot_name = deploy_config.get("bot.name")
@@ -71,8 +78,17 @@ def up(config: str, verbose: bool) -> None:
         console.print(f"[cyan]📦 Preparing deployment directory: {remote_dir}[/cyan]")
         vps.run_command(f"mkdir -p {remote_dir}")
 
-        # Generate Docker files from templates
-        console.print("[cyan]📝 Generating Docker configuration...[/cyan]")
+        # Generate deployment files from templates based on method
+        if deployment_method == "docker":
+            console.print("[cyan]📝 Generating Docker configuration...[/cyan]")
+        elif deployment_method == "systemd":
+            console.print("[cyan]📝 Generating systemd configuration...[/cyan]")
+        else:
+            console.print(
+                f"[red]❌ Unknown deployment method: {deployment_method}[/red]"
+            )
+            console.print("[yellow]Supported methods: docker, systemd[/yellow]")
+            return
 
         temp_dir = Path(".deploy-temp")
         temp_dir.mkdir(exist_ok=True)
@@ -91,15 +107,23 @@ def up(config: str, verbose: bool) -> None:
                 )
                 has_secrets = len(encrypted_secrets) > 0
 
-            # Render templates
-            renderer = DockerTemplateRenderer(deploy_config, has_secrets=has_secrets)
-            renderer.render_all(temp_dir)
+            # Render templates based on deployment method
+            if deployment_method == "docker":
+                docker_renderer = DockerTemplateRenderer(
+                    deploy_config, has_secrets=has_secrets
+                )
+                docker_renderer.render_all(temp_dir)
+                console.print("[green]✓ Docker configuration generated[/green]\n")
+            elif deployment_method == "systemd":
+                systemd_renderer = SystemdTemplateRenderer(
+                    deploy_config, has_secrets=has_secrets
+                )
+                systemd_renderer.render_all(temp_dir)
+                console.print("[green]✓ systemd configuration generated[/green]\n")
 
             # Create .env file (secrets will be loaded from .secrets.env on VPS)
             env_file = temp_dir / ".env"
-            create_env_file(deploy_config, env_file)
-
-            console.print("[green]✓ Docker configuration generated[/green]\n")
+            create_env_file(deploy_config, env_file, secrets_manager, vps)
 
             # Transfer files to VPS
             console.print("[cyan]📤 Transferring files to VPS...[/cyan]")
@@ -129,21 +153,93 @@ def up(config: str, verbose: bool) -> None:
 
             console.print("[green]✓ Files transferred[/green]\n")
 
-            # Create decryption script that decrypts secrets in-memory during container startup
-            # This ensures secrets remain encrypted at rest on VPS filesystem
-            # Note: has_secrets was already determined above
-            encryption_key = deploy_config.get("secrets.encryption_key")
+            # Deploy based on method
+            if deployment_method == "docker":
+                success = _deploy_docker(
+                    vps,
+                    deploy_config,
+                    bot_name,
+                    remote_dir,
+                    has_secrets,
+                    encryption_key,
+                )
+            elif deployment_method == "systemd":
+                success = _deploy_systemd(
+                    vps,
+                    deploy_config,
+                    bot_name,
+                    remote_dir,
+                    has_secrets,
+                    encryption_key,
+                )
+            else:
+                console.print(
+                    f"[red]❌ Unknown deployment method: {deployment_method}[/red]"
+                )
+                return
 
-            # Create Python script that decrypts secrets in-memory and outputs to stdout
-            # This script runs during container startup, never writes plain text to filesystem
-            # Escape encryption_key for use in Python string (handle None case)
-            encryption_key_str = encryption_key if encryption_key else ""
-            # Escape backslashes and quotes for Python string literal
-            encryption_key_escaped = encryption_key_str.replace("\\", "\\\\").replace(
-                '"', '\\"'
+            if not success:
+                return
+
+            # Show status
+            console.print("[cyan]📊 Checking bot status...[/cyan]")
+            if deployment_method == "docker":
+                vps.run_command(f"cd {remote_dir} && docker-compose ps")
+            elif deployment_method == "systemd":
+                vps.run_command(f"systemctl status {bot_name} --no-pager -l")
+
+            console.print("\n[green]🎉 Deployment successful![/green]\n")
+            console.print("[bold]Bot Information:[/bold]")
+            console.print(f"  Name: {bot_name}")
+            console.print(f"  Host: {deploy_config.get('vps.host')}")
+            console.print(f"  Directory: {remote_dir}")
+            console.print(f"  Method: {deployment_method}")
+            console.print("\n[bold]Useful commands:[/bold]")
+            console.print("  View logs:   [cyan]telegram-bot-stack deploy logs[/cyan]")
+            console.print(
+                "  Check status: [cyan]telegram-bot-stack deploy status[/cyan]"
             )
+            console.print("  Stop bot:    [cyan]telegram-bot-stack deploy down[/cyan]")
 
-            decrypt_script = f"""#!/usr/bin/env python3
+        finally:
+            # Cleanup temp directory
+            if temp_dir.exists():
+                shutil.rmtree(temp_dir)
+
+    finally:
+        # Always close VPS connection
+        vps.close()
+
+
+def _deploy_docker(
+    vps: Any,
+    deploy_config: DeploymentConfig,
+    bot_name: str,
+    remote_dir: str,
+    has_secrets: bool,
+    encryption_key: Optional[str],
+) -> bool:
+    """Deploy bot using Docker.
+
+    Args:
+        vps: VPSConnection instance
+        deploy_config: Deployment configuration
+        bot_name: Bot name
+        remote_dir: Remote directory path
+        has_secrets: Whether secrets are configured
+        encryption_key: Encryption key for secrets
+
+    Returns:
+        True if successful, False otherwise
+    """
+    # Create decryption script that decrypts secrets in-memory during container startup
+    # This ensures secrets remain encrypted at rest on VPS filesystem
+    encryption_key_str = encryption_key if encryption_key else ""
+    encryption_key_escaped = encryption_key_str.replace("\\", "\\\\").replace(
+        '"', '\\"'
+    )
+
+    decrypt_script = f"""#!/usr/bin/env python3
 \"\"\"
 Decrypt secrets in-memory and output as environment variables.
 This script is executed during container startup to decrypt secrets
@@ -190,14 +286,12 @@ def decrypt_secrets():
                     try:
                         decrypted_value = fernet.decrypt(encrypted_value.encode()).decode()
                         # Output as KEY=VALUE (properly escaped for .env file format)
-                        # Simple escaping: quote if contains special characters
                         needs_quoting = any(
                             char in decrypted_value
                             for char in ["\\n", "\\r", "\\t", '"', "\\\\", " ", "#", "=", "$", "`"]
                         )
 
                         if needs_quoting:
-                            # Build escaped value step by step
                             temp_val = decrypted_value.replace("\\\\", "\\\\\\\\")
                             temp_val = temp_val.replace('"', '\\\\"')
                             temp_val = temp_val.replace("\\n", "\\\\n")
@@ -208,7 +302,6 @@ def decrypt_secrets():
                             output_value = '"' + temp_val + '"'
                         else:
                             output_value = decrypted_value
-                        # Use format to avoid f-string nesting issues
                         print("{{}}={{}}".format(key, output_value))
                     except Exception as e:
                         print(f"# Warning: Failed to decrypt {{key}}: {{e}}", file=sys.stderr)
@@ -219,85 +312,123 @@ if __name__ == "__main__":
     decrypt_secrets()
 """
 
-            decrypt_script_path = f"{remote_dir}/decrypt_secrets.py"
-            if vps.write_file(decrypt_script, decrypt_script_path, mode="700"):
-                console.print("[green]✓ Created secrets decryption script[/green]")
-            else:
-                console.print(
-                    "[yellow]⚠️  Warning: Could not create decryption script[/yellow]"
-                )
+    decrypt_script_path = f"{remote_dir}/decrypt_secrets.py"
+    if vps.write_file(decrypt_script, decrypt_script_path, mode="700"):
+        console.print("[green]✓ Created secrets decryption script[/green]")
+    else:
+        console.print("[yellow]⚠️  Warning: Could not create decryption script[/yellow]")
 
-            # Note: Makefile template now handles decryption via decrypt_secrets.py
-            # Secrets are decrypted to /dev/shm (shared memory, RAM-based, not persisted)
-            if has_secrets:
-                console.print(
-                    "[dim]   (Secrets will be decrypted in-memory to shared memory during container startup)[/dim]"
-                )
+    if has_secrets:
+        console.print(
+            "[dim]   (Secrets will be decrypted in-memory to shared memory during container startup)[/dim]"
+        )
 
-            # Initialize version tracker
-            version_tracker = VersionTracker(bot_name, remote_dir)
-            git_commit = version_tracker.get_current_git_commit()
-            docker_tag = version_tracker.generate_docker_tag(git_commit)
+    # Initialize version tracker
+    version_tracker = VersionTracker(bot_name, remote_dir)
+    git_commit = version_tracker.get_current_git_commit()
+    docker_tag = version_tracker.generate_docker_tag(git_commit)
 
-            console.print(f"[dim]   Version: {docker_tag}[/dim]")
+    console.print(f"[dim]   Version: {docker_tag}[/dim]")
 
-            # Build and start bot
-            console.print("[cyan]🏗️  Building Docker image...[/cyan]")
-            # Build with specific tag
-            if not vps.run_command(
-                f"cd {remote_dir} && docker-compose build && docker tag {bot_name}:latest {docker_tag}"
-            ):
-                console.print("[red]❌ Failed to build Docker image[/red]")
-                # Track failed deployment
-                version_tracker.add_deployment(vps, docker_tag, status="failed")
-                return
+    # Build and start bot
+    console.print("[cyan]🏗️  Building Docker image...[/cyan]")
+    if not vps.run_command(
+        f"cd {remote_dir} && docker-compose build && docker tag {bot_name}:latest {docker_tag}"
+    ):
+        console.print("[red]❌ Failed to build Docker image[/red]")
+        version_tracker.add_deployment(vps, docker_tag, status="failed")
+        return False
 
-            console.print("[green]✓ Docker image built[/green]\n")
+    console.print("[green]✓ Docker image built[/green]\n")
 
-            console.print("[cyan]🚀 Starting bot...[/cyan]")
-            # Makefile handles secrets decryption via decrypt_secrets.py
-            # Secrets are decrypted to /dev/shm (shared memory) before docker-compose starts
-            if not vps.run_command(f"cd {remote_dir} && make up"):
-                console.print("[red]❌ Failed to start bot[/red]")
-                # Track failed deployment
-                version_tracker.add_deployment(vps, docker_tag, status="failed")
-                return
+    console.print("[cyan]🚀 Starting bot...[/cyan]")
+    if not vps.run_command(f"cd {remote_dir} && make up"):
+        console.print("[red]❌ Failed to start bot[/red]")
+        version_tracker.add_deployment(vps, docker_tag, status="failed")
+        return False
 
-            console.print("[green]✓ Bot started[/green]\n")
+    console.print("[green]✓ Bot started[/green]\n")
 
-            # Track successful deployment
-            if version_tracker.add_deployment(vps, docker_tag, status="active"):
-                console.print("[dim]   Deployment version saved[/dim]")
+    # Track successful deployment
+    if version_tracker.add_deployment(vps, docker_tag, status="active"):
+        console.print("[dim]   Deployment version saved[/dim]")
 
-            # Cleanup old Docker images
-            removed = version_tracker.cleanup_old_images(vps)
-            if removed > 0:
-                console.print(f"[dim]   Cleaned up {removed} old Docker image(s)[/dim]")
+    # Cleanup old Docker images
+    removed = version_tracker.cleanup_old_images(vps)
+    if removed > 0:
+        console.print(f"[dim]   Cleaned up {removed} old Docker image(s)[/dim]")
 
-            # Show status
-            console.print("[cyan]📊 Checking bot status...[/cyan]")
-            vps.run_command(f"cd {remote_dir} && docker-compose ps")
+    return True
 
-            console.print("\n[green]🎉 Deployment successful![/green]\n")
-            console.print("[bold]Bot Information:[/bold]")
-            console.print(f"  Name: {bot_name}")
-            console.print(f"  Host: {deploy_config.get('vps.host')}")
-            console.print(f"  Directory: {remote_dir}")
-            console.print("\n[bold]Useful commands:[/bold]")
-            console.print("  View logs:   [cyan]telegram-bot-stack deploy logs[/cyan]")
+
+def _deploy_systemd(
+    vps: Any,
+    deploy_config: DeploymentConfig,
+    bot_name: str,
+    remote_dir: str,
+    has_secrets: bool,
+    encryption_key: Optional[str],
+) -> bool:
+    """Deploy bot using systemd.
+
+    Args:
+        vps: VPSConnection instance
+        deploy_config: Deployment configuration
+        bot_name: Bot name
+        remote_dir: Remote directory path
+        has_secrets: Whether secrets are configured
+        encryption_key: Encryption key for secrets
+
+    Returns:
+        True if successful, False otherwise
+    """
+    # Install Python dependencies
+    console.print("[cyan]📦 Installing Python dependencies...[/cyan]")
+    python_version = deploy_config.get("bot.python_version", "3.11")
+    if isinstance(python_version, str) and python_version.startswith("3."):
+        python_version = ".".join(python_version.split(".")[:2])
+
+    requirements_file = f"{remote_dir}/requirements.txt"
+    if vps.run_command(f"test -f {requirements_file}"):
+        if not vps.run_command(
+            f"cd {remote_dir} && python{python_version} -m pip install --user -r requirements.txt"
+        ):
             console.print(
-                "  Check status: [cyan]telegram-bot-stack deploy status[/cyan]"
+                "[yellow]⚠️  Warning: Some dependencies may have failed to install[/yellow]"
             )
-            console.print("  Stop bot:    [cyan]telegram-bot-stack deploy down[/cyan]")
+    else:
+        console.print("[yellow]⚠️  Warning: requirements.txt not found[/yellow]")
 
-        finally:
-            # Cleanup temp directory
-            if temp_dir.exists():
-                shutil.rmtree(temp_dir)
+    # Install systemd service file
+    service_file = f"{remote_dir}/{bot_name}.service"
+    systemd_service_path = f"/etc/systemd/system/{bot_name}.service"
 
-    finally:
-        # Always close VPS connection
-        vps.close()
+    console.print("[cyan]📝 Installing systemd service...[/cyan]")
+    if not vps.run_command(f"cp {service_file} {systemd_service_path}"):
+        console.print("[red]❌ Failed to copy service file[/red]")
+        return False
+
+    # Reload systemd and enable service
+    vps.run_command("systemctl daemon-reload")
+    vps.run_command(f"systemctl enable {bot_name}")
+
+    # Start service
+    console.print("[cyan]🚀 Starting bot service...[/cyan]")
+    if not vps.run_command(f"systemctl start {bot_name}"):
+        console.print("[red]❌ Failed to start service[/red]")
+        return False
+
+    # Check service status
+    result = vps.run_command(f"systemctl is-active {bot_name}", hide=True)
+    if result:
+        console.print("[green]✓ Bot service started[/green]\n")
+    else:
+        console.print(
+            "[yellow]⚠️  Warning: Service may not be running properly[/yellow]"
+        )
+        console.print("[cyan]   Check logs: systemctl status {bot_name}[/cyan]\n")
+
+    return True
 
 
 @click.command()
