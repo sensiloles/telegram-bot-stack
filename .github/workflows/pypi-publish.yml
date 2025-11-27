@@ -41,7 +41,7 @@ jobs:
 
       - name: Run tests
         run: |
-          pip install -e ".[dev]"
+          pip install -e ".[dev,database]"
           pytest --cov=telegram_bot_stack --cov-report=term
 
       - name: Build package
