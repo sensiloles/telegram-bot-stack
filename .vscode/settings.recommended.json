@@ -1,30 +1,12 @@
 {
-  "python.defaultInterpreterPath": "./venv/bin/python3",
-  "python.languageServer": "Pylance",
-  "python.analysis.typeCheckingMode": "strict",
-  "python.analysis.diagnosticMode": "workspace",
-  "python.analysis.diagnosticSeverityOverrides": {
-    "reportGeneralTypeIssues": "error",
-    "reportOptionalSubscript": "error",
-    "reportOptionalMemberAccess": "error",
-    "reportOptionalCall": "error",
-    "reportOptionalIterable": "error",
-    "reportOptionalContextManager": "error",
-    "reportOptionalOperand": "error",
-    "reportMissingTypeStubs": "warning",
-    "reportUnknownParameterType": "warning",
-    "reportUnknownArgumentType": "warning",
-    "reportUnknownMemberType": "warning",
-    "reportMissingTypeArgument": "warning",
-    "reportUnnecessaryIsInstance": "warning",
-    "reportUnnecessaryCast": "warning"
+  "files.exclude": {
+    "**/__pycache__": true,
+    "**/*.pyc": true,
+    "**/.pytest_cache": true,
+    "**/.mypy_cache": true,
+    "**/.ruff_cache": true,
+    "**/*.egg-info": true
   },
-  "python.analysis.inlayHints.functionReturnTypes": true,
-  "python.analysis.inlayHints.variableTypes": true,
-  "python.analysis.inlayHints.callArgumentNames": true,
-  "python.analysis.autoImportCompletions": true,
-  "python.analysis.useLibraryCodeForTypes": true,
-  "python.analysis.indexing": true,
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
     "source.organizeImports.ruff": "explicit",
@@ -59,15 +41,6 @@
     "editor.formatOnSave": true,
     "editor.wordWrap": "on"
   },
-  "[dockerfile]": {
-    "editor.defaultFormatter": "foxundermoon.shell-format",
-    "editor.formatOnSave": true
-  },
-  "[shellscript]": {
-    "editor.defaultFormatter": "foxundermoon.shell-format",
-    "editor.formatOnSave": true
-  },
-  "shellformat.flag": "-i=2 -ci",
   "ruff.nativeServer": "on",
   "ruff.enable": true,
   "ruff.configurationPreference": "filesystemFirst",
@@ -75,20 +48,40 @@
   "ruff.path": [
     "./venv/bin/ruff"
   ],
+  "python.defaultInterpreterPath": "./venv/bin/python3",
+  "python.analysis.typeCheckingMode": "off",
+  "python.analysis.diagnosticMode": "workspace",
+  "python.analysis.diagnosticSeverityOverrides": {
+    "reportGeneralTypeIssues": "none",
+    "reportOptionalSubscript": "none",
+    "reportOptionalMemberAccess": "none",
+    "reportOptionalCall": "none",
+    "reportOptionalIterable": "none",
+    "reportOptionalContextManager": "none",
+    "reportOptionalOperand": "none",
+    "reportMissingTypeStubs": "none",
+    "reportUnknownParameterType": "none",
+    "reportUnknownArgumentType": "none",
+    "reportUnknownMemberType": "none",
+    "reportMissingTypeArgument": "none",
+    "reportIncompatibleVariableOverride": "none",
+    "reportIncompatibleMethodOverride": "none",
+    "reportAssignmentType": "none",
+    "reportArgumentType": "none",
+    "reportReturnType": "none"
+  },
+  "python.analysis.inlayHints.functionReturnTypes": true,
+  "python.analysis.inlayHints.variableTypes": true,
+  "python.analysis.autoImportCompletions": true,
+  "python.analysis.useLibraryCodeForTypes": true,
   "python.linting.enabled": false,
   "python.linting.pylintEnabled": false,
   "python.linting.flake8Enabled": false,
   "python.formatting.provider": "none",
-  "files.associations": {
-    "*.py": "python",
-    ".cursorrules": "plaintext",
-    ".pre-commit-config.yaml": "yaml",
-    "Dockerfile": "dockerfile",
-    "Dockerfile.*": "dockerfile"
-  },
-  "python.terminal.activateEnvironment": true,
-  "python.terminal.activateEnvInCurrentTerminal": true,
-  "problems.showCurrentInStatus": true,
-  "breadcrumbs.symbolPath": "on",
-  "editor.parameterHints.enabled": true
+  "mypy-type-checker.args": [
+    "--config-file=pyproject.toml"
+  ],
+  "mypy-type-checker.reportingScope": "workspace",
+  "mypy-type-checker.enabled": true,
+  "mypy-type-checker.showNotifications": "onError"
 }

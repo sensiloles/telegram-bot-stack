@@ -7,16 +7,13 @@
     "**/.ruff_cache": true,
     "**/*.egg-info": true
   },
-  // Global editor settings
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
     "source.organizeImports.ruff": "explicit",
     "source.fixAll.ruff": "explicit"
   },
-  // Ensure all files end with newline (POSIX compliant)
   "files.insertFinalNewline": true,
   "files.trimFinalNewlines": false,
-  // Python - Ruff linter configuration (uses pyproject.toml)
   "[python]": {
     "editor.defaultFormatter": "charliermarsh.ruff",
     "editor.formatOnSave": true,
@@ -25,7 +22,6 @@
       "source.fixAll.ruff": "explicit"
     }
   },
-  // JSON - built-in formatter
   "[json]": {
     "editor.defaultFormatter": "vscode.json-language-features",
     "editor.formatOnSave": true,
@@ -36,18 +32,15 @@
     "editor.formatOnSave": true,
     "editor.tabSize": 2
   },
-  // YAML
   "[yaml]": {
     "editor.defaultFormatter": "redhat.vscode-yaml",
     "editor.formatOnSave": true,
     "editor.tabSize": 2
   },
-  // Markdown
   "[markdown]": {
     "editor.formatOnSave": true,
     "editor.wordWrap": "on"
   },
-  // Ruff extension settings - using native server
   "ruff.nativeServer": "on",
   "ruff.enable": true,
   "ruff.configurationPreference": "filesystemFirst",
@@ -55,38 +48,40 @@
   "ruff.path": [
     "./venv/bin/ruff"
   ],
-  // Python interpreter and type checking configuration
   "python.defaultInterpreterPath": "./venv/bin/python3",
-  // Python type checking with Cursor Pyright (built-in, matches CI mypy checks)
-  // Note: Cursor Pyright automatically manages python.languageServer setting
-  "python.analysis.typeCheckingMode": "strict",
+  "python.analysis.typeCheckingMode": "off",
   "python.analysis.diagnosticMode": "workspace",
   "python.analysis.diagnosticSeverityOverrides": {
-    "reportGeneralTypeIssues": "error",
-    "reportOptionalSubscript": "error",
-    "reportOptionalMemberAccess": "error",
-    "reportOptionalCall": "error",
-    "reportOptionalIterable": "error",
-    "reportOptionalContextManager": "error",
-    "reportOptionalOperand": "error",
-    "reportMissingTypeStubs": "warning",
-    "reportUnknownParameterType": "warning",
-    "reportUnknownArgumentType": "warning",
-    "reportUnknownMemberType": "warning",
-    "reportMissingTypeArgument": "warning",
-    "reportIncompatibleVariableOverride": "error",
-    "reportIncompatibleMethodOverride": "error",
-    "reportAssignmentType": "error",
-    "reportArgumentType": "error",
-    "reportReturnType": "error"
+    "reportGeneralTypeIssues": "none",
+    "reportOptionalSubscript": "none",
+    "reportOptionalMemberAccess": "none",
+    "reportOptionalCall": "none",
+    "reportOptionalIterable": "none",
+    "reportOptionalContextManager": "none",
+    "reportOptionalOperand": "none",
+    "reportMissingTypeStubs": "none",
+    "reportUnknownParameterType": "none",
+    "reportUnknownArgumentType": "none",
+    "reportUnknownMemberType": "none",
+    "reportMissingTypeArgument": "none",
+    "reportIncompatibleVariableOverride": "none",
+    "reportIncompatibleMethodOverride": "none",
+    "reportAssignmentType": "none",
+    "reportArgumentType": "none",
+    "reportReturnType": "none"
   },
   "python.analysis.inlayHints.functionReturnTypes": true,
   "python.analysis.inlayHints.variableTypes": true,
   "python.analysis.autoImportCompletions": true,
   "python.analysis.useLibraryCodeForTypes": true,
-  // Disable other formatters/linters to avoid conflicts
   "python.linting.enabled": false,
   "python.linting.pylintEnabled": false,
   "python.linting.flake8Enabled": false,
   "python.formatting.provider": "none",
+  "mypy-type-checker.args": [
+    "--config-file=pyproject.toml"
+  ],
+  "mypy-type-checker.reportingScope": "workspace",
+  "mypy-type-checker.enabled": true,
+  "mypy-type-checker.showNotifications": "onError"
 }

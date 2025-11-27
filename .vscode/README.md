@@ -18,27 +18,34 @@ cp .vscode/settings.recommended.json .vscode/settings.json
 ```
 
 **What you get:**
-- ✅ Real-time type error highlighting
-- ✅ Better autocomplete
-- ✅ Inline type hints
-- ✅ Catch bugs before CI
+
+- ✅ Real-time type error highlighting (mypy - same as CI)
+- ✅ Better autocomplete (Pylance)
+- ✅ Inline type hints (Pylance)
+- ✅ Catch bugs before CI (mypy shows the same errors)
+- ✅ Single source of truth for types (mypy everywhere)
 
 **Requirements:**
-- Install **Pylance** extension: `ms-python.vscode-pylance`
+
+- Install **Pylance** extension: `ms-python.vscode-pylance` (autocomplete)
+- Install **Mypy** extension: `matangover.mypy` (type checking)
 - Restart VSCode
 
 ## Why Two Files?
 
 **`settings.json`** (current):
+
 - Basic setup with Ruff
 - Works out of the box
-- No strict type checking
+- Type checking with mypy (matches CI)
 
 **`settings.recommended.json`** (recommended):
-- Full type checking with Pylance
-- Shows all 44 type errors (from Issue #30)
-- Better developer experience
-- Same as CI checks
+
+- Full setup with Ruff + Pylance + Mypy
+- **Mypy** - single source of type checking (matches CI/pre-commit)
+- **Pylance** - autocomplete, navigation, hints (no type checking)
+- Single source of truth for types: mypy everywhere (IDE and CI)
+- Better developer experience without conflicts
 
 ## See Also
 

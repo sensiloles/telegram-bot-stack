@@ -4,6 +4,7 @@
     "ms-python.python",
     "ms-python.vscode-pylance",
     "redhat.vscode-yaml",
-    "github.copilot"
+    "github.copilot",
+    "matangover.mypy"
   ]
 }
