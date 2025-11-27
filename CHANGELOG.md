@@ -2,6 +2,20 @@
 
 <!-- version list -->
 
+## v1.25.1 (2025-11-27)
+
+### Bug Fixes
+
+- **ci**: Add database dependencies to PyPI publish workflow
+  ([`7587f26`](https://github.com/sensiloles/telegram-bot-stack/commit/7587f260707564d02997d9cb282af58a6d053add))
+
+### Documentation
+
+- **deploy**: Add comprehensive troubleshooting guide
+  ([#84](https://github.com/sensiloles/telegram-bot-stack/pull/84),
+  [`2b235be`](https://github.com/sensiloles/telegram-bot-stack/commit/2b235befcc4a22c33373c6ffb2aa356a63ae7c47))
+
+
 ## v1.25.0 (2025-11-27)
 
 ### Features
