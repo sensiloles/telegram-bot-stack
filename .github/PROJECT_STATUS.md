@@ -1,7 +1,7 @@
 # Project Status - telegram-bot-stack
 
 **Version:** v1.21.0 → v2.0.0 MVP
-**Updated:** 2025-01-27
+**Updated:** 2025-01-28
 **Status:** 🏗️ Phase 2 - Hardening Killer Feature
 
 ---
@@ -73,7 +73,7 @@ Total: ~10 minutes to live bot 🚀
 
 | #       | Issue                         | Part of Deploy | Status  | Time  | Blocks |
 | ------- | ----------------------------- | -------------- | ------- | ----- | ------ |
-| **#76** | Rollback mechanism            | ✅ YES         | ⏳ TODO | 3-4h  | -      |
+| **#76** | Rollback mechanism            | ✅ YES         | ✅ DONE | 3-4h  | -      |
 | **#77** | Health checks + auto-recovery | ✅ YES         | ⏳ TODO | 4-5h  | #78    |
 | **#79** | Secrets management            | ✅ YES         | ✅ DONE | 5-6h  | -      |
 | **#81** | Backup/restore                | ✅ YES         | ✅ DONE | 5-6h  | -      |
@@ -81,7 +81,7 @@ Total: ~10 minutes to live bot 🚀
 | **#85** | Integration tests             | ✅ YES (tests) | ⏳ TODO | 8-10h | -      |
 | **#88** | Doctor command                | 🔧 CLI tool    | ⏳ TODO | 6-8h  | -      |
 
-**Total Critical Path:** ~24-31 hours (4-5 days) - **2 issues completed!**
+**Total Critical Path:** ~24-31 hours (4-5 days) - **3 issues completed!**
 
 **IMPORTANT Issues (do after critical):**
 
@@ -112,7 +112,7 @@ Total: ~10 minutes to live bot 🚀
 | --- | ---------------------- | -------- | ----------------- | ------- | -------- |
 | #27 | VPS Deploy CLI         | Deploy   | ✅ DONE (v1.19.0) | #40     | #76-#85  |
 | #28 | Docker Templates       | Deploy   | ✅ DONE (v1.21.0) | #27     | #76-#85  |
-| #76 | **Rollback mechanism** | Deploy   | ⏳ TODO           | #27     | -        |
+| #76 | **Rollback mechanism** | Deploy   | ✅ DONE           | #27     | -        |
 | #77 | **Health checks**      | Deploy   | ⏳ TODO           | #27     | #78, #80 |
 | #79 | **Secrets management** | Deploy   | ✅ DONE           | #27     | -        |
 | #81 | **Backup/restore**     | Deploy   | ✅ DONE           | #27     | -        |
@@ -127,7 +127,7 @@ Total: ~10 minutes to live bot 🚀
 | #40 | Full Dev Setup | ✅ DONE (v1.17.0) | Killer Feature #1 |
 | #60 | Agent Optimize | 🏗️ In Progress    | Ongoing           |
 
-**Total Critical: 7 TODO + 5 DONE = 12 issues**
+**Total Critical: 6 TODO + 6 DONE = 12 issues**
 
 ---
 
@@ -278,10 +278,10 @@ Supporting Infrastructure (parallel):
 2. ✅ #81 Backup/restore (5-6h) ← DONE (data safety)
    → Data protection implemented with auto-backup
 
-3. #76 Rollback mechanism (3-4h) ← NEXT (recovery)
-   → Safety net for deployments
+3. ✅ #76 Rollback mechanism (3-4h) ← DONE (recovery)
+   → Safety net for deployments - version tracking + rollback commands
 
-4. #77 Health checks (4-5h) ← AFTER (reliability)
+4. #77 Health checks (4-5h) ← NEXT (reliability)
    → Auto-recovery for production
 ```
 
@@ -306,14 +306,14 @@ Supporting Infrastructure (parallel):
 
 - Security (#79 Secrets) ✅
 - Data Safety (#81 Backup) ✅
+- Recovery (#76 Rollback) ✅
 
 **⏳ Remaining:**
 
-- Recovery (#76 Rollback)
 - Reliability (#77 Health checks)
 - Testing & Docs (#85, #84, #88)
 
-**Milestone:** Production-safe deployment ✅
+**Milestone:** Production-safe deployment (3/4 critical features done) 🏗️
 
 ### 🚀 Week 9: Advanced Features
 
@@ -375,7 +375,7 @@ Supporting Infrastructure (parallel):
 
 - [x] Basic deployment works
 - [x] Deployment guide exists
-- [ ] Rollback mechanism (#76)
+- [x] Rollback mechanism (#76) ✅
 - [ ] Health checks (#77)
 - [x] Secrets management (#79) ✅
 - [x] Backup/restore (#81) ✅
@@ -532,7 +532,7 @@ Supporting Infrastructure (parallel):
 ---
 
 **Status:** 🏗️ Killer Feature #2 deployed, now hardening for production
-**Progress:** 2/7 critical hardening tasks completed (#79 Secrets, #81 Backup)
-**Current Focus:** Production safety (#76 Rollback, #77 Health checks, #84 Troubleshooting, #85 Tests, #88 Doctor)
+**Progress:** 3/7 critical hardening tasks completed (#79 Secrets, #81 Backup, #76 Rollback)
+**Current Focus:** Production safety (#77 Health checks, #84 Troubleshooting, #85 Tests, #88 Doctor)
 **Next Milestone:** v2.0.0 MVP (Week 10)
 **Next Review:** After completing critical hardening (Week 8)

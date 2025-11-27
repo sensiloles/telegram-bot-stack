@@ -9,6 +9,8 @@ from telegram_bot_stack.cli.commands.deploy.deploy import deploy
 deploy.add_command(operations.up, "up")
 deploy.add_command(operations.update, "update")
 deploy.add_command(operations.down, "down")
+deploy.add_command(operations.rollback, "rollback")
+deploy.add_command(operations.history, "history")
 deploy.add_command(monitoring.status, "status")
 deploy.add_command(monitoring.logs, "logs")
 deploy.add_command(secrets.secrets, "secrets")

@@ -307,3 +307,277 @@ class TestDeployUpdate:
 
             assert result.exit_code == 0
             assert "Bot updated successfully" in result.output
+
+
+class TestDeployRollback:
+    """Tests for deploy rollback command."""
+
+    def test_rollback_without_config(self, runner, tmp_path):
+        """Test rollback command without config file."""
+        os.chdir(tmp_path)
+
+        result = runner.invoke(deploy, ["rollback"])
+
+        assert result.exit_code == 0
+        assert "Configuration file not found" in result.output
+
+    def test_rollback_to_previous_version(self, runner, tmp_path, temp_deploy_config):
+        """Test rollback to previous version."""
+        os.chdir(tmp_path)
+
+        # Copy config to current directory
+        import shutil
+
+        shutil.copy(temp_deploy_config, tmp_path / "deploy.yaml")
+
+        with (
+            patch(
+                "telegram_bot_stack.cli.commands.deploy.operations.VPSConnection"
+            ) as mock_vps,
+            patch(
+                "telegram_bot_stack.cli.commands.deploy.operations.VersionTracker"
+            ) as mock_tracker,
+            patch(
+                "telegram_bot_stack.cli.commands.deploy.operations.BackupManager"
+            ) as mock_backup,
+        ):
+            # Mock VPS connection
+            mock_instance = MagicMock()
+            mock_instance.test_connection.return_value = True
+            mock_instance.run_command.return_value = True
+            mock_vps.return_value = mock_instance
+
+            # Mock version tracker
+            mock_tracker_instance = MagicMock()
+            mock_version = MagicMock()
+            mock_version.docker_tag = "test-bot:v1234567890-abc123"
+            mock_version.git_commit = "abc123"
+            mock_version.deployed_at = "2025-01-26 14:30:00"
+            mock_tracker_instance.get_previous_version.return_value = mock_version
+            mock_tracker_instance.mark_version_status.return_value = True
+            mock_tracker.return_value = mock_tracker_instance
+
+            # Mock backup manager
+            mock_backup_instance = MagicMock()
+            mock_backup_instance.create_backup.return_value = "backup.tar.gz"
+            mock_backup.return_value = mock_backup_instance
+
+            result = runner.invoke(deploy, ["rollback", "--yes"])
+
+            assert result.exit_code == 0
+            assert "Rollback successful" in result.output
+
+    def test_rollback_no_previous_version(self, runner, tmp_path, temp_deploy_config):
+        """Test rollback when no previous version exists."""
+        os.chdir(tmp_path)
+
+        # Copy config to current directory
+        import shutil
+
+        shutil.copy(temp_deploy_config, tmp_path / "deploy.yaml")
+
+        with (
+            patch(
+                "telegram_bot_stack.cli.commands.deploy.operations.VPSConnection"
+            ) as mock_vps,
+            patch(
+                "telegram_bot_stack.cli.commands.deploy.operations.VersionTracker"
+            ) as mock_tracker,
+        ):
+            mock_instance = MagicMock()
+            mock_instance.test_connection.return_value = True
+            mock_vps.return_value = mock_instance
+
+            mock_tracker_instance = MagicMock()
+            mock_tracker_instance.get_previous_version.return_value = None
+            mock_tracker.return_value = mock_tracker_instance
+
+            result = runner.invoke(deploy, ["rollback"])
+
+            assert result.exit_code == 0
+            assert "No previous version found" in result.output
+
+    def test_rollback_to_specific_version(self, runner, tmp_path, temp_deploy_config):
+        """Test rollback to specific version."""
+        os.chdir(tmp_path)
+
+        # Copy config to current directory
+        import shutil
+
+        shutil.copy(temp_deploy_config, tmp_path / "deploy.yaml")
+
+        with (
+            patch(
+                "telegram_bot_stack.cli.commands.deploy.operations.VPSConnection"
+            ) as mock_vps,
+            patch(
+                "telegram_bot_stack.cli.commands.deploy.operations.VersionTracker"
+            ) as mock_tracker,
+            patch(
+                "telegram_bot_stack.cli.commands.deploy.operations.BackupManager"
+            ) as mock_backup,
+        ):
+            mock_instance = MagicMock()
+            mock_instance.test_connection.return_value = True
+            mock_instance.run_command.return_value = True
+            mock_vps.return_value = mock_instance
+
+            mock_tracker_instance = MagicMock()
+            mock_version = MagicMock()
+            mock_version.docker_tag = "test-bot:v1234567880-def456"
+            mock_version.git_commit = "def456"
+            mock_version.deployed_at = "2025-01-26 14:20:00"
+            mock_tracker_instance.get_version_by_tag.return_value = mock_version
+            mock_tracker_instance.mark_version_status.return_value = True
+            mock_tracker.return_value = mock_tracker_instance
+
+            mock_backup_instance = MagicMock()
+            mock_backup_instance.create_backup.return_value = "backup.tar.gz"
+            mock_backup.return_value = mock_backup_instance
+
+            result = runner.invoke(
+                deploy,
+                ["rollback", "--version", "test-bot:v1234567880-def456", "--yes"],
+            )
+
+            assert result.exit_code == 0
+            assert "Rollback successful" in result.output
+
+
+class TestDeployHistory:
+    """Tests for deploy history command."""
+
+    def test_history_without_config(self, runner, tmp_path):
+        """Test history command without config file."""
+        os.chdir(tmp_path)
+
+        result = runner.invoke(deploy, ["history"])
+
+        assert result.exit_code == 0
+        assert "Configuration file not found" in result.output
+
+    def test_history_empty(self, runner, tmp_path, temp_deploy_config):
+        """Test history command with no deployments."""
+        os.chdir(tmp_path)
+
+        # Copy config to current directory
+        import shutil
+
+        shutil.copy(temp_deploy_config, tmp_path / "deploy.yaml")
+
+        with (
+            patch(
+                "telegram_bot_stack.cli.commands.deploy.operations.VPSConnection"
+            ) as mock_vps,
+            patch(
+                "telegram_bot_stack.cli.commands.deploy.operations.VersionTracker"
+            ) as mock_tracker,
+        ):
+            mock_instance = MagicMock()
+            mock_instance.test_connection.return_value = True
+            mock_vps.return_value = mock_instance
+
+            mock_tracker_instance = MagicMock()
+            mock_tracker_instance.load_history.return_value = []
+            mock_tracker.return_value = mock_tracker_instance
+
+            result = runner.invoke(deploy, ["history"])
+
+            assert result.exit_code == 0
+            assert "No deployment history found" in result.output
+
+    def test_history_with_versions(self, runner, tmp_path, temp_deploy_config):
+        """Test history command with multiple versions."""
+        os.chdir(tmp_path)
+
+        # Copy config to current directory
+        import shutil
+
+        shutil.copy(temp_deploy_config, tmp_path / "deploy.yaml")
+
+        with (
+            patch(
+                "telegram_bot_stack.cli.commands.deploy.operations.VPSConnection"
+            ) as mock_vps,
+            patch(
+                "telegram_bot_stack.cli.commands.deploy.operations.VersionTracker"
+            ) as mock_tracker,
+        ):
+            mock_instance = MagicMock()
+            mock_instance.test_connection.return_value = True
+            mock_vps.return_value = mock_instance
+
+            # Mock versions
+            from telegram_bot_stack.cli.utils.version_tracking import DeploymentVersion
+
+            mock_versions = [
+                DeploymentVersion(
+                    timestamp="1234567890",
+                    git_commit="abc123",
+                    docker_tag="test-bot:v1234567890-abc123",
+                    status="active",
+                    deployed_at="2025-01-26 14:30:00",
+                ),
+                DeploymentVersion(
+                    timestamp="1234567880",
+                    git_commit="def456",
+                    docker_tag="test-bot:v1234567880-def456",
+                    status="old",
+                    deployed_at="2025-01-26 14:20:00",
+                ),
+            ]
+
+            mock_tracker_instance = MagicMock()
+            mock_tracker_instance.load_history.return_value = mock_versions
+            mock_tracker.return_value = mock_tracker_instance
+
+            result = runner.invoke(deploy, ["history"])
+
+            assert result.exit_code == 0
+            assert "Deployment History" in result.output
+            assert "abc123" in result.output
+            assert "def456" in result.output
+            assert "Active" in result.output
+
+    def test_history_with_limit(self, runner, tmp_path, temp_deploy_config):
+        """Test history command with limit."""
+        os.chdir(tmp_path)
+
+        # Copy config to current directory
+        import shutil
+
+        shutil.copy(temp_deploy_config, tmp_path / "deploy.yaml")
+
+        with (
+            patch(
+                "telegram_bot_stack.cli.commands.deploy.operations.VPSConnection"
+            ) as mock_vps,
+            patch(
+                "telegram_bot_stack.cli.commands.deploy.operations.VersionTracker"
+            ) as mock_tracker,
+        ):
+            mock_instance = MagicMock()
+            mock_instance.test_connection.return_value = True
+            mock_vps.return_value = mock_instance
+
+            from telegram_bot_stack.cli.utils.version_tracking import DeploymentVersion
+
+            mock_versions = [
+                DeploymentVersion(
+                    timestamp=str(1234567890 - i),
+                    git_commit=f"commit{i}",
+                    docker_tag=f"test-bot:v{1234567890 - i}-commit{i}",
+                    status="old",
+                    deployed_at=f"2025-01-26 14:{30-i}:00",
+                )
+                for i in range(5)
+            ]
+
+            mock_tracker_instance = MagicMock()
+            mock_tracker_instance.load_history.return_value = mock_versions
+            mock_tracker.return_value = mock_tracker_instance
+
+            result = runner.invoke(deploy, ["history", "--limit", "3"])
+
+            assert result.exit_code == 0
+            assert "Showing 3 of 5 versions" in result.output

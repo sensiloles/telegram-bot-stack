@@ -11,7 +11,7 @@
     "description": "CLI tool for bot project management and development",
     "scope": "CLI tool for bot project management and development",
     "root_package": "telegram_bot_stack.cli",
-    "node_count": 29,
+    "node_count": 30,
     "edge_count": 35
   },
   "nodes": [
@@ -578,7 +578,7 @@
       "category": "implementation",
       "path": "telegram_bot_stack/cli/commands/deploy/__init__.py",
       "description": "Deployment commands module - refactored into smaller modules.",
-      "lines_of_code": 16,
+      "lines_of_code": 18,
       "complexity_score": 1,
       "exports": [],
       "classes": [],
@@ -594,18 +594,22 @@
       "category": "implementation",
       "path": "telegram_bot_stack/cli/commands/deploy/operations.py",
       "description": "Deployment operations (up, update, down).",
-      "lines_of_code": 413,
+      "lines_of_code": 682,
       "complexity_score": 1,
       "exports": [
         "up",
         "update",
-        "down"
+        "down",
+        "rollback",
+        "history"
       ],
       "classes": [],
       "functions": [
         "up",
         "update",
-        "down"
+        "down",
+        "rollback",
+        "history"
       ],
       "dependencies": [],
       "dependents": [],
@@ -740,6 +744,51 @@
         "main",
         "get_welcome_message",
         "register_handlers"
+      ],
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium"
+    },
+    {
+      "id": "telegram_bot_stack.cli.utils.version_tracking",
+      "name": "version_tracking",
+      "type": "module",
+      "category": "implementation",
+      "path": "telegram_bot_stack/cli/utils/version_tracking.py",
+      "description": "Module version_tracking",
+      "lines_of_code": 334,
+      "complexity_score": 1,
+      "exports": [
+        "DeploymentVersion",
+        "VersionTracker",
+        "to_dict",
+        "from_dict",
+        "get_current_git_commit",
+        "generate_docker_tag",
+        "load_history",
+        "save_history",
+        "add_deployment",
+        "get_version_by_tag",
+        "get_previous_version",
+        "mark_version_status",
+        "cleanup_old_images"
+      ],
+      "classes": [
+        "DeploymentVersion",
+        "VersionTracker"
+      ],
+      "functions": [
+        "to_dict",
+        "from_dict",
+        "get_current_git_commit",
+        "generate_docker_tag",
+        "load_history",
+        "save_history",
+        "add_deployment",
+        "get_version_by_tag",
+        "get_previous_version",
+        "mark_version_status",
+        "cleanup_old_images"
       ],
       "dependencies": [],
       "dependents": [],
