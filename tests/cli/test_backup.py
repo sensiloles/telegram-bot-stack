@@ -205,7 +205,7 @@ class TestBackupCommands:
         shutil.copy(temp_deploy_config, tmp_path / "deploy.yaml")
 
         with patch(
-            "telegram_bot_stack.cli.commands.deploy.VPSConnection"
+            "telegram_bot_stack.cli.commands.deploy.deploy.VPSConnection"
         ) as mock_vps_class:
             mock_vps = MagicMock()
             mock_vps.test_connection.return_value = True
@@ -235,7 +235,7 @@ class TestBackupCommands:
         shutil.copy(temp_deploy_config, tmp_path / "deploy.yaml")
 
         with patch(
-            "telegram_bot_stack.cli.commands.deploy.VPSConnection"
+            "telegram_bot_stack.cli.commands.deploy.deploy.VPSConnection"
         ) as mock_vps_class:
             mock_vps = MagicMock()
             mock_conn = MagicMock()
@@ -265,7 +265,7 @@ class TestBackupCommands:
         shutil.copy(temp_deploy_config, tmp_path / "deploy.yaml")
 
         with patch(
-            "telegram_bot_stack.cli.commands.deploy.VPSConnection"
+            "telegram_bot_stack.cli.commands.deploy.deploy.VPSConnection"
         ) as mock_vps_class:
             mock_vps = MagicMock()
             mock_vps.test_connection.return_value = True
