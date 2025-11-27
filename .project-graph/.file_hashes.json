@@ -4,5 +4,10 @@
   "telegram_bot_stack/storage/memory.py": "848435c00c9706b124ad89ad2f6dd7418a2d396bab7146c3aa500c4b4eba6f35",
   "telegram_bot_stack/storage/sql.py": "7d6a7101a3f45642e58d14c5644846b0aae017fd0d78953849e88ce56e2a748a",
   "telegram_bot_stack/user_manager.py": "992c901e97fa6f59789149c915d815b0b13f1fd3fea40e6b5c7cfb9f6fc6fda8",
-  ".github/workflows/tests.yml": "b623b50af8078db86a1924a417a1985e470552aea20cf4b65db1ec844ae2c496"
+  ".github/workflows/tests.yml": "b623b50af8078db86a1924a417a1985e470552aea20cf4b65db1ec844ae2c496",
+  "docs/deployment_guide.md": "66432e21b91058321dcdf503d7dd28a7fd99efde675ee4df71fd0cef82184192",
+  "telegram_bot_stack/cli/utils/deployment.py": "7798540772362525e839941bfb925dd4776f6e1c00ee4cbafd9c42a8cd7ed6d8",
+  "telegram_bot_stack/cli/commands/deploy.py": "99fb729223900251b961aa4c8c3f5bfbdf2d93cff926649fb53af9dc6ba846d3",
+  "telegram_bot_stack/cli/utils/secrets.py": "b33d1bbb3c60d5550def79a69484c117d45df0f6cbcdd003293f29bf1f8df2c4",
+  "telegram_bot_stack/cli/utils/vps.py": "760ce1317818f4da95edd1d2f29d98e122b28996168bcb0e800cb9cfa652756d"
 }

@@ -174,4 +174,8 @@ class TestCreateEnvFile:
 
         assert env_file.exists()
         content = env_file.read_text()
-        assert "BOT_TOKEN=YOUR_BOT_TOKEN_HERE" in content
+        # New implementation warns but doesn't add placeholder token
+        # Secrets should be set using 'deploy secrets set' command
+        assert "test-bot" in content
+        assert "TZ=UTC" in content
+        assert "PRODUCTION=true" in content

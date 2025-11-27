@@ -177,6 +177,51 @@ class VPSConnection:
             console.print(f"[red]File transfer failed: {e}[/red]")
             return False
 
+    def write_file(self, content: str, remote_path: str, mode: str = "644") -> bool:
+        """Write file content to VPS.
+
+        Args:
+            content: File content to write
+            remote_path: Remote file path
+            mode: File permissions (default: 644)
+
+        Returns:
+            True if successful, False otherwise
+        """
+        try:
+            conn = self.connect()
+
+            # Create remote directory if needed
+            remote_dir = "/".join(remote_path.split("/")[:-1])
+            if remote_dir:
+                conn.run(f"mkdir -p {remote_dir}", hide=True)
+
+            # Write to temporary file first, then move (atomic operation)
+            temp_file = f"{remote_path}.tmp"
+
+            # Use base64 encoding to avoid shell escaping issues
+            import base64
+
+            content_b64 = base64.b64encode(content.encode()).decode()
+            python_cmd = (
+                f'python3 -c "'
+                f"import base64; "
+                f"f=open('{temp_file}', 'w'); "
+                f"f.write(base64.b64decode('{content_b64}').decode()); "
+                f"f.close()"
+                f'"'
+            )
+            conn.run(python_cmd, hide=True)
+
+            # Move to final location and set permissions
+            conn.run(f"mv {temp_file} {remote_path}", hide=True)
+            conn.run(f"chmod {mode} {remote_path}", hide=True)
+
+            return True
+        except Exception as e:
+            console.print(f"[red]Failed to write file: {e}[/red]")
+            return False
+
     def close(self) -> None:
         """Close SSH connection."""
         if self.connection:
