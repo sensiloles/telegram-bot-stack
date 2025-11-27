@@ -1,0 +1,8 @@
+# Ignore generated SSH keys for testing
+.ssh-test/
+*.pem
+*.key
+
+# Ignore temporary files
+*.log
+*.tmp

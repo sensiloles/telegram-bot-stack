@@ -9,5 +9,8 @@
   ".github/workflows/pypi-publish.yml": "c5b9dec1244ea8c8feb2424d35bf641ec95d88f112596d7fb878ebcc0fcf39a4",
   "telegram_bot_stack/cli/utils/git.py": "470f80b9d6e22854bed39b53a884e0d94381e141d6b7f06933942ce70fc500d6",
   "telegram_bot_stack/cli/commands/deploy/operations.py": "58071a9e572f314c7003ae48dccb6bdb52975415f5e0b7956e869d9406376a25",
-  "telegram_bot_stack/cli/utils/deployment.py": "37e837e28fd4e4f0409d7498492b776b76cde5a077635622b516cd3871f0c0b8"
+  "telegram_bot_stack/cli/utils/deployment.py": "37e837e28fd4e4f0409d7498492b776b76cde5a077635622b516cd3871f0c0b8",
+  ".github/workflows/integration-tests.yml": "2f9910eb02cafef5443f97f364a7a7e9d06c3febb2a6ec15e08991186e8db6c8",
+  "README.md": "57b2ecd61cac568eaa8b1257fd7c80146c83ecda5b11b1e8be61a86c2d2d0bac",
+  "pyproject.toml": "195891d4b4d0b084fe57ee32c5442175b476fccc9e20392e6e8cb665088d3881"
 }
