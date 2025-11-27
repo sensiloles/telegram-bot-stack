@@ -102,9 +102,15 @@ telegram-bot-stack deploy update
 
 This will:
 
+- Create automatic backup (if enabled)
 - Transfer updated files
 - Rebuild Docker image
 - Restart bot container (minimal downtime)
+
+**Options:**
+
+- `--backup` - Force backup before update
+- `--no-backup` - Skip automatic backup
 
 ### 7. Stop Bot
 
@@ -112,9 +118,14 @@ This will:
 # Stop bot (keeps container and image)
 telegram-bot-stack deploy down
 
-# Stop and remove everything
+# Stop and remove everything (with auto-backup)
 telegram-bot-stack deploy down --cleanup
+
+# Skip auto-backup before cleanup
+telegram-bot-stack deploy down --cleanup --no-backup
 ```
+
+**Note:** When using `--cleanup`, an automatic backup is created before removing containers and images (unless `--no-backup` is specified).
 
 ## Configuration
 
@@ -867,37 +878,177 @@ jobs:
 
 ### Backup and Restore
 
-**Backup bot data:**
+Automated backup and restore system for protecting your bot data.
+
+#### Create Backup
 
 ```bash
-# SSH to VPS
-ssh root@your-vps-ip
-
-# Backup data directory
-tar -czf bot-backup-$(date +%Y%m%d).tar.gz /opt/bot-name/data/
-
-# Download backup
-scp root@your-vps-ip:/root/bot-backup-*.tar.gz ./
+# Create a backup of bot data
+telegram-bot-stack deploy backup
 ```
 
-**Restore from backup:**
+This will:
+
+- Stop bot container temporarily (if running)
+- Backup data directory (`/opt/{bot_name}/data/`)
+- Backup `.env` file (if exists)
+- Backup encrypted secrets file (if exists)
+- Create tarball: `backup-{timestamp}.tar.gz`
+- Store in `/opt/{bot_name}/backups/`
+- Restart bot container
+- Clean up old backups (based on retention policy)
+
+**Example output:**
+
+```
+📦 Creating backup...
+
+✓ Stopped bot container
+✓ Backed up data directory (2.3 MB)
+✓ Backed up .env file
+✓ Created backup: backup-20250126-143022.tar.gz
+✓ Started bot container
+
+✅ Backup created successfully!
+Location: /opt/my-bot/backups/backup-20250126-143022.tar.gz
+```
+
+#### List Backups
 
 ```bash
-# Upload backup to VPS
-scp bot-backup-20250101.tar.gz root@your-vps-ip:/root/
+# List all available backups
+telegram-bot-stack deploy backup list
+```
 
+Shows all backups with:
+
+- Filename
+- Size
+- Creation date
+
+**Example output:**
+
+```
+📦 Available Backups
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Filename                            ┃ Size  ┃ Date                 ┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━┩
+│ backup-20250126-143022.tar.gz      │ 2.3M  │ 2025-01-26 14:30:22  │
+│ backup-20250125-120000.tar.gz      │ 1.5M  │ 2025-01-25 12:00:00  │
+└────────────────────────────────────┴───────┴──────────────────────┘
+```
+
+#### Restore from Backup
+
+```bash
+# Restore from backup (with confirmation)
+telegram-bot-stack deploy restore backup-20250126-143022.tar.gz
+
+# Restore without confirmation prompt
+telegram-bot-stack deploy restore backup-20250126-143022.tar.gz --yes
+```
+
+This will:
+
+- Stop bot container
+- Extract backup tarball
+- Restore data directory
+- Restore `.env` file
+- Restore encrypted secrets file
+- Start bot container
+- Verify restoration
+
+**⚠️ Warning:** This will replace current bot data! Make sure you have a recent backup before restoring.
+
+#### Download Backup
+
+```bash
+# Download backup to local machine
+telegram-bot-stack deploy backup download backup-20250126-143022.tar.gz
+
+# Download to specific directory
+telegram-bot-stack deploy backup download backup-20250126-143022.tar.gz --output ./backups/
+```
+
+#### Auto-Backup Configuration
+
+Backups are automatically created before critical operations:
+
+**Before update:**
+
+```bash
+# Auto-backup before update (enabled by default)
+telegram-bot-stack deploy update
+
+# Skip auto-backup
+telegram-bot-stack deploy update --no-backup
+
+# Force backup even if auto-backup disabled
+telegram-bot-stack deploy update --backup
+```
+
+**Before cleanup:**
+
+```bash
+# Auto-backup before cleanup (enabled by default)
+telegram-bot-stack deploy down --cleanup
+
+# Skip auto-backup
+telegram-bot-stack deploy down --cleanup --no-backup
+```
+
+#### Backup Configuration
+
+Configure backup settings in `deploy.yaml`:
+
+```yaml
+backup:
+  enabled: true # Enable backup system
+  auto_backup_before_update: true # Auto-backup before updates
+  auto_backup_before_cleanup: true # Auto-backup before cleanup
+  retention_days: 7 # Keep backups for 7 days
+  max_backups: 10 # Maximum number of backups to keep
+```
+
+**Retention Policy:**
+
+- Backups older than `retention_days` are automatically deleted
+- If more than `max_backups` exist, oldest backups are deleted first
+- Cleanup runs automatically after each backup creation
+
+#### Backup Contents
+
+Each backup includes:
+
+- **Data directory** (`/opt/{bot_name}/data/`) - All bot data (JSON/SQL files)
+- **Environment file** (`.env`) - Environment variables
+- **Encrypted secrets** (`.secrets.env.encrypted`) - Encrypted secrets file
+
+**Note:** Secrets are included in encrypted form only. The encryption key is stored in `deploy.yaml` (local only, not transferred to VPS).
+
+#### Best Practices
+
+1. **Regular Backups:** Create backups before major updates or changes
+2. **Test Restores:** Periodically test restore process to ensure backups work
+3. **Offsite Storage:** Download important backups to local machine or cloud storage
+4. **Retention Policy:** Adjust `retention_days` and `max_backups` based on your needs
+5. **Before Cleanup:** Always backup before running `deploy down --cleanup`
+
+#### Manual Backup (Alternative)
+
+If you prefer manual backup via SSH:
+
+```bash
 # SSH to VPS
 ssh root@your-vps-ip
 
-# Stop bot
+# Create backup manually
 cd /opt/bot-name
-docker-compose down
+tar -czf backups/manual-backup-$(date +%Y%m%d).tar.gz data/ .env .secrets.env.encrypted
 
-# Restore data
-tar -xzf /root/bot-backup-20250101.tar.gz -C /
-
-# Start bot
-docker-compose up -d
+# Download backup
+scp root@your-vps-ip:/opt/bot-name/backups/manual-backup-*.tar.gz ./
 ```
 
 ### Health Monitoring

@@ -11,8 +11,8 @@
     "description": "CLI tool for bot project management and development",
     "scope": "CLI tool for bot project management and development",
     "root_package": "telegram_bot_stack.cli",
-    "node_count": 24,
-    "edge_count": 20
+    "node_count": 25,
+    "edge_count": 22
   },
   "nodes": [
     {
@@ -353,7 +353,7 @@
       "category": "implementation",
       "path": "telegram_bot_stack/cli/commands/deploy.py",
       "description": "VPS deployment commands for telegram-bot-stack.",
-      "lines_of_code": 783,
+      "lines_of_code": 1021,
       "complexity_score": 1,
       "exports": [
         "deploy",
@@ -367,7 +367,12 @@
         "set_secret",
         "get_secret",
         "list_secrets",
-        "remove_secret"
+        "remove_secret",
+        "backup",
+        "create_backup",
+        "list_backups",
+        "download",
+        "restore"
       ],
       "classes": [],
       "functions": [
@@ -382,7 +387,12 @@
         "set_secret",
         "get_secret",
         "list_secrets",
-        "remove_secret"
+        "remove_secret",
+        "backup",
+        "create_backup",
+        "list_backups",
+        "download",
+        "restore"
       ],
       "dependencies": [],
       "dependents": [],
@@ -633,6 +643,37 @@
       "dependencies": [],
       "dependents": [],
       "criticality": "medium"
+    },
+    {
+      "id": "telegram_bot_stack.cli.utils.backup",
+      "name": "backup",
+      "type": "module",
+      "category": "implementation",
+      "path": "telegram_bot_stack/cli/utils/backup.py",
+      "description": "Module backup",
+      "lines_of_code": 354,
+      "complexity_score": 1,
+      "exports": [
+        "BackupManager",
+        "create_backup",
+        "list_backups",
+        "restore_backup",
+        "download_backup",
+        "cleanup_old_backups"
+      ],
+      "classes": [
+        "BackupManager"
+      ],
+      "functions": [
+        "create_backup",
+        "list_backups",
+        "restore_backup",
+        "download_backup",
+        "cleanup_old_backups"
+      ],
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium"
     }
   ],
   "edges": [
@@ -775,6 +816,20 @@
       "target": "telegram_bot_stack.cli.utils.secrets",
       "type": "imports",
       "description": "Imports from telegram_bot_stack.cli.utils.secrets"
+    },
+    {
+      "id": "edge_21",
+      "source": "telegram_bot_stack.cli.commands.deploy",
+      "target": "telegram_bot_stack.cli.utils",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.utils"
+    },
+    {
+      "id": "edge_22",
+      "source": "telegram_bot_stack.cli.utils.backup",
+      "target": "telegram_bot_stack.cli.utils.vps",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.utils.vps"
     }
   ]
 }
