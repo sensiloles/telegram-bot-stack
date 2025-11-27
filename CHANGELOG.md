@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.25.2 (2025-11-27)
+
+### Bug Fixes
+
+- **tests**: Configure git identity locally in CI environments
+  ([`7c27e75`](https://github.com/sensiloles/telegram-bot-stack/commit/7c27e7575fce0b186fdbbb65e6ddc1d064c718f0))
+
+
 ## v1.25.1 (2025-11-27)
 
 ### Bug Fixes
