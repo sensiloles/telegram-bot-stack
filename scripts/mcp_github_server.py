@@ -14,6 +14,8 @@ import json
 import os
 import subprocess
 import sys
+import urllib.error
+import urllib.request
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Optional
@@ -148,6 +150,107 @@ class MCPServer:
         if repo_name not in self._repo_cache:
             self._repo_cache[repo_name] = get_repo(repo_name)
         return self._repo_cache[repo_name]
+
+    def _get_ci_logs_internal(
+        self,
+        repo_name: str,
+        run_id: int,
+        job_name: Optional[str] = None,
+        max_lines: int = 100,
+    ) -> Optional[str]:
+        """Get logs from failed CI jobs using GitHub API.
+
+        Args:
+            repo_name: Repository name in format owner/repo
+            run_id: Workflow run ID
+            job_name: Optional specific job name to get logs for
+            max_lines: Maximum lines to return per job
+
+        Returns:
+            Formatted logs text or None if error
+        """
+        token = os.getenv("GITHUB_TOKEN")
+        if not token:
+            return None
+
+        try:
+            # Get workflow run jobs
+            url = f"https://api.github.com/repos/{repo_name}/actions/runs/{run_id}/jobs"
+            req = urllib.request.Request(url)
+            req.add_header("Accept", "application/vnd.github+json")
+            req.add_header("Authorization", f"Bearer {token}")
+            req.add_header("X-GitHub-Api-Version", "2022-11-28")
+
+            with urllib.request.urlopen(req) as response:
+                jobs_data = json.loads(response.read())
+
+            jobs = jobs_data.get("jobs", [])
+            if not jobs:
+                return None
+
+            # Filter failed jobs
+            failed_jobs = [j for j in jobs if j.get("conclusion") == "failure"]
+            if job_name:
+                failed_jobs = [j for j in failed_jobs if j.get("name") == job_name]
+
+            if not failed_jobs:
+                return "✅ No failed jobs found in this run."
+
+            result_lines = []
+            result_lines.append(f"📋 CI Logs for Run #{run_id}")
+            result_lines.append("=" * 80)
+            result_lines.append("")
+
+            for job in failed_jobs:
+                job_id = job.get("id")
+                job_name_str = job.get("name", "Unknown")
+                result_lines.append(f"❌ Job: {job_name_str} (ID: {job_id})")
+                result_lines.append("-" * 80)
+
+                # Get logs for this job
+                try:
+                    log_url = f"https://api.github.com/repos/{repo_name}/actions/jobs/{job_id}/logs"
+                    log_req = urllib.request.Request(log_url)
+                    log_req.add_header("Accept", "application/vnd.github+json")
+                    log_req.add_header("Authorization", f"Bearer {token}")
+                    log_req.add_header("X-GitHub-Api-Version", "2022-11-28")
+
+                    with urllib.request.urlopen(log_req) as log_response:
+                        logs = log_response.read().decode("utf-8")
+
+                    # Get last N lines
+                    log_lines = logs.split("\n")
+                    if len(log_lines) > max_lines:
+                        result_lines.append(
+                            f"... (showing last {max_lines} of {len(log_lines)} lines) ..."
+                        )
+                        log_lines = log_lines[-max_lines:]
+
+                    result_lines.extend(log_lines)
+                    result_lines.append("")
+
+                except urllib.error.HTTPError as e:
+                    if e.code == 403:
+                        result_lines.append(
+                            "⚠️  Permission denied. Token needs 'actions:read' scope."
+                        )
+                    elif e.code == 404:
+                        result_lines.append("⚠️  Logs not available (may have expired).")
+                    else:
+                        result_lines.append(f"⚠️  Error fetching logs: {e.code}")
+                    result_lines.append("")
+                except Exception as e:
+                    result_lines.append(f"⚠️  Error: {e}")
+                    result_lines.append("")
+
+            return "\n".join(result_lines)
+
+        except urllib.error.HTTPError as e:
+            log_debug(f"HTTP error getting CI logs: {e.code} - {e.read().decode()}")
+            return None
+        except Exception as e:
+            log_debug(f"Error getting CI logs: {e}")
+            return None
 
     def format_github_error(self, e: Any) -> str:
         """Format GitHub API error with actionable hints.
@@ -468,6 +571,33 @@ class MCPServer:
                                 "description": "Repository in format owner/repo (auto-detected if not provided)",
                             },
                         },
+                    },
+                },
+                {
+                    "name": "get_ci_logs",
+                    "description": "Get logs from failed CI jobs for a workflow run",
+                    "inputSchema": {
+                        "type": "object",
+                        "properties": {
+                            "run_id": {
+                                "type": "integer",
+                                "description": "Workflow run ID (from check_ci or GitHub Actions URL)",
+                            },
+                            "job_name": {
+                                "type": "string",
+                                "description": "Optional: specific job name to get logs for (default: all failed jobs)",
+                            },
+                            "max_lines": {
+                                "type": "integer",
+                                "description": "Maximum lines of logs to return per job (default: 100)",
+                                "default": 100,
+                            },
+                            "repo": {
+                                "type": "string",
+                                "description": "Repository in format owner/repo (auto-detected if not provided)",
+                            },
+                        },
+                        "required": ["run_id"],
                     },
                 },
                 {
@@ -912,20 +1042,111 @@ class MCPServer:
                 response_text = f"📊 CI Status for {context}\n\n"
                 response_text += f"✅ Passed: {passing} | ❌ Failed: {failing} | ⏳ Running: {running}\n\n"
 
+                # Get workflow run ID for failed checks (for log retrieval)
+                failed_run_ids = []
                 for check in check_runs:
                     if check.conclusion == "success":
                         icon = "✅"
                     elif check.conclusion == "failure":
                         icon = "❌"
+                        # Try to get run_id from check details
+                        if hasattr(check, "details_url") and check.details_url:
+                            # Extract run_id from URL if possible
+                            try:
+                                # URL format: https://github.com/owner/repo/actions/runs/RUN_ID/job/JOB_ID
+                                if "/actions/runs/" in check.details_url:
+                                    run_id = check.details_url.split("/actions/runs/")[
+                                        1
+                                    ].split("/")[0]
+                                    failed_run_ids.append(int(run_id))
+                            except (ValueError, IndexError):
+                                pass
                     else:
                         icon = "⏳"
                     response_text += (
                         f"{icon} {check.name}: {check.conclusion or 'running'}\n"
                     )
 
+                # If there are failures, suggest getting logs
+                if failing > 0 and failed_run_ids:
+                    response_text += f"\n💡 Use 'get_ci_logs' with run_id={failed_run_ids[0]} to see error details"
+
+                # If there are failures, try to get workflow run and logs
+                if failing > 0:
+                    workflow_run_id = None
+                    # Try to get workflow run ID from commit
+                    try:
+                        # Get workflow runs for this commit
+                        workflow_runs = list(
+                            repo.get_workflow_runs(head_sha=commit_sha)
+                        )
+                        if workflow_runs:
+                            # Get the most recent run
+                            latest_run = workflow_runs[0]
+                            workflow_run_id = latest_run.id
+                    except Exception as e:
+                        log_debug(f"Could not get workflow runs: {e}")
+                        # Fallback: try to extract from check details_url
+                        for check in check_runs:
+                            if check.conclusion == "failure" and hasattr(
+                                check, "details_url"
+                            ):
+                                try:
+                                    if "/actions/runs/" in check.details_url:
+                                        run_id_str = check.details_url.split(
+                                            "/actions/runs/"
+                                        )[1].split("/")[0]
+                                        workflow_run_id = int(run_id_str)
+                                        break
+                                except (ValueError, IndexError, AttributeError):
+                                    pass
+
+                    # If we found a run_id, get logs
+                    if workflow_run_id:
+                        try:
+                            logs_result = self._get_ci_logs_internal(
+                                repo_name, workflow_run_id, max_lines=50
+                            )
+                            if logs_result:
+                                response_text += (
+                                    "\n\n📋 Error Logs (showing last 50 lines):\n"
+                                )
+                                response_text += "=" * 80 + "\n"
+                                response_text += logs_result
+                        except Exception as e:
+                            log_debug(f"Could not fetch logs: {e}")
+                            response_text += f"\n💡 Use 'get_ci_logs' with run_id={workflow_run_id} to see detailed error logs"
+                    else:
+                        response_text += "\n💡 Use 'get_ci_logs' with run_id to see detailed error logs"
+
                 return {
                     "content": [{"type": "text", "text": response_text}],
                     "isError": failing > 0,
+                }
+
+            elif name == "get_ci_logs":
+                run_id = arguments["run_id"]
+                job_name = arguments.get("job_name")
+                max_lines = arguments.get("max_lines", 100)
+
+                logs_text = self._get_ci_logs_internal(
+                    repo_name, run_id, job_name, max_lines
+                )
+
+                if not logs_text:
+                    return {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": f"❌ Could not retrieve logs for run {run_id}. Check token permissions.",
+                            }
+                        ],
+                        "isError": True,
+                    }
+
+                return {
+                    "content": [{"type": "text", "text": logs_text}],
+                    "isError": False,
                 }
 
             elif name == "list_prs":
