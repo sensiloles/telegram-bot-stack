@@ -17,6 +17,7 @@ on:
 
 permissions:
   contents: read
+  id-token: write  # Required for Trusted Publishing (OIDC)
 
 jobs:
   publish:
