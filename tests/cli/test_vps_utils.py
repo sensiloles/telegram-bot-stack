@@ -5,6 +5,8 @@ from unittest.mock import MagicMock, patch
 from telegram_bot_stack.cli.utils.vps import (
     VPSConnection,
     check_docker_compose_installed,
+    get_container_health,
+    get_recent_errors,
 )
 
 
@@ -159,3 +161,168 @@ class TestCheckDockerComposeInstalled:
         result = check_docker_compose_installed(mock_conn)
 
         assert result is False
+
+
+class TestGetContainerHealth:
+    """Tests for get_container_health function."""
+
+    def test_container_running_healthy(self):
+        """Test health check for running healthy container."""
+        mock_conn = MagicMock()
+
+        # Mock responses for different docker inspect commands
+        def mock_run(cmd, hide=False, warn=False):
+            result = MagicMock()
+            result.ok = True
+            if "State.Running" in cmd:
+                result.stdout = "true"
+            elif "State.Health.Status" in cmd:
+                result.stdout = "healthy"
+            elif "State.StartedAt" in cmd:
+                result.stdout = "2025-11-27T10:00:00Z"
+            elif "RestartCount" in cmd:
+                result.stdout = "0"
+            return result
+
+        mock_conn.run = mock_run
+
+        health = get_container_health(mock_conn, "test-bot")
+
+        assert health["running"] is True
+        assert health["health_status"] == "healthy"
+        assert health["uptime"] == "2025-11-27T10:00:00Z"
+        assert health["restarts"] == 0
+
+    def test_container_not_running(self):
+        """Test health check for stopped container."""
+        mock_conn = MagicMock()
+
+        def mock_run(cmd, hide=False, warn=False):
+            result = MagicMock()
+            result.ok = True
+            if "State.Running" in cmd:
+                result.stdout = "false"
+            elif "State.ExitCode" in cmd:
+                result.stdout = "1"
+            return result
+
+        mock_conn.run = mock_run
+
+        health = get_container_health(mock_conn, "test-bot")
+
+        assert health["running"] is False
+        assert health["exit_code"] == 1
+
+    def test_container_unhealthy(self):
+        """Test health check for unhealthy container."""
+        mock_conn = MagicMock()
+
+        def mock_run(cmd, hide=False, warn=False):
+            result = MagicMock()
+            result.ok = True
+            if "State.Running" in cmd:
+                result.stdout = "true"
+            elif "State.Health.Status" in cmd:
+                result.stdout = "unhealthy"
+            elif "State.StartedAt" in cmd:
+                result.stdout = "2025-11-27T10:00:00Z"
+            elif "RestartCount" in cmd:
+                result.stdout = "3"
+            return result
+
+        mock_conn.run = mock_run
+
+        health = get_container_health(mock_conn, "test-bot")
+
+        assert health["running"] is True
+        assert health["health_status"] == "unhealthy"
+        assert health["restarts"] == 3
+
+    def test_container_starting(self):
+        """Test health check for starting container."""
+        mock_conn = MagicMock()
+
+        def mock_run(cmd, hide=False, warn=False):
+            result = MagicMock()
+            result.ok = True
+            if "State.Running" in cmd:
+                result.stdout = "true"
+            elif "State.Health.Status" in cmd:
+                result.stdout = "starting"
+            elif "State.StartedAt" in cmd:
+                result.stdout = "2025-11-27T10:00:00Z"
+            elif "RestartCount" in cmd:
+                result.stdout = "0"
+            return result
+
+        mock_conn.run = mock_run
+
+        health = get_container_health(mock_conn, "test-bot")
+
+        assert health["running"] is True
+        assert health["health_status"] == "starting"
+
+    def test_container_not_found(self):
+        """Test health check for non-existent container."""
+        mock_conn = MagicMock()
+
+        def mock_run(cmd, hide=False, warn=False):
+            result = MagicMock()
+            result.ok = False
+            return result
+
+        mock_conn.run = mock_run
+
+        health = get_container_health(mock_conn, "nonexistent-bot")
+
+        assert health["running"] is False
+        assert health["health_status"] == "unknown"
+
+
+class TestGetRecentErrors:
+    """Tests for get_recent_errors function."""
+
+    def test_get_errors_found(self):
+        """Test getting recent errors when errors exist."""
+        mock_conn = MagicMock()
+        mock_result = MagicMock()
+        mock_result.ok = True
+        mock_result.stdout = "ERROR: Connection failed\nERROR: Timeout\n"
+        mock_conn.run.return_value = mock_result
+
+        errors = get_recent_errors(mock_conn, "test-bot", lines=50)
+
+        assert "ERROR: Connection failed" in errors
+        assert "ERROR: Timeout" in errors
+
+    def test_get_errors_none_found(self):
+        """Test getting recent errors when no errors exist."""
+        mock_conn = MagicMock()
+        mock_result = MagicMock()
+        mock_result.ok = True
+        mock_result.stdout = ""
+        mock_conn.run.return_value = mock_result
+
+        errors = get_recent_errors(mock_conn, "test-bot", lines=50)
+
+        assert errors == ""
+
+    def test_get_errors_command_failed(self):
+        """Test getting recent errors when command fails."""
+        mock_conn = MagicMock()
+        mock_result = MagicMock()
+        mock_result.ok = False
+        mock_conn.run.return_value = mock_result
+
+        errors = get_recent_errors(mock_conn, "test-bot", lines=50)
+
+        assert errors == ""
+
+    def test_get_errors_exception(self):
+        """Test getting recent errors when exception occurs."""
+        mock_conn = MagicMock()
+        mock_conn.run.side_effect = Exception("Connection error")
+
+        errors = get_recent_errors(mock_conn, "test-bot", lines=50)
+
+        assert errors == ""

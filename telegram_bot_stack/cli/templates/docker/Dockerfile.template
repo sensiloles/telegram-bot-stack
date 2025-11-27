@@ -35,9 +35,11 @@ COPY --chown=botuser:botuser . .
 # Switch to non-root user
 USER botuser
 
-# Health check
+# Health check - verify bot process is running
+# Note: This is a basic process check. For Telegram API health check,
+# use 'telegram-bot-stack deploy health' command
 HEALTHCHECK --interval=30s --timeout=10s --retries=3 --start-period=30s \
-    CMD pgrep -f "python.*bot" || exit 1
+    CMD pgrep -f "python.*bot" > /dev/null || exit 1
 
 # Start bot
 CMD ["python", "{{ bot_entry_point }}"]

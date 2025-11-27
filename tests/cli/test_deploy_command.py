@@ -581,3 +581,172 @@ class TestDeployHistory:
 
             assert result.exit_code == 0
             assert "Showing 3 of 5 versions" in result.output
+
+
+class TestDeployHealth:
+    """Tests for deploy health command."""
+
+    def test_health_no_config(self, runner, tmp_path):
+        """Test health command without config file."""
+        os.chdir(tmp_path)
+
+        result = runner.invoke(deploy, ["health"])
+
+        assert result.exit_code == 0
+        assert "Configuration file not found" in result.output
+
+    def test_health_container_running_healthy(
+        self, runner, tmp_path, temp_deploy_config
+    ):
+        """Test health command with healthy running container."""
+        os.chdir(tmp_path)
+
+        with (
+            patch(
+                "telegram_bot_stack.cli.commands.deploy.monitoring.VPSConnection"
+            ) as mock_vps,
+            patch(
+                "telegram_bot_stack.cli.commands.deploy.monitoring.get_container_health"
+            ) as mock_health,
+        ):
+            mock_instance = MagicMock()
+            mock_instance.test_connection.return_value = True
+            mock_vps.return_value = mock_instance
+
+            mock_health.return_value = {
+                "running": True,
+                "health_status": "healthy",
+                "uptime": "2025-11-27T10:00:00Z",
+                "restarts": 0,
+                "exit_code": None,
+            }
+
+            result = runner.invoke(
+                deploy, ["health", "--config", str(temp_deploy_config)]
+            )
+
+            assert result.exit_code == 0
+            assert "Bot Health Check" in result.output
+            assert "Running" in result.output
+            assert "Healthy" in result.output
+
+    def test_health_container_not_running(self, runner, tmp_path, temp_deploy_config):
+        """Test health command with stopped container."""
+        os.chdir(tmp_path)
+
+        with (
+            patch(
+                "telegram_bot_stack.cli.commands.deploy.monitoring.VPSConnection"
+            ) as mock_vps,
+            patch(
+                "telegram_bot_stack.cli.commands.deploy.monitoring.get_container_health"
+            ) as mock_health,
+        ):
+            mock_instance = MagicMock()
+            mock_instance.test_connection.return_value = True
+            mock_vps.return_value = mock_instance
+
+            mock_health.return_value = {
+                "running": False,
+                "health_status": "unknown",
+                "uptime": None,
+                "restarts": 0,
+                "exit_code": 1,
+            }
+
+            result = runner.invoke(
+                deploy, ["health", "--config", str(temp_deploy_config)]
+            )
+
+            assert result.exit_code == 0
+            assert "Bot Health Check" in result.output
+            assert "Not running" in result.output or "Stopped" in result.output
+
+    def test_health_container_unhealthy(self, runner, tmp_path, temp_deploy_config):
+        """Test health command with unhealthy container."""
+        os.chdir(tmp_path)
+
+        with (
+            patch(
+                "telegram_bot_stack.cli.commands.deploy.monitoring.VPSConnection"
+            ) as mock_vps,
+            patch(
+                "telegram_bot_stack.cli.commands.deploy.monitoring.get_container_health"
+            ) as mock_health,
+        ):
+            mock_instance = MagicMock()
+            mock_instance.test_connection.return_value = True
+            mock_vps.return_value = mock_instance
+
+            mock_health.return_value = {
+                "running": True,
+                "health_status": "unhealthy",
+                "uptime": "2025-11-27T10:00:00Z",
+                "restarts": 5,
+                "exit_code": None,
+            }
+
+            result = runner.invoke(
+                deploy, ["health", "--config", str(temp_deploy_config)]
+            )
+
+            assert result.exit_code == 0
+            assert "Bot Health Check" in result.output
+            assert "Unhealthy" in result.output or "unhealthy" in result.output
+
+    def test_health_with_errors_flag(self, runner, tmp_path, temp_deploy_config):
+        """Test health command with --errors flag."""
+        os.chdir(tmp_path)
+
+        with (
+            patch(
+                "telegram_bot_stack.cli.commands.deploy.monitoring.VPSConnection"
+            ) as mock_vps,
+            patch(
+                "telegram_bot_stack.cli.commands.deploy.monitoring.get_container_health"
+            ) as mock_health,
+            patch(
+                "telegram_bot_stack.cli.commands.deploy.monitoring.get_recent_errors"
+            ) as mock_errors,
+        ):
+            mock_instance = MagicMock()
+            mock_instance.test_connection.return_value = True
+            mock_vps.return_value = mock_instance
+
+            mock_health.return_value = {
+                "running": True,
+                "health_status": "healthy",
+                "uptime": "2025-11-27T10:00:00Z",
+                "restarts": 0,
+                "exit_code": None,
+            }
+
+            mock_errors.return_value = (
+                "ERROR: Connection timeout\nERROR: Failed to send message"
+            )
+
+            result = runner.invoke(
+                deploy, ["health", "--config", str(temp_deploy_config), "--errors"]
+            )
+
+            assert result.exit_code == 0
+            assert "Bot Health Check" in result.output
+            assert "Recent Errors" in result.output
+
+    def test_health_connection_failed(self, runner, tmp_path, temp_deploy_config):
+        """Test health command when VPS connection fails."""
+        os.chdir(tmp_path)
+
+        with patch(
+            "telegram_bot_stack.cli.commands.deploy.monitoring.VPSConnection"
+        ) as mock_vps:
+            mock_instance = MagicMock()
+            mock_instance.test_connection.return_value = False
+            mock_vps.return_value = mock_instance
+
+            result = runner.invoke(
+                deploy, ["health", "--config", str(temp_deploy_config)]
+            )
+
+            assert result.exit_code == 0
+            assert "Failed to connect to VPS" in result.output
