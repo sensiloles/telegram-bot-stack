@@ -12,7 +12,7 @@
     "scope": "CLI tool for bot project management and development",
     "root_package": "telegram_bot_stack.cli",
     "node_count": 29,
-    "edge_count": 36
+    "edge_count": 35
   },
   "nodes": [
     {
@@ -578,7 +578,7 @@
       "category": "implementation",
       "path": "telegram_bot_stack/cli/commands/deploy/__init__.py",
       "description": "Deployment commands module - refactored into smaller modules.",
-      "lines_of_code": 14,
+      "lines_of_code": 16,
       "complexity_score": 1,
       "exports": [],
       "classes": [],
@@ -972,32 +972,25 @@
       "description": "Imports from telegram_bot_stack.cli.utils.vps"
     },
     {
-      "id": "edge_33",
-      "source": "telegram_bot_stack.cli.templates.advanced.bot",
-      "target": "telegram_bot_stack",
+      "id": "edge_37",
+      "source": "telegram_bot_stack.cli.commands.deploy",
+      "target": "telegram_bot_stack.cli.commands.deploy.operations",
       "type": "imports",
-      "description": "Imports from telegram_bot_stack"
+      "description": "Imports from telegram_bot_stack.cli.commands.deploy.operations"
     },
     {
-      "id": "edge_34",
-      "source": "telegram_bot_stack.cli.templates.basic.bot",
-      "target": "telegram_bot_stack",
+      "id": "edge_38",
+      "source": "telegram_bot_stack.cli.commands.deploy",
+      "target": "telegram_bot_stack.cli.commands.deploy.monitoring",
       "type": "imports",
-      "description": "Imports from telegram_bot_stack"
+      "description": "Imports from telegram_bot_stack.cli.commands.deploy.monitoring"
     },
     {
-      "id": "edge_35",
-      "source": "telegram_bot_stack.cli.templates.menu.bot",
-      "target": "telegram_bot_stack",
+      "id": "edge_39",
+      "source": "telegram_bot_stack.cli.commands.deploy",
+      "target": "telegram_bot_stack.cli.commands.deploy.secrets",
       "type": "imports",
-      "description": "Imports from telegram_bot_stack"
-    },
-    {
-      "id": "edge_36",
-      "source": "telegram_bot_stack.cli.templates.counter.bot",
-      "target": "telegram_bot_stack",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack"
+      "description": "Imports from telegram_bot_stack.cli.commands.deploy.secrets"
     }
   ]
 }

@@ -1,5 +1,7 @@
 """Deployment commands module - refactored into smaller modules."""
 
+# Import deploy group first to avoid circular imports
+# Import command modules
 from telegram_bot_stack.cli.commands.deploy import monitoring, operations, secrets
 from telegram_bot_stack.cli.commands.deploy.deploy import deploy
 

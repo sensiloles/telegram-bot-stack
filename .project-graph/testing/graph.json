@@ -8,8 +8,8 @@
     "project_name": "telegram-bot-stack",
     "description": "Test suite, fixtures, and testing utilities",
     "scope": "Unit tests, integration tests, fixtures",
-    "node_count": 28,
-    "edge_count": 0
+    "node_count": 29,
+    "edge_count": 1
   },
   "nodes": [
     {
@@ -1288,7 +1288,31 @@
         "test_all_bots_have_main_function",
         "test_all_bots_use_post_init_wrapper"
       ]
+    },
+    {
+      "id": "telegram_bot_stack.cli.commands.deploy",
+      "name": "__init__",
+      "type": "module",
+      "category": "implementation",
+      "path": "telegram_bot_stack/cli/commands/deploy/__init__.py",
+      "description": "Module __init__",
+      "lines_of_code": 16,
+      "complexity_score": 1,
+      "exports": [],
+      "classes": [],
+      "functions": [],
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium"
     }
   ],
-  "edges": []
+  "edges": [
+    {
+      "id": "edge_1",
+      "source": "telegram_bot_stack.cli.commands.deploy",
+      "target": "telegram_bot_stack.cli.commands.deploy",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.commands.deploy"
+    }
+  ]
 }

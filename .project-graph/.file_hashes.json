@@ -9,7 +9,7 @@
   ".github/PROJECT_STATUS.md": "24f5e9e6fe9fc55b71ccbbeb5a7816caaee05e310be8242fe4e847d4494179bc",
   "telegram_bot_stack/cli/utils/backup.py": "62766fbd4184202674cceda4558e66419e6e7c61beba78f69edcfaada60c0de6",
   "telegram_bot_stack/cli/commands/__init__.py": "3b764f345a2072de9f943abefc5d5b512cfd8f41d5349f9bae327fd061ff36eb",
-  "telegram_bot_stack/cli/commands/deploy/__init__.py": "f04c7e40909e732b51e970bcb059223c6e170ea686aaeea3f626fa0301dab41c",
+  "telegram_bot_stack/cli/commands/deploy/__init__.py": "c77413be67e6f69abcb0fac00bfd58e32ea5bd061747c22a69222685bcf295b1",
   "telegram_bot_stack/cli/commands/deploy/monitoring.py": "926aa85aae2d1fa9c8f06e6452ff073ec085951d4dfd9b36ccdda06b89a2b964",
   "telegram_bot_stack/cli/commands/deploy/deploy.py": "d8b7e34f9d69482d4aa9ad835fe450250e3010ebc82b0d19686147fe126d54dd",
   "telegram_bot_stack/cli/commands/deploy/operations.py": "57348568cd32481c9c61ffe38dfa754e645ab18d2dac2db8f95cf456b02517c4",
