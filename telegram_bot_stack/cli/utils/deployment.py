@@ -152,13 +152,15 @@ class DeploymentConfig:
 class DockerTemplateRenderer:
     """Renders Docker templates with configuration."""
 
-    def __init__(self, config: DeploymentConfig):
+    def __init__(self, config: DeploymentConfig, has_secrets: bool = False):
         """Initialize template renderer.
 
         Args:
             config: Deployment configuration
+            has_secrets: Whether secrets are configured (affects docker-compose template)
         """
         self.config = config
+        self.has_secrets = has_secrets
 
         # Get templates directory
         templates_dir = Path(__file__).parent.parent / "templates" / "docker"
@@ -196,6 +198,7 @@ class DockerTemplateRenderer:
             log_level=self.config.get("logging.level", "INFO"),
             log_max_size=self.config.get("logging.max_size", "5m"),
             log_max_files=self.config.get("logging.max_files", "5"),
+            has_secrets=self.has_secrets,
         )
 
     def render_dockerignore(self) -> str:
