@@ -12,13 +12,21 @@ Version: 2.0.0 (Enhanced)
 import asyncio
 import json
 import os
+import ssl
 import subprocess
 import sys
-import urllib.error
-import urllib.request
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Optional
+
+try:
+    import requests
+except ImportError:
+    # Fallback to urllib if requests not available
+    import urllib.error
+    import urllib.request
+
+    requests = None
 
 # Setup paths
 project_root = Path(__file__).parent.parent
@@ -176,13 +184,27 @@ class MCPServer:
         try:
             # Get workflow run jobs
             url = f"https://api.github.com/repos/{repo_name}/actions/runs/{run_id}/jobs"
-            req = urllib.request.Request(url)
-            req.add_header("Accept", "application/vnd.github+json")
-            req.add_header("Authorization", f"Bearer {token}")
-            req.add_header("X-GitHub-Api-Version", "2022-11-28")
+            headers = {
+                "Accept": "application/vnd.github+json",
+                "Authorization": f"Bearer {token}",
+                "X-GitHub-Api-Version": "2022-11-28",
+            }
 
-            with urllib.request.urlopen(req) as response:
-                jobs_data = json.loads(response.read())
+            if requests:
+                response = requests.get(url, headers=headers, timeout=30)
+                response.raise_for_status()
+                jobs_data = response.json()
+            else:
+                req = urllib.request.Request(url)
+                for key, value in headers.items():
+                    req.add_header(key, value)
+                # Create SSL context that doesn't verify certificates (for local dev)
+                # In production, proper certificates should be used
+                ssl_context = ssl.create_default_context()
+                ssl_context.check_hostname = False
+                ssl_context.verify_mode = ssl.CERT_NONE
+                with urllib.request.urlopen(req, context=ssl_context) as response:
+                    jobs_data = json.loads(response.read())
 
             jobs = jobs_data.get("jobs", [])
             if not jobs:
@@ -210,13 +232,30 @@ class MCPServer:
                 # Get logs for this job
                 try:
                     log_url = f"https://api.github.com/repos/{repo_name}/actions/jobs/{job_id}/logs"
-                    log_req = urllib.request.Request(log_url)
-                    log_req.add_header("Accept", "application/vnd.github+json")
-                    log_req.add_header("Authorization", f"Bearer {token}")
-                    log_req.add_header("X-GitHub-Api-Version", "2022-11-28")
+                    log_headers = {
+                        "Accept": "application/vnd.github+json",
+                        "Authorization": f"Bearer {token}",
+                        "X-GitHub-Api-Version": "2022-11-28",
+                    }
 
-                    with urllib.request.urlopen(log_req) as log_response:
-                        logs = log_response.read().decode("utf-8")
+                    if requests:
+                        log_response = requests.get(
+                            log_url, headers=log_headers, timeout=30
+                        )
+                        log_response.raise_for_status()
+                        logs = log_response.text
+                    else:
+                        log_req = urllib.request.Request(log_url)
+                        for key, value in log_headers.items():
+                            log_req.add_header(key, value)
+                        # Use SSL context
+                        ssl_context = ssl.create_default_context()
+                        ssl_context.check_hostname = False
+                        ssl_context.verify_mode = ssl.CERT_NONE
+                        with urllib.request.urlopen(
+                            log_req, context=ssl_context
+                        ) as log_response:
+                            logs = log_response.read().decode("utf-8")
 
                     # Get last N lines
                     log_lines = logs.split("\n")
@@ -229,18 +268,25 @@ class MCPServer:
                     result_lines.extend(log_lines)
                     result_lines.append("")
 
-                except urllib.error.HTTPError as e:
-                    if e.code == 403:
+                except Exception as e:
+                    error_code = None
+                    if requests:
+                        if hasattr(e, "response") and e.response is not None:
+                            error_code = e.response.status_code
+                    else:
+                        if hasattr(e, "code"):
+                            error_code = e.code
+
+                    if error_code == 403:
                         result_lines.append(
                             "⚠️  Permission denied. Token needs 'actions:read' scope."
                         )
-                    elif e.code == 404:
+                    elif error_code == 404:
                         result_lines.append("⚠️  Logs not available (may have expired).")
+                    elif error_code:
+                        result_lines.append(f"⚠️  Error fetching logs: {error_code}")
                     else:
-                        result_lines.append(f"⚠️  Error fetching logs: {e.code}")
-                    result_lines.append("")
-                except Exception as e:
-                    result_lines.append(f"⚠️  Error: {e}")
+                        result_lines.append(f"⚠️  Error: {e}")
                     result_lines.append("")
 
             return "\n".join(result_lines)
