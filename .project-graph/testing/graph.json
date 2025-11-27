@@ -983,7 +983,7 @@
       "type": "test_module",
       "path": "tests/cli/test_deploy_command.py",
       "description": "Tests for deploy command.",
-      "lines_of_code": 313,
+      "lines_of_code": 309,
       "exports": [
         "TestDeployInit",
         "TestDeployUp",

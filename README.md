@@ -179,6 +179,9 @@ python3 -m pytest tests/core/test_storage.py
 
 # Run with coverage report
 python3 -m pytest --cov=telegram_bot_stack --cov-report=html
+
+# Test on all Python versions (3.9-3.12) locally
+make test-all-versions
 ```
 
 The framework includes comprehensive test coverage (84%) with:
@@ -187,6 +190,24 @@ The framework includes comprehensive test coverage (84%) with:
 - Integration tests for complete workflows
 - Async test support with pytest-asyncio
 - CI/CD integration with GitHub Actions (Python 3.9-3.12)
+- **Multi-version testing with tox** - Test locally on all Python versions
+
+**Testing on Multiple Python Versions:**
+
+To ensure your bot works across all supported Python versions (3.9-3.12), use tox:
+
+```bash
+# Test on all versions (parallel execution)
+make test-all-versions
+
+# Test on specific version
+make test-py39   # Python 3.9
+make test-py310  # Python 3.10
+make test-py311  # Python 3.11
+make test-py312  # Python 3.12
+```
+
+See [Multi-Version Testing Guide](docs/multi-version-testing.md) for setup instructions and detailed usage.
 
 ## Architecture
 

@@ -64,6 +64,7 @@ dev = [
 "pytest-cov>=4.1.0",
 "pytest-mock>=3.12.0",
 "pre-commit>=3.8.0",
+"tox>=4.0.0",                     # Multi-version testing
 ]
 
 # GitHub Actions automation
@@ -184,6 +185,7 @@ python_functions = ["test_*"]
 asyncio_mode = "auto"
 addopts = [
 "--cov=telegram_bot_stack",
+"--cov-config=pyproject.toml",
 "--cov-report=html",
 "--cov-report=term-missing",
 "--cov-report=xml",
@@ -210,6 +212,8 @@ omit = [
 "*/examples/*",
 "*/.github/*",
 ]
+# Explicitly use pyproject.toml for coverage config, ignore tox.ini
+data_file = ".coverage"
 
 [tool.coverage.report]
 exclude_lines = [

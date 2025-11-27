@@ -63,6 +63,26 @@ test-integration: ## Run only integration tests
 	@echo "$(GREEN)Running integration tests...$(NC)"
 	pytest tests/integration/ -v
 
+test-all-versions: ## Run tests on all Python versions (3.9-3.12) using tox
+	@echo "$(GREEN)Running tests on all Python versions...$(NC)"
+	tox -p auto
+
+test-py39: ## Run tests on Python 3.9 only
+	@echo "$(GREEN)Running tests on Python 3.9...$(NC)"
+	tox -e py39
+
+test-py310: ## Run tests on Python 3.10 only
+	@echo "$(GREEN)Running tests on Python 3.10...$(NC)"
+	tox -e py310
+
+test-py311: ## Run tests on Python 3.11 only
+	@echo "$(GREEN)Running tests on Python 3.11...$(NC)"
+	tox -e py311
+
+test-py312: ## Run tests on Python 3.12 only
+	@echo "$(GREEN)Running tests on Python 3.12...$(NC)"
+	tox -e py312
+
 ##@ Code Quality
 
 lint: ## Run linter (ruff)

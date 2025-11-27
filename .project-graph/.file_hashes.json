@@ -5,7 +5,7 @@
   "telegram_bot_stack/cli/utils/deployment.py": "9950f45f8a454034a167f335b2968d5c88b0ac7d4fdc0232315270da4e5b1f27",
   ".vscode/README.md": "604518c008aed67939b76d51056f46e5ba0008b7424a2fa8189cd23b50ff97f0",
   "CHANGELOG.md": "d0d2314d4c37c189f319c18282bfb530e1ddb110675a077fa42a12c18c97fcc5",
-  "pyproject.toml": "85786ade18954d55a161bcb41ed5835320c84141d64a37544c6755481a0d8635",
+  "pyproject.toml": "0627eddadd86a82aed2ba88935bf849f08e0a9c8713f2402b309919d565467ab",
   ".github/PROJECT_STATUS.md": "24f5e9e6fe9fc55b71ccbbeb5a7816caaee05e310be8242fe4e847d4494179bc",
   "telegram_bot_stack/cli/utils/backup.py": "62766fbd4184202674cceda4558e66419e6e7c61beba78f69edcfaada60c0de6",
   "telegram_bot_stack/cli/commands/__init__.py": "3b764f345a2072de9f943abefc5d5b512cfd8f41d5349f9bae327fd061ff36eb",
@@ -16,5 +16,7 @@
   "telegram_bot_stack/cli/commands/deploy/secrets.py": "07c84a7535ce802aeb752adcc00414cdcbc133f903a3e96899976da83f7ef759",
   "tests/cli/test_backup.py": "0f5fefab90e02ac34344eeb7de8c2a32b35dae5255f468748a0693de90ca0cac",
   "scripts/mcp_github_server.py": "2d76cf032a3b94640f8bac5b5dbfdd45501d383efe289270db884e6d22e44937",
-  "tests/cli/test_deploy_command.py": "2664b6a9e4d4ebab85996d196722027bcf291651625d4405a9a98bb40e4f8a90"
+  "tests/cli/test_deploy_command.py": "441f88ef2bcf8a2cd175528f10c2f3b526dae0ca950d6b34cce583bf4f562810",
+  "README.md": "b9b4e1993c57f0cb11c344518b28342c8d166c629505acaf906a50e6957d8b30",
+  "docs/multi-version-testing.md": "c007ed637628f2cb708bca8e1df172bd5639c84b65faf145cdbb0d085a1a148f"
 }

@@ -44,11 +44,9 @@ class TestDeployInit:
         os.chdir(tmp_path)
 
         with patch(
-            "telegram_bot_stack.cli.commands.deploy.deploy.VPSConnection"
-        ) as mock_vps:
-            # Mock successful connection test
-            mock_vps.return_value.test_connection.return_value = True
-
+            "telegram_bot_stack.cli.utils.vps.VPSConnection.test_connection",
+            return_value=True,
+        ):
             result = runner.invoke(
                 deploy,
                 [
@@ -73,11 +71,9 @@ class TestDeployInit:
         os.chdir(tmp_path)
 
         with patch(
-            "telegram_bot_stack.cli.commands.deploy.deploy.VPSConnection"
-        ) as mock_vps:
-            # Mock failed connection test
-            mock_vps.return_value.test_connection.return_value = False
-
+            "telegram_bot_stack.cli.utils.vps.VPSConnection.test_connection",
+            return_value=False,
+        ):
             result = runner.invoke(
                 deploy,
                 [
