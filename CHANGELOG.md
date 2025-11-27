@@ -2,6 +2,19 @@
 
 <!-- version list -->
 
+## v1.24.0 (2025-11-27)
+
+### Features
+
+- **deploy**: Add rollback mechanism for failed deployments
+  ([`2e107c0`](https://github.com/sensiloles/telegram-bot-stack/commit/2e107c0eac65534e0acd03641b308adc21fe833f))
+
+### Refactoring
+
+- **deploy**: Split deploy.py into smaller modules
+  ([`7c98d16`](https://github.com/sensiloles/telegram-bot-stack/commit/7c98d165c9e1b4d23dd2aaf5a4d4e3805497f702))
+
+
 ## v1.23.0 (2025-11-27)
 
 ### Features
