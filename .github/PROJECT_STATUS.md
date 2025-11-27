@@ -1,7 +1,7 @@
 # Project Status - telegram-bot-stack
 
 **Version:** v1.21.0 → v2.0.0 MVP
-**Updated:** 2025-11-26
+**Updated:** 2025-01-27
 **Status:** 🏗️ Phase 2 - Hardening Killer Feature
 
 ---
@@ -75,13 +75,13 @@ Total: ~10 minutes to live bot 🚀
 | ------- | ----------------------------- | -------------- | ------- | ----- | ------ |
 | **#76** | Rollback mechanism            | ✅ YES         | ⏳ TODO | 3-4h  | -      |
 | **#77** | Health checks + auto-recovery | ✅ YES         | ⏳ TODO | 4-5h  | #78    |
-| **#79** | Secrets management            | ✅ YES         | ⏳ TODO | 5-6h  | -      |
-| **#81** | Backup/restore                | ✅ YES         | ⏳ TODO | 5-6h  | -      |
+| **#79** | Secrets management            | ✅ YES         | ✅ DONE | 5-6h  | -      |
+| **#81** | Backup/restore                | ✅ YES         | ✅ DONE | 5-6h  | -      |
 | **#84** | Troubleshooting guide         | ✅ YES (docs)  | ⏳ TODO | 3-4h  | -      |
 | **#85** | Integration tests             | ✅ YES (tests) | ⏳ TODO | 8-10h | -      |
 | **#88** | Doctor command                | 🔧 CLI tool    | ⏳ TODO | 6-8h  | -      |
 
-**Total Critical Path:** ~35-43 hours (5-6 days)
+**Total Critical Path:** ~24-31 hours (4-5 days) - **2 issues completed!**
 
 **IMPORTANT Issues (do after critical):**
 
@@ -114,8 +114,8 @@ Total: ~10 minutes to live bot 🚀
 | #28 | Docker Templates       | Deploy   | ✅ DONE (v1.21.0) | #27     | #76-#85  |
 | #76 | **Rollback mechanism** | Deploy   | ⏳ TODO           | #27     | -        |
 | #77 | **Health checks**      | Deploy   | ⏳ TODO           | #27     | #78, #80 |
-| #79 | **Secrets management** | Deploy   | ⏳ TODO           | #27     | -        |
-| #81 | **Backup/restore**     | Deploy   | ⏳ TODO           | #27     | -        |
+| #79 | **Secrets management** | Deploy   | ✅ DONE           | #27     | -        |
+| #81 | **Backup/restore**     | Deploy   | ✅ DONE           | #27     | -        |
 | #84 | **Troubleshooting**    | Docs     | ⏳ TODO           | #27     | -        |
 | #85 | **Deploy tests**       | Tests    | ⏳ TODO           | #27     | -        |
 | #88 | **Doctor command**     | CLI      | ⏳ TODO           | -       | -        |
@@ -127,7 +127,7 @@ Total: ~10 minutes to live bot 🚀
 | #40 | Full Dev Setup | ✅ DONE (v1.17.0) | Killer Feature #1 |
 | #60 | Agent Optimize | 🏗️ In Progress    | Ongoing           |
 
-**Total Critical: 9 TODO + 3 DONE = 12 issues**
+**Total Critical: 7 TODO + 5 DONE = 12 issues**
 
 ---
 
@@ -242,8 +242,8 @@ Killer Feature #2: VPS Deployment
 ├── Critical Hardening (parallel work):
 │   ├── #76 Rollback ← #27
 │   ├── #77 Health checks ← #27 → blocks #78, #80
-│   ├── #79 Secrets ← #27
-│   ├── #81 Backup ← #27
+│   ├── ✅ #79 Secrets ← #27 (DONE)
+│   ├── ✅ #81 Backup ← #27 (DONE)
 │   ├── #84 Troubleshooting ← #27
 │   ├── #85 Deploy tests ← #27
 │   └── #88 Doctor (independent)
@@ -272,16 +272,16 @@ Supporting Infrastructure (parallel):
 ```bash
 # Work order for maximum safety:
 
-1. #79 Secrets management (5-6h) ← FIRST (security)
-   → Secure token storage before anything else
+1. ✅ #79 Secrets management (5-6h) ← DONE (security)
+   → Secure token storage implemented
 
-2. #81 Backup/restore (5-6h) ← SECOND (data safety)
-   → Protect data before making changes
+2. ✅ #81 Backup/restore (5-6h) ← DONE (data safety)
+   → Data protection implemented with auto-backup
 
-3. #76 Rollback mechanism (3-4h) ← THIRD (recovery)
+3. #76 Rollback mechanism (3-4h) ← NEXT (recovery)
    → Safety net for deployments
 
-4. #77 Health checks (4-5h) ← FOURTH (reliability)
+4. #77 Health checks (4-5h) ← AFTER (reliability)
    → Auto-recovery for production
 ```
 
@@ -302,10 +302,16 @@ Supporting Infrastructure (parallel):
 
 ### 🎯 Week 7-8 Goals
 
-**Monday-Tuesday:** Security (#79 Secrets)
-**Wednesday-Thursday:** Data Safety (#81 Backup, #76 Rollback)
-**Friday:** Reliability (#77 Health checks)
-**Weekend:** Testing & Docs (#85, #84, #88)
+**✅ Completed:**
+
+- Security (#79 Secrets) ✅
+- Data Safety (#81 Backup) ✅
+
+**⏳ Remaining:**
+
+- Recovery (#76 Rollback)
+- Reliability (#77 Health checks)
+- Testing & Docs (#85, #84, #88)
 
 **Milestone:** Production-safe deployment ✅
 
@@ -352,8 +358,8 @@ Supporting Infrastructure (parallel):
 - 🔒 Production-safe deployment ⏳ IN PROGRESS
   - Rollback on failure (#76)
   - Auto-recovery (#77)
-  - Secure secrets (#79)
-  - Data backups (#81)
+  - ✅ Secure secrets (#79) DONE
+  - ✅ Data backups (#81) DONE
   - Auto-diagnostics (#88)
 
 **Technical Requirements:**
@@ -371,8 +377,8 @@ Supporting Infrastructure (parallel):
 - [x] Deployment guide exists
 - [ ] Rollback mechanism (#76)
 - [ ] Health checks (#77)
-- [ ] Secrets management (#79)
-- [ ] Backup/restore (#81)
+- [x] Secrets management (#79) ✅
+- [x] Backup/restore (#81) ✅
 - [ ] Troubleshooting guide (#84)
 - [ ] Integration tests (#85)
 - [ ] Doctor command (#88)
@@ -416,7 +422,8 @@ Supporting Infrastructure (parallel):
   - init, new, dev, validate
 - **Phase 2:** Deploy commands 🏗️ IN PROGRESS
   - ✅ Basic: init, up, down, status, logs, update
-  - ⏳ Production: secrets (#79), backup (#81), health (#77)
+  - ✅ Production: secrets (#79) DONE, backup (#81) DONE
+  - ⏳ Production: health (#77)
   - ⏳ Advanced: rollback (#76), verify (#80), monitor (#82)
 - **Phase 3:** Advanced tooling (v2.1.0+)
   - upgrade (#86), migrate (#47), doctor (#88)
@@ -450,8 +457,8 @@ Supporting Infrastructure (parallel):
 
 - #76: Rollback mechanism ⏳
 - #77: Health checks + auto-recovery ⏳
-- #79: Secrets management ⏳
-- #81: Backup/restore ⏳
+- ✅ #79: Secrets management DONE
+- ✅ #81: Backup/restore DONE
 - #84: Troubleshooting guide ⏳
 - #85: Integration tests ⏳
 - #88: Doctor command ⏳
@@ -506,7 +513,7 @@ Supporting Infrastructure (parallel):
 
 ### Open Issues by Priority
 
-- 🔴 **CRITICAL:** 9 issues (deployment hardening)
+- 🔴 **CRITICAL:** 7 issues (deployment hardening) - 2 completed!
 - 🟠 **HIGH:** 11 issues (advanced features)
 - 🟡 **MEDIUM:** 6 issues (future enhancements)
 - 🟢 **LOW:** 9 issues (long-term vision)
@@ -525,6 +532,7 @@ Supporting Infrastructure (parallel):
 ---
 
 **Status:** 🏗️ Killer Feature #2 deployed, now hardening for production
-**Current Focus:** Production safety (#76, #77, #79, #81, #84, #85, #88)
+**Progress:** 2/7 critical hardening tasks completed (#79 Secrets, #81 Backup)
+**Current Focus:** Production safety (#76 Rollback, #77 Health checks, #84 Troubleshooting, #85 Tests, #88 Doctor)
 **Next Milestone:** v2.0.0 MVP (Week 10)
 **Next Review:** After completing critical hardening (Week 8)

@@ -1,9 +1,11 @@
 {
   "telegram_bot_stack/cli/utils/vps.py": "4ffdb2519350fb8756f21c20e30a5ebe7db2ad974fdecf69a54002cdac702c99",
-  "docs/deployment_guide.md": "c59c093cf8adbfaf95c06257eca926d17bef9b45b05855888438becdee199556",
-  "telegram_bot_stack/cli/commands/deploy.py": "de2ec0d4a3921d8e931a3eef47ede67395de1a851874c30277fdd42cfdb6800d",
+  "docs/deployment_guide.md": "ff8171ce094354c846b549d4db25b0c674e80892217806be47111977d3b1c247",
+  "telegram_bot_stack/cli/commands/deploy.py": "a09cbcba825967760aa7b32731b7718f952e29ecb3a530851d5c76dfb6097185",
   "telegram_bot_stack/cli/utils/deployment.py": "9950f45f8a454034a167f335b2968d5c88b0ac7d4fdc0232315270da4e5b1f27",
   ".vscode/README.md": "604518c008aed67939b76d51056f46e5ba0008b7424a2fa8189cd23b50ff97f0",
   "CHANGELOG.md": "d0d2314d4c37c189f319c18282bfb530e1ddb110675a077fa42a12c18c97fcc5",
-  "pyproject.toml": "85786ade18954d55a161bcb41ed5835320c84141d64a37544c6755481a0d8635"
+  "pyproject.toml": "85786ade18954d55a161bcb41ed5835320c84141d64a37544c6755481a0d8635",
+  ".github/PROJECT_STATUS.md": "24f5e9e6fe9fc55b71ccbbeb5a7816caaee05e310be8242fe4e847d4494179bc",
+  "telegram_bot_stack/cli/utils/backup.py": "62766fbd4184202674cceda4558e66419e6e7c61beba78f69edcfaada60c0de6"
 }
