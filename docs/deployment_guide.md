@@ -112,7 +112,82 @@ This will:
 - `--backup` - Force backup before update
 - `--no-backup` - Skip automatic backup
 
-### 7. Stop Bot
+### 7. Rollback to Previous Version
+
+If an update introduces issues, rollback to the previous working version:
+
+```bash
+# Rollback to previous deployment
+telegram-bot-stack deploy rollback
+```
+
+This will:
+
+- Show version information
+- Request confirmation
+- Create backup of current data
+- Stop current bot
+- Switch to previous Docker image
+- Start bot with previous version
+
+**Rollback to Specific Version:**
+
+```bash
+# View deployment history first
+telegram-bot-stack deploy history
+
+# Rollback to specific version
+telegram-bot-stack deploy rollback --version mybot:v1234567890-abc123
+
+# Skip confirmation prompt
+telegram-bot-stack deploy rollback --yes
+```
+
+**Important:**
+
+- Rollback is only available if you have deployed at least twice
+- Previous Docker images must still exist (last 5 versions are kept)
+- Rollback automatically creates a backup before switching versions
+- Data is preserved during rollback (unless incompatible schema changes)
+
+### 8. View Deployment History
+
+Track all your deployments:
+
+```bash
+# View deployment history
+telegram-bot-stack deploy history
+
+# Limit number of versions shown
+telegram-bot-stack deploy history --limit 5
+```
+
+**Output shows:**
+
+- Version status (active/old/failed/rolled back)
+- Docker image tag
+- Git commit hash
+- Deployment timestamp
+
+**Example:**
+
+```
+📜 Deployment History
+
+Status          Docker Tag                           Git Commit  Deployed At
+✅ Active        mybot:v1706281800-abc123f           abc123f     2025-01-26 14:30:00
+📦 Old          mybot:v1706278200-def456a           def456a     2025-01-26 13:30:00
+📦 Old          mybot:v1706274600-789bcde           789bcde     2025-01-26 12:30:00
+```
+
+**Version Management:**
+
+- Automatic version tracking on every deployment
+- Last 5 deployments are kept (configurable)
+- Old Docker images are automatically cleaned up
+- Failed deployments are also tracked
+
+### 9. Stop Bot
 
 ```bash
 # Stop bot (keeps container and image)
@@ -645,6 +720,140 @@ telegram-bot-stack deploy logs
 
 **Resource allocation:** Each bot runs in its own container with separate resource limits. Ensure your VPS has enough resources (RAM, CPU) for all bots.
 
+### Version Management and Rollback Strategies
+
+Every deployment is automatically versioned and tracked. This enables safe rollbacks and deployment auditing.
+
+**How Version Tracking Works:**
+
+1. **Automatic Versioning:**
+
+   - Each deployment creates a new Docker image tag: `botname:v{timestamp}-{git-commit}`
+   - Example: `mybot:v1706281800-abc123f`
+   - Timestamp allows sorting by deployment time
+   - Git commit links deployment to code version
+
+2. **Version History:**
+
+   - Last 5 deployments are kept by default
+   - Each version tracks: timestamp, git commit, status
+   - Old Docker images are automatically cleaned up
+
+3. **Version States:**
+   - **Active** - Currently running version
+   - **Old** - Previous successful deployments
+   - **Failed** - Deployments that didn't complete
+   - **Rolled Back** - Reverted deployments
+
+**Rollback Strategies:**
+
+**1. Quick Rollback (Emergency Fix):**
+
+```bash
+# Instant rollback to previous version
+telegram-bot-stack deploy rollback --yes
+
+# No questions asked, minimal downtime
+# Creates backup automatically before rollback
+```
+
+**2. Selective Rollback (Choose Version):**
+
+```bash
+# Step 1: View deployment history
+telegram-bot-stack deploy history
+
+# Output:
+# Status     Docker Tag                      Git Commit  Deployed At
+# ✅ Active   mybot:v1706281800-abc123f      abc123f     2025-01-26 14:30:00
+# 📦 Old     mybot:v1706278200-def456a      def456a     2025-01-26 13:30:00
+# 📦 Old     mybot:v1706274600-789bcde      789bcde     2025-01-26 12:30:00
+
+# Step 2: Rollback to specific version
+telegram-bot-stack deploy rollback --version mybot:v1706274600-789bcde
+```
+
+**3. Canary Deployment (Test Before Full Rollout):**
+
+```bash
+# Deploy to staging first
+cd staging-bot/
+telegram-bot-stack deploy update
+
+# Test thoroughly
+# If issues found, rollback immediately
+telegram-bot-stack deploy rollback
+
+# If OK, deploy to production
+cd ../production-bot/
+telegram-bot-stack deploy update
+```
+
+**Best Practices:**
+
+1. **Always keep automatic backups enabled:**
+
+   ```yaml
+   # deploy.yaml
+   backup:
+     enabled: true
+     auto_backup_before_update: true
+   ```
+
+2. **Test rollback process regularly:**
+
+   ```bash
+   # Practice rollback in staging environment
+   telegram-bot-stack deploy update
+   telegram-bot-stack deploy rollback
+   telegram-bot-stack deploy update  # Re-deploy
+   ```
+
+3. **Monitor deployments:**
+
+   ```bash
+   # After deployment, watch logs
+   telegram-bot-stack deploy logs --follow
+
+   # If issues appear, rollback immediately
+   telegram-bot-stack deploy rollback --yes
+   ```
+
+4. **Keep deployment notes:**
+
+   ```bash
+   # Use git tags to mark deployments
+   git tag -a v1.2.3 -m "Fixed user authentication bug"
+   git push --tags
+
+   # View history with git info
+   telegram-bot-stack deploy history
+   git log --oneline
+   ```
+
+**Rollback Limitations:**
+
+- ⚠️ **Database Schema Changes:** If update modified database schema, rollback may fail
+- ⚠️ **Old Images Deleted:** Can only rollback to kept versions (last 5 by default)
+- ⚠️ **Data Format Changes:** If data format changed, old version may not read new data
+
+**Advanced: Manual Version Management:**
+
+```bash
+# SSH to VPS
+ssh root@your-vps-ip
+
+# List all Docker images
+docker images mybot
+
+# Manually tag specific image as latest
+docker tag mybot:v1706274600-789bcde mybot:latest
+
+# Restart with that image
+cd /opt/mybot
+docker-compose restart
+```
+
 ### Custom Domain with HTTPS
 
 Add custom domain to your bot for webhook support:
@@ -1106,6 +1315,46 @@ Logs are automatically rotated to prevent disk space issues:
 2. Verify bot token is correct: `echo $BOT_TOKEN`
 3. Check bot code for errors
 4. Ensure all dependencies are in `requirements.txt`
+5. **Rollback to previous version** if recent update caused the issue:
+   ```bash
+   telegram-bot-stack deploy rollback
+   ```
+
+### Update Broke the Bot
+
+**Problem:** Bot stopped working after an update
+
+**Solutions:**
+
+1. **Immediate fix - Rollback to previous version:**
+
+   ```bash
+   telegram-bot-stack deploy rollback --yes
+   ```
+
+2. Check what changed:
+
+   - View deployment history: `telegram-bot-stack deploy history`
+   - Compare code changes: `git diff HEAD^`
+   - Review recent commits
+
+3. Fix the issue:
+
+   - Fix code locally
+   - Test thoroughly
+   - Deploy again: `telegram-bot-stack deploy update`
+
+4. If rollback failed:
+   - Check if previous image exists: `telegram-bot-stack deploy history`
+   - Restore from backup: `telegram-bot-stack deploy restore <backup-file>`
+   - Manual rollback: SSH to VPS and use `docker images` to list available images
+
+**Prevention:**
+
+- Test updates locally before deploying
+- Use staging environment for testing
+- Keep automatic backups enabled
+- Review deployment history regularly
 
 ### Out of Memory
 

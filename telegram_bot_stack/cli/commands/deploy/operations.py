@@ -13,6 +13,7 @@ from telegram_bot_stack.cli.utils.deployment import (
     create_env_file,
 )
 from telegram_bot_stack.cli.utils.secrets import SecretsManager
+from telegram_bot_stack.cli.utils.version_tracking import VersionTracker
 from telegram_bot_stack.cli.utils.vps import VPSConnection
 
 console = Console()
@@ -233,10 +234,22 @@ if __name__ == "__main__":
                     "[dim]   (Secrets will be decrypted in-memory to shared memory during container startup)[/dim]"
                 )
 
+            # Initialize version tracker
+            version_tracker = VersionTracker(bot_name, remote_dir)
+            git_commit = version_tracker.get_current_git_commit()
+            docker_tag = version_tracker.generate_docker_tag(git_commit)
+
+            console.print(f"[dim]   Version: {docker_tag}[/dim]")
+
             # Build and start bot
             console.print("[cyan]🏗️  Building Docker image...[/cyan]")
-            if not vps.run_command(f"cd {remote_dir} && docker-compose build"):
+            # Build with specific tag
+            if not vps.run_command(
+                f"cd {remote_dir} && docker-compose build && docker tag {bot_name}:latest {docker_tag}"
+            ):
                 console.print("[red]❌ Failed to build Docker image[/red]")
+                # Track failed deployment
+                version_tracker.add_deployment(vps, docker_tag, status="failed")
                 return
 
             console.print("[green]✓ Docker image built[/green]\n")
@@ -246,9 +259,20 @@ if __name__ == "__main__":
             # Secrets are decrypted to /dev/shm (shared memory) before docker-compose starts
             if not vps.run_command(f"cd {remote_dir} && make up"):
                 console.print("[red]❌ Failed to start bot[/red]")
+                # Track failed deployment
+                version_tracker.add_deployment(vps, docker_tag, status="failed")
                 return
 
             console.print("[green]✓ Bot started[/green]\n")
+
+            # Track successful deployment
+            if version_tracker.add_deployment(vps, docker_tag, status="active"):
+                console.print("[dim]   Deployment version saved[/dim]")
+
+            # Cleanup old Docker images
+            removed = version_tracker.cleanup_old_images(vps)
+            if removed > 0:
+                console.print(f"[dim]   Cleaned up {removed} old Docker image(s)[/dim]")
 
             # Show status
             console.print("[cyan]📊 Checking bot status...[/cyan]")
@@ -304,6 +328,13 @@ def update(config: str, verbose: bool, backup: bool, no_backup: bool) -> None:
         bot_name = deploy_config.get("bot.name")
         remote_dir = f"/opt/{bot_name}"
 
+        # Initialize version tracker
+        version_tracker = VersionTracker(bot_name, remote_dir)
+        git_commit = version_tracker.get_current_git_commit()
+        docker_tag = version_tracker.generate_docker_tag(git_commit)
+
+        console.print(f"[dim]   New version: {docker_tag}[/dim]")
+
         # Auto-backup before update (if enabled and not explicitly disabled)
         auto_backup_enabled = deploy_config.get(
             "backup.auto_backup_before_update", True
@@ -346,10 +377,27 @@ def update(config: str, verbose: bool, backup: bool, no_backup: bool) -> None:
 
             # Rebuild and restart
             console.print("[cyan]🏗️  Rebuilding Docker image...[/cyan]")
-            vps.run_command(f"cd {remote_dir} && docker-compose build")
+            if not vps.run_command(
+                f"cd {remote_dir} && docker-compose build && docker tag {bot_name}:latest {docker_tag}"
+            ):
+                console.print("[red]❌ Failed to build Docker image[/red]")
+                version_tracker.add_deployment(vps, docker_tag, status="failed")
+                return
 
             console.print("[cyan]🔄 Restarting bot...[/cyan]")
-            vps.run_command(f"cd {remote_dir} && docker-compose up -d")
+            if not vps.run_command(f"cd {remote_dir} && docker-compose up -d"):
+                console.print("[red]❌ Failed to restart bot[/red]")
+                version_tracker.add_deployment(vps, docker_tag, status="failed")
+                return
+
+            # Track successful update
+            if version_tracker.add_deployment(vps, docker_tag, status="active"):
+                console.print("[dim]   Deployment version saved[/dim]")
+
+            # Cleanup old Docker images
+            removed = version_tracker.cleanup_old_images(vps)
+            if removed > 0:
+                console.print(f"[dim]   Cleaned up {removed} old Docker image(s)[/dim]")
 
             console.print("\n[green]✅ Bot updated successfully![/green]")
 
@@ -408,6 +456,227 @@ def down(config: str, cleanup: bool, backup: bool, no_backup: bool) -> None:
             console.print("[cyan]Stopping bot...[/cyan]")
             vps.run_command(f"cd {remote_dir} && docker-compose down")
             console.print("[green]✓ Bot stopped[/green]")
+
+    finally:
+        vps.close()
+
+
+@click.command()
+@click.option("--config", default="deploy.yaml", help="Deployment config file")
+@click.option("--version", "-v", help="Specific version to rollback to (Docker tag)")
+@click.option("--yes", "-y", is_flag=True, help="Skip confirmation prompt")
+def rollback(config: str, version: str, yes: bool) -> None:
+    """Rollback to previous deployment version.
+
+    Example:
+        # Rollback to previous version
+        telegram-bot-stack deploy rollback
+
+        # Rollback to specific version
+        telegram-bot-stack deploy rollback --version mybot:v1234567890-abc123
+    """
+    console.print("🔄 [bold cyan]Rolling back deployment...[/bold cyan]\n")
+
+    # Load configuration
+    if not Path(config).exists():
+        console.print(f"[red]❌ Configuration file not found: {config}[/red]")
+        return
+
+    deploy_config = DeploymentConfig(config)
+
+    # Connect to VPS
+    vps = VPSConnection(
+        host=deploy_config.get("vps.host"),
+        user=deploy_config.get("vps.user"),
+        ssh_key=deploy_config.get("vps.ssh_key"),
+        port=deploy_config.get("vps.port", 22),
+    )
+
+    try:
+        if not vps.test_connection():
+            console.print("[red]❌ Failed to connect to VPS[/red]")
+            return
+
+        bot_name = deploy_config.get("bot.name")
+        remote_dir = f"/opt/{bot_name}"
+
+        # Initialize version tracker
+        version_tracker = VersionTracker(bot_name, remote_dir)
+
+        # Get target version
+        if version:
+            # Rollback to specific version
+            target_version = version_tracker.get_version_by_tag(vps, version)
+            if not target_version:
+                console.print(f"[red]❌ Version not found: {version}[/red]")
+                console.print(
+                    "\n[yellow]Run 'telegram-bot-stack deploy history' to see available versions[/yellow]"
+                )
+                return
+        else:
+            # Rollback to previous version
+            target_version = version_tracker.get_previous_version(vps)
+            if not target_version:
+                console.print("[red]❌ No previous version found for rollback[/red]")
+                console.print(
+                    "\n[yellow]Run 'telegram-bot-stack deploy history' to see available versions[/yellow]"
+                )
+                return
+
+        # Show rollback information
+        console.print("[bold]Rollback Information:[/bold]")
+        console.print(f"  Version: {target_version.docker_tag}")
+        console.print(f"  Git Commit: {target_version.git_commit}")
+        console.print(f"  Deployed: {target_version.deployed_at}")
+        console.print()
+
+        # Confirm rollback
+        if not yes:
+            from rich.prompt import Confirm
+
+            if not Confirm.ask(
+                "[yellow]⚠️  Are you sure you want to rollback?[/yellow]",
+                default=False,
+            ):
+                console.print("[yellow]Rollback cancelled[/yellow]")
+                return
+
+        # Create backup before rollback
+        console.print("[cyan]📦 Creating backup before rollback...[/cyan]")
+        backup_manager = BackupManager(bot_name, remote_dir)
+        backup_manager.create_backup(vps, auto_backup=True)
+        console.print()
+
+        # Stop current bot
+        console.print("[cyan]🛑 Stopping current bot...[/cyan]")
+        vps.run_command(f"cd {remote_dir} && docker-compose down")
+
+        # Update docker-compose to use old image
+        console.print(
+            f"[cyan]🔄 Switching to version {target_version.docker_tag}...[/cyan]"
+        )
+
+        # Tag the old image as latest
+        if not vps.run_command(
+            f"docker tag {target_version.docker_tag} {bot_name}:latest"
+        ):
+            console.print("[red]❌ Failed to switch image tag[/red]")
+            console.print(
+                "[yellow]⚠️  Image may have been removed. Try specifying a version that exists.[/yellow]"
+            )
+            return
+
+        # Start bot with rolled back version
+        console.print("[cyan]🚀 Starting bot with previous version...[/cyan]")
+        if not vps.run_command(f"cd {remote_dir} && make up"):
+            console.print("[red]❌ Failed to start bot[/red]")
+            return
+
+        console.print("[green]✓ Bot started with previous version[/green]\n")
+
+        # Update version status
+        version_tracker.mark_version_status(
+            vps, target_version.docker_tag, status="active"
+        )
+        console.print("[dim]   Version status updated[/dim]")
+
+        # Show status
+        console.print("[cyan]📊 Checking bot status...[/cyan]")
+        vps.run_command(f"cd {remote_dir} && docker-compose ps")
+
+        console.print("\n[green]✅ Rollback successful![/green]\n")
+        console.print("[bold]Useful commands:[/bold]")
+        console.print("  View logs:   [cyan]telegram-bot-stack deploy logs[/cyan]")
+        console.print("  Check status: [cyan]telegram-bot-stack deploy status[/cyan]")
+        console.print("  View history: [cyan]telegram-bot-stack deploy history[/cyan]")
+
+    finally:
+        vps.close()
+
+
+@click.command()
+@click.option("--config", default="deploy.yaml", help="Deployment config file")
+@click.option("--limit", "-n", default=10, help="Number of versions to show")
+def history(config: str, limit: int) -> None:
+    """Show deployment history.
+
+    Example:
+        telegram-bot-stack deploy history
+    """
+    console.print("📜 [bold cyan]Deployment History[/bold cyan]\n")
+
+    # Load configuration
+    if not Path(config).exists():
+        console.print(f"[red]❌ Configuration file not found: {config}[/red]")
+        return
+
+    deploy_config = DeploymentConfig(config)
+
+    # Connect to VPS
+    vps = VPSConnection(
+        host=deploy_config.get("vps.host"),
+        user=deploy_config.get("vps.user"),
+        ssh_key=deploy_config.get("vps.ssh_key"),
+        port=deploy_config.get("vps.port", 22),
+    )
+
+    try:
+        if not vps.test_connection():
+            console.print("[red]❌ Failed to connect to VPS[/red]")
+            return
+
+        bot_name = deploy_config.get("bot.name")
+        remote_dir = f"/opt/{bot_name}"
+
+        # Load deployment history
+        version_tracker = VersionTracker(bot_name, remote_dir)
+        versions = version_tracker.load_history(vps)
+
+        if not versions:
+            console.print("[yellow]No deployment history found[/yellow]")
+            console.print("\n[dim]Deploy your bot to start tracking versions:[/dim]")
+            console.print("[cyan]telegram-bot-stack deploy up[/cyan]")
+            return
+
+        # Show versions
+        from rich.table import Table
+
+        table = Table(show_header=True, header_style="bold cyan")
+        table.add_column("Status", width=12)
+        table.add_column("Docker Tag", width=35)
+        table.add_column("Git Commit", width=10)
+        table.add_column("Deployed At", width=20)
+
+        for version in versions[:limit]:
+            # Add status emoji
+            status_display = {
+                "active": "✅ Active",
+                "old": "📦 Old",
+                "failed": "❌ Failed",
+                "rolled_back": "🔄 Rolled Back",
+            }.get(version.status, version.status)
+
+            table.add_row(
+                status_display,
+                version.docker_tag,
+                version.git_commit,
+                version.deployed_at,
+            )
+
+        console.print(table)
+        console.print(
+            f"\n[dim]Showing {min(len(versions), limit)} of {len(versions)} versions[/dim]"
+        )
+
+        # Show rollback hint
+        if len(versions) > 1:
+            console.print("\n[bold]Rollback commands:[/bold]")
+            console.print(
+                "  Previous version: [cyan]telegram-bot-stack deploy rollback[/cyan]"
+            )
+            console.print(
+                "  Specific version: [cyan]telegram-bot-stack deploy rollback --version <tag>[/cyan]"
+            )
 
     finally:
         vps.close()
