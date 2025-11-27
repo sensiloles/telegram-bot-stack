@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.23.0 (2025-11-27)
+
+### Features
+
+- **deploy**: Add backup and restore commands for bot data
+  ([`0bcfd84`](https://github.com/sensiloles/telegram-bot-stack/commit/0bcfd8464f69efa564c9b6ee8cf69a0aceb5893d))
+
+
 ## v1.22.1 (2025-11-27)
 
 ### Bug Fixes
