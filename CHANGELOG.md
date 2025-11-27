@@ -2,6 +2,19 @@
 
 <!-- version list -->
 
+## v1.22.0 (2025-11-27)
+
+### Continuous Integration
+
+- Trigger workflows after making repository public
+  ([`0ff4c2c`](https://github.com/sensiloles/telegram-bot-stack/commit/0ff4c2c3d87547d2027c8d96dd4b2a38d2bf9170))
+
+### Features
+
+- **deploy**: Add secrets management for secure token storage
+  ([`d7a95e2`](https://github.com/sensiloles/telegram-bot-stack/commit/d7a95e2d68d11e4492528bd95f394110adbd82e0))
+
+
 ## v1.21.1 (2025-11-26)
 
 ### Bug Fixes
