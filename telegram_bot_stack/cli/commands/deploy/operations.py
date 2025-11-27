@@ -184,7 +184,7 @@ def up(config: str, verbose: bool) -> None:
             # Show status
             console.print("[cyan]📊 Checking bot status...[/cyan]")
             if deployment_method == "docker":
-                vps.run_command(f"cd {remote_dir} && docker-compose ps")
+                vps.run_command(f"cd {remote_dir} && make status")
             elif deployment_method == "systemd":
                 vps.run_command(f"systemctl status {bot_name} --no-pager -l")
 
@@ -332,9 +332,7 @@ if __name__ == "__main__":
 
     # Build and start bot
     console.print("[cyan]🏗️  Building Docker image...[/cyan]")
-    if not vps.run_command(
-        f"cd {remote_dir} && docker-compose build && docker tag {bot_name}:latest {docker_tag}"
-    ):
+    if not vps.run_command(f"cd {remote_dir} && make build-tag TAG={docker_tag}"):
         console.print("[red]❌ Failed to build Docker image[/red]")
         version_tracker.add_deployment(vps, docker_tag, status="failed")
         return False
@@ -509,14 +507,14 @@ def update(config: str, verbose: bool, backup: bool, no_backup: bool) -> None:
             # Rebuild and restart
             console.print("[cyan]🏗️  Rebuilding Docker image...[/cyan]")
             if not vps.run_command(
-                f"cd {remote_dir} && docker-compose build && docker tag {bot_name}:latest {docker_tag}"
+                f"cd {remote_dir} && make build-tag TAG={docker_tag}"
             ):
                 console.print("[red]❌ Failed to build Docker image[/red]")
                 version_tracker.add_deployment(vps, docker_tag, status="failed")
                 return
 
             console.print("[cyan]🔄 Restarting bot...[/cyan]")
-            if not vps.run_command(f"cd {remote_dir} && docker-compose up -d"):
+            if not vps.run_command(f"cd {remote_dir} && make up"):
                 console.print("[red]❌ Failed to restart bot[/red]")
                 version_tracker.add_deployment(vps, docker_tag, status="failed")
                 return
@@ -581,11 +579,11 @@ def down(config: str, cleanup: bool, backup: bool, no_backup: bool) -> None:
         # Stop bot
         if cleanup:
             console.print("[cyan]Stopping and removing containers...[/cyan]")
-            vps.run_command(f"cd {remote_dir} && docker-compose down -v --rmi all")
+            vps.run_command(f"cd {remote_dir} && make clean")
             console.print("[green]✓ Bot stopped and cleaned up[/green]")
         else:
             console.print("[cyan]Stopping bot...[/cyan]")
-            vps.run_command(f"cd {remote_dir} && docker-compose down")
+            vps.run_command(f"cd {remote_dir} && make down")
             console.print("[green]✓ Bot stopped[/green]")
 
     finally:
@@ -680,7 +678,7 @@ def rollback(config: str, version: str, yes: bool) -> None:
 
         # Stop current bot
         console.print("[cyan]🛑 Stopping current bot...[/cyan]")
-        vps.run_command(f"cd {remote_dir} && docker-compose down")
+        vps.run_command(f"cd {remote_dir} && make down")
 
         # Update docker-compose to use old image
         console.print(
@@ -713,7 +711,7 @@ def rollback(config: str, version: str, yes: bool) -> None:
 
         # Show status
         console.print("[cyan]📊 Checking bot status...[/cyan]")
-        vps.run_command(f"cd {remote_dir} && docker-compose ps")
+        vps.run_command(f"cd {remote_dir} && make status")
 
         console.print("\n[green]✅ Rollback successful![/green]\n")
         console.print("[bold]Useful commands:[/bold]")
