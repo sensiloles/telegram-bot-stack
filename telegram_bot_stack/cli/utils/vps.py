@@ -5,6 +5,7 @@ Handles SSH connections, file transfers, and remote command execution.
 """
 
 import os
+import shlex
 from pathlib import Path
 from typing import Any, Dict, Optional
 
@@ -160,14 +161,24 @@ class VPSConnection:
             conn = self.connect()
 
             # Create remote directory if it doesn't exist
-            conn.run(f"mkdir -p {remote_path}", hide=True)
+            # Properly escape remote_path to prevent command injection
+            conn.run(f"mkdir -p {shlex.quote(remote_path)}", hide=True)
 
             # Use rsync for efficient file transfer
             console.print(f"[cyan]Transferring files to {remote_path}...[/cyan]")
 
             # Build rsync command
-            ssh_key_arg = f"-e 'ssh -i {self.ssh_key}'" if self.ssh_key else ""
-            rsync_cmd = f"rsync -avz --delete {ssh_key_arg} {local_path}/ {self.user}@{self.host}:{remote_path}/"
+            # Properly escape all paths and SSH key to prevent command injection
+            if self.ssh_key:
+                ssh_key_quoted = shlex.quote(self.ssh_key)
+                # rsync -e option expects a shell command string
+                ssh_cmd = f"ssh -i {ssh_key_quoted}"
+                ssh_key_arg = f"-e {shlex.quote(ssh_cmd)}"
+            else:
+                ssh_key_arg = ""
+            local_path_quoted = shlex.quote(str(local_path))
+            remote_path_quoted = shlex.quote(remote_path)
+            rsync_cmd = f"rsync -avz --delete {ssh_key_arg} {local_path_quoted}/ {self.user}@{self.host}:{remote_path_quoted}/"
 
             os.system(rsync_cmd)
 
@@ -175,6 +186,61 @@ class VPSConnection:
             return True
         except Exception as e:
             console.print(f"[red]File transfer failed: {e}[/red]")
+            return False
+
+    def write_file(self, content: str, remote_path: str, mode: str = "644") -> bool:
+        """Write file content to VPS.
+
+        Args:
+            content: File content to write
+            remote_path: Remote file path
+            mode: File permissions (default: 644)
+
+        Returns:
+            True if successful, False otherwise
+        """
+        try:
+            conn = self.connect()
+
+            # Create remote directory if needed
+            remote_dir = "/".join(remote_path.split("/")[:-1])
+            if remote_dir:
+                # Properly escape remote_dir to prevent command injection
+                conn.run(f"mkdir -p {shlex.quote(remote_dir)}", hide=True)
+
+            # Write to temporary file first, then move (atomic operation)
+            temp_file = f"{remote_path}.tmp"
+
+            # Use base64 encoding to avoid shell escaping issues
+            import base64
+
+            content_b64 = base64.b64encode(content.encode("utf-8")).decode("ascii")
+            # Pass paths as command-line arguments to avoid shell/Python string escaping issues
+            # This prevents command injection by avoiding string interpolation in Python code
+            temp_file_quoted = shlex.quote(temp_file)
+            content_b64_quoted = shlex.quote(content_b64)
+            python_cmd = (
+                f'python3 -c "'
+                f"import sys, base64; "
+                f"temp_file=sys.argv[1]; "
+                f"content_b64=sys.argv[2]; "
+                f"f=open(temp_file, 'w'); "
+                f"f.write(base64.b64decode(content_b64).decode()); "
+                f"f.close()"
+                f'" -- {temp_file_quoted} {content_b64_quoted}'
+            )
+            conn.run(python_cmd, hide=True)
+
+            # Move to final location and set permissions
+            # Properly escape file paths to prevent command injection
+            conn.run(
+                f"mv {shlex.quote(temp_file)} {shlex.quote(remote_path)}", hide=True
+            )
+            conn.run(f"chmod {mode} {shlex.quote(remote_path)}", hide=True)
+
+            return True
+        except Exception as e:
+            console.print(f"[red]Failed to write file: {e}[/red]")
             return False
 
     def close(self) -> None:

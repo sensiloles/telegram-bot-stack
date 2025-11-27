@@ -37,10 +37,23 @@ Bot Token (from @BotFather): 1234567890:ABCdefGHIjklMNOpqrsTUVwxyz
 ✅ Configuration saved to deploy.yaml
 ```
 
-### 2. Deploy to VPS
+### 2. Set Secrets (Recommended)
+
+For secure production deployment, use secrets management:
+
+```bash
+telegram-bot-stack deploy secrets set BOT_TOKEN "your-bot-token-here"
+```
+
+Alternatively, you can use environment variables (less secure):
 
 ```bash
 export BOT_TOKEN="your-bot-token-here"
+```
+
+### 3. Deploy to VPS
+
+```bash
 telegram-bot-stack deploy up
 ```
 
@@ -54,7 +67,7 @@ This will:
 
 **First deployment takes ~5 minutes. Updates take ~2 minutes.**
 
-### 3. Check Status
+### 4. Check Status
 
 ```bash
 telegram-bot-stack deploy status
@@ -66,7 +79,7 @@ Shows:
 - Resource usage (CPU, memory)
 - Recent logs
 
-### 4. View Logs
+### 5. View Logs
 
 ```bash
 # View last 50 lines
@@ -79,7 +92,7 @@ telegram-bot-stack deploy logs --follow
 telegram-bot-stack deploy logs --tail 100
 ```
 
-### 5. Update Bot
+### 6. Update Bot
 
 After making changes to your bot code:
 
@@ -93,7 +106,7 @@ This will:
 - Rebuild Docker image
 - Restart bot container (minimal downtime)
 
-### 6. Stop Bot
+### 7. Stop Bot
 
 ```bash
 # Stop bot (keeps container and image)
@@ -153,6 +166,68 @@ export CUSTOM_VAR="value"
 ```
 
 These will be automatically added to the `.env` file on VPS.
+
+### Secrets Management (Recommended)
+
+For production deployments, use the secure secrets management system instead of environment variables:
+
+**1. Initialize deployment (generates encryption key):**
+
+```bash
+telegram-bot-stack deploy init
+```
+
+This automatically generates an encryption key and stores it in `deploy.yaml`.
+
+**2. Set secrets on VPS:**
+
+```bash
+# Set bot token
+telegram-bot-stack deploy secrets set BOT_TOKEN "your-bot-token-here"
+
+# Set additional secrets
+telegram-bot-stack deploy secrets set DB_PASSWORD "secure-password"
+```
+
+**3. List stored secrets:**
+
+```bash
+telegram-bot-stack deploy secrets list
+```
+
+Shows secret names only (values are hidden for security).
+
+**4. Get secret value (for debugging):**
+
+```bash
+telegram-bot-stack deploy secrets get BOT_TOKEN
+```
+
+**5. Remove secret:**
+
+```bash
+telegram-bot-stack deploy secrets remove BOT_TOKEN
+```
+
+**How it works:**
+
+- Secrets are encrypted using Fernet (symmetric encryption)
+- Encrypted version stored in `/opt/{bot_name}/.secrets.env.encrypted` on VPS with 600 permissions (owner read/write only)
+- During container startup, secrets are decrypted **in-memory** to `/dev/shm` (shared memory, RAM-based, not persisted to disk)
+- Decrypted secrets are only available during container startup and never written to persistent storage
+- Automatically loaded into Docker container via symlink from shared memory
+- Not visible in `docker inspect` or process list
+
+**Security benefits:**
+
+- ✅ Secrets encrypted at rest on VPS (only encrypted version on filesystem)
+- ✅ Decrypted secrets stored in RAM (`/dev/shm`) - cleared on reboot, never on disk
+- ✅ Secure file permissions (600) for both encrypted and decrypted versions
+- ✅ Not visible in environment variables or Docker inspect
+- ✅ No plain text secrets ever written to persistent storage
+- ✅ No need to export tokens before every deployment
+
+**Important:** Keep `deploy.yaml` secure - it contains your encryption key!
 
 ## VPS Providers
 

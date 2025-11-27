@@ -12,6 +12,7 @@ from rich.console import Console
 from rich.prompt import Confirm, Prompt
 
 from telegram_bot_stack.cli.utils.deployment import DeploymentConfig
+from telegram_bot_stack.cli.utils.secrets import SecretsManager
 from telegram_bot_stack.cli.utils.vps import VPSConnection
 
 console = Console()
@@ -64,14 +65,18 @@ def init(
     console.print("\n[cyan]Testing SSH connection...[/cyan]")
     vps = VPSConnection(host=host, user=user, ssh_key=ssh_key, port=port)
 
-    if not vps.test_connection():
-        console.print("[red]❌ SSH connection failed[/red]")
-        console.print(
-            "\n[yellow]Please check your VPS details and SSH key permissions[/yellow]"
-        )
-        return
+    try:
+        if not vps.test_connection():
+            console.print("[red]❌ SSH connection failed[/red]")
+            console.print(
+                "\n[yellow]Please check your VPS details and SSH key permissions[/yellow]"
+            )
+            return
 
-    console.print("[green]✓ SSH connection successful[/green]")
+        console.print("[green]✓ SSH connection successful[/green]")
+    finally:
+        # Always close VPS connection
+        vps.close()
 
     # Create deployment configuration
     config = DeploymentConfig("deploy.yaml")
@@ -95,6 +100,10 @@ def init(
     config.set("logging.max_files", "5")
     config.set("environment.timezone", "UTC")
 
+    # Generate encryption key for secrets management
+    encryption_key = SecretsManager.generate_key()
+    config.set("secrets.encryption_key", encryption_key)
+
     config.save()
 
     # Copy example deploy.yaml for reference
@@ -105,11 +114,17 @@ def init(
         console.print("[dim]ℹ️  deploy.yaml.example copied for reference[/dim]")
 
     console.print("\n[green]✅ Configuration saved to deploy.yaml[/green]")
+    console.print("[green]✅ Encryption key generated for secrets management[/green]")
     console.print("\n[bold]Next steps:[/bold]")
     console.print("1. Review deploy.yaml and adjust settings if needed")
-    console.print(f"2. Set {bot_token_env} environment variable")
+    console.print(
+        "2. Set secrets on VPS: [cyan]telegram-bot-stack deploy secrets set BOT_TOKEN 'your-token'[/cyan]"
+    )
     console.print("3. Run: [cyan]telegram-bot-stack deploy up[/cyan]")
     console.print("\n[dim]See deploy.yaml.example for all available options[/dim]")
+    console.print(
+        "[yellow]⚠️  Keep deploy.yaml secure - it contains your encryption key![/yellow]"
+    )
 
 
 @deploy.command()
@@ -140,112 +155,233 @@ def up(config: str, verbose: bool) -> None:
         port=deploy_config.get("vps.port", 22),
     )
 
-    if not vps.test_connection():
-        console.print("[red]❌ Failed to connect to VPS[/red]")
+    try:
+        if not vps.test_connection():
+            console.print("[red]❌ Failed to connect to VPS[/red]")
+            return
+
+        console.print("[green]✓ Connected to VPS[/green]\n")
+
+        # Check and install Docker if needed
+        console.print("[cyan]🐳 Checking Docker installation...[/cyan]")
+        if not vps.check_docker_installed():
+            console.print("[yellow]Docker not found, installing...[/yellow]")
+            if not vps.install_docker():
+                console.print("[red]❌ Failed to install Docker[/red]")
+                return
+        else:
+            console.print("[green]✓ Docker is installed[/green]\n")
+
+        # Prepare deployment directory
+        bot_name = deploy_config.get("bot.name")
+        remote_dir = f"/opt/{bot_name}"
+
+        console.print(f"[cyan]📦 Preparing deployment directory: {remote_dir}[/cyan]")
+        vps.run_command(f"mkdir -p {remote_dir}")
+
+        # Generate Docker files from templates
+        console.print("[cyan]📝 Generating Docker configuration...[/cyan]")
+        from telegram_bot_stack.cli.utils.deployment import (
+            DockerTemplateRenderer,
+            create_env_file,
+        )
+
+        temp_dir = Path(".deploy-temp")
+        temp_dir.mkdir(exist_ok=True)
+
+        try:
+            # Render templates
+            renderer = DockerTemplateRenderer(deploy_config)
+            renderer.render_all(temp_dir)
+
+            # Create .env file (secrets will be loaded from .secrets.env on VPS)
+            env_file = temp_dir / ".env"
+            create_env_file(deploy_config, env_file)
+
+            console.print("[green]✓ Docker configuration generated[/green]\n")
+
+            # Transfer files to VPS
+            console.print("[cyan]📤 Transferring files to VPS...[/cyan]")
+
+            # Copy current directory files to temp
+            for item in Path.cwd().iterdir():
+                if item.name not in [
+                    ".git",
+                    ".venv",
+                    "venv",
+                    "__pycache__",
+                    ".deploy-temp",
+                    "logs",
+                    ".pytest_cache",
+                    "htmlcov",
+                    ".secrets.env",  # Exclude - encrypted version exists on VPS
+                ]:
+                    if item.is_file():
+                        shutil.copy2(item, temp_dir)
+                    elif item.is_dir():
+                        shutil.copytree(item, temp_dir / item.name, dirs_exist_ok=True)
+
+            # Transfer to VPS
+            if not vps.transfer_files(temp_dir, remote_dir):
+                console.print("[red]❌ Failed to transfer files[/red]")
+                return
+
+            console.print("[green]✓ Files transferred[/green]\n")
+
+            # Create decryption script that decrypts secrets in-memory during container startup
+            # This ensures secrets remain encrypted at rest on VPS filesystem
+            encryption_key = deploy_config.get("secrets.encryption_key")
+            has_secrets = False
+
+            if encryption_key:
+                secrets_manager = SecretsManager(bot_name, remote_dir, encryption_key)
+                # Check if secrets exist (without decrypting)
+                encrypted_secrets = secrets_manager.list_secrets(
+                    vps, return_values=False
+                )
+                has_secrets = len(encrypted_secrets) > 0
+
+            # Create Python script that decrypts secrets in-memory and outputs to stdout
+            # This script runs during container startup, never writes plain text to filesystem
+            # Escape encryption_key for use in Python string (handle None case)
+            encryption_key_str = encryption_key if encryption_key else ""
+            # Escape backslashes and quotes for Python string literal
+            encryption_key_escaped = encryption_key_str.replace("\\", "\\\\").replace(
+                '"', '\\"'
+            )
+
+            decrypt_script = f"""#!/usr/bin/env python3
+\"\"\"
+Decrypt secrets in-memory and output as environment variables.
+This script is executed during container startup to decrypt secrets
+without writing plain text to the filesystem.
+\"\"\"
+import os
+import sys
+from pathlib import Path
+
+# Import cryptography for decryption
+try:
+    from cryptography.fernet import Fernet
+except ImportError:
+    print("# Error: cryptography not available", file=sys.stderr)
+    sys.exit(1)
+
+def decrypt_secrets():
+    \"\"\"Decrypt secrets from encrypted file and output as env file format.\"\"\"
+    remote_dir = "{remote_dir}"
+    secrets_file = f"{{remote_dir}}/.secrets.env.encrypted"
+    encryption_key = "{encryption_key_escaped}"
+
+    if not encryption_key:
         return
 
-    console.print("[green]✓ Connected to VPS[/green]\n")
-
-    # Check and install Docker if needed
-    console.print("[cyan]🐳 Checking Docker installation...[/cyan]")
-    if not vps.check_docker_installed():
-        console.print("[yellow]Docker not found, installing...[/yellow]")
-        if not vps.install_docker():
-            console.print("[red]❌ Failed to install Docker[/red]")
-            return
-    else:
-        console.print("[green]✓ Docker is installed[/green]\n")
-
-    # Prepare deployment directory
-    bot_name = deploy_config.get("bot.name")
-    remote_dir = f"/opt/{bot_name}"
-
-    console.print(f"[cyan]📦 Preparing deployment directory: {remote_dir}[/cyan]")
-    vps.run_command(f"mkdir -p {remote_dir}")
-
-    # Generate Docker files from templates
-    console.print("[cyan]📝 Generating Docker configuration...[/cyan]")
-    from telegram_bot_stack.cli.utils.deployment import (
-        DockerTemplateRenderer,
-        create_env_file,
-    )
-
-    temp_dir = Path(".deploy-temp")
-    temp_dir.mkdir(exist_ok=True)
+    # Read encrypted secrets file
+    if not Path(secrets_file).exists():
+        return
 
     try:
-        # Render templates
-        renderer = DockerTemplateRenderer(deploy_config)
-        renderer.render_all(temp_dir)
+        fernet = Fernet(encryption_key.encode())
 
-        # Create .env file
-        env_file = temp_dir / ".env"
-        create_env_file(deploy_config, env_file)
+        with open(secrets_file, "r") as f:
+            for line in f:
+                line = line.strip()
+                if not line or line.startswith("#"):
+                    continue
 
-        console.print("[green]✓ Docker configuration generated[/green]\n")
+                if "=" in line:
+                    key, encrypted_value = line.split("=", 1)
+                    key = key.strip()
+                    encrypted_value = encrypted_value.strip()
 
-        # Transfer files to VPS
-        console.print("[cyan]📤 Transferring files to VPS...[/cyan]")
+                    try:
+                        decrypted_value = fernet.decrypt(encrypted_value.encode()).decode()
+                        # Output as KEY=VALUE (properly escaped for .env file format)
+                        # Simple escaping: quote if contains special characters
+                        needs_quoting = any(
+                            char in decrypted_value
+                            for char in ["\\n", "\\r", "\\t", '"', "\\\\", " ", "#", "=", "$", "`"]
+                        )
 
-        # Copy current directory files to temp
-        for item in Path.cwd().iterdir():
-            if item.name not in [
-                ".git",
-                ".venv",
-                "venv",
-                "__pycache__",
-                ".deploy-temp",
-                "logs",
-                ".pytest_cache",
-                "htmlcov",
-            ]:
-                if item.is_file():
-                    shutil.copy2(item, temp_dir)
-                elif item.is_dir():
-                    shutil.copytree(item, temp_dir / item.name, dirs_exist_ok=True)
+                        if needs_quoting:
+                            # Build escaped value step by step
+                            temp_val = decrypted_value.replace("\\\\", "\\\\\\\\")
+                            temp_val = temp_val.replace('"', '\\\\"')
+                            temp_val = temp_val.replace("\\n", "\\\\n")
+                            temp_val = temp_val.replace("\\r", "\\\\r")
+                            temp_val = temp_val.replace("\\t", "\\\\t")
+                            temp_val = temp_val.replace("$", "\\\\$")
+                            temp_val = temp_val.replace("`", "\\\\`")
+                            output_value = '"' + temp_val + '"'
+                        else:
+                            output_value = decrypted_value
+                        # Use format to avoid f-string nesting issues
+                        print("{{}}={{}}".format(key, output_value))
+                    except Exception as e:
+                        print(f"# Warning: Failed to decrypt {{key}}: {{e}}", file=sys.stderr)
+    except Exception as e:
+        print(f"# Error decrypting secrets: {{e}}", file=sys.stderr)
 
-        # Transfer to VPS
-        if not vps.transfer_files(temp_dir, remote_dir):
-            console.print("[red]❌ Failed to transfer files[/red]")
-            return
+if __name__ == "__main__":
+    decrypt_secrets()
+"""
 
-        console.print("[green]✓ Files transferred[/green]\n")
+            decrypt_script_path = f"{remote_dir}/decrypt_secrets.py"
+            if vps.write_file(decrypt_script, decrypt_script_path, mode="700"):
+                console.print("[green]✓ Created secrets decryption script[/green]")
+            else:
+                console.print(
+                    "[yellow]⚠️  Warning: Could not create decryption script[/yellow]"
+                )
 
-        # Build and start bot
-        console.print("[cyan]🏗️  Building Docker image...[/cyan]")
-        if not vps.run_command(f"cd {remote_dir} && docker-compose build"):
-            console.print("[red]❌ Failed to build Docker image[/red]")
-            return
+            # Note: Makefile template now handles decryption via decrypt_secrets.py
+            # Secrets are decrypted to /dev/shm (shared memory, RAM-based, not persisted)
+            if has_secrets:
+                console.print(
+                    "[dim]   (Secrets will be decrypted in-memory to shared memory during container startup)[/dim]"
+                )
 
-        console.print("[green]✓ Docker image built[/green]\n")
+            # Build and start bot
+            console.print("[cyan]🏗️  Building Docker image...[/cyan]")
+            if not vps.run_command(f"cd {remote_dir} && docker-compose build"):
+                console.print("[red]❌ Failed to build Docker image[/red]")
+                return
 
-        console.print("[cyan]🚀 Starting bot...[/cyan]")
-        if not vps.run_command(f"cd {remote_dir} && docker-compose up -d"):
-            console.print("[red]❌ Failed to start bot[/red]")
-            return
+            console.print("[green]✓ Docker image built[/green]\n")
 
-        console.print("[green]✓ Bot started[/green]\n")
+            console.print("[cyan]🚀 Starting bot...[/cyan]")
+            # Makefile handles secrets decryption via decrypt_secrets.py
+            # Secrets are decrypted to /dev/shm (shared memory) before docker-compose starts
+            if not vps.run_command(f"cd {remote_dir} && make up"):
+                console.print("[red]❌ Failed to start bot[/red]")
+                return
 
-        # Show status
-        console.print("[cyan]📊 Checking bot status...[/cyan]")
-        vps.run_command(f"cd {remote_dir} && docker-compose ps")
+            console.print("[green]✓ Bot started[/green]\n")
 
-        console.print("\n[green]🎉 Deployment successful![/green]\n")
-        console.print("[bold]Bot Information:[/bold]")
-        console.print(f"  Name: {bot_name}")
-        console.print(f"  Host: {deploy_config.get('vps.host')}")
-        console.print(f"  Directory: {remote_dir}")
-        console.print("\n[bold]Useful commands:[/bold]")
-        console.print("  View logs:   [cyan]telegram-bot-stack deploy logs[/cyan]")
-        console.print("  Check status: [cyan]telegram-bot-stack deploy status[/cyan]")
-        console.print("  Stop bot:    [cyan]telegram-bot-stack deploy down[/cyan]")
+            # Show status
+            console.print("[cyan]📊 Checking bot status...[/cyan]")
+            vps.run_command(f"cd {remote_dir} && docker-compose ps")
+
+            console.print("\n[green]🎉 Deployment successful![/green]\n")
+            console.print("[bold]Bot Information:[/bold]")
+            console.print(f"  Name: {bot_name}")
+            console.print(f"  Host: {deploy_config.get('vps.host')}")
+            console.print(f"  Directory: {remote_dir}")
+            console.print("\n[bold]Useful commands:[/bold]")
+            console.print("  View logs:   [cyan]telegram-bot-stack deploy logs[/cyan]")
+            console.print(
+                "  Check status: [cyan]telegram-bot-stack deploy status[/cyan]"
+            )
+            console.print("  Stop bot:    [cyan]telegram-bot-stack deploy down[/cyan]")
+
+        finally:
+            # Cleanup temp directory
+            if temp_dir.exists():
+                shutil.rmtree(temp_dir)
 
     finally:
-        # Cleanup temp directory
-        if temp_dir.exists():
-            shutil.rmtree(temp_dir)
-
-    vps.close()
+        # Always close VPS connection
+        vps.close()
 
 
 @deploy.command()
@@ -426,3 +562,217 @@ def down(config: str, cleanup: bool) -> None:
         console.print("[green]✓ Bot stopped[/green]")
 
     vps.close()
+
+
+@deploy.group()
+def secrets() -> None:
+    """Manage deployment secrets (secure token storage)."""
+    pass
+
+
+@secrets.command()
+@click.option("--config", default="deploy.yaml", help="Deployment config file")
+@click.argument("key")
+@click.argument("value")
+def set_secret(config: str, key: str, value: str) -> None:
+    """Set a secret value on VPS.
+
+    Example:
+        telegram-bot-stack deploy secrets set BOT_TOKEN "your-token-here"
+    """
+    console.print(f"🔐 [bold cyan]Setting secret: {key}[/bold cyan]\n")
+
+    # Load configuration
+    if not Path(config).exists():
+        console.print(f"[red]❌ Configuration file not found: {config}[/red]")
+        console.print("\n[yellow]Run 'telegram-bot-stack deploy init' first[/yellow]")
+        return
+
+    deploy_config = DeploymentConfig(config)
+
+    if not deploy_config.validate():
+        console.print("[red]❌ Invalid configuration[/red]")
+        return
+
+    # Get encryption key from config
+    encryption_key = deploy_config.get("secrets.encryption_key")
+    if not encryption_key:
+        console.print("[red]❌ Encryption key not found in deploy.yaml[/red]")
+        console.print(
+            "\n[yellow]Run 'telegram-bot-stack deploy init' to generate encryption key[/yellow]"
+        )
+        return
+
+    # Connect to VPS
+    vps = VPSConnection(
+        host=deploy_config.get("vps.host"),
+        user=deploy_config.get("vps.user"),
+        ssh_key=deploy_config.get("vps.ssh_key"),
+        port=deploy_config.get("vps.port", 22),
+    )
+
+    try:
+        if not vps.test_connection():
+            console.print("[red]❌ Failed to connect to VPS[/red]")
+            return
+
+        bot_name = deploy_config.get("bot.name")
+        remote_dir = f"/opt/{bot_name}"
+
+        # Set secret
+        secrets_manager = SecretsManager(bot_name, remote_dir, encryption_key)
+        if secrets_manager.set_secret(key, value, vps):
+            console.print(f"[green]✅ Secret '{key}' set successfully[/green]")
+        else:
+            console.print(f"[red]❌ Failed to set secret '{key}'[/red]")
+
+    finally:
+        # Always close VPS connection
+        vps.close()
+
+
+@secrets.command()
+@click.option("--config", default="deploy.yaml", help="Deployment config file")
+@click.argument("key")
+def get_secret(config: str, key: str) -> None:
+    """Get a secret value from VPS (for debugging).
+
+    Example:
+        telegram-bot-stack deploy secrets get BOT_TOKEN
+    """
+    # Load configuration
+    if not Path(config).exists():
+        console.print(f"[red]❌ Configuration file not found: {config}[/red]")
+        return
+
+    deploy_config = DeploymentConfig(config)
+
+    # Get encryption key
+    encryption_key = deploy_config.get("secrets.encryption_key")
+    if not encryption_key:
+        console.print("[red]❌ Encryption key not found[/red]")
+        return
+
+    # Connect to VPS
+    vps = VPSConnection(
+        host=deploy_config.get("vps.host"),
+        user=deploy_config.get("vps.user"),
+        ssh_key=deploy_config.get("vps.ssh_key"),
+        port=deploy_config.get("vps.port", 22),
+    )
+
+    try:
+        bot_name = deploy_config.get("bot.name")
+        remote_dir = f"/opt/{bot_name}"
+
+        # Get secret
+        secrets_manager = SecretsManager(bot_name, remote_dir, encryption_key)
+        value = secrets_manager.get_secret(key, vps)
+
+        if value:
+            console.print(f"[green]{key}={value}[/green]")
+        else:
+            console.print(f"[yellow]Secret '{key}' not found[/yellow]")
+
+    finally:
+        # Always close VPS connection
+        vps.close()
+
+
+@secrets.command()
+@click.option("--config", default="deploy.yaml", help="Deployment config file")
+def list_secrets(config: str) -> None:
+    """List all secrets (names only, not values).
+
+    Example:
+        telegram-bot-stack deploy secrets list
+    """
+    console.print("🔐 [bold cyan]Stored Secrets[/bold cyan]\n")
+
+    # Load configuration
+    if not Path(config).exists():
+        console.print(f"[red]❌ Configuration file not found: {config}[/red]")
+        return
+
+    deploy_config = DeploymentConfig(config)
+
+    # Get encryption key
+    encryption_key = deploy_config.get("secrets.encryption_key")
+    if not encryption_key:
+        console.print("[red]❌ Encryption key not found[/red]")
+        return
+
+    # Connect to VPS
+    vps = VPSConnection(
+        host=deploy_config.get("vps.host"),
+        user=deploy_config.get("vps.user"),
+        ssh_key=deploy_config.get("vps.ssh_key"),
+        port=deploy_config.get("vps.port", 22),
+    )
+
+    try:
+        bot_name = deploy_config.get("bot.name")
+        remote_dir = f"/opt/{bot_name}"
+
+        # List secrets
+        secrets_manager = SecretsManager(bot_name, remote_dir, encryption_key)
+        secrets = secrets_manager.list_secrets(vps)
+
+        if secrets:
+            console.print("[bold]Secret names:[/bold]")
+            for key in sorted(secrets.keys()):
+                console.print(f"  • {key}")
+        else:
+            console.print("[yellow]No secrets stored[/yellow]")
+
+    finally:
+        # Always close VPS connection
+        vps.close()
+
+
+@secrets.command()
+@click.option("--config", default="deploy.yaml", help="Deployment config file")
+@click.argument("key")
+def remove_secret(config: str, key: str) -> None:
+    """Remove a secret from VPS.
+
+    Example:
+        telegram-bot-stack deploy secrets remove BOT_TOKEN
+    """
+    console.print(f"🗑️  [bold cyan]Removing secret: {key}[/bold cyan]\n")
+
+    # Load configuration
+    if not Path(config).exists():
+        console.print(f"[red]❌ Configuration file not found: {config}[/red]")
+        return
+
+    deploy_config = DeploymentConfig(config)
+
+    # Get encryption key
+    encryption_key = deploy_config.get("secrets.encryption_key")
+    if not encryption_key:
+        console.print("[red]❌ Encryption key not found[/red]")
+        return
+
+    # Connect to VPS
+    vps = VPSConnection(
+        host=deploy_config.get("vps.host"),
+        user=deploy_config.get("vps.user"),
+        ssh_key=deploy_config.get("vps.ssh_key"),
+        port=deploy_config.get("vps.port", 22),
+    )
+
+    try:
+        bot_name = deploy_config.get("bot.name")
+        remote_dir = f"/opt/{bot_name}"
+
+        # Remove secret
+        secrets_manager = SecretsManager(bot_name, remote_dir, encryption_key)
+        if secrets_manager.remove_secret(key, vps):
+            console.print(f"[green]✅ Secret '{key}' removed successfully[/green]")
+        else:
+            console.print(f"[red]❌ Failed to remove secret '{key}'[/red]")
+
+    finally:
+        # Always close VPS connection
+        vps.close()

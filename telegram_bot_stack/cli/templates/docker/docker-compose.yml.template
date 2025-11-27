@@ -25,6 +25,7 @@ cpus: "{{ cpu_reservation }}"
 # Environment configuration
 env_file:
 - .env
+- .secrets.env              # Decrypted secrets (created during deployment from .secrets.env.encrypted)
 environment:
 - TZ={{ timezone }}
 - PYTHONPATH=/app

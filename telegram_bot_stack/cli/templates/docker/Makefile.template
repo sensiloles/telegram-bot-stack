@@ -17,6 +17,12 @@ build:
 	docker-compose build
 
 up:
+	@                                                                                  # Decrypt secrets in-memory to shared memory (/dev/shm) before starting
+	@if [ -f decrypt_secrets.py ]                                                      ; then \
+		python3 decrypt_secrets.py > /dev/shm/{{ bot_name }}_secrets.env 2>/dev/null && \
+		chmod 600 /dev/shm/{{ bot_name }}_secrets.env 2>/dev/null && \
+		ln -sf /dev/shm/{{ bot_name }}_secrets.env .secrets.env 2>/dev/null || true       ; \
+	fi
 	docker-compose up -d
 	@echo "✅ Bot started!"
 	@echo "View logs: make logs"

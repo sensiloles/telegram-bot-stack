@@ -1,7 +1,7 @@
 {
   "metadata": {
     "version": "3.0.0",
-    "generated_at": "2025-11-26",
+    "generated_at": "2025-11-27",
     "graph_id": "bot_framework_cli",
     "graph_name": "Bot Framework - CLI",
     "graph_type": "sub_graph",
@@ -11,8 +11,8 @@
     "description": "CLI tool for bot project management and development",
     "scope": "CLI tool for bot project management and development",
     "root_package": "telegram_bot_stack.cli",
-    "node_count": 23,
-    "edge_count": 23
+    "node_count": 24,
+    "edge_count": 20
   },
   "nodes": [
     {
@@ -82,11 +82,12 @@
       "category": "implementation",
       "path": "telegram_bot_stack/cli/utils/deployment.py",
       "description": "Deployment configuration and template rendering utilities.",
-      "lines_of_code": 245,
+      "lines_of_code": 310,
       "complexity_score": 1,
       "exports": [
         "DeploymentConfig",
         "DockerTemplateRenderer",
+        "escape_env_value",
         "create_env_file",
         "load",
         "save",
@@ -104,6 +105,7 @@
         "DockerTemplateRenderer"
       ],
       "functions": [
+        "escape_env_value",
         "create_env_file",
         "load",
         "save",
@@ -215,7 +217,7 @@
       "category": "implementation",
       "path": "telegram_bot_stack/cli/utils/vps.py",
       "description": "VPS operations utilities for deployment.",
-      "lines_of_code": 200,
+      "lines_of_code": 266,
       "complexity_score": 1,
       "exports": [
         "VPSConnection",
@@ -226,6 +228,7 @@
         "check_docker_installed",
         "install_docker",
         "transfer_files",
+        "write_file",
         "close"
       ],
       "classes": [
@@ -239,6 +242,7 @@
         "check_docker_installed",
         "install_docker",
         "transfer_files",
+        "write_file",
         "close"
       ],
       "dependencies": [],
@@ -349,7 +353,7 @@
       "category": "implementation",
       "path": "telegram_bot_stack/cli/commands/deploy.py",
       "description": "VPS deployment commands for telegram-bot-stack.",
-      "lines_of_code": 428,
+      "lines_of_code": 778,
       "complexity_score": 1,
       "exports": [
         "deploy",
@@ -358,7 +362,12 @@
         "update",
         "status",
         "logs",
-        "down"
+        "down",
+        "secrets",
+        "set_secret",
+        "get_secret",
+        "list_secrets",
+        "remove_secret"
       ],
       "classes": [],
       "functions": [
@@ -368,7 +377,12 @@
         "update",
         "status",
         "logs",
-        "down"
+        "down",
+        "secrets",
+        "set_secret",
+        "get_secret",
+        "list_secrets",
+        "remove_secret"
       ],
       "dependencies": [],
       "dependents": [],
@@ -584,6 +598,41 @@
       "dependencies": [],
       "dependents": [],
       "criticality": "medium"
+    },
+    {
+      "id": "telegram_bot_stack.cli.utils.secrets",
+      "name": "secrets",
+      "type": "module",
+      "category": "implementation",
+      "path": "telegram_bot_stack/cli/utils/secrets.py",
+      "description": "Module secrets",
+      "lines_of_code": 272,
+      "complexity_score": 1,
+      "exports": [
+        "SecretsManager",
+        "generate_key",
+        "derive_key_from_password",
+        "set_secret",
+        "get_secret",
+        "list_secrets",
+        "remove_secret",
+        "load_secrets_to_env"
+      ],
+      "classes": [
+        "SecretsManager"
+      ],
+      "functions": [
+        "generate_key",
+        "derive_key_from_password",
+        "set_secret",
+        "get_secret",
+        "list_secrets",
+        "remove_secret",
+        "load_secrets_to_env"
+      ],
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium"
     }
   ],
   "edges": [
@@ -722,31 +771,10 @@
     },
     {
       "id": "edge_20",
-      "source": "telegram_bot_stack.cli.templates.advanced.bot",
-      "target": "telegram_bot_stack",
+      "source": "telegram_bot_stack.cli.commands.deploy",
+      "target": "telegram_bot_stack.cli.utils.secrets",
       "type": "imports",
-      "description": "Imports from telegram_bot_stack"
-    },
-    {
-      "id": "edge_21",
-      "source": "telegram_bot_stack.cli.templates.basic.bot",
-      "target": "telegram_bot_stack",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack"
-    },
-    {
-      "id": "edge_22",
-      "source": "telegram_bot_stack.cli.templates.menu.bot",
-      "target": "telegram_bot_stack",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack"
-    },
-    {
-      "id": "edge_23",
-      "source": "telegram_bot_stack.cli.templates.counter.bot",
-      "target": "telegram_bot_stack",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack"
+      "description": "Imports from telegram_bot_stack.cli.utils.secrets"
     }
   ]
 }
