@@ -1426,102 +1426,1679 @@ Logs are automatically rotated to prevent disk space issues:
 
 ## Troubleshooting
 
-### SSH Connection Failed
+This comprehensive guide covers common deployment issues and their solutions. Each issue includes symptoms, diagnosis commands, and step-by-step fixes.
 
-**Problem:** Cannot connect to VPS
+### Quick Diagnosis Commands
+
+Before troubleshooting specific issues, use these commands to gather information:
+
+```bash
+# Check bot health
+telegram-bot-stack deploy health
+
+# View recent logs
+telegram-bot-stack deploy logs --tail 100
+
+# Check deployment status
+telegram-bot-stack deploy status
+
+# View recent errors only
+telegram-bot-stack deploy health --errors
+
+# View deployment history
+telegram-bot-stack deploy history
+```
+
+---
+
+## SSH Connection Issues
+
+### 1. SSH Connection Failed
+
+**Symptoms:**
+
+- Cannot connect to VPS
+- "Connection timed out" error
+- "Permission denied" error
+
+**Diagnosis:**
+
+```bash
+# Test SSH connection with verbose output
+ssh -v root@your-vps-ip
+
+# Check if SSH key exists
+ls -la ~/.ssh/id_rsa
+
+# Verify SSH key permissions
+ls -l ~/.ssh/id_rsa
+```
 
 **Solutions:**
 
-1. Check SSH key permissions: `chmod 600 ~/.ssh/id_rsa`
-2. Verify VPS IP address
-3. Check firewall rules (port 22 must be open)
-4. Try password authentication: `ssh root@your-vps-ip`
+**1.1 Fix SSH Key Permissions:**
 
-### Docker Installation Failed
+```bash
+# SSH key must have restricted permissions
+chmod 600 ~/.ssh/id_rsa
+chmod 700 ~/.ssh
 
-**Problem:** Docker installation fails
+# Try connecting again
+ssh root@your-vps-ip
+```
+
+**1.2 Wrong SSH Key Path:**
+
+```bash
+# Check which key is being used
+ssh -v root@your-vps-ip 2>&1 | grep "identity file"
+
+# Specify correct key explicitly
+ssh -i ~/.ssh/your-key root@your-vps-ip
+
+# Update deploy.yaml with correct path
+# vps:
+#   ssh_key: "~/.ssh/your-key"
+```
+
+**1.3 Firewall Blocking SSH:**
+
+```bash
+# Check if port 22 is open (from local machine)
+nc -zv your-vps-ip 22
+
+# Contact VPS provider to:
+# - Open port 22 in firewall
+# - Check if SSH is enabled
+# - Verify VPS is running
+```
+
+**1.4 Host Key Verification Failed:**
+
+```bash
+# Remove old host key
+ssh-keygen -R your-vps-ip
+
+# Or edit ~/.ssh/known_hosts and remove the line for your VPS
+
+# Try connecting again (will ask to accept new key)
+ssh root@your-vps-ip
+```
+
+### 2. SSH Key Not Authorized
+
+**Symptoms:**
+
+- "Permission denied (publickey)" error
+- Can connect with password but not with key
+
+**Diagnosis:**
+
+```bash
+# Test with password authentication
+ssh -o PreferredAuthentications=password root@your-vps-ip
+
+# Check authorized keys on VPS
+ssh root@your-vps-ip "cat ~/.ssh/authorized_keys"
+```
 
 **Solutions:**
 
-1. Check VPS OS compatibility (Ubuntu 20.04+)
-2. Ensure you have root access
-3. Install Docker manually (see Docker Setup section)
+**2.1 Add SSH Key to VPS:**
 
-### Bot Not Starting
+```bash
+# Copy public key to VPS
+ssh-copy-id -i ~/.ssh/id_rsa.pub root@your-vps-ip
 
-**Problem:** Bot container starts but immediately stops
+# Or manually:
+cat ~/.ssh/id_rsa.pub | ssh root@your-vps-ip "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys"
+
+# Verify permissions on VPS
+ssh root@your-vps-ip "chmod 700 ~/.ssh && chmod 600 ~/.ssh/authorized_keys"
+```
+
+**2.2 Wrong Public Key:**
+
+```bash
+# Check your public key
+cat ~/.ssh/id_rsa.pub
+
+# Check key fingerprint
+ssh-keygen -lf ~/.ssh/id_rsa.pub
+
+# Compare with VPS authorized_keys
+ssh root@your-vps-ip "ssh-keygen -lf ~/.ssh/authorized_keys"
+```
+
+### 3. Connection Timeout
+
+**Symptoms:**
+
+- Connection hangs
+- "Operation timed out" after long wait
+- Cannot reach VPS at all
+
+**Diagnosis:**
+
+```bash
+# Test basic connectivity
+ping your-vps-ip
+
+# Check if any port is open
+nc -zv your-vps-ip 22
+
+# Trace route to VPS
+traceroute your-vps-ip
+```
 
 **Solutions:**
 
-1. Check logs: `telegram-bot-stack deploy logs`
-2. Verify bot token is correct: `echo $BOT_TOKEN`
-3. Check bot code for errors
-4. Ensure all dependencies are in `requirements.txt`
-5. **Rollback to previous version** if recent update caused the issue:
+**3.1 VPS is Down:**
+
+- Check VPS provider dashboard
+- Restart VPS from provider's control panel
+- Contact VPS support
+
+**3.2 Firewall Blocking:**
+
+- Configure VPS firewall (allow port 22)
+- Check cloud provider security groups
+- Temporarily disable local firewall for testing
+
+**3.3 Wrong IP Address:**
+
+```bash
+# Verify IP in deploy.yaml
+cat deploy.yaml | grep host
+
+# Get correct IP from VPS provider
+# Update deploy.yaml with correct IP
+```
+
+---
+
+## Docker Issues
+
+### 4. Docker Installation Failed
+
+**Symptoms:**
+
+- Error during `deploy up` when installing Docker
+- "Docker installation failed" message
+- Cannot install Docker packages
+
+**Diagnosis:**
+
+```bash
+# Check if Docker is installed
+ssh root@your-vps-ip "docker --version"
+
+# Check OS version
+ssh root@your-vps-ip "cat /etc/os-release"
+
+# Check available disk space
+ssh root@your-vps-ip "df -h"
+```
+
+**Solutions:**
+
+**4.1 Unsupported OS Version:**
+
+```bash
+# Upgrade OS or use compatible VPS
+# Supported: Ubuntu 20.04+, Debian 11+, CentOS 8+
+
+# For Ubuntu:
+ssh root@your-vps-ip "lsb_release -a"
+```
+
+**4.2 Insufficient Disk Space:**
+
+```bash
+# Clean up disk space
+ssh root@your-vps-ip "apt-get clean"
+ssh root@your-vps-ip "apt-get autoremove -y"
+
+# Check space again
+ssh root@your-vps-ip "df -h"
+```
+
+**4.3 Manual Docker Installation:**
+
+See [Docker Setup](#docker-deployment-recommended) section for manual installation steps.
+
+### 5. Docker Daemon Not Running
+
+**Symptoms:**
+
+- "Cannot connect to Docker daemon" error
+- Docker commands fail with connection error
+- Bot won't start after VPS reboot
+
+**Diagnosis:**
+
+```bash
+# Check Docker service status
+ssh root@your-vps-ip "systemctl status docker"
+
+# Check if Docker socket exists
+ssh root@your-vps-ip "ls -l /var/run/docker.sock"
+```
+
+**Solutions:**
+
+**5.1 Start Docker Service:**
+
+```bash
+# Start Docker
+ssh root@your-vps-ip "systemctl start docker"
+
+# Enable auto-start on boot
+ssh root@your-vps-ip "systemctl enable docker"
+
+# Verify it's running
+ssh root@your-vps-ip "systemctl status docker"
+```
+
+**5.2 Docker Socket Permission Issues:**
+
+```bash
+# Add user to docker group
+ssh root@your-vps-ip "usermod -aG docker $USER"
+
+# Fix socket permissions
+ssh root@your-vps-ip "chmod 666 /var/run/docker.sock"
+
+# Restart Docker
+ssh root@your-vps-ip "systemctl restart docker"
+```
+
+### 6. Docker Image Build Failed
+
+**Symptoms:**
+
+- "Error during build" message
+- "Failed to build Docker image"
+- Build hangs at certain step
+
+**Diagnosis:**
+
+```bash
+# Check recent logs
+telegram-bot-stack deploy logs --tail 100
+
+# Check Docker images
+ssh root@your-vps-ip "docker images"
+
+# Check build cache
+ssh root@your-vps-ip "docker system df"
+```
+
+**Solutions:**
+
+**6.1 Missing Dependencies:**
+
+```bash
+# Check requirements.txt exists
+ls requirements.txt
+
+# Verify all dependencies are listed
+cat requirements.txt
+
+# Add missing packages
+echo "missing-package>=1.0.0" >> requirements.txt
+
+# Try deployment again
+telegram-bot-stack deploy update
+```
+
+**6.2 Network Issues During Build:**
+
+```bash
+# Test internet connection on VPS
+ssh root@your-vps-ip "ping -c 3 8.8.8.8"
+
+# Try building with no cache
+ssh root@your-vps-ip "cd /opt/your-bot && docker-compose build --no-cache"
+```
+
+**6.3 Disk Space Full:**
+
+```bash
+# Check disk space
+ssh root@your-vps-ip "df -h"
+
+# Clean Docker cache
+ssh root@your-vps-ip "docker system prune -af"
+
+# Remove unused images
+ssh root@your-vps-ip "docker image prune -af"
+```
+
+### 7. Container Won't Start
+
+**Symptoms:**
+
+- Container status: "Exited (1)" or "Restarting"
+- Bot starts then immediately stops
+- Health check shows "Not running"
+
+**Diagnosis:**
+
+```bash
+# Check bot health
+telegram-bot-stack deploy health
+
+# View logs
+telegram-bot-stack deploy logs --tail 50
+
+# Check container status
+ssh root@your-vps-ip "docker ps -a"
+
+# Inspect container
+ssh root@your-vps-ip "docker inspect bot-name"
+```
+
+**Solutions:**
+
+**7.1 Check Error Logs:**
+
+```bash
+# View detailed logs
+telegram-bot-stack deploy logs --tail 200
+
+# Look for specific error messages:
+# - "ModuleNotFoundError" → Missing dependency
+# - "Unauthorized" → Wrong bot token
+# - "Connection refused" → Network/database issue
+# - "Permission denied" → File permission issue
+```
+
+**7.2 Invalid Bot Token:**
+
+```bash
+# Test bot token locally
+python3 -c "
+import telegram, os
+token = 'YOUR_BOT_TOKEN'
+bot = telegram.Bot(token=token)
+print(bot.get_me())
+"
+
+# Update token on VPS
+telegram-bot-stack deploy secrets set BOT_TOKEN "your-correct-token"
+
+# Restart bot
+telegram-bot-stack deploy up
+```
+
+**7.3 Port Already in Use:**
+
+```bash
+# Check what's using the port
+ssh root@your-vps-ip "netstat -tlnp | grep :8080"
+
+# Stop conflicting service
+ssh root@your-vps-ip "docker stop $(docker ps -q --filter 'publish=8080')"
+
+# Or change bot port in docker-compose.yml
+```
+
+**7.4 File Permission Issues:**
+
+```bash
+# Fix data directory permissions
+ssh root@your-vps-ip "cd /opt/your-bot && chown -R 1000:1000 data/ logs/"
+
+# Restart container
+telegram-bot-stack deploy up
+```
+
+---
+
+## Deployment Failures
+
+### 8. File Transfer Failed
+
+**Symptoms:**
+
+- "Failed to transfer files" error
+- rsync errors
+- Deployment stuck at "Transferring files"
+
+**Diagnosis:**
+
+```bash
+# Test file transfer manually
+rsync -avz --dry-run ./ root@vps-ip:/tmp/test/
+
+# Check VPS disk space
+ssh root@your-vps-ip "df -h /opt/"
+
+# Test SSH connection
+ssh root@your-vps-ip "echo 'Connection OK'"
+```
+
+**Solutions:**
+
+**8.1 Disk Space Full on VPS:**
+
+```bash
+# Clean up space
+ssh root@your-vps-ip "docker system prune -af"
+ssh root@your-vps-ip "apt-get clean"
+
+# Check space
+ssh root@your-vps-ip "df -h"
+
+# Try deployment again
+telegram-bot-stack deploy update
+```
+
+**8.2 Large Files Not in .gitignore:**
+
+```bash
+# Add large files to .gitignore
+echo "*.db" >> .gitignore
+echo "data/*.json" >> .gitignore
+echo "venv/" >> .gitignore
+
+# Commit changes
+git add .gitignore
+git commit -m "chore: update .gitignore"
+
+# Deploy again
+telegram-bot-stack deploy update
+```
+
+**8.3 SSH Connection Unstable:**
+
+```bash
+# Use compression for transfer
+# Add to deploy.yaml:
+# transfer:
+#   compression: true
+#   retries: 3
+```
+
+### 9. Deployment Succeeds But Bot Not Responding
+
+**Symptoms:**
+
+- Deployment completes without errors
+- Container is running
+- Bot doesn't respond to messages
+- No errors in logs
+
+**Diagnosis:**
+
+```bash
+# Check bot health
+telegram-bot-stack deploy health
+
+# Test bot is alive
+ssh root@your-vps-ip "docker exec bot-name python3 -c 'import telegram; print(\"OK\")'"
+
+# Check bot in Telegram
+# Send /start to your bot
+```
+
+**Solutions:**
+
+**9.1 Bot Token Issues:**
+
+```bash
+# Verify bot token is set
+ssh root@your-vps-ip "docker exec bot-name env | grep BOT_TOKEN"
+
+# Test bot token
+python3 -c "
+import telegram
+bot = telegram.Bot(token='YOUR_TOKEN')
+print(bot.get_me())
+"
+
+# Update token if wrong
+telegram-bot-stack deploy secrets set BOT_TOKEN "correct-token"
+telegram-bot-stack deploy up
+```
+
+**9.2 Webhook Issues (If Using Webhooks):**
+
+```bash
+# Check webhook status
+curl "https://api.telegram.org/botYOUR_TOKEN/getWebhookInfo"
+
+# Delete webhook (if using polling)
+curl "https://api.telegram.org/botYOUR_TOKEN/deleteWebhook"
+
+# Restart bot
+telegram-bot-stack deploy up
+```
+
+**9.3 Firewall Blocking Telegram:**
+
+```bash
+# Test Telegram API connectivity
+ssh root@your-vps-ip "curl -I https://api.telegram.org"
+
+# Check if bot can reach Telegram
+ssh root@your-vps-ip "docker exec bot-name ping -c 3 api.telegram.org"
+```
+
+### 10. Update Deployment Failed
+
+**Symptoms:**
+
+- Update fails midway
+- Bot stops working after update
+- "Deployment failed" error
+
+**Diagnosis:**
+
+```bash
+# Check deployment history
+telegram-bot-stack deploy history
+
+# Check what's running
+ssh root@your-vps-ip "docker ps -a"
+
+# View recent errors
+telegram-bot-stack deploy health --errors
+```
+
+**Solutions:**
+
+**10.1 Rollback to Previous Version:**
+
+```bash
+# Immediate rollback
+telegram-bot-stack deploy rollback --yes
+
+# Verify bot is working
+telegram-bot-stack deploy health
+
+# Check logs
+telegram-bot-stack deploy logs
+```
+
+**10.2 Backup Restore:**
+
+```bash
+# List available backups
+telegram-bot-stack deploy backup list
+
+# Restore from backup
+telegram-bot-stack deploy restore backup-20250127-120000.tar.gz
+```
+
+**10.3 Manual Recovery:**
+
+```bash
+# SSH to VPS
+ssh root@your-vps-ip
+
+# Check available images
+docker images
+
+# Start previous image manually
+docker run -d --name bot-recovery previous-image:tag
+
+# Or rebuild from clean state
+cd /opt/your-bot
+docker-compose down
+docker-compose up -d --build
+```
+
+---
+
+## Runtime Issues
+
+### 11. Bot Crashes Randomly
+
+**Symptoms:**
+
+- Bot works then suddenly stops
+- Container restarts frequently
+- Health check shows multiple restarts
+
+**Diagnosis:**
+
+```bash
+# Check restart count
+telegram-bot-stack deploy health
+
+# View crash logs
+telegram-bot-stack deploy logs --tail 200
+
+# Check resource usage
+ssh root@your-vps-ip "docker stats --no-stream bot-name"
+```
+
+**Solutions:**
+
+**11.1 Memory Leak:**
+
+```bash
+# Increase memory limit in deploy.yaml
+# resources:
+#   memory_limit: "512M"  # Increase from 256M
+
+# Restart bot
+telegram-bot-stack deploy up
+
+# Monitor memory usage
+ssh root@your-vps-ip "watch docker stats bot-name"
+```
+
+**11.2 Unhandled Exceptions:**
+
+```bash
+# Check for Python errors in logs
+telegram-bot-stack deploy health --errors
+
+# Add error handling to bot code
+# Wrap handlers in try-except blocks
+
+# Update and redeploy
+telegram-bot-stack deploy update
+```
+
+**11.3 Resource Limits Too Low:**
+
+```bash
+# Check current limits
+ssh root@your-vps-ip "docker inspect bot-name | grep -A 5 Memory"
+
+# Adjust in deploy.yaml:
+# resources:
+#   memory_limit: "512M"
+#   memory_reservation: "256M"
+#   cpu_limit: "1.0"
+#   cpu_reservation: "0.5"
+
+# Redeploy
+telegram-bot-stack deploy update
+```
+
+### 12. High Memory Usage
+
+**Symptoms:**
+
+- Bot uses more memory over time
+- Eventually crashes with OOM error
+- System becomes slow
+
+**Diagnosis:**
+
+```bash
+# Monitor memory usage
+ssh root@your-vps-ip "docker stats bot-name"
+
+# Check memory limit
+ssh root@your-vps-ip "docker inspect bot-name | grep Memory"
+
+# View memory-related errors
+telegram-bot-stack deploy logs | grep -i "memory\|oom"
+```
+
+**Solutions:**
+
+**12.1 Memory Leak in Code:**
+
+```python
+# Common causes:
+# - Storing too much in memory (use database)
+# - Not cleaning up old data
+# - Large conversation states
+
+# Fix: Implement proper data cleanup
+# Example:
+async def cleanup_old_data(context):
+    # Clear old conversation data
+    for user_id in list(context.user_data.keys()):
+        if should_cleanup(user_id):
+            del context.user_data[user_id]
+```
+
+**12.2 Increase Memory Limit:**
+
+```yaml
+# In deploy.yaml
+resources:
+  memory_limit: "1G" # Increase limit
+  memory_reservation: "512M"
+```
+
+**12.3 Use External Storage:**
+
+```python
+# Instead of storing in memory, use database
+# Example: Store conversation state in SQL/Redis
+from telegram_bot_stack import SQLStorage
+
+storage = SQLStorage("bot.db")
+```
+
+### 13. Bot Response Slow
+
+**Symptoms:**
+
+- Bot takes long time to respond
+- Timeout errors
+- Users complain about slowness
+
+**Diagnosis:**
+
+```bash
+# Check CPU/memory usage
+ssh root@your-vps-ip "docker stats bot-name"
+
+# Check network latency
+ssh root@your-vps-ip "ping -c 10 api.telegram.org"
+
+# Profile bot code
+# Add timing logs to identify slow operations
+```
+
+**Solutions:**
+
+**13.1 Optimize Database Queries:**
+
+```python
+# Add indexes to frequently queried columns
+# Use batch operations instead of loops
+# Cache frequently accessed data
+```
+
+**13.2 Increase Resources:**
+
+```yaml
+# In deploy.yaml
+resources:
+  cpu_limit: "2.0" # Increase CPU
+  memory_limit: "1G"
+```
+
+**13.3 Use Async Operations:**
+
+```python
+# Use async/await for I/O operations
+async def slow_operation():
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as response:
+            return await response.text()
+```
+
+### 14. Rate Limiting Issues
+
+**Symptoms:**
+
+- "Too many requests" errors
+- Bot stops responding temporarily
+- 429 HTTP errors in logs
+
+**Diagnosis:**
+
+```bash
+# Check logs for rate limit errors
+telegram-bot-stack deploy logs | grep -i "429\|rate limit\|too many"
+
+# Monitor request frequency
+# Add logging to track API calls
+```
+
+**Solutions:**
+
+**14.1 Implement Rate Limiting:**
+
+```python
+# Use telegram-bot-stack's rate limiting
+from telegram_bot_stack import BotBase
+
+class MyBot(BotBase):
+    def __init__(self):
+        super().__init__(
+            rate_limiter={"enabled": True, "calls": 30, "period": 1}
+        )
+```
+
+**14.2 Batch Updates:**
+
+```python
+# Instead of sending many messages one by one
+# Batch them together or add delays
+import asyncio
+
+async def send_multiple(chat_ids, text):
+    for chat_id in chat_ids:
+        await bot.send_message(chat_id, text)
+        await asyncio.sleep(0.1)  # Small delay between messages
+```
+
+**14.3 Use Queues:**
+
+```python
+# Implement message queue for high-volume bots
+from queue import Queue
+import threading
+
+message_queue = Queue()
+
+def process_queue():
+    while True:
+        chat_id, text = message_queue.get()
+        bot.send_message(chat_id, text)
+        time.sleep(0.05)  # Rate limit
+```
+
+---
+
+## Network and Connectivity Issues
+
+### 15. Cannot Reach Telegram API
+
+**Symptoms:**
+
+- "Connection refused" errors
+- "Unable to connect to api.telegram.org"
+- Bot works locally but not on VPS
+
+**Diagnosis:**
+
+```bash
+# Test Telegram API connectivity
+ssh root@your-vps-ip "curl -I https://api.telegram.org"
+
+# Check DNS resolution
+ssh root@your-vps-ip "nslookup api.telegram.org"
+
+# Test from within container
+ssh root@your-vps-ip "docker exec bot-name ping -c 3 api.telegram.org"
+```
+
+**Solutions:**
+
+**15.1 VPS Firewall Blocking:**
+
+```bash
+# Check iptables rules
+ssh root@your-vps-ip "iptables -L -n"
+
+# Allow outbound HTTPS
+ssh root@your-vps-ip "iptables -A OUTPUT -p tcp --dport 443 -j ACCEPT"
+
+# Or configure cloud provider firewall/security groups
+```
+
+**15.2 DNS Issues:**
+
+```bash
+# Add Google DNS to container
+# In docker-compose.yml:
+# dns:
+#   - 8.8.8.8
+#   - 8.8.4.4
+
+# Redeploy
+telegram-bot-stack deploy update
+```
+
+**15.3 Proxy Required:**
+
+```python
+# Configure proxy in bot code
+from telegram.ext import Application
+
+application = (
+    Application.builder()
+    .token(TOKEN)
+    .proxy_url("http://proxy:port")
+    .build()
+)
+```
+
+### 16. Webhook Not Working
+
+**Symptoms:**
+
+- Bot doesn't respond to messages
+- Webhook URL returns errors
+- SSL certificate errors
+
+**Diagnosis:**
+
+```bash
+# Check webhook info
+curl "https://api.telegram.org/botYOUR_TOKEN/getWebhookInfo"
+
+# Test webhook URL
+curl -I https://your-domain.com/webhook
+
+# Check SSL certificate
+curl -v https://your-domain.com/webhook 2>&1 | grep -i ssl
+```
+
+**Solutions:**
+
+**16.1 Invalid SSL Certificate:**
+
+```bash
+# Use Let's Encrypt for free SSL
+# Install certbot
+apt-get install certbot
+
+# Get certificate
+certbot certonly --standalone -d your-domain.com
+
+# Configure in bot
+# Set webhook with certificate
+```
+
+**16.2 Webhook URL Not Accessible:**
+
+```bash
+# Ensure port 443 is open
+ssh root@your-vps-ip "netstat -tlnp | grep :443"
+
+# Check nginx/reverse proxy configuration
+# Make sure webhook path is routed correctly
+```
+
+**16.3 Switch to Polling:**
+
+```python
+# If webhooks are problematic, use polling
+# In bot code:
+application.run_polling()
+
+# Instead of:
+# application.run_webhook()
+```
+
+### 17. Port Already in Use
+
+**Symptoms:**
+
+- "Address already in use" error
+- Cannot bind to port
+- Container fails to start
+
+**Diagnosis:**
+
+```bash
+# Check what's using the port
+ssh root@your-vps-ip "netstat -tlnp | grep :8080"
+ssh root@your-vps-ip "lsof -i :8080"
+
+# Check Docker port mappings
+ssh root@your-vps-ip "docker ps --format '{{.Names}}: {{.Ports}}'"
+```
+
+**Solutions:**
+
+**17.1 Stop Conflicting Container:**
+
+```bash
+# Find and stop container using the port
+ssh root@your-vps-ip "docker stop \$(docker ps -q --filter 'publish=8080')"
+
+# Start your bot
+telegram-bot-stack deploy up
+```
+
+**17.2 Change Bot Port:**
+
+```yaml
+# In docker-compose.yml
+ports:
+  - "8081:8080" # Use different external port
+
+# Or remove port mapping if not needed (for polling bots)
+```
+
+**17.3 Kill Process Using Port:**
+
+```bash
+# Kill process (use with caution)
+ssh root@your-vps-ip "kill \$(lsof -t -i:8080)"
+
+# Restart bot
+telegram-bot-stack deploy up
+```
+
+---
+
+## Database and Storage Issues
+
+### 18. Database Connection Failed
+
+**Symptoms:**
+
+- "Could not connect to database" errors
+- Bot crashes when accessing data
+- SQL/database errors in logs
+
+**Diagnosis:**
+
+```bash
+# Check if database file exists
+ssh root@your-vps-ip "ls -la /opt/your-bot/data/bot.db"
+
+# Check file permissions
+ssh root@your-vps-ip "ls -l /opt/your-bot/data/"
+
+# Test database connection
+ssh root@your-vps-ip "docker exec bot-name python3 -c 'import sqlite3; conn=sqlite3.connect(\"data/bot.db\"); print(\"OK\")'"
+```
+
+**Solutions:**
+
+**18.1 Database File Missing:**
+
+```bash
+# Initialize database
+ssh root@your-vps-ip "cd /opt/your-bot && docker exec bot-name python3 -c 'from storage import init_db; init_db()'"
+
+# Or restore from backup
+telegram-bot-stack deploy restore backup-*.tar.gz
+```
+
+**18.2 Permission Issues:**
+
+```bash
+# Fix permissions
+ssh root@your-vps-ip "cd /opt/your-bot && chown -R 1000:1000 data/"
+
+# Ensure data directory is writable
+ssh root@your-vps-ip "chmod 755 /opt/your-bot/data"
+```
+
+**18.3 Database Locked:**
+
+```bash
+# Check for multiple processes accessing database
+ssh root@your-vps-ip "docker ps | grep bot"
+
+# Stop duplicate containers
+ssh root@your-vps-ip "docker stop \$(docker ps -q --filter name=bot)"
+
+# Start only one instance
+telegram-bot-stack deploy up
+```
+
+### 19. Data Loss After Update
+
+**Symptoms:**
+
+- User data disappeared after update
+- Bot "forgets" previous conversations
+- Empty database after deployment
+
+**Diagnosis:**
+
+```bash
+# Check if data volume is mounted
+ssh root@your-vps-ip "docker inspect bot-name | grep -A 10 Mounts"
+
+# Check data directory
+ssh root@your-vps-ip "ls -la /opt/your-bot/data/"
+
+# List available backups
+telegram-bot-stack deploy backup list
+```
+
+**Solutions:**
+
+**19.1 Restore from Backup:**
+
+```bash
+# List backups
+telegram-bot-stack deploy backup list
+
+# Restore latest backup
+telegram-bot-stack deploy restore backup-20250127-120000.tar.gz
+
+# Verify data is restored
+telegram-bot-stack deploy logs
+```
+
+**19.2 Fix Volume Mounting:**
+
+```yaml
+# In docker-compose.yml, ensure volumes are correct:
+volumes:
+  - ./data:/app/data:rw  # Must be read-write
+  - ./logs:/app/logs:rw
+
+# Redeploy
+telegram-bot-stack deploy update
+```
+
+**19.3 Enable Automatic Backups:**
+
+```yaml
+# In deploy.yaml
+backup:
+  enabled: true
+  auto_backup_before_update: true
+  retention_days: 7
+  max_backups: 10
+```
+
+### 20. Storage Full
+
+**Symptoms:**
+
+- "No space left on device" errors
+- Bot crashes randomly
+- Cannot write to database
+
+**Diagnosis:**
+
+```bash
+# Check disk usage
+ssh root@your-vps-ip "df -h"
+
+# Check bot data size
+ssh root@your-vps-ip "du -sh /opt/your-bot/data/"
+
+# Find large files
+ssh root@your-vps-ip "du -sh /opt/your-bot/* | sort -h"
+```
+
+**Solutions:**
+
+**20.1 Clean Old Logs:**
+
+```bash
+# Remove old logs
+ssh root@your-vps-ip "cd /opt/your-bot/logs && rm -f *.log.gz"
+
+# Or configure log rotation in deploy.yaml:
+# logging:
+#   max_size: "5m"
+#   max_files: "3"
+```
+
+**20.2 Clean Docker Resources:**
+
+```bash
+# Remove unused Docker resources
+ssh root@your-vps-ip "docker system prune -af"
+
+# Remove old images
+ssh root@your-vps-ip "docker image prune -af"
+
+# Check space freed
+ssh root@your-vps-ip "df -h"
+```
+
+**20.3 Archive Old Data:**
+
+```bash
+# Archive and compress old data
+ssh root@your-vps-ip "cd /opt/your-bot/data && tar -czf old-data.tar.gz *.old"
+
+# Download archive locally
+scp root@your-vps-ip:/opt/your-bot/data/old-data.tar.gz ./
+
+# Remove old data from VPS
+ssh root@your-vps-ip "cd /opt/your-bot/data && rm *.old old-data.tar.gz"
+```
+
+**20.4 Upgrade VPS:**
+
+- Upgrade to VPS plan with more storage
+- Or add additional volume/disk
+
+---
+
+## Performance Issues
+
+### 21. Deployment Takes Too Long
+
+**Symptoms:**
+
+- Deployment hangs at certain steps
+- File transfer very slow
+- Build takes 10+ minutes
+
+**Diagnosis:**
+
+```bash
+# Test network speed to VPS
+ssh root@your-vps-ip "curl -o /dev/null http://speedtest.tele2.net/100MB.zip"
+
+# Check VPS CPU/memory during deployment
+ssh root@your-vps-ip "top"
+
+# Check disk I/O
+ssh root@your-vps-ip "iostat -x 2 5"
+```
+
+**Solutions:**
+
+**21.1 Slow Network:**
+
+```bash
+# Use compression for file transfer
+# Already enabled by default in rsync
+
+# Consider smaller deployments (exclude unnecessary files)
+echo "tests/" >> .gitignore
+echo "docs/" >> .gitignore
+```
+
+**21.2 VPS Performance Issues:**
+
+```bash
+# Upgrade VPS plan for better CPU/disk
+# Or optimize build process
+
+# Enable build cache in docker-compose.yml
+# Add: cache_from: ["${DOCKER_IMAGE}"]
+```
+
+**21.3 Large Dependencies:**
+
+```bash
+# Optimize requirements.txt
+# Remove unused packages
+# Pin versions to avoid resolving latest
+
+# Example:
+# python-telegram-bot==22.5  # Instead of >=22.0
+```
+
+### 22. Out of Memory Errors
+
+**Symptoms:**
+
+- "OOMKilled" in container status
+- Bot crashes with memory errors
+- System becomes unresponsive
+
+**Diagnosis:**
+
+```bash
+# Check memory usage
+ssh root@your-vps-ip "free -h"
+
+# Check container memory
+ssh root@your-vps-ip "docker stats bot-name --no-stream"
+
+# Check memory limit
+ssh root@your-vps-ip "docker inspect bot-name | grep Memory"
+```
+
+**Solutions:**
+
+**22.1 Increase Memory Limit:**
+
+```yaml
+# In deploy.yaml
+resources:
+  memory_limit: "1G"  # Increase from 256M
+  memory_reservation: "512M"
+
+# Redeploy
+telegram-bot-stack deploy update
+```
+
+**22.2 Optimize Bot Code:**
+
+```python
+# Common memory issues:
+# 1. Storing too much user data
+# 2. Large file processing in memory
+# 3. No data cleanup
+
+# Fix: Implement cleanup
+def cleanup_old_data():
+    # Remove old user data
+    # Clear expired cache
+    # Cleanup temporary files
+    pass
+```
+
+**22.3 Upgrade VPS:**
+
+- Switch to VPS plan with more RAM
+- Current plan insufficient for bot's needs
+
+### 23. High CPU Usage
+
+**Symptoms:**
+
+- Bot becomes slow
+- CPU constantly at 100%
+- VPS provider throttles resources
+
+**Diagnosis:**
+
+```bash
+# Check CPU usage
+ssh root@your-vps-ip "docker stats bot-name --no-stream"
+
+# Profile bot code
+# Add timing logs to identify slow operations
+
+# Check for infinite loops
+telegram-bot-stack deploy logs | grep -i "loop\|recursion"
+```
+
+**Solutions:**
+
+**23.1 Optimize Code:**
+
+```python
+# Common CPU issues:
+# - Inefficient loops
+# - Heavy computations
+# - Blocking operations
+
+# Use async/await for I/O
+# Cache expensive operations
+# Use background tasks for heavy work
+```
+
+**23.2 Increase CPU Limit:**
+
+```yaml
+# In deploy.yaml
+resources:
+  cpu_limit: "2.0" # Increase from 0.5
+```
+
+**23.3 Offload Heavy Tasks:**
+
+```python
+# Use external services for:
+# - Image processing
+# - File conversions
+# - Heavy computations
+
+# Or use background workers
+from celery import Celery
+```
+
+---
+
+## Miscellaneous Issues
+
+### 24. Secrets Not Loading
+
+**Symptoms:**
+
+- Bot token not found
+- Environment variables missing
+- "BOT_TOKEN is not set" error
+
+**Diagnosis:**
+
+```bash
+# Check if secrets file exists
+ssh root@your-vps-ip "ls -la /opt/your-bot/.secrets.env.encrypted"
+
+# Check environment variables in container
+ssh root@your-vps-ip "docker exec bot-name env | grep BOT"
+
+# Verify secrets are set
+telegram-bot-stack deploy secrets list
+```
+
+**Solutions:**
+
+**24.1 Set Secrets:**
+
+```bash
+# Set bot token
+telegram-bot-stack deploy secrets set BOT_TOKEN "your-token-here"
+
+# Set other secrets
+telegram-bot-stack deploy secrets set DATABASE_URL "postgres://..."
+
+# Redeploy
+telegram-bot-stack deploy up
+```
+
+**24.2 Check Encryption Key:**
+
+```bash
+# Verify encryption key in deploy.yaml
+cat deploy.yaml | grep encryption_key
+
+# If missing, regenerate:
+# telegram-bot-stack deploy init
+```
+
+**24.3 Manual Fix:**
+
+```bash
+# SSH to VPS
+ssh root@your-vps-ip
+
+# Create .env file manually (temporary fix)
+cd /opt/your-bot
+echo "BOT_TOKEN=your-token" > .env
+
+# Restart bot
+docker-compose restart
+```
+
+### 25. Time Zone Issues
+
+**Symptoms:**
+
+- Scheduled tasks run at wrong time
+- Timestamps are incorrect
+- Time-based features don't work
+
+**Diagnosis:**
+
+```bash
+# Check container timezone
+ssh root@your-vps-ip "docker exec bot-name date"
+
+# Check VPS timezone
+ssh root@your-vps-ip "timedatectl"
+
+# Check timezone in bot logs
+telegram-bot-stack deploy logs | grep -i time
+```
+
+**Solutions:**
+
+**25.1 Set Timezone in Deploy Config:**
+
+```yaml
+# In deploy.yaml
+environment:
+  timezone: "Europe/London"  # Your timezone
+
+# Or in docker-compose.yml:
+environment:
+  - TZ=Europe/London
+```
+
+**25.2 Set Timezone in Bot Code:**
+
+```python
+import os
+import pytz
+
+# Set timezone
+os.environ['TZ'] = 'Europe/London'
+
+# Use timezone-aware datetime
+from datetime import datetime
+now = datetime.now(pytz.timezone('Europe/London'))
+```
+
+### 26. SSL Certificate Errors
+
+**Symptoms:**
+
+- "SSL certificate verify failed" errors
+- Cannot connect to external APIs
+- HTTPS requests fail
+
+**Diagnosis:**
+
+```bash
+# Test SSL connectivity
+ssh root@your-vps-ip "docker exec bot-name curl -v https://api.telegram.org"
+
+# Check SSL certificates in container
+ssh root@your-vps-ip "docker exec bot-name ls -la /etc/ssl/certs/"
+```
+
+**Solutions:**
+
+**26.1 Update CA Certificates:**
+
+```dockerfile
+# Add to Dockerfile if needed:
+RUN apt-get update && apt-get install -y ca-certificates
+RUN update-ca-certificates
+```
+
+**26.2 Disable SSL Verification (NOT RECOMMENDED for production):**
+
+```python
+# Only for testing/debugging
+import ssl
+ssl._create_default_https_context = ssl._create_unverified_context
+```
+
+**26.3 Use Specific CA Bundle:**
+
+```python
+import certifi
+import httpx
+
+# Use certifi's CA bundle
+client = httpx.Client(verify=certifi.where())
+```
+
+---
+
+## Prevention and Best Practices
+
+### Prevent Deployment Issues
+
+**1. Test Locally First:**
+
+```bash
+# Always test before deploying
+telegram-bot-stack dev
+
+# Run tests
+pytest
+
+# Check for errors
+telegram-bot-stack validate
+```
+
+**2. Use Staging Environment:**
+
+- Deploy to test VPS first
+- Verify everything works
+- Then deploy to production
+
+**3. Enable Automatic Backups:**
+
+```yaml
+# In deploy.yaml
+backup:
+  enabled: true
+  auto_backup_before_update: true
+  retention_days: 7
+```
+
+**4. Monitor Regularly:**
+
+```bash
+# Daily health check
+telegram-bot-stack deploy health
+
+# Weekly review
+telegram-bot-stack deploy history
+telegram-bot-stack deploy backup list
+```
+
+**5. Keep Dependencies Updated:**
+
+```bash
+# Update dependencies regularly
+pip list --outdated
+
+# Update requirements.txt
+pip freeze > requirements.txt
+
+# Test locally before deploying
+telegram-bot-stack dev
+```
+
+### Quick Recovery Checklist
+
+When something goes wrong:
+
+1. **Check Health:**
+
    ```bash
-   telegram-bot-stack deploy rollback
+   telegram-bot-stack deploy health
+   telegram-bot-stack deploy health --errors
    ```
 
-### Update Broke the Bot
+2. **Review Logs:**
 
-**Problem:** Bot stopped working after an update
+   ```bash
+   telegram-bot-stack deploy logs --tail 100
+   ```
 
-**Solutions:**
+3. **Check History:**
 
-1. **Immediate fix - Rollback to previous version:**
+   ```bash
+   telegram-bot-stack deploy history
+   ```
+
+4. **Rollback if Needed:**
 
    ```bash
    telegram-bot-stack deploy rollback --yes
    ```
 
-2. Check what changed:
-
-   - View deployment history: `telegram-bot-stack deploy history`
-   - Compare code changes: `git diff HEAD^`
-   - Review recent commits
-
-3. Fix the issue:
-
-   - Fix code locally
-   - Test thoroughly
-   - Deploy again: `telegram-bot-stack deploy update`
-
-4. If rollback failed:
-   - Check if previous image exists: `telegram-bot-stack deploy history`
-   - Restore from backup: `telegram-bot-stack deploy restore <backup-file>`
-   - Manual rollback: SSH to VPS and use `docker images` to list available images
-
-**Prevention:**
-
-- Test updates locally before deploying
-- Use staging environment for testing
-- Keep automatic backups enabled
-- Review deployment history regularly
-
-### Out of Memory
-
-**Problem:** Bot crashes due to memory issues
-
-**Solutions:**
-
-1. Increase memory limit in `deploy.yaml`:
-   ```yaml
-   resources:
-     memory_limit: "512M" # Increase from 256M
+5. **Restore from Backup:**
+   ```bash
+   telegram-bot-stack deploy backup list
+   telegram-bot-stack deploy restore backup-*.tar.gz
    ```
-2. Upgrade VPS plan
-3. Optimize bot code (reduce memory usage)
 
-### Deployment Takes Too Long
+### Getting Help
 
-**Problem:** Deployment hangs or takes very long
+If you're still stuck:
 
-**Solutions:**
+1. **Check Documentation:**
 
-1. Check VPS internet connection
-2. Verify Docker is installed: `ssh root@vps "docker --version"`
-3. Check VPS disk space: `ssh root@vps "df -h"`
-4. Use verbose mode: `telegram-bot-stack deploy up --verbose`
+   - [Deployment Guide](deployment_guide.md)
+   - [Architecture](architecture.md)
+   - [API Reference](api_reference.md)
+
+2. **Search Issues:**
+
+   - [GitHub Issues](https://github.com/sensiloles/telegram-bot-stack/issues)
+   - Search for similar problems
+
+3. **Ask for Help:**
+
+   - [GitHub Discussions](https://github.com/sensiloles/telegram-bot-stack/discussions)
+   - Include: logs, deploy.yaml (without secrets), error messages
+
+4. **Report Bugs:**
+   - [Create Issue](https://github.com/sensiloles/telegram-bot-stack/issues/new)
+   - Include: minimal reproduction steps, environment details
 
 ## Security Best Practices
 
