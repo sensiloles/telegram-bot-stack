@@ -46,6 +46,48 @@ def init_git(project_path: Path, initial_commit: bool = True) -> None:
 
         # Create initial commit
         if initial_commit:
+            # Configure git identity locally if not already set globally
+            # This is important for CI environments
+            try:
+                result = subprocess.run(
+                    ["git", "config", "user.email"],
+                    cwd=project_path,
+                    capture_output=True,
+                    text=True,
+                )
+                if not result.stdout.strip():
+                    # No global config, set local config
+                    subprocess.run(
+                        ["git", "config", "user.email", "bot@example.com"],
+                        cwd=project_path,
+                        check=True,
+                        capture_output=True,
+                        text=True,
+                    )
+                    subprocess.run(
+                        ["git", "config", "user.name", "Bot"],
+                        cwd=project_path,
+                        check=True,
+                        capture_output=True,
+                        text=True,
+                    )
+            except subprocess.CalledProcessError:
+                # If checking config fails, set it anyway
+                subprocess.run(
+                    ["git", "config", "user.email", "bot@example.com"],
+                    cwd=project_path,
+                    check=True,
+                    capture_output=True,
+                    text=True,
+                )
+                subprocess.run(
+                    ["git", "config", "user.name", "Bot"],
+                    cwd=project_path,
+                    check=True,
+                    capture_output=True,
+                    text=True,
+                )
+
             subprocess.run(
                 ["git", "add", "."],
                 cwd=project_path,

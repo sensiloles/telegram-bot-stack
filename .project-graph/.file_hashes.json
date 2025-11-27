@@ -6,5 +6,6 @@
   ".github/PROJECT_STATUS.md": "1258f9b2ab52339987e7356fe421e44621d3c76673b8dfbc532c3a7bcc95c81d",
   ".github/workflows/docs.yml": "0aa605badab2318f39aa4f960f4f21f81d597c832f2b1fd7e9d027a7e171b36f",
   ".github/workflows/tests.yml": "03c8a68f7a01995d6df3423db0112397e10e555249da90c68f4857a9032a4e41",
-  ".github/workflows/pypi-publish.yml": "7e6adf7ed60052bf47af71a7965c69d94e84c846b6cb4cff7515bff762481c09"
+  ".github/workflows/pypi-publish.yml": "7e6adf7ed60052bf47af71a7965c69d94e84c846b6cb4cff7515bff762481c09",
+  "telegram_bot_stack/cli/utils/git.py": "470f80b9d6e22854bed39b53a884e0d94381e141d6b7f06933942ce70fc500d6"
 }
