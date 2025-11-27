@@ -1,7 +1,7 @@
 {
   "metadata": {
     "version": "3.0.0",
-    "generated_at": "2025-11-26",
+    "generated_at": "2025-11-27",
     "graph_id": "bot_framework",
     "graph_name": "Bot Framework",
     "graph_type": "domain_router",
@@ -16,8 +16,8 @@
       "graph_id": "bot_framework_cli",
       "name": "CLI",
       "description": "CLI tool for bot project management and development",
-      "modules": 23,
-      "lines_of_code": 3904,
+      "modules": 29,
+      "lines_of_code": 5309,
       "recommended_for": [
         "CLI command development",
         "Project scaffolding changes",
@@ -31,7 +31,7 @@
       "name": "Core",
       "description": "Core bot framework components",
       "modules": 4,
-      "lines_of_code": 949,
+      "lines_of_code": 988,
       "recommended_for": [
         "Adding new bot features",
         "Customizing bot behavior",
@@ -44,7 +44,7 @@
       "name": "Storage",
       "description": "Storage abstraction layer and implementations",
       "modules": 5,
-      "lines_of_code": 681,
+      "lines_of_code": 686,
       "recommended_for": [
         "Adding new storage backend",
         "Storage migration",
@@ -96,10 +96,8 @@
   ],
   "statistics": {
     "total_sub_graphs": 4,
-    "total_modules": 33,
-    "total_lines_of_code": 5719,
-    "cross_graph_edges": 3,
-    "total_nodes": 33,
-    "total_edges": 23
+    "total_modules": 39,
+    "total_lines_of_code": 7168,
+    "cross_graph_edges": 3
   }
 }

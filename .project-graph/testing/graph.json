@@ -1,7 +1,7 @@
 {
   "metadata": {
     "version": "3.0.0",
-    "generated_at": "2025-11-26",
+    "generated_at": "2025-11-27",
     "graph_id": "testing",
     "graph_name": "Testing Infrastructure",
     "graph_type": "domain",
@@ -9,7 +9,7 @@
     "description": "Test suite, fixtures, and testing utilities",
     "scope": "Unit tests, integration tests, fixtures",
     "node_count": 30,
-    "edge_count": 5
+    "edge_count": 4
   },
   "nodes": [
     {
@@ -814,11 +814,12 @@
       "type": "test_module",
       "path": "tests/cli/test_deployment_utils.py",
       "description": "Tests for deployment utilities.",
-      "lines_of_code": 177,
+      "lines_of_code": 297,
       "exports": [
         "TestDeploymentConfig",
         "TestDockerTemplateRenderer",
         "TestCreateEnvFile",
+        "TestEscapeEnvValue",
         "test_create_new_config",
         "test_load_existing_config",
         "test_nested_keys",
@@ -829,12 +830,24 @@
         "test_render_compose",
         "test_render_all",
         "test_create_env_file_with_token",
-        "test_create_env_file_without_token"
+        "test_create_env_file_without_token",
+        "test_escape_simple_value",
+        "test_escape_value_with_newline",
+        "test_escape_value_with_quotes",
+        "test_escape_value_with_backslash",
+        "test_escape_value_with_equals",
+        "test_escape_value_with_dollar",
+        "test_escape_value_with_backtick",
+        "test_escape_value_with_multiple_special_chars",
+        "test_escape_value_with_space",
+        "test_escape_empty_value",
+        "test_escape_value_roundtrip"
       ],
       "classes": [
         "TestDeploymentConfig",
         "TestDockerTemplateRenderer",
-        "TestCreateEnvFile"
+        "TestCreateEnvFile",
+        "TestEscapeEnvValue"
       ],
       "functions": [
         "test_create_new_config",
@@ -847,7 +860,18 @@
         "test_render_compose",
         "test_render_all",
         "test_create_env_file_with_token",
-        "test_create_env_file_without_token"
+        "test_create_env_file_without_token",
+        "test_escape_simple_value",
+        "test_escape_value_with_newline",
+        "test_escape_value_with_quotes",
+        "test_escape_value_with_backslash",
+        "test_escape_value_with_equals",
+        "test_escape_value_with_dollar",
+        "test_escape_value_with_backtick",
+        "test_escape_value_with_multiple_special_chars",
+        "test_escape_value_with_space",
+        "test_escape_empty_value",
+        "test_escape_value_roundtrip"
       ]
     },
     {
@@ -878,12 +902,88 @@
       ]
     },
     {
+      "id": "tests.cli.test_backup",
+      "name": "test_backup",
+      "type": "test_module",
+      "path": "tests/cli/test_backup.py",
+      "description": "Tests for backup and restore utilities.",
+      "lines_of_code": 274,
+      "exports": [
+        "TestBackupManager",
+        "TestBackupCommands",
+        "test_create_backup_no_data",
+        "test_create_backup_with_data",
+        "test_list_backups",
+        "test_list_backups_empty",
+        "test_restore_backup",
+        "test_restore_backup_not_found",
+        "test_cleanup_old_backups",
+        "runner",
+        "temp_deploy_config",
+        "test_backup_create",
+        "test_backup_list",
+        "test_restore_command",
+        "mock_run_command"
+      ],
+      "classes": [
+        "TestBackupManager",
+        "TestBackupCommands"
+      ],
+      "functions": [
+        "test_create_backup_no_data",
+        "test_create_backup_with_data",
+        "test_list_backups",
+        "test_list_backups_empty",
+        "test_restore_backup",
+        "test_restore_backup_not_found",
+        "test_cleanup_old_backups",
+        "runner",
+        "temp_deploy_config",
+        "test_backup_create",
+        "test_backup_list",
+        "test_restore_command",
+        "mock_run_command"
+      ]
+    },
+    {
+      "id": "tests.cli.test_secrets",
+      "name": "test_secrets",
+      "type": "test_module",
+      "path": "tests/cli/test_secrets.py",
+      "description": "Tests for secrets management utilities.",
+      "lines_of_code": 171,
+      "exports": [
+        "TestSecretsManager",
+        "test_generate_key",
+        "test_derive_key_from_password",
+        "test_set_and_get_secret",
+        "test_list_secrets",
+        "test_remove_secret",
+        "test_load_secrets_to_env",
+        "test_get_secret_not_found",
+        "test_list_secrets_empty_file"
+      ],
+      "classes": [
+        "TestSecretsManager"
+      ],
+      "functions": [
+        "test_generate_key",
+        "test_derive_key_from_password",
+        "test_set_and_get_secret",
+        "test_list_secrets",
+        "test_remove_secret",
+        "test_load_secrets_to_env",
+        "test_get_secret_not_found",
+        "test_list_secrets_empty_file"
+      ]
+    },
+    {
       "id": "tests.cli.test_deploy_command",
       "name": "test_deploy_command",
       "type": "test_module",
       "path": "tests/cli/test_deploy_command.py",
       "description": "Tests for deploy command.",
-      "lines_of_code": 286,
+      "lines_of_code": 309,
       "exports": [
         "TestDeployInit",
         "TestDeployUp",
@@ -1190,121 +1290,48 @@
       ]
     },
     {
-      "id": "telegram_bot_stack.admin_manager",
-      "name": "admin_manager",
-      "type": "module",
-      "category": "implementation",
-      "path": "telegram_bot_stack/admin_manager.py",
-      "description": "Module admin_manager",
-      "lines_of_code": 131,
-      "complexity_score": 1,
-      "exports": [
-        "AdminManager",
-        "save_admins",
-        "add_admin",
-        "remove_admin",
-        "is_admin",
-        "get_all_admins",
-        "get_admin_count",
-        "has_admins"
-      ],
-      "classes": [
-        "AdminManager"
-      ],
-      "functions": [
-        "save_admins",
-        "add_admin",
-        "remove_admin",
-        "is_admin",
-        "get_all_admins",
-        "get_admin_count",
-        "has_admins"
-      ],
-      "dependencies": [],
-      "dependents": [],
-      "criticality": "medium"
-    },
-    {
-      "id": "telegram_bot_stack.bot_base",
-      "name": "bot_base",
-      "type": "module",
-      "category": "implementation",
-      "path": "telegram_bot_stack/bot_base.py",
-      "description": "Module bot_base",
-      "lines_of_code": 686,
-      "complexity_score": 1,
-      "exports": [
-        "BotBase",
-        "get_welcome_message",
-        "register_handlers"
-      ],
-      "classes": [
-        "BotBase"
-      ],
-      "functions": [
-        "get_welcome_message",
-        "register_handlers"
-      ],
-      "dependencies": [],
-      "dependents": [],
-      "criticality": "medium"
-    },
-    {
       "id": "telegram_bot_stack.cli.commands.deploy",
+      "name": "__init__",
+      "type": "module",
+      "category": "implementation",
+      "path": "telegram_bot_stack/cli/commands/deploy/__init__.py",
+      "description": "Module __init__",
+      "lines_of_code": 16,
+      "complexity_score": 1,
+      "exports": [],
+      "classes": [],
+      "functions": [],
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium"
+    },
+    {
+      "id": "telegram_bot_stack.cli.commands.deploy.deploy",
       "name": "deploy",
       "type": "module",
       "category": "implementation",
-      "path": "telegram_bot_stack/cli/commands/deploy.py",
+      "path": "telegram_bot_stack/cli/commands/deploy/deploy.py",
       "description": "Module deploy",
-      "lines_of_code": 428,
+      "lines_of_code": 334,
       "complexity_score": 1,
       "exports": [
         "deploy",
         "init",
-        "up",
-        "update",
-        "status",
-        "logs",
-        "down"
+        "backup",
+        "create_backup",
+        "list_backups",
+        "download",
+        "restore"
       ],
       "classes": [],
       "functions": [
         "deploy",
         "init",
-        "up",
-        "update",
-        "status",
-        "logs",
-        "down"
-      ],
-      "dependencies": [],
-      "dependents": [],
-      "criticality": "medium"
-    },
-    {
-      "id": "telegram_bot_stack.cli.commands.dev",
-      "name": "dev",
-      "type": "module",
-      "category": "implementation",
-      "path": "telegram_bot_stack/cli/commands/dev.py",
-      "description": "Module dev",
-      "lines_of_code": 298,
-      "complexity_score": 1,
-      "exports": [
-        "BotReloadHandler",
-        "dev",
-        "start_bot",
-        "read_output",
-        "on_modified"
-      ],
-      "classes": [
-        "BotReloadHandler"
-      ],
-      "functions": [
-        "dev",
-        "start_bot",
-        "read_output",
-        "on_modified"
+        "backup",
+        "create_backup",
+        "list_backups",
+        "download",
+        "restore"
       ],
       "dependencies": [],
       "dependents": [],
@@ -1314,66 +1341,31 @@
   "edges": [
     {
       "id": "edge_1",
-      "source": "tests.conftest",
-      "target": "telegram_bot_stack.admin_manager",
+      "source": "telegram_bot_stack.cli.commands.deploy",
+      "target": "telegram_bot_stack.cli.commands.deploy",
       "type": "imports",
-      "description": "Imports from telegram_bot_stack.admin_manager"
+      "description": "Imports from telegram_bot_stack.cli.commands.deploy"
     },
     {
-      "id": "edge_8",
-      "source": "tests.core.test_admin_manager",
-      "target": "telegram_bot_stack.admin_manager",
+      "id": "edge_2",
+      "source": "tests.cli.test_backup",
+      "target": "telegram_bot_stack.cli.commands.deploy",
       "type": "imports",
-      "description": "Imports from telegram_bot_stack.admin_manager"
+      "description": "Imports from telegram_bot_stack.cli.commands.deploy"
     },
     {
-      "id": "edge_13",
-      "source": "tests.core
-      ],
-     ,
-      "target": "telegram_bot_stack.bot_base",
+      "id": "edge_3",
+      "source": "tests.cli.test_deploy_command",
+      "target": "telegram_bot_stack.cli.commands.deploy",
       "type": "imports",
-      "description": "Imports from telegram_bot_stack.bot_base"
+      "description": "Imports from telegram_bot_stack.cli.commands.deploy"
     },
     {
-      "id": "edge_15",
-      "source": "tests.integration.test_full_flow",
-      "target": "telegram_bot_stack.bot_base",
+      "id": "edge_4",
+      "source": "tests.cli.test_deploy_command",
+      "target": "telegram_bot_stack.cli.commands.deploy.deploy",
       "type": "imports",
-      "description": "Imports from telegram_bot_stack.bot_base"
-    },
-    {
-      "id": "edge_34",
-      "source": "telegram_bot_stack.bot_base",
-      "target": "telegram_bot_stack.admin_manager",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.admin_manager"
-    }
-  ]
-}
-pe": "imports",
-      "description": "Imports from telegram_bot_stack.admin_manager"
-    },
-    {
-      "id": "edge_13",
-      "source": "tests.core.test_bot_base",
-      "target": "telegram_bot_stack.bot_base",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.bot_base"
-    },
-    {
-      "id": "edge_15",
-      "source": "tests.integration.test_full_flow",
-      "target": "telegram_bot_stack.bot_base",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.bot_base"
-    },
-    {
-      "id": "edge_34",
-      "source": "telegram_bot_stack.bot_base",
-      "target": "telegram_bot_stack.admin_manager",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.admin_manager"
+      "description": "Imports from telegram_bot_stack.cli.commands.deploy.deploy"
     }
   ]
 }

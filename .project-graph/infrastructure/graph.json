@@ -777,7 +777,7 @@
       "type": "script",
       "path": "scripts/mcp_github_server.py",
       "description": "MCP Server for GitHub Issues and Pull Requests.",
-      "lines_of_code": 1091,
+      "lines_of_code": 1486,
       "exports": [
         "MCPServer",
         "GithubException",

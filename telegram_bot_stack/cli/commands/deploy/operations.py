@@ -1,0 +1,413 @@
+"""Deployment operations (up, update, down)."""
+
+import shutil
+from pathlib import Path
+
+import click
+from rich.console import Console
+
+from telegram_bot_stack.cli.utils.backup import BackupManager
+from telegram_bot_stack.cli.utils.deployment import (
+    DeploymentConfig,
+    DockerTemplateRenderer,
+    create_env_file,
+)
+from telegram_bot_stack.cli.utils.secrets import SecretsManager
+from telegram_bot_stack.cli.utils.vps import VPSConnection
+
+console = Console()
+
+
+@click.command()
+@click.option("--config", default="deploy.yaml", help="Deployment config file")
+@click.option("--verbose", "-v", is_flag=True, help="Verbose output")
+def up(config: str, verbose: bool) -> None:
+    """Deploy bot to VPS."""
+    console.print("🚀 [bold cyan]Deploying bot to VPS...[/bold cyan]\n")
+
+    # Load configuration
+    if not Path(config).exists():
+        console.print(f"[red]❌ Configuration file not found: {config}[/red]")
+        console.print("\n[yellow]Run 'telegram-bot-stack deploy init' first[/yellow]")
+        return
+
+    deploy_config = DeploymentConfig(config)
+
+    if not deploy_config.validate():
+        console.print("[red]❌ Invalid configuration[/red]")
+        return
+
+    # Connect to VPS
+    console.print("[cyan]🔧 Connecting to VPS...[/cyan]")
+    vps = VPSConnection(
+        host=deploy_config.get("vps.host"),
+        user=deploy_config.get("vps.user"),
+        ssh_key=deploy_config.get("vps.ssh_key"),
+        port=deploy_config.get("vps.port", 22),
+    )
+
+    try:
+        if not vps.test_connection():
+            console.print("[red]❌ Failed to connect to VPS[/red]")
+            return
+
+        console.print("[green]✓ Connected to VPS[/green]\n")
+
+        # Check and install Docker if needed
+        console.print("[cyan]🐳 Checking Docker installation...[/cyan]")
+        if not vps.check_docker_installed():
+            console.print("[yellow]Docker not found, installing...[/yellow]")
+            if not vps.install_docker():
+                console.print("[red]❌ Failed to install Docker[/red]")
+                return
+        else:
+            console.print("[green]✓ Docker is installed[/green]\n")
+
+        # Prepare deployment directory
+        bot_name = deploy_config.get("bot.name")
+        remote_dir = f"/opt/{bot_name}"
+
+        console.print(f"[cyan]📦 Preparing deployment directory: {remote_dir}[/cyan]")
+        vps.run_command(f"mkdir -p {remote_dir}")
+
+        # Generate Docker files from templates
+        console.print("[cyan]📝 Generating Docker configuration...[/cyan]")
+
+        temp_dir = Path(".deploy-temp")
+        temp_dir.mkdir(exist_ok=True)
+
+        try:
+            # Check if secrets exist before rendering templates
+            # This determines whether .secrets.env should be included in docker-compose.yml
+            encryption_key = deploy_config.get("secrets.encryption_key")
+            has_secrets = False
+
+            if encryption_key:
+                secrets_manager = SecretsManager(bot_name, remote_dir, encryption_key)
+                # Check if secrets exist (without decrypting)
+                encrypted_secrets = secrets_manager.list_secrets(
+                    vps, return_values=False
+                )
+                has_secrets = len(encrypted_secrets) > 0
+
+            # Render templates
+            renderer = DockerTemplateRenderer(deploy_config, has_secrets=has_secrets)
+            renderer.render_all(temp_dir)
+
+            # Create .env file (secrets will be loaded from .secrets.env on VPS)
+            env_file = temp_dir / ".env"
+            create_env_file(deploy_config, env_file)
+
+            console.print("[green]✓ Docker configuration generated[/green]\n")
+
+            # Transfer files to VPS
+            console.print("[cyan]📤 Transferring files to VPS...[/cyan]")
+
+            # Copy current directory files to temp
+            for item in Path.cwd().iterdir():
+                if item.name not in [
+                    ".git",
+                    ".venv",
+                    "venv",
+                    "__pycache__",
+                    ".deploy-temp",
+                    "logs",
+                    ".pytest_cache",
+                    "htmlcov",
+                    ".secrets.env",  # Exclude - encrypted version exists on VPS
+                ]:
+                    if item.is_file():
+                        shutil.copy2(item, temp_dir)
+                    elif item.is_dir():
+                        shutil.copytree(item, temp_dir / item.name, dirs_exist_ok=True)
+
+            # Transfer to VPS
+            if not vps.transfer_files(temp_dir, remote_dir):
+                console.print("[red]❌ Failed to transfer files[/red]")
+                return
+
+            console.print("[green]✓ Files transferred[/green]\n")
+
+            # Create decryption script that decrypts secrets in-memory during container startup
+            # This ensures secrets remain encrypted at rest on VPS filesystem
+            # Note: has_secrets was already determined above
+            encryption_key = deploy_config.get("secrets.encryption_key")
+
+            # Create Python script that decrypts secrets in-memory and outputs to stdout
+            # This script runs during container startup, never writes plain text to filesystem
+            # Escape encryption_key for use in Python string (handle None case)
+            encryption_key_str = encryption_key if encryption_key else ""
+            # Escape backslashes and quotes for Python string literal
+            encryption_key_escaped = encryption_key_str.replace("\\", "\\\\").replace(
+                '"', '\\"'
+            )
+
+            decrypt_script = f"""#!/usr/bin/env python3
+\"\"\"
+Decrypt secrets in-memory and output as environment variables.
+This script is executed during container startup to decrypt secrets
+without writing plain text to the filesystem.
+\"\"\"
+import os
+import sys
+from pathlib import Path
+
+# Import cryptography for decryption
+try:
+    from cryptography.fernet import Fernet
+except ImportError:
+    print("# Error: cryptography not available", file=sys.stderr)
+    sys.exit(1)
+
+def decrypt_secrets():
+    \"\"\"Decrypt secrets from encrypted file and output as env file format.\"\"\"
+    remote_dir = "{remote_dir}"
+    secrets_file = f"{{remote_dir}}/.secrets.env.encrypted"
+    encryption_key = "{encryption_key_escaped}"
+
+    if not encryption_key:
+        return
+
+    # Read encrypted secrets file
+    if not Path(secrets_file).exists():
+        return
+
+    try:
+        fernet = Fernet(encryption_key.encode())
+
+        with open(secrets_file, "r") as f:
+            for line in f:
+                line = line.strip()
+                if not line or line.startswith("#"):
+                    continue
+
+                if "=" in line:
+                    key, encrypted_value = line.split("=", 1)
+                    key = key.strip()
+                    encrypted_value = encrypted_value.strip()
+
+                    try:
+                        decrypted_value = fernet.decrypt(encrypted_value.encode()).decode()
+                        # Output as KEY=VALUE (properly escaped for .env file format)
+                        # Simple escaping: quote if contains special characters
+                        needs_quoting = any(
+                            char in decrypted_value
+                            for char in ["\\n", "\\r", "\\t", '"', "\\\\", " ", "#", "=", "$", "`"]
+                        )
+
+                        if needs_quoting:
+                            # Build escaped value step by step
+                            temp_val = decrypted_value.replace("\\\\", "\\\\\\\\")
+                            temp_val = temp_val.replace('"', '\\\\"')
+                            temp_val = temp_val.replace("\\n", "\\\\n")
+                            temp_val = temp_val.replace("\\r", "\\\\r")
+                            temp_val = temp_val.replace("\\t", "\\\\t")
+                            temp_val = temp_val.replace("$", "\\\\$")
+                            temp_val = temp_val.replace("`", "\\\\`")
+                            output_value = '"' + temp_val + '"'
+                        else:
+                            output_value = decrypted_value
+                        # Use format to avoid f-string nesting issues
+                        print("{{}}={{}}".format(key, output_value))
+                    except Exception as e:
+                        print(f"# Warning: Failed to decrypt {{key}}: {{e}}", file=sys.stderr)
+    except Exception as e:
+        print(f"# Error decrypting secrets: {{e}}", file=sys.stderr)
+
+if __name__ == "__main__":
+    decrypt_secrets()
+"""
+
+            decrypt_script_path = f"{remote_dir}/decrypt_secrets.py"
+            if vps.write_file(decrypt_script, decrypt_script_path, mode="700"):
+                console.print("[green]✓ Created secrets decryption script[/green]")
+            else:
+                console.print(
+                    "[yellow]⚠️  Warning: Could not create decryption script[/yellow]"
+                )
+
+            # Note: Makefile template now handles decryption via decrypt_secrets.py
+            # Secrets are decrypted to /dev/shm (shared memory, RAM-based, not persisted)
+            if has_secrets:
+                console.print(
+                    "[dim]   (Secrets will be decrypted in-memory to shared memory during container startup)[/dim]"
+                )
+
+            # Build and start bot
+            console.print("[cyan]🏗️  Building Docker image...[/cyan]")
+            if not vps.run_command(f"cd {remote_dir} && docker-compose build"):
+                console.print("[red]❌ Failed to build Docker image[/red]")
+                return
+
+            console.print("[green]✓ Docker image built[/green]\n")
+
+            console.print("[cyan]🚀 Starting bot...[/cyan]")
+            # Makefile handles secrets decryption via decrypt_secrets.py
+            # Secrets are decrypted to /dev/shm (shared memory) before docker-compose starts
+            if not vps.run_command(f"cd {remote_dir} && make up"):
+                console.print("[red]❌ Failed to start bot[/red]")
+                return
+
+            console.print("[green]✓ Bot started[/green]\n")
+
+            # Show status
+            console.print("[cyan]📊 Checking bot status...[/cyan]")
+            vps.run_command(f"cd {remote_dir} && docker-compose ps")
+
+            console.print("\n[green]🎉 Deployment successful![/green]\n")
+            console.print("[bold]Bot Information:[/bold]")
+            console.print(f"  Name: {bot_name}")
+            console.print(f"  Host: {deploy_config.get('vps.host')}")
+            console.print(f"  Directory: {remote_dir}")
+            console.print("\n[bold]Useful commands:[/bold]")
+            console.print("  View logs:   [cyan]telegram-bot-stack deploy logs[/cyan]")
+            console.print(
+                "  Check status: [cyan]telegram-bot-stack deploy status[/cyan]"
+            )
+            console.print("  Stop bot:    [cyan]telegram-bot-stack deploy down[/cyan]")
+
+        finally:
+            # Cleanup temp directory
+            if temp_dir.exists():
+                shutil.rmtree(temp_dir)
+
+    finally:
+        # Always close VPS connection
+        vps.close()
+
+
+@click.command()
+@click.option("--config", default="deploy.yaml", help="Deployment config file")
+@click.option("--verbose", "-v", is_flag=True, help="Verbose output")
+@click.option("--backup", is_flag=True, help="Create backup before updating")
+@click.option("--no-backup", is_flag=True, help="Skip automatic backup")
+def update(config: str, verbose: bool, backup: bool, no_backup: bool) -> None:
+    """Update running bot on VPS."""
+    console.print("🔄 [bold cyan]Updating bot...[/bold cyan]\n")
+
+    # Load configuration
+    if not Path(config).exists():
+        console.print(f"[red]❌ Configuration file not found: {config}[/red]")
+        return
+
+    deploy_config = DeploymentConfig(config)
+
+    # Connect to VPS
+    vps = VPSConnection(
+        host=deploy_config.get("vps.host"),
+        user=deploy_config.get("vps.user"),
+        ssh_key=deploy_config.get("vps.ssh_key"),
+        port=deploy_config.get("vps.port", 22),
+    )
+
+    try:
+        bot_name = deploy_config.get("bot.name")
+        remote_dir = f"/opt/{bot_name}"
+
+        # Auto-backup before update (if enabled and not explicitly disabled)
+        auto_backup_enabled = deploy_config.get(
+            "backup.auto_backup_before_update", True
+        )
+        if backup or (auto_backup_enabled and not no_backup):
+            backup_manager = BackupManager(bot_name, remote_dir)
+            backup_manager.create_backup(vps, auto_backup=True)
+            console.print()  # Add spacing
+
+        # Transfer updated files
+        console.print("[cyan]📤 Transferring updated files...[/cyan]")
+
+        temp_dir = Path(".deploy-temp")
+        temp_dir.mkdir(exist_ok=True)
+
+        try:
+            # Copy current directory files to temp
+            for item in Path.cwd().iterdir():
+                if item.name not in [
+                    ".git",
+                    ".venv",
+                    "venv",
+                    "__pycache__",
+                    ".deploy-temp",
+                    "logs",
+                    ".pytest_cache",
+                    "htmlcov",
+                ]:
+                    if item.is_file():
+                        shutil.copy2(item, temp_dir)
+                    elif item.is_dir():
+                        shutil.copytree(item, temp_dir / item.name, dirs_exist_ok=True)
+
+            # Transfer to VPS
+            if not vps.transfer_files(temp_dir, remote_dir):
+                console.print("[red]❌ Failed to transfer files[/red]")
+                return
+
+            console.print("[green]✓ Files transferred[/green]\n")
+
+            # Rebuild and restart
+            console.print("[cyan]🏗️  Rebuilding Docker image...[/cyan]")
+            vps.run_command(f"cd {remote_dir} && docker-compose build")
+
+            console.print("[cyan]🔄 Restarting bot...[/cyan]")
+            vps.run_command(f"cd {remote_dir} && docker-compose up -d")
+
+            console.print("\n[green]✅ Bot updated successfully![/green]")
+
+        finally:
+            if temp_dir.exists():
+                shutil.rmtree(temp_dir)
+
+    finally:
+        vps.close()
+
+
+@click.command()
+@click.option("--config", default="deploy.yaml", help="Deployment config file")
+@click.option("--cleanup", is_flag=True, help="Remove container and image")
+@click.option("--backup", is_flag=True, help="Create backup before stopping")
+@click.option("--no-backup", is_flag=True, help="Skip automatic backup")
+def down(config: str, cleanup: bool, backup: bool, no_backup: bool) -> None:
+    """Stop bot on VPS."""
+    console.print("🛑 [bold cyan]Stopping bot...[/bold cyan]\n")
+
+    # Load configuration
+    if not Path(config).exists():
+        console.print(f"[red]❌ Configuration file not found: {config}[/red]")
+        return
+
+    deploy_config = DeploymentConfig(config)
+
+    # Connect to VPS
+    vps = VPSConnection(
+        host=deploy_config.get("vps.host"),
+        user=deploy_config.get("vps.user"),
+        ssh_key=deploy_config.get("vps.ssh_key"),
+        port=deploy_config.get("vps.port", 22),
+    )
+
+    try:
+        bot_name = deploy_config.get("bot.name")
+        remote_dir = f"/opt/{bot_name}"
+
+        # Auto-backup before cleanup (if enabled and not explicitly disabled)
+        if cleanup:
+            auto_backup_enabled = deploy_config.get(
+                "backup.auto_backup_before_cleanup", True
+            )
+            if backup or (auto_backup_enabled and not no_backup):
+                backup_manager = BackupManager(bot_name, remote_dir)
+                backup_manager.create_backup(vps, auto_backup=True)
+                console.print()  # Add spacing
+
+        # Stop bot
+        if cleanup:
+            console.print("[cyan]Stopping and removing containers...[/cyan]")
+            vps.run_command(f"cd {remote_dir} && docker-compose down -v --rmi all")
+            console.print("[green]✓ Bot stopped and cleaned up[/green]")
+        else:
+            console.print("[cyan]Stopping bot...[/cyan]")
+            vps.run_command(f"cd {remote_dir} && docker-compose down")
+            console.print("[green]✓ Bot stopped[/green]")
+
+    finally:
+        vps.close()
