@@ -1,6 +1,6 @@
 # Project Status - telegram-bot-stack
 
-**Version:** v1.21.0 → v2.0.0 MVP
+**Version:** v1.25.0 → v2.0.0 MVP
 **Updated:** 2025-11-27
 **Status:** 🏗️ Phase 2 - Hardening Killer Feature
 
@@ -77,11 +77,11 @@ Total: ~10 minutes to live bot 🚀
 | **#77** | Health checks + auto-recovery | ✅ YES         | ✅ DONE | 4-5h  | #78    |
 | **#79** | Secrets management            | ✅ YES         | ✅ DONE | 5-6h  | -      |
 | **#81** | Backup/restore                | ✅ YES         | ✅ DONE | 5-6h  | -      |
-| **#84** | Troubleshooting guide         | ✅ YES (docs)  | ⏳ TODO | 3-4h  | -      |
+| **#84** | Troubleshooting guide         | ✅ YES (docs)  | ✅ DONE | 3-4h  | -      |
 | **#85** | Integration tests             | ✅ YES (tests) | ⏳ TODO | 8-10h | -      |
 | **#88** | Doctor command                | 🔧 CLI tool    | ⏳ TODO | 6-8h  | -      |
 
-**Total Critical Path:** ~24-31 hours (4-5 days) - **4 issues completed!**
+**Total Critical Path:** ~24-31 hours (4-5 days) - **5 issues completed!**
 
 **IMPORTANT Issues (do after critical):**
 
@@ -116,7 +116,7 @@ Total: ~10 minutes to live bot 🚀
 | #77 | **Health checks**      | Deploy   | ✅ DONE           | #27     | #78, #80 |
 | #79 | **Secrets management** | Deploy   | ✅ DONE           | #27     | -        |
 | #81 | **Backup/restore**     | Deploy   | ✅ DONE           | #27     | -        |
-| #84 | **Troubleshooting**    | Docs     | ⏳ TODO           | #27     | -        |
+| #84 | **Troubleshooting**    | Docs     | ✅ DONE           | #27     | -        |
 | #85 | **Deploy tests**       | Tests    | ⏳ TODO           | #27     | -        |
 | #88 | **Doctor command**     | CLI      | ⏳ TODO           | -       | -        |
 
@@ -127,7 +127,7 @@ Total: ~10 minutes to live bot 🚀
 | #40 | Full Dev Setup | ✅ DONE (v1.17.0) | Killer Feature #1 |
 | #60 | Agent Optimize | 🏗️ In Progress    | Ongoing           |
 
-**Total Critical: 5 TODO + 7 DONE = 12 issues**
+**Total Critical: 4 TODO + 8 DONE = 12 issues**
 
 ---
 
@@ -244,7 +244,7 @@ Killer Feature #2: VPS Deployment
 │   ├── ✅ #77 Health checks ← #27 → blocks #78, #80 (DONE)
 │   ├── ✅ #79 Secrets ← #27 (DONE)
 │   ├── ✅ #81 Backup ← #27 (DONE)
-│   ├── #84 Troubleshooting ← #27
+│   ├── ✅ #84 Troubleshooting ← #27 (DONE)
 │   ├── #85 Deploy tests ← #27
 │   └── #88 Doctor (independent)
 │
@@ -308,12 +308,13 @@ Supporting Infrastructure (parallel):
 - Data Safety (#81 Backup) ✅
 - Recovery (#76 Rollback) ✅
 - Reliability (#77 Health checks) ✅
+- Documentation (#84 Troubleshooting) ✅
 
 **⏳ Remaining:**
 
-- Testing & Docs (#85, #84, #88)
+- Testing & Tooling (#85, #88)
 
-**Milestone:** Production-safe deployment (4/4 critical features done) ✅
+**Milestone:** Production-safe deployment (5/5 critical features done) ✅
 
 ### 🚀 Week 9: Advanced Features
 
@@ -379,7 +380,7 @@ Supporting Infrastructure (parallel):
 - [x] Health checks (#77) ✅
 - [x] Secrets management (#79) ✅
 - [x] Backup/restore (#81) ✅
-- [ ] Troubleshooting guide (#84)
+- [x] Troubleshooting guide (#84) ✅
 - [ ] Integration tests (#85)
 - [ ] Doctor command (#88)
 - [ ] Zero-downtime updates (#78)
@@ -459,7 +460,7 @@ Supporting Infrastructure (parallel):
 - ✅ #77: Health checks + auto-recovery DONE
 - ✅ #79: Secrets management DONE
 - ✅ #81: Backup/restore DONE
-- #84: Troubleshooting guide ⏳
+- ✅ #84: Troubleshooting guide DONE
 - #85: Integration tests ⏳
 - #88: Doctor command ⏳
 
@@ -532,7 +533,7 @@ Supporting Infrastructure (parallel):
 ---
 
 **Status:** 🏗️ Killer Feature #2 deployed, now hardening for production
-**Progress:** 4/7 critical hardening tasks completed (#79 Secrets, #81 Backup, #76 Rollback, #77 Health) ✅
-**Current Focus:** Testing & Documentation (#84 Troubleshooting, #85 Tests, #88 Doctor)
+**Progress:** 5/7 critical hardening tasks completed (#79 Secrets, #81 Backup, #76 Rollback, #77 Health, #84 Troubleshooting) ✅
+**Current Focus:** Testing & Tooling (#85 Integration Tests, #88 Doctor)
 **Next Milestone:** v2.0.0 MVP (Week 10)
 **Next Review:** After completing critical hardening (Week 8)

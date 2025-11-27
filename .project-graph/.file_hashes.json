@@ -1,6 +1,7 @@
 {
-  "docs/deployment_guide.md": "c3ed7ff408f9a996fb0a081625da9b5a87fceba68f0ae7353f4f174bc1f0a937",
+  "docs/deployment_guide.md": "40aa8d23bb7c492b636220db4481861ca0234073ec4ed9d8dc9af7f4a01e0373",
   "telegram_bot_stack/cli/commands/deploy/__init__.py": "9ffaee12493adce3d58d6ebf4bbd91d771dbe5023924adb884fdb1b14ff387c7",
   "telegram_bot_stack/cli/commands/deploy/monitoring.py": "127e5537212504b7e00f4c25a65f29c4bbd7d6e155bbd1b40aa6803b575b23a2",
-  "telegram_bot_stack/cli/utils/vps.py": "3f31e15ade7284588370c749ecaaec5027d7d27f990471849fe08681ccb4c332"
+  "telegram_bot_stack/cli/utils/vps.py": "3f31e15ade7284588370c749ecaaec5027d7d27f990471849fe08681ccb4c332",
+  ".github/PROJECT_STATUS.md": "1258f9b2ab52339987e7356fe421e44621d3c76673b8dfbc532c3a7bcc95c81d"
 }
