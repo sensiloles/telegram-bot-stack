@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.25.3 (2025-11-27)
+
+### Bug Fixes
+
+- **ci**: Add id-token permission for PyPI Trusted Publishing
+  ([`e202830`](https://github.com/sensiloles/telegram-bot-stack/commit/e202830d819b2a644d6972bd3eba1428a250d579))
+
+
 ## v1.25.2 (2025-11-27)
 
 ### Bug Fixes
