@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.22.1 (2025-11-27)
+
+### Bug Fixes
+
+- **ide**: Configure mypy extension for real-time type checking
+  ([`da660e0`](https://github.com/sensiloles/telegram-bot-stack/commit/da660e04e2e4330030ab11290f6fff65a6d17825))
+
+
 ## v1.22.0 (2025-11-27)
 
 ### Continuous Integration
