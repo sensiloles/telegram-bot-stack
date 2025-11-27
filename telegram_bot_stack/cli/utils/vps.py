@@ -264,3 +264,105 @@ def check_docker_compose_installed(conn: Connection) -> bool:
         return bool(result.ok)
     except Exception:
         return False
+
+
+def get_container_health(conn: Connection, container_name: str) -> Dict[str, Any]:
+    """Get container health status.
+
+    Args:
+        conn: Fabric Connection object
+        container_name: Name of the container
+
+    Returns:
+        Dictionary with health information
+    """
+    health_info: Dict[str, Any] = {
+        "running": False,
+        "health_status": "unknown",
+        "uptime": None,
+        "restarts": 0,
+        "last_restart": None,
+        "exit_code": None,
+    }
+
+    try:
+        # Check if container exists and is running
+        result = conn.run(
+            f"docker inspect --format='{{{{.State.Running}}}}' {container_name}",
+            hide=True,
+            warn=True,
+        )
+        if result.ok and result.stdout.strip() == "true":
+            health_info["running"] = True
+
+            # Get health status
+            result = conn.run(
+                f"docker inspect --format='{{{{.State.Health.Status}}}}' {container_name}",
+                hide=True,
+                warn=True,
+            )
+            if result.ok and result.stdout.strip():
+                health_info["health_status"] = result.stdout.strip()
+
+            # Get uptime
+            result = conn.run(
+                f"docker inspect --format='{{{{.State.StartedAt}}}}' {container_name}",
+                hide=True,
+                warn=True,
+            )
+            if result.ok:
+                health_info["uptime"] = result.stdout.strip()
+
+            # Get restart count
+            result = conn.run(
+                f"docker inspect --format='{{{{.RestartCount}}}}' {container_name}",
+                hide=True,
+                warn=True,
+            )
+            if result.ok:
+                try:
+                    health_info["restarts"] = int(result.stdout.strip())
+                except ValueError:
+                    pass
+
+        else:
+            # Container not running - get exit code
+            result = conn.run(
+                f"docker inspect --format='{{{{.State.ExitCode}}}}' {container_name}",
+                hide=True,
+                warn=True,
+            )
+            if result.ok:
+                try:
+                    health_info["exit_code"] = int(result.stdout.strip())
+                except ValueError:
+                    pass
+
+    except Exception as e:
+        console.print(f"[yellow]Warning: Failed to get health info: {e}[/yellow]")
+
+    return health_info
+
+
+def get_recent_errors(conn: Connection, container_name: str, lines: int = 50) -> str:
+    """Get recent error logs from container.
+
+    Args:
+        conn: Fabric Connection object
+        container_name: Name of the container
+        lines: Number of log lines to retrieve (default: 50)
+
+    Returns:
+        Recent error logs as string
+    """
+    try:
+        result = conn.run(
+            f"docker logs --tail={lines} {container_name} 2>&1 | grep -i 'error\\|exception\\|failed\\|critical' || true",
+            hide=True,
+            warn=True,
+        )
+        if result.ok and result.stdout:
+            return str(result.stdout.strip())
+        return ""
+    except Exception:
+        return ""

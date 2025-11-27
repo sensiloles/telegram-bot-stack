@@ -248,11 +248,13 @@
       "category": "implementation",
       "path": "telegram_bot_stack/cli/utils/vps.py",
       "description": "VPS operations utilities for deployment.",
-      "lines_of_code": 266,
+      "lines_of_code": 368,
       "complexity_score": 1,
       "exports": [
         "VPSConnection",
         "check_docker_compose_installed",
+        "get_container_health",
+        "get_recent_errors",
         "test_connection",
         "connect",
         "run_command",
@@ -267,6 +269,8 @@
       ],
       "functions": [
         "check_docker_compose_installed",
+        "get_container_health",
+        "get_recent_errors",
         "test_connection",
         "connect",
         "run_command",
@@ -556,16 +560,18 @@
       "category": "implementation",
       "path": "telegram_bot_stack/cli/commands/deploy/monitoring.py",
       "description": "Monitoring commands for deployment (status, logs).",
-      "lines_of_code": 82,
+      "lines_of_code": 251,
       "complexity_score": 1,
       "exports": [
         "status",
-        "logs"
+        "logs",
+        "health"
       ],
       "classes": [],
       "functions": [
         "status",
-        "logs"
+        "logs",
+        "health"
       ],
       "dependencies": [],
       "dependents": [],
@@ -578,7 +584,7 @@
       "category": "implementation",
       "path": "telegram_bot_stack/cli/commands/deploy/__init__.py",
       "description": "Deployment commands module - refactored into smaller modules.",
-      "lines_of_code": 18,
+      "lines_of_code": 19,
       "complexity_score": 1,
       "exports": [],
       "classes": [],

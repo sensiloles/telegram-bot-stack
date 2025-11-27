@@ -13,6 +13,7 @@ deploy.add_command(operations.rollback, "rollback")
 deploy.add_command(operations.history, "history")
 deploy.add_command(monitoring.status, "status")
 deploy.add_command(monitoring.logs, "logs")
+deploy.add_command(monitoring.health, "health")
 deploy.add_command(secrets.secrets, "secrets")
 
 __all__ = ["deploy"]

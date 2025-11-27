@@ -70,13 +70,19 @@ This will:
 ### 4. Check Status
 
 ```bash
+# Check deployment status
 telegram-bot-stack deploy status
+
+# Check bot health
+telegram-bot-stack deploy health
 ```
 
 Shows:
 
 - Container status (running/stopped)
+- Health status (healthy/unhealthy)
 - Resource usage (CPU, memory)
+- Uptime and restart count
 - Recent logs
 
 ### 5. View Logs
@@ -1262,16 +1268,152 @@ scp root@your-vps-ip:/opt/bot-name/backups/manual-backup-*.tar.gz ./
 
 ### Health Monitoring
 
-The deployed bot includes automatic health checks:
+The deployed bot includes automatic health checks and recovery:
 
-- Container restarts automatically on failure
-- Health check every 30 seconds
-- 3 retries before marking unhealthy
+- **Automatic health checks** every 30 seconds
+- **Auto-restart on failure** (up to 3 retries within 5 minutes)
+- **Process monitoring** - detects if bot process crashes
+- **Container monitoring** - detects if container stops
 
-View health status:
+#### Check Bot Health
+
+View comprehensive health status:
 
 ```bash
+telegram-bot-stack deploy health
+```
+
+Shows:
+
+- **Container Status:** Running, stopped, or restarting
+- **Health Status:** Healthy, unhealthy, or starting
+- **Uptime:** How long bot has been running
+- **Restart Count:** Number of automatic restarts
+- **Auto-Recovery:** Whether automatic restart is enabled
+
+**Example output:**
+
+```
+🏥 Bot Health Check
+
+┏━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Metric        ┃ Status                   ┃
+┡━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│ Container     │ ✓ Running                │
+│ Health Status │ ✓ Healthy                │
+│ Uptime        │ 2d 5h 30m                │
+│ Restarts      │ 0 restarts               │
+└───────────────┴──────────────────────────┘
+
+Automatic Recovery:
+  ✓ Enabled - Container will restart on failure
+  Max retries: 3 within 5 minutes
+```
+
+#### Check Recent Errors
+
+View recent errors from bot logs:
+
+```bash
+telegram-bot-stack deploy health --errors
+```
+
+This shows only ERROR, EXCEPTION, FAILED, and CRITICAL log entries, making it easy to diagnose issues.
+
+#### Health Check Configuration
+
+Health checks are configured in `docker-compose.yml`:
+
+```yaml
+healthcheck:
+  test: ["CMD", "pgrep", "-f", "python.*bot"]
+  interval: 30s # Check every 30 seconds
+  timeout: 10s # Timeout after 10 seconds
+  retries: 3 # Mark unhealthy after 3 failed checks
+  start_period: 30s # Grace period for bot startup
+```
+
+To customize health check settings, edit your `docker-compose.yml` after deployment.
+
+#### Automatic Recovery
+
+Automatic restart is enabled by default in `docker-compose.yml`:
+
+```yaml
+restart: always # Always restart on failure
+```
+
+**Restart policies:**
+
+- `always` - Always restart (recommended for production)
+- `unless-stopped` - Restart unless manually stopped
+- `on-failure` - Restart only on error exit
+- `no` - Never restart automatically
+
+#### Health Monitoring Best Practices
+
+1. **Regular Health Checks:**
+
+   ```bash
+   # Check health daily
+   telegram-bot-stack deploy health
+   ```
+
+2. **Monitor Restarts:**
+
+   - If restart count > 3, investigate the issue
+   - Check errors: `telegram-bot-stack deploy health --errors`
+
+3. **Set Up Alerts:**
+
+   - Use external monitoring (e.g., UptimeRobot, Pingdom)
+   - Monitor bot's Telegram status via [@BotFather](https://t.me/BotFather)
+
+4. **Log Monitoring:**
+
+   - Review logs regularly: `telegram-bot-stack deploy logs`
+   - Look for patterns in errors
+
+5. **Resource Monitoring:**
+   - Check resource usage: `telegram-bot-stack deploy status`
+   - Ensure bot has enough memory/CPU
+
+#### Troubleshooting Health Issues
+
+**Bot marked as unhealthy:**
+
+```bash
+# Check what's wrong
+telegram-bot-stack deploy health --errors
+
+# View full logs
+telegram-bot-stack deploy logs --tail 100
+
+# Restart if needed
+telegram-bot-stack deploy up
+```
+
+**Multiple restarts detected:**
+
+```bash
+# View deployment history
+telegram-bot-stack deploy history
+
+# Rollback to previous version
+telegram-bot-stack deploy rollback
+```
+
+**Container not running:**
+
+```bash
+# Check status
 telegram-bot-stack deploy status
+
+# View logs for crash reason
+telegram-bot-stack deploy logs
+
+# Restart bot
+telegram-bot-stack deploy up
 ```
 
 ### Log Rotation
