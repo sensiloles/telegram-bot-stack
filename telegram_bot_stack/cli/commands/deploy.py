@@ -190,8 +190,21 @@ def up(config: str, verbose: bool) -> None:
         temp_dir.mkdir(exist_ok=True)
 
         try:
+            # Check if secrets exist before rendering templates
+            # This determines whether .secrets.env should be included in docker-compose.yml
+            encryption_key = deploy_config.get("secrets.encryption_key")
+            has_secrets = False
+
+            if encryption_key:
+                secrets_manager = SecretsManager(bot_name, remote_dir, encryption_key)
+                # Check if secrets exist (without decrypting)
+                encrypted_secrets = secrets_manager.list_secrets(
+                    vps, return_values=False
+                )
+                has_secrets = len(encrypted_secrets) > 0
+
             # Render templates
-            renderer = DockerTemplateRenderer(deploy_config)
+            renderer = DockerTemplateRenderer(deploy_config, has_secrets=has_secrets)
             renderer.render_all(temp_dir)
 
             # Create .env file (secrets will be loaded from .secrets.env on VPS)
@@ -230,16 +243,8 @@ def up(config: str, verbose: bool) -> None:
 
             # Create decryption script that decrypts secrets in-memory during container startup
             # This ensures secrets remain encrypted at rest on VPS filesystem
+            # Note: has_secrets was already determined above
             encryption_key = deploy_config.get("secrets.encryption_key")
-            has_secrets = False
-
-            if encryption_key:
-                secrets_manager = SecretsManager(bot_name, remote_dir, encryption_key)
-                # Check if secrets exist (without decrypting)
-                encrypted_secrets = secrets_manager.list_secrets(
-                    vps, return_values=False
-                )
-                has_secrets = len(encrypted_secrets) > 0
 
             # Create Python script that decrypts secrets in-memory and outputs to stdout
             # This script runs during container startup, never writes plain text to filesystem

@@ -82,7 +82,7 @@
       "category": "implementation",
       "path": "telegram_bot_stack/cli/utils/deployment.py",
       "description": "Deployment configuration and template rendering utilities.",
-      "lines_of_code": 310,
+      "lines_of_code": 313,
       "complexity_score": 1,
       "exports": [
         "DeploymentConfig",
@@ -353,7 +353,7 @@
       "category": "implementation",
       "path": "telegram_bot_stack/cli/commands/deploy.py",
       "description": "VPS deployment commands for telegram-bot-stack.",
-      "lines_of_code": 778,
+      "lines_of_code": 783,
       "complexity_score": 1,
       "exports": [
         "deploy",

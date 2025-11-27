@@ -105,7 +105,12 @@ exclude = [
 "venv/",
 "build/",
 "dist/",
-".project-graph/"
+".project-graph/",
+"examples/",
+"tests/",
+"scripts/",
+"telegram_bot_stack/cli/templates/",
+"archive/"
 ]
 
 [tool.ruff]
