@@ -110,6 +110,7 @@ def init(
     config.set("backup.max_backups", 10)
 
     config.save()
+    console.print("\n[green]✓ Configuration saved to deploy.yaml[/green]")
 
     # Copy example deploy.yaml for reference
     templates_dir = Path(__file__).parent.parent.parent / "templates" / "docker"

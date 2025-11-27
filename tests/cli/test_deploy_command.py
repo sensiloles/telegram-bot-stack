@@ -43,7 +43,9 @@ class TestDeployInit:
         """Test init command with all options provided."""
         os.chdir(tmp_path)
 
-        with patch("telegram_bot_stack.cli.utils.vps.VPSConnection") as mock_vps:
+        with patch(
+            "telegram_bot_stack.cli.commands.deploy.deploy.VPSConnection"
+        ) as mock_vps:
             # Mock successful connection test
             mock_vps.return_value.test_connection.return_value = True
 
@@ -70,7 +72,9 @@ class TestDeployInit:
         """Test init command with connection failure."""
         os.chdir(tmp_path)
 
-        with patch("telegram_bot_stack.cli.utils.vps.VPSConnection") as mock_vps:
+        with patch(
+            "telegram_bot_stack.cli.commands.deploy.deploy.VPSConnection"
+        ) as mock_vps:
             # Mock failed connection test
             mock_vps.return_value.test_connection.return_value = False
 
