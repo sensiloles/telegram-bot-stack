@@ -2,6 +2,15 @@
 
 <!-- version list -->
 
+## v1.25.0 (2025-11-27)
+
+### Features
+
+- **deploy**: Add health checks and automatic recovery
+  ([#77](https://github.com/sensiloles/telegram-bot-stack/pull/77),
+  [`f5241f1`](https://github.com/sensiloles/telegram-bot-stack/commit/f5241f170a844a440d0b4058f9b1199cd2f47cee))
+
+
 ## v1.24.0 (2025-11-27)
 
 ### Features
