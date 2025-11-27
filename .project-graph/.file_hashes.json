@@ -3,5 +3,7 @@
   "telegram_bot_stack/cli/commands/deploy/__init__.py": "9ffaee12493adce3d58d6ebf4bbd91d771dbe5023924adb884fdb1b14ff387c7",
   "telegram_bot_stack/cli/commands/deploy/monitoring.py": "127e5537212504b7e00f4c25a65f29c4bbd7d6e155bbd1b40aa6803b575b23a2",
   "telegram_bot_stack/cli/utils/vps.py": "3f31e15ade7284588370c749ecaaec5027d7d27f990471849fe08681ccb4c332",
-  ".github/PROJECT_STATUS.md": "1258f9b2ab52339987e7356fe421e44621d3c76673b8dfbc532c3a7bcc95c81d"
+  ".github/PROJECT_STATUS.md": "1258f9b2ab52339987e7356fe421e44621d3c76673b8dfbc532c3a7bcc95c81d",
+  ".github/workflows/docs.yml": "0aa605badab2318f39aa4f960f4f21f81d597c832f2b1fd7e9d027a7e171b36f",
+  ".github/workflows/tests.yml": "03c8a68f7a01995d6df3423db0112397e10e555249da90c68f4857a9032a4e41"
 }

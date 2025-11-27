@@ -3,8 +3,22 @@ name: Tests
 on:
   push:
     branches: [main, develop]
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+      - ".github/PROJECT_STATUS.md"
+      - "LICENSE"
+      - ".gitignore"
+      - ".cursorrules"
   pull_request:
     branches: [main, develop]
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+      - ".github/PROJECT_STATUS.md"
+      - "LICENSE"
+      - ".gitignore"
+      - ".cursorrules"
   workflow_call: # Allow this workflow to be called by other workflows
 
 jobs:
