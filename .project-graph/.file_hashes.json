@@ -1,13 +1,6 @@
 {
-  "telegram_bot_stack/decorators.py": "c072d29832cc5cba3f3c131feac050ea9b46955a44684f5d851b76f97f8c7e39",
-  "telegram_bot_stack/storage/json.py": "51d88b0bd25a9e467a1e4a30a66ad838c04a942ce062dcdcc789a91c904c068c",
-  "telegram_bot_stack/storage/memory.py": "848435c00c9706b124ad89ad2f6dd7418a2d396bab7146c3aa500c4b4eba6f35",
-  "telegram_bot_stack/storage/sql.py": "7d6a7101a3f45642e58d14c5644846b0aae017fd0d78953849e88ce56e2a748a",
-  "telegram_bot_stack/user_manager.py": "992c901e97fa6f59789149c915d815b0b13f1fd3fea40e6b5c7cfb9f6fc6fda8",
-  ".github/workflows/tests.yml": "b623b50af8078db86a1924a417a1985e470552aea20cf4b65db1ec844ae2c496",
-  "docs/deployment_guide.md": "dde04fcb9283616783f68bc68be1be5a5c2599986d549f6ff86a87854cc27dad",
-  "telegram_bot_stack/cli/utils/deployment.py": "7798540772362525e839941bfb925dd4776f6e1c00ee4cbafd9c42a8cd7ed6d8",
-  "telegram_bot_stack/cli/commands/deploy.py": "54509fa27066c0c26eb84b7445d53ac445596de4a2f327fce2ea4b8569772b38",
-  "telegram_bot_stack/cli/utils/secrets.py": "ed399fb41d1646da493c3c9641e61fcdc262937338dbedc063dee70e34be686f",
-  "telegram_bot_stack/cli/utils/vps.py": "760ce1317818f4da95edd1d2f29d98e122b28996168bcb0e800cb9cfa652756d"
+  "telegram_bot_stack/cli/utils/vps.py": "4ffdb2519350fb8756f21c20e30a5ebe7db2ad974fdecf69a54002cdac702c99",
+  "docs/deployment_guide.md": "c59c093cf8adbfaf95c06257eca926d17bef9b45b05855888438becdee199556",
+  "telegram_bot_stack/cli/commands/deploy.py": "70085415b15690e3ca00d5d0c18c7df47cf3431d41eb1703c47e62d836c79d97",
+  "telegram_bot_stack/cli/utils/deployment.py": "c2309ef86a7deec6293eae8234181d3a89e4ef428ba1c88d8ead8166034e3d0a"
 }

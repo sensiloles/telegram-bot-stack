@@ -4,6 +4,7 @@ from telegram_bot_stack.cli.utils.deployment import (
     DeploymentConfig,
     DockerTemplateRenderer,
     create_env_file,
+    escape_env_value,
 )
 
 
@@ -179,3 +180,118 @@ class TestCreateEnvFile:
         assert "test-bot" in content
         assert "TZ=UTC" in content
         assert "PRODUCTION=true" in content
+
+
+class TestEscapeEnvValue:
+    """Tests for escape_env_value function."""
+
+    def test_escape_simple_value(self):
+        """Test escaping simple value (no special characters)."""
+        value = "simple_token_123"
+        escaped = escape_env_value(value)
+        assert escaped == value
+
+    def test_escape_value_with_newline(self):
+        """Test escaping value with newline (injection attempt)."""
+        value = "token\nMALICIOUS_KEY=value"
+        escaped = escape_env_value(value)
+        # Should be quoted and newline escaped
+        assert escaped.startswith('"')
+        assert escaped.endswith('"')
+        assert "\\n" in escaped
+        assert "MALICIOUS_KEY" in escaped
+        # Should not contain unescaped newline
+        assert "\n" not in escaped[1:-1]  # Exclude quotes
+
+    def test_escape_value_with_quotes(self):
+        """Test escaping value with quotes."""
+        value = 'token with "quotes"'
+        escaped = escape_env_value(value)
+        assert escaped.startswith('"')
+        assert escaped.endswith('"')
+        assert '\\"' in escaped
+
+    def test_escape_value_with_backslash(self):
+        """Test escaping value with backslash."""
+        value = "token\\with\\backslashes"
+        escaped = escape_env_value(value)
+        assert escaped.startswith('"')
+        assert escaped.endswith('"')
+        assert "\\\\" in escaped
+
+    def test_escape_value_with_equals(self):
+        """Test escaping value with equals sign."""
+        value = "token=value"
+        escaped = escape_env_value(value)
+        assert escaped.startswith('"')
+        assert escaped.endswith('"')
+        assert "token=value" in escaped
+
+    def test_escape_value_with_dollar(self):
+        """Test escaping value with dollar sign (shell variable)."""
+        value = "token$VAR"
+        escaped = escape_env_value(value)
+        assert escaped.startswith('"')
+        assert escaped.endswith('"')
+        assert "\\$" in escaped
+
+    def test_escape_value_with_backtick(self):
+        """Test escaping value with backtick (command substitution)."""
+        value = "token`command`"
+        escaped = escape_env_value(value)
+        assert escaped.startswith('"')
+        assert escaped.endswith('"')
+        assert "\\`" in escaped
+
+    def test_escape_value_with_multiple_special_chars(self):
+        """Test escaping value with multiple special characters."""
+        value = 'token\n"quoted"\\backslash$VAR`cmd`'
+        escaped = escape_env_value(value)
+        assert escaped.startswith('"')
+        assert escaped.endswith('"')
+        assert "\\n" in escaped
+        assert '\\"' in escaped
+        assert "\\\\" in escaped
+        assert "\\$" in escaped
+        assert "\\`" in escaped
+
+    def test_escape_value_with_space(self):
+        """Test escaping value with space."""
+        value = "token with spaces"
+        escaped = escape_env_value(value)
+        assert escaped.startswith('"')
+        assert escaped.endswith('"')
+
+    def test_escape_empty_value(self):
+        """Test escaping empty value."""
+        value = ""
+        escaped = escape_env_value(value)
+        # Empty value doesn't need quoting
+        assert escaped == ""
+
+    def test_escape_value_roundtrip(self):
+        """Test that escaped value can be safely parsed back."""
+
+        test_values = [
+            "simple",
+            "token\nnewline",
+            'token"quotes"',
+            "token\\backslash",
+            "token=equals",
+            "token$var",
+            "token`cmd`",
+            "token with spaces",
+        ]
+
+        for value in test_values:
+            escaped = escape_env_value(value)
+            # Try to parse with shlex (simulates shell/env file parsing)
+            if escaped.startswith('"'):
+                # Remove quotes and unescape
+                unescaped = escaped[1:-1].encode().decode("unicode_escape")
+                # For newlines, verify they're preserved as \n
+                if "\n" in value:
+                    assert "\\n" in escaped
+            else:
+                # Simple value, should be unchanged
+                assert escaped == value

@@ -13,6 +13,46 @@ from rich.console import Console
 console = Console()
 
 
+def escape_env_value(value: str) -> str:
+    """Escape a value for use in .env file format.
+
+    Properly escapes newlines, quotes, backslashes, and other special characters
+    to prevent injection attacks and format corruption.
+
+    Args:
+        value: The value to escape
+
+    Returns:
+        Properly escaped value safe for .env file format
+    """
+    # Check if value contains special characters that need escaping
+    needs_quoting = any(
+        char in value for char in ["\n", "\r", "\t", '"', "\\", " ", "#", "=", "$", "`"]
+    )
+
+    if not needs_quoting:
+        # Simple value, no escaping needed
+        return value
+
+    # Escape backslashes first (must be done before escaping quotes)
+    escaped = value.replace("\\", "\\\\")
+    # Escape double quotes
+    escaped = escaped.replace('"', '\\"')
+    # Escape newlines
+    escaped = escaped.replace("\n", "\\n")
+    # Escape carriage returns
+    escaped = escaped.replace("\r", "\\r")
+    # Escape tabs
+    escaped = escaped.replace("\t", "\\t")
+    # Escape dollar signs (shell variable expansion)
+    escaped = escaped.replace("$", "\\$")
+    # Escape backticks (command substitution)
+    escaped = escaped.replace("`", "\\`")
+
+    # Wrap in double quotes
+    return f'"{escaped}"'
+
+
 class DeploymentConfig:
     """Manages deployment configuration."""
 
@@ -252,7 +292,8 @@ PRODUCTION=true
             env_content += (
                 "\n# Legacy: token from environment (consider using secrets)\n"
             )
-            env_content += f"{bot_token_env}={bot_token}\n"
+            escaped_token = escape_env_value(bot_token)
+            env_content += f"{bot_token_env}={escaped_token}\n"
         else:
             console.print(
                 f"[yellow]⚠️  Warning: {bot_token_env} not found. Use 'deploy secrets set' to store it securely.[/yellow]"
@@ -262,7 +303,8 @@ PRODUCTION=true
     env_config = config.get("environment", {})
     for key, value in env_config.items():
         if key not in ["timezone"]:  # Skip already added keys
-            env_content += f"{key}={value}\n"
+            escaped_value = escape_env_value(str(value))
+            env_content += f"{key}={escaped_value}\n"
 
     output_path.write_text(env_content)
     console.print(f"[green]✓ Generated {output_path}[/green]")

@@ -82,11 +82,12 @@
       "category": "implementation",
       "path": "telegram_bot_stack/cli/utils/deployment.py",
       "description": "Deployment configuration and template rendering utilities.",
-      "lines_of_code": 268,
+      "lines_of_code": 310,
       "complexity_score": 1,
       "exports": [
         "DeploymentConfig",
         "DockerTemplateRenderer",
+        "escape_env_value",
         "create_env_file",
         "load",
         "save",
@@ -104,6 +105,7 @@
         "DockerTemplateRenderer"
       ],
       "functions": [
+        "escape_env_value",
         "create_env_file",
         "load",
         "save",
@@ -215,7 +217,7 @@
       "category": "implementation",
       "path": "telegram_bot_stack/cli/utils/vps.py",
       "description": "VPS operations utilities for deployment.",
-      "lines_of_code": 245,
+      "lines_of_code": 266,
       "complexity_score": 1,
       "exports": [
         "VPSConnection",
@@ -351,7 +353,7 @@
       "category": "implementation",
       "path": "telegram_bot_stack/cli/commands/deploy.py",
       "description": "VPS deployment commands for telegram-bot-stack.",
-      "lines_of_code": 694,
+      "lines_of_code": 778,
       "complexity_score": 1,
       "exports": [
         "deploy",
