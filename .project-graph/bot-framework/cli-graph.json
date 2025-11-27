@@ -351,7 +351,7 @@
       "category": "implementation",
       "path": "telegram_bot_stack/cli/commands/deploy.py",
       "description": "VPS deployment commands for telegram-bot-stack.",
-      "lines_of_code": 661,
+      "lines_of_code": 694,
       "complexity_score": 1,
       "exports": [
         "deploy",
@@ -604,7 +604,7 @@
       "category": "implementation",
       "path": "telegram_bot_stack/cli/utils/secrets.py",
       "description": "Module secrets",
-      "lines_of_code": 271,
+      "lines_of_code": 272,
       "complexity_score": 1,
       "exports": [
         "SecretsManager",
@@ -768,11 +768,11 @@
       "description": "Imports from telegram_bot_stack.cli.utils"
     },
     {
-      "id": "edge_24",
+      "id": "edge_20",
       "source": "telegram_bot_stack.cli.commands.deploy",
-      "target": "telegram_bot_stack.cli.utils",
+      "target": "telegram_bot_stack.cli.utils.secrets",
       "type": "imports",
-      "description": "Imports from telegram_bot_stack.cli.utils"
+      "description": "Imports from telegram_bot_stack.cli.utils.secrets"
     }
   ]
 }

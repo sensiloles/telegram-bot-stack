@@ -212,7 +212,8 @@ telegram-bot-stack deploy secrets remove BOT_TOKEN
 **How it works:**
 
 - Secrets are encrypted using Fernet (symmetric encryption)
-- Stored in `/opt/{bot_name}/.secrets.env` on VPS with 600 permissions (owner read/write only)
+- Encrypted version stored in `/opt/{bot_name}/.secrets.env.encrypted` on VPS with 600 permissions (owner read/write only)
+- Decrypted version created in `/opt/{bot_name}/.secrets.env` during deployment for Docker Compose (also 600 permissions)
 - Automatically decrypted and loaded into Docker container during deployment
 - Not visible in `docker inspect` or process list
 

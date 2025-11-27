@@ -30,7 +30,8 @@ class SecretsManager:
         """
         self.bot_name = bot_name
         self.remote_dir = remote_dir
-        self.secrets_file = f"{remote_dir}/.secrets.env"
+        # Use .secrets.env.encrypted to avoid conflict with decrypted .secrets.env
+        self.secrets_file = f"{remote_dir}/.secrets.env.encrypted"
         self.encryption_key = encryption_key
 
     @staticmethod
