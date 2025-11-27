@@ -11,8 +11,8 @@
     "description": "CLI tool for bot project management and development",
     "scope": "CLI tool for bot project management and development",
     "root_package": "telegram_bot_stack.cli",
-    "node_count": 25,
-    "edge_count": 22
+    "node_count": 29,
+    "edge_count": 36
   },
   "nodes": [
     {
@@ -70,6 +70,37 @@
       "functions": [
         "init_git",
         "create_gitignore"
+      ],
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium"
+    },
+    {
+      "id": "telegram_bot_stack.cli.utils.backup",
+      "name": "backup",
+      "type": "module",
+      "category": "implementation",
+      "path": "telegram_bot_stack/cli/utils/backup.py",
+      "description": "Backup and restore utilities for bot data.",
+      "lines_of_code": 354,
+      "complexity_score": 1,
+      "exports": [
+        "BackupManager",
+        "create_backup",
+        "list_backups",
+        "restore_backup",
+        "download_backup",
+        "cleanup_old_backups"
+      ],
+      "classes": [
+        "BackupManager"
+      ],
+      "functions": [
+        "create_backup",
+        "list_backups",
+        "restore_backup",
+        "download_backup",
+        "cleanup_old_backups"
       ],
       "dependencies": [],
       "dependents": [],
@@ -250,6 +281,41 @@
       "criticality": "medium"
     },
     {
+      "id": "telegram_bot_stack.cli.utils.secrets",
+      "name": "secrets",
+      "type": "module",
+      "category": "implementation",
+      "path": "telegram_bot_stack/cli/utils/secrets.py",
+      "description": "Secrets management utilities for secure token storage.",
+      "lines_of_code": 272,
+      "complexity_score": 1,
+      "exports": [
+        "SecretsManager",
+        "generate_key",
+        "derive_key_from_password",
+        "set_secret",
+        "get_secret",
+        "list_secrets",
+        "remove_secret",
+        "load_secrets_to_env"
+      ],
+      "classes": [
+        "SecretsManager"
+      ],
+      "functions": [
+        "generate_key",
+        "derive_key_from_password",
+        "set_secret",
+        "get_secret",
+        "list_secrets",
+        "remove_secret",
+        "load_secrets_to_env"
+      ],
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium"
+    },
+    {
       "id": "telegram_bot_stack.cli.utils.makefile",
       "name": "makefile",
       "type": "module",
@@ -341,58 +407,6 @@
         "install_requirements",
         "create_requirements_file",
         "create_pyproject_toml"
-      ],
-      "dependencies": [],
-      "dependents": [],
-      "criticality": "medium"
-    },
-    {
-      "id": "telegram_bot_stack.cli.commands.deploy",
-      "name": "deploy",
-      "type": "module",
-      "category": "implementation",
-      "path": "telegram_bot_stack/cli/commands/deploy.py",
-      "description": "VPS deployment commands for telegram-bot-stack.",
-      "lines_of_code": 1021,
-      "complexity_score": 1,
-      "exports": [
-        "deploy",
-        "init",
-        "up",
-        "update",
-        "status",
-        "logs",
-        "down",
-        "secrets",
-        "set_secret",
-        "get_secret",
-        "list_secrets",
-        "remove_secret",
-        "backup",
-        "create_backup",
-        "list_backups",
-        "download",
-        "restore"
-      ],
-      "classes": [],
-      "functions": [
-        "deploy",
-        "init",
-        "up",
-        "update",
-        "status",
-        "logs",
-        "down",
-        "secrets",
-        "set_secret",
-        "get_secret",
-        "list_secrets",
-        "remove_secret",
-        "backup",
-        "create_backup",
-        "list_backups",
-        "download",
-        "restore"
       ],
       "dependencies": [],
       "dependents": [],
@@ -504,6 +518,128 @@
       "criticality": "medium"
     },
     {
+      "id": "telegram_bot_stack.cli.commands.deploy.deploy",
+      "name": "deploy",
+      "type": "module",
+      "category": "implementation",
+      "path": "telegram_bot_stack/cli/commands/deploy/deploy.py",
+      "description": "Core deployment commands (init, backup, restore).",
+      "lines_of_code": 333,
+      "complexity_score": 1,
+      "exports": [
+        "deploy",
+        "init",
+        "backup",
+        "create_backup",
+        "list_backups",
+        "download",
+        "restore"
+      ],
+      "classes": [],
+      "functions": [
+        "deploy",
+        "init",
+        "backup",
+        "create_backup",
+        "list_backups",
+        "download",
+        "restore"
+      ],
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium"
+    },
+    {
+      "id": "telegram_bot_stack.cli.commands.deploy.monitoring",
+      "name": "monitoring",
+      "type": "module",
+      "category": "implementation",
+      "path": "telegram_bot_stack/cli/commands/deploy/monitoring.py",
+      "description": "Monitoring commands for deployment (status, logs).",
+      "lines_of_code": 82,
+      "complexity_score": 1,
+      "exports": [
+        "status",
+        "logs"
+      ],
+      "classes": [],
+      "functions": [
+        "status",
+        "logs"
+      ],
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium"
+    },
+    {
+      "id": "telegram_bot_stack.cli.commands.deploy",
+      "name": "__init__",
+      "type": "module",
+      "category": "implementation",
+      "path": "telegram_bot_stack/cli/commands/deploy/__init__.py",
+      "description": "Deployment commands module - refactored into smaller modules.",
+      "lines_of_code": 14,
+      "complexity_score": 1,
+      "exports": [],
+      "classes": [],
+      "functions": [],
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium"
+    },
+    {
+      "id": "telegram_bot_stack.cli.commands.deploy.operations",
+      "name": "operations",
+      "type": "module",
+      "category": "implementation",
+      "path": "telegram_bot_stack/cli/commands/deploy/operations.py",
+      "description": "Deployment operations (up, update, down).",
+      "lines_of_code": 413,
+      "complexity_score": 1,
+      "exports": [
+        "up",
+        "update",
+        "down"
+      ],
+      "classes": [],
+      "functions": [
+        "up",
+        "update",
+        "down"
+      ],
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium"
+    },
+    {
+      "id": "telegram_bot_stack.cli.commands.deploy.secrets",
+      "name": "secrets",
+      "type": "module",
+      "category": "implementation",
+      "path": "telegram_bot_stack/cli/commands/deploy/secrets.py",
+      "description": "Secrets management commands for deployment.",
+      "lines_of_code": 226,
+      "complexity_score": 1,
+      "exports": [
+        "secrets",
+        "set_secret",
+        "get_secret",
+        "list_secrets",
+        "remove_secret"
+      ],
+      "classes": [],
+      "functions": [
+        "secrets",
+        "set_secret",
+        "get_secret",
+        "list_secrets",
+        "remove_secret"
+      ],
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium"
+    },
+    {
       "id": "telegram_bot_stack.cli.templates.advanced.bot",
       "name": "bot",
       "type": "module",
@@ -608,72 +744,6 @@
       "dependencies": [],
       "dependents": [],
       "criticality": "medium"
-    },
-    {
-      "id": "telegram_bot_stack.cli.utils.secrets",
-      "name": "secrets",
-      "type": "module",
-      "category": "implementation",
-      "path": "telegram_bot_stack/cli/utils/secrets.py",
-      "description": "Module secrets",
-      "lines_of_code": 272,
-      "complexity_score": 1,
-      "exports": [
-        "SecretsManager",
-        "generate_key",
-        "derive_key_from_password",
-        "set_secret",
-        "get_secret",
-        "list_secrets",
-        "remove_secret",
-        "load_secrets_to_env"
-      ],
-      "classes": [
-        "SecretsManager"
-      ],
-      "functions": [
-        "generate_key",
-        "derive_key_from_password",
-        "set_secret",
-        "get_secret",
-        "list_secrets",
-        "remove_secret",
-        "load_secrets_to_env"
-      ],
-      "dependencies": [],
-      "dependents": [],
-      "criticality": "medium"
-    },
-    {
-      "id": "telegram_bot_stack.cli.utils.backup",
-      "name": "backup",
-      "type": "module",
-      "category": "implementation",
-      "path": "telegram_bot_stack/cli/utils/backup.py",
-      "description": "Module backup",
-      "lines_of_code": 354,
-      "complexity_score": 1,
-      "exports": [
-        "BackupManager",
-        "create_backup",
-        "list_backups",
-        "restore_backup",
-        "download_backup",
-        "cleanup_old_backups"
-      ],
-      "classes": [
-        "BackupManager"
-      ],
-      "functions": [
-        "create_backup",
-        "list_backups",
-        "restore_backup",
-        "download_backup",
-        "cleanup_old_backups"
-      ],
-      "dependencies": [],
-      "dependents": [],
-      "criticality": "medium"
     }
   ],
   "edges": [
@@ -686,21 +756,21 @@
     },
     {
       "id": "edge_2",
+      "source": "telegram_bot_stack.cli.utils.backup",
+      "target": "telegram_bot_stack.cli.utils.vps",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.utils.vps"
+    },
+    {
+      "id": "edge_3",
       "source": "telegram_bot_stack.cli.utils",
       "target": "telegram_bot_stack.cli.utils",
       "type": "imports",
       "description": "Imports from telegram_bot_stack.cli.utils"
     },
     {
-      "id": "edge_3",
-      "source": "telegram_bot_stack.cli.utils.linting",
-      "target": "telegram_bot_stack.cli.utils.venv",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.cli.utils.venv"
-    },
-    {
       "id": "edge_4",
-      "source": "telegram_bot_stack.cli.utils.dependencies",
+      "source": "telegram_bot_stack.cli.utils.linting",
       "target": "telegram_bot_stack.cli.utils.venv",
       "type": "imports",
       "description": "Imports from telegram_bot_stack.cli.utils.venv"
@@ -714,122 +784,220 @@
     },
     {
       "id": "edge_6",
-      "source": "telegram_bot_stack.cli.commands.deploy",
-      "target": "telegram_bot_stack.cli.utils.deployment",
+      "source": "telegram_bot_stack.cli.utils.dependencies",
+      "target": "telegram_bot_stack.cli.utils.venv",
       "type": "imports",
-      "description": "Imports from telegram_bot_stack.cli.utils.deployment"
+      "description": "Imports from telegram_bot_stack.cli.utils.venv"
     },
     {
       "id": "edge_7",
-      "source": "telegram_bot_stack.cli.commands.deploy",
-      "target": "telegram_bot_stack.cli.utils.vps",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.cli.utils.vps"
-    },
-    {
-      "id": "edge_8",
-      "source": "telegram_bot_stack.cli.commands.deploy",
-      "target": "telegram_bot_stack.cli.utils.deployment",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.cli.utils.deployment"
-    },
-    {
-      "id": "edge_9",
       "source": "telegram_bot_stack.cli.commands",
       "target": "telegram_bot_stack.cli.commands",
       "type": "imports",
       "description": "Imports from telegram_bot_stack.cli.commands"
     },
     {
-      "id": "edge_10",
+      "id": "edge_8",
       "source": "telegram_bot_stack.cli.commands.dev",
       "target": "telegram_bot_stack.cli.utils",
       "type": "imports",
       "description": "Imports from telegram_bot_stack.cli.utils"
     },
     {
-      "id": "edge_11",
+      "id": "edge_9",
       "source": "telegram_bot_stack.cli.commands.dev",
       "target": "telegram_bot_stack.cli.utils.bot_lock",
       "type": "imports",
       "description": "Imports from telegram_bot_stack.cli.utils.bot_lock"
     },
     {
-      "id": "edge_12",
+      "id": "edge_10",
       "source": "telegram_bot_stack.cli.commands.dev",
       "target": "telegram_bot_stack.cli.utils.venv",
       "type": "imports",
       "description": "Imports from telegram_bot_stack.cli.utils.venv"
     },
     {
-      "id": "edge_13",
+      "id": "edge_11",
       "source": "telegram_bot_stack.cli.commands.init",
       "target": "telegram_bot_stack.cli.utils",
       "type": "imports",
       "description": "Imports from telegram_bot_stack.cli.utils"
     },
     {
-      "id": "edge_14",
+      "id": "edge_12",
       "source": "telegram_bot_stack.cli.commands.init",
       "target": "telegram_bot_stack.cli.utils.ide",
       "type": "imports",
       "description": "Imports from telegram_bot_stack.cli.utils.ide"
     },
     {
-      "id": "edge_15",
+      "id": "edge_13",
       "source": "telegram_bot_stack.cli.commands.init",
       "target": "telegram_bot_stack.cli.utils.linting",
       "type": "imports",
       "description": "Imports from telegram_bot_stack.cli.utils.linting"
     },
     {
-      "id": "edge_16",
+      "id": "edge_14",
       "source": "telegram_bot_stack.cli.commands.init",
       "target": "telegram_bot_stack.cli.utils.makefile",
       "type": "imports",
       "description": "Imports from telegram_bot_stack.cli.utils.makefile"
     },
     {
-      "id": "edge_17",
+      "id": "edge_15",
       "source": "telegram_bot_stack.cli.commands.init",
       "target": "telegram_bot_stack.cli.utils.testing",
       "type": "imports",
       "description": "Imports from telegram_bot_stack.cli.utils.testing"
     },
     {
-      "id": "edge_18",
+      "id": "edge_16",
       "source": "telegram_bot_stack.cli.commands.init",
       "target": "telegram_bot_stack.cli.utils.venv",
       "type": "imports",
       "description": "Imports from telegram_bot_stack.cli.utils.venv"
     },
     {
-      "id": "edge_19",
+      "id": "edge_17",
       "source": "telegram_bot_stack.cli.commands.init",
       "target": "telegram_bot_stack.cli.utils",
       "type": "imports",
       "description": "Imports from telegram_bot_stack.cli.utils"
     },
     {
+      "id": "edge_18",
+      "source": "telegram_bot_stack.cli.commands.deploy.deploy",
+      "target": "telegram_bot_stack.cli.utils.backup",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.utils.backup"
+    },
+    {
+      "id": "edge_19",
+      "source": "telegram_bot_stack.cli.commands.deploy.deploy",
+      "target": "telegram_bot_stack.cli.utils.deployment",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.utils.deployment"
+    },
+    {
       "id": "edge_20",
-      "source": "telegram_bot_stack.cli.commands.deploy",
+      "source": "telegram_bot_stack.cli.commands.deploy.deploy",
       "target": "telegram_bot_stack.cli.utils.secrets",
       "type": "imports",
       "description": "Imports from telegram_bot_stack.cli.utils.secrets"
     },
     {
       "id": "edge_21",
-      "source": "telegram_bot_stack.cli.commands.deploy",
-      "target": "telegram_bot_stack.cli.utils",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.cli.utils"
-    },
-    {
-      "id": "edge_22",
-      "source": "telegram_bot_stack.cli.utils.backup",
+      "source": "telegram_bot_stack.cli.commands.deploy.deploy",
       "target": "telegram_bot_stack.cli.utils.vps",
       "type": "imports",
       "description": "Imports from telegram_bot_stack.cli.utils.vps"
+    },
+    {
+      "id": "edge_22",
+      "source": "telegram_bot_stack.cli.commands.deploy.monitoring",
+      "target": "telegram_bot_stack.cli.utils.deployment",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.utils.deployment"
+    },
+    {
+      "id": "edge_23",
+      "source": "telegram_bot_stack.cli.commands.deploy.monitoring",
+      "target": "telegram_bot_stack.cli.utils.vps",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.utils.vps"
+    },
+    {
+      "id": "edge_24",
+      "source": "telegram_bot_stack.cli.commands.deploy",
+      "target": "telegram_bot_stack.cli.commands.deploy",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.commands.deploy"
+    },
+    {
+      "id": "edge_25",
+      "source": "telegram_bot_stack.cli.commands.deploy",
+      "target": "telegram_bot_stack.cli.commands.deploy.deploy",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.commands.deploy.deploy"
+    },
+    {
+      "id": "edge_26",
+      "source": "telegram_bot_stack.cli.commands.deploy.operations",
+      "target": "telegram_bot_stack.cli.utils.backup",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.utils.backup"
+    },
+    {
+      "id": "edge_27",
+      "source": "telegram_bot_stack.cli.commands.deploy.operations",
+      "target": "telegram_bot_stack.cli.utils.deployment",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.utils.deployment"
+    },
+    {
+      "id": "edge_28",
+      "source": "telegram_bot_stack.cli.commands.deploy.operations",
+      "target": "telegram_bot_stack.cli.utils.secrets",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.utils.secrets"
+    },
+    {
+      "id": "edge_29",
+      "source": "telegram_bot_stack.cli.commands.deploy.operations",
+      "target": "telegram_bot_stack.cli.utils.vps",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.utils.vps"
+    },
+    {
+      "id": "edge_30",
+      "source": "telegram_bot_stack.cli.commands.deploy.secrets",
+      "target": "telegram_bot_stack.cli.utils.deployment",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.utils.deployment"
+    },
+    {
+      "id": "edge_31",
+      "source": "telegram_bot_stack.cli.commands.deploy.secrets",
+      "target": "telegram_bot_stack.cli.utils.secrets",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.utils.secrets"
+    },
+    {
+      "id": "edge_32",
+      "source": "telegram_bot_stack.cli.commands.deploy.secrets",
+      "target": "telegram_bot_stack.cli.utils.vps",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.utils.vps"
+    },
+    {
+      "id": "edge_33",
+      "source": "telegram_bot_stack.cli.templates.advanced.bot",
+      "target": "telegram_bot_stack",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack"
+    },
+    {
+      "id": "edge_34",
+      "source": "telegram_bot_stack.cli.templates.basic.bot",
+      "target": "telegram_bot_stack",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack"
+    },
+    {
+      "id": "edge_35",
+      "source": "telegram_bot_stack.cli.templates.menu.bot",
+      "target": "telegram_bot_stack",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack"
+    },
+    {
+      "id": "edge_36",
+      "source": "telegram_bot_stack.cli.templates.counter.bot",
+      "target": "telegram_bot_stack",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack"
     }
   ]
 }
