@@ -9,7 +9,7 @@
     "description": "Test suite, fixtures, and testing utilities",
     "scope": "Unit tests, integration tests, fixtures",
     "node_count": 29,
-    "edge_count": 1
+    "edge_count": 3
   },
   "nodes": [
     {
@@ -907,7 +907,7 @@
       "type": "test_module",
       "path": "tests/cli/test_backup.py",
       "description": "Tests for backup and restore utilities.",
-      "lines_of_code": 280,
+      "lines_of_code": 274,
       "exports": [
         "TestBackupManager",
         "TestBackupCommands",
@@ -983,7 +983,7 @@
       "type": "test_module",
       "path": "tests/cli/test_deploy_command.py",
       "description": "Tests for deploy command.",
-      "lines_of_code": 313,
+      "lines_of_code": 309,
       "exports": [
         "TestDeployInit",
         "TestDeployUp",
@@ -1310,6 +1310,20 @@
     {
       "id": "edge_1",
       "source": "telegram_bot_stack.cli.commands.deploy",
+      "target": "telegram_bot_stack.cli.commands.deploy",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.commands.deploy"
+    },
+    {
+      "id": "edge_2",
+      "source": "tests.cli.test_backup",
+      "target": "telegram_bot_stack.cli.commands.deploy",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.commands.deploy"
+    },
+    {
+      "id": "edge_3",
+      "source": "tests.cli.test_deploy_command",
       "target": "telegram_bot_stack.cli.commands.deploy",
       "type": "imports",
       "description": "Imports from telegram_bot_stack.cli.commands.deploy"
