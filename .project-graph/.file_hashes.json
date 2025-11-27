@@ -15,6 +15,6 @@
   "telegram_bot_stack/cli/commands/deploy/operations.py": "57348568cd32481c9c61ffe38dfa754e645ab18d2dac2db8f95cf456b02517c4",
   "telegram_bot_stack/cli/commands/deploy/secrets.py": "07c84a7535ce802aeb752adcc00414cdcbc133f903a3e96899976da83f7ef759",
   "tests/cli/test_backup.py": "0f5fefab90e02ac34344eeb7de8c2a32b35dae5255f468748a0693de90ca0cac",
-  "scripts/mcp_github_server.py": "1b657b6b9d3772e98e4b224ba5ab638ef1828c9cc329f724d9be0c451a55a3dc",
+  "scripts/mcp_github_server.py": "2d76cf032a3b94640f8bac5b5dbfdd45501d383efe289270db884e6d22e44937",
   "tests/cli/test_deploy_command.py": "8d96ea235c51ba93518037d48f8f5a24dfd64a9543d9e2faaceaeb9b10dcce30"
 }

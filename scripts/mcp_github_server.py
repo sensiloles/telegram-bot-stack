@@ -159,12 +159,129 @@ class MCPServer:
             self._repo_cache[repo_name] = get_repo(repo_name)
         return self._repo_cache[repo_name]
 
+    def _analyze_logs_for_errors(self, logs: str) -> dict:
+        """Analyze logs and extract key error information.
+
+        Args:
+            logs: Raw log text
+
+        Returns:
+            Dictionary with error analysis
+        """
+        lines = logs.split("\n")
+        errors = {
+            "tracebacks": [],
+            "assertion_errors": [],
+            "import_errors": [],
+            "test_failures": [],
+            "syntax_errors": [],
+            "key_errors": [],
+        }
+
+        current_traceback = []
+        in_traceback = False
+
+        for i, line in enumerate(lines):
+            # Detect tracebacks
+            if "Traceback (most recent call last):" in line:
+                in_traceback = True
+                current_traceback = [line]
+            elif in_traceback:
+                current_traceback.append(line)
+                # End of traceback - usually an exception line
+                if (
+                    line.strip()
+                    and not line.startswith(" ")
+                    and not line.startswith("File")
+                ):
+                    if current_traceback:
+                        errors["tracebacks"].append(
+                            "\n".join(current_traceback[-10:])
+                        )  # Last 10 lines
+                    in_traceback = False
+                    current_traceback = []
+
+            # Detect specific error types
+            if "AssertionError" in line:
+                errors["assertion_errors"].append(line)
+                # Get context (previous 2 lines)
+                if i >= 2:
+                    errors["assertion_errors"].append(
+                        f"  Context: {lines[i-2].strip()}"
+                    )
+
+            if "ImportError" in line or "ModuleNotFoundError" in line:
+                errors["import_errors"].append(line)
+
+            if "SyntaxError" in line:
+                errors["syntax_errors"].append(line)
+                if i < len(lines) - 1:
+                    errors["syntax_errors"].append(f"  Next line: {lines[i+1].strip()}")
+
+            if "FAILED" in line and "test" in line.lower():
+                errors["test_failures"].append(line)
+
+            if "AttributeError" in line:
+                errors["key_errors"].append(line)
+
+        return errors
+
+    def _format_error_analysis(self, errors: dict, job_name: str) -> str:
+        """Format error analysis into readable text.
+
+        Args:
+            errors: Error analysis dictionary
+            job_name: Name of the job
+
+        Returns:
+            Formatted error summary
+        """
+        if not any(errors.values()):
+            return ""
+
+        summary = [f"\n🔍 Error Analysis for {job_name}:"]
+        summary.append("-" * 80)
+
+        if errors["tracebacks"]:
+            summary.append("\n📋 Tracebacks found:")
+            for i, tb in enumerate(errors["tracebacks"][:3], 1):  # Max 3 tracebacks
+                summary.append(f"\n  Traceback {i}:")
+                summary.append(tb[:500])  # Limit length
+
+        if errors["assertion_errors"]:
+            summary.append("\n❌ Assertion Errors:")
+            for err in errors["assertion_errors"][:5]:
+                summary.append(f"  {err}")
+
+        if errors["import_errors"]:
+            summary.append("\n📦 Import Errors:")
+            for err in errors["import_errors"][:5]:
+                summary.append(f"  {err}")
+
+        if errors["syntax_errors"]:
+            summary.append("\n🔤 Syntax Errors:")
+            for err in errors["syntax_errors"][:5]:
+                summary.append(f"  {err}")
+
+        if errors["test_failures"]:
+            summary.append("\n🧪 Test Failures:")
+            for err in errors["test_failures"][:10]:
+                summary.append(f"  {err}")
+
+        if errors["key_errors"]:
+            summary.append("\n🔑 Attribute Errors:")
+            for err in errors["key_errors"][:5]:
+                summary.append(f"  {err}")
+
+        return "\n".join(summary)
+
     def _get_ci_logs_internal(
         self,
         repo_name: str,
         run_id: int,
         job_name: Optional[str] = None,
         max_lines: int = 100,
+        analyze_errors: bool = True,
     ) -> Optional[str]:
         """Get logs from failed CI jobs using GitHub API.
 
@@ -257,11 +374,21 @@ class MCPServer:
                         ) as log_response:
                             logs = log_response.read().decode("utf-8")
 
+                    # Analyze errors if requested
+                    if analyze_errors:
+                        error_analysis = self._analyze_logs_for_errors(logs)
+                        error_summary = self._format_error_analysis(
+                            error_analysis, job_name_str
+                        )
+                        if error_summary:
+                            result_lines.append(error_summary)
+                            result_lines.append("")
+
                     # Get last N lines
                     log_lines = logs.split("\n")
                     if len(log_lines) > max_lines:
                         result_lines.append(
-                            f"... (showing last {max_lines} of {len(log_lines)} lines) ..."
+                            f"\n... (showing last {max_lines} of {len(log_lines)} lines) ..."
                         )
                         log_lines = log_lines[-max_lines:]
 
@@ -1117,7 +1244,7 @@ class MCPServer:
                 if failing > 0 and failed_run_ids:
                     response_text += f"\n💡 Use 'get_ci_logs' with run_id={failed_run_ids[0]} to see error details"
 
-                # If there are failures, try to get workflow run and logs
+                # If there are failures, automatically get and analyze logs
                 if failing > 0:
                     workflow_run_id = None
                     # Try to get workflow run ID from commit
@@ -1147,16 +1274,17 @@ class MCPServer:
                                 except (ValueError, IndexError, AttributeError):
                                     pass
 
-                    # If we found a run_id, get logs
+                    # If we found a run_id, get and analyze logs
                     if workflow_run_id:
                         try:
                             logs_result = self._get_ci_logs_internal(
-                                repo_name, workflow_run_id, max_lines=50
+                                repo_name,
+                                workflow_run_id,
+                                max_lines=100,
+                                analyze_errors=True,
                             )
                             if logs_result:
-                                response_text += (
-                                    "\n\n📋 Error Logs (showing last 50 lines):\n"
-                                )
+                                response_text += "\n\n📋 Error Logs & Analysis:\n"
                                 response_text += "=" * 80 + "\n"
                                 response_text += logs_result
                         except Exception as e:
