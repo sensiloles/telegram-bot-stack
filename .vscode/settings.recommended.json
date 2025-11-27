@@ -78,10 +78,10 @@
   "python.linting.pylintEnabled": false,
   "python.linting.flake8Enabled": false,
   "python.formatting.provider": "none",
-  "mypy-type-checker.args": [
+  "mypy.args": [
     "--config-file=pyproject.toml"
   ],
-  "mypy-type-checker.reportingScope": "workspace",
-  "mypy-type-checker.enabled": true,
-  "mypy-type-checker.showNotifications": "onError"
+  "mypy.reportingScope": "workspace",
+  "mypy.enabled": true,
+  "mypy.showNotifications": "onError"
 }
