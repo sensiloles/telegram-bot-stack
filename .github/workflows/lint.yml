@@ -1,0 +1,149 @@
+name: Lint
+
+# Code quality checks with Ruff (linter + formatter)
+# Run locally: ruff check . && ruff format --check .
+
+on:
+  push:
+    branches: [main, develop]
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+      - ".github/PROJECT_STATUS.md"
+  pull_request:
+    branches: [main, develop]
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+      - ".github/PROJECT_STATUS.md"
+  workflow_call: # Allow being called by other workflows (ci.yml, release.yml)
+
+jobs:
+  ruff:
+    name: Ruff Linter + Formatter
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          echo "::group::📦 Installing dependencies"
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+          echo "::endgroup::"
+
+      - name: Run Ruff linter
+        id: ruff_lint
+        continue-on-error: true
+        run: |
+          echo "::group::🔍 Running Ruff linter"
+          ruff check . --output-format=github 2>&1 | tee ruff_lint.log
+          LINT_EXIT_CODE=${PIPESTATUS[0]}
+          echo "::endgroup::"
+          exit $LINT_EXIT_CODE
+
+      - name: Analyze linting errors
+        if: always() && steps.ruff_lint.outcome != 'success'
+        run: |
+          # Count errors by type
+          ERROR_COUNT=$(grep -c "error:" ruff_lint.log || echo "0")
+          WARNING_COUNT=$(grep -c "warning:" ruff_lint.log || echo "0")
+
+          # Print to console
+          echo "::error::❌ Linting errors detected"
+          echo ""
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "🎨 LINTING ERRORS"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "Errors: $ERROR_COUNT | Warnings: $WARNING_COUNT"
+          echo ""
+          echo "Top 20 issues:"
+          head -20 ruff_lint.log
+          echo ""
+          echo "🔧 FIX: Run 'ruff check . --fix' locally to auto-fix issues"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo ""
+
+          # Also write to summary
+          echo "### ❌ Linting Errors Detected" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Errors:** $ERROR_COUNT" >> $GITHUB_STEP_SUMMARY
+          echo "**Warnings:** $WARNING_COUNT" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "#### Top Issues" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          head -20 ruff_lint.log >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Fix:** Run \`ruff check . --fix\` locally to auto-fix issues." >> $GITHUB_STEP_SUMMARY
+
+      - name: Run Ruff formatter check
+        id: ruff_format
+        continue-on-error: true
+        run: |
+          echo "::group::🎨 Checking code formatting"
+          ruff format --check . 2>&1 | tee ruff_format.log
+          FORMAT_EXIT_CODE=${PIPESTATUS[0]}
+          echo "::endgroup::"
+          exit $FORMAT_EXIT_CODE
+
+      - name: Analyze formatting errors
+        if: always() && steps.ruff_format.outcome != 'success'
+        run: |
+          # Extract files that need formatting
+          UNFORMATTED_FILES=$(grep "Would reformat:" ruff_format.log || echo "")
+
+          # Print to console
+          echo "::error::❌ Formatting issues detected"
+          echo ""
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "🎨 FORMATTING ISSUES"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          if [ -n "$UNFORMATTED_FILES" ]; then
+            echo "$UNFORMATTED_FILES"
+          fi
+          echo ""
+          echo "🔧 FIX: Run 'ruff format .' locally to format code"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo ""
+
+          # Also write to summary
+          echo "### ❌ Formatting Issues Detected" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ -n "$UNFORMATTED_FILES" ]; then
+            echo "#### Files needing formatting:" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "$UNFORMATTED_FILES" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Fix:** Run \`ruff format .\` locally to format code." >> $GITHUB_STEP_SUMMARY
+
+      - name: Summary
+        if: always()
+        run: |
+          if [ "${{ steps.ruff_lint.outcome }}" == "success" ] && [ "${{ steps.ruff_format.outcome }}" == "success" ]; then
+            echo "### ✅ Linting Passed" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Ruff linter:** No issues found" >> $GITHUB_STEP_SUMMARY
+            echo "**Ruff formatter:** Code is properly formatted" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Fail if linting or formatting failed
+        if: steps.ruff_lint.outcome != 'success' || steps.ruff_format.outcome != 'success'
+        run: |
+          echo "::error::Linting or formatting checks failed"
+          exit 1

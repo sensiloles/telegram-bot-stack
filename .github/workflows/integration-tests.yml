@@ -1,20 +1,19 @@
 name: Integration Tests
 
-# Integration tests require Docker and may fail in CI environment
-# Fast tests are required, E2E tests are optional (non-blocking)
-# Run locally: make test-fast (quick) or make test-deploy (full E2E)
+# Fast integration tests (no Docker, ~1-2 min)
+# Run locally: pytest tests/integration/bot/ tests/integration/deployment/test_config.py
 
 on:
+  push:
+    branches: [main, develop]
   pull_request:
     branches: [main, develop]
-  push:
-    branches: [main]
   workflow_dispatch: # Allow manual trigger
+  workflow_call: # Allow being called by other workflows (ci.yml, release.yml)
 
 jobs:
-  # Fast integration tests (required, ~1-2 min)
-  integration-fast:
-    name: Integration Tests - Fast (Python ${{ matrix.python-version }})
+  integration:
+    name: Integration Tests - Python ${{ matrix.python-version }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -38,7 +37,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -e ".[dev]"
 
-      - name: Run fast integration tests
+      - name: Run integration tests
         run: |
           echo "⚡ Running fast integration tests (no Docker required)"
           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -52,89 +51,19 @@ jobs:
             --tb=short \
             --no-cov
 
-          echo "✅ Fast integration tests completed"
+          echo "✅ Integration tests completed"
 
-  # Full E2E tests with Docker (optional, non-blocking)
-  integration-e2e:
-    name: Integration Tests - E2E (Python ${{ matrix.python-version }})
-    runs-on: ubuntu-latest
-    timeout-minutes: 45
-    continue-on-error: true # Don't block PR merge if E2E tests fail
-
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ["3.12"] # Only test on latest Python for E2E
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-          cache: "pip"
-
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y openssh-client sshpass
-
-      - name: Install Python dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -e ".[dev]"
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Build Mock VPS Docker image
-        run: |
-          echo "🐳 Building Mock VPS image..."
-          docker build \
-            -t mock-vps:latest \
-            -f tests/integration/fixtures/Dockerfile.mock-vps \
-            tests/integration/fixtures/
-          docker images | grep mock-vps
-
-      - name: Run E2E deployment tests
-        run: |
-          echo "🎯 Running E2E deployment tests (with Mock VPS)"
-          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-
-          pytest tests/e2e/deployment/ \
-            -v \
-            --tb=short \
-            --log-cli-level=INFO \
-            --no-cov \
-            --run-e2e \
-            --maxfail=5
-
-          echo "✅ E2E tests completed"
-
-      - name: Show Docker logs on failure
-        if: failure()
-        run: |
-          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-          echo "🔍 Docker Containers Status"
-          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-          docker ps -a || true
-          echo ""
-
-          # Show logs from all containers
-          for container in $(docker ps -a --format "{{.Names}}" 2>/dev/null); do
-            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-            echo "📋 Logs from: $container"
-            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-            docker logs --tail 100 "$container" 2>&1 || true
-            echo ""
-          done
-
-      - name: Cleanup Docker resources
+      - name: Summary
         if: always()
         run: |
-          echo "🧹 Cleaning up Docker resources..."
-          docker compose -f tests/integration/fixtures/docker-compose.mock-vps.yml down -v || true
-          docker system prune -af || true
-          echo "✅ Cleanup complete"
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "### ✅ Integration Tests Passed" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Python ${{ matrix.python-version }}:** All integration tests passed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "### ❌ Integration Tests Failed" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Python ${{ matrix.python-version }}:** Some integration tests failed" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Check logs above for details**" >> $GITHUB_STEP_SUMMARY
+          fi

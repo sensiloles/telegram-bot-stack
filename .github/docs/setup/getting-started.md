@@ -130,8 +130,13 @@ The following files should exist:
 .github/
 ├── semantic_release.toml   # ✅ Semantic release config
 ├── workflows/
+│   ├── ci.yml              # ✅ Main CI orchestrator (for PRs)
 │   ├── release.yml         # ✅ Automatic release workflow
-│   └── tests.yml           # ✅ CI tests
+│   ├── unit-tests.yml      # ✅ Unit tests only
+│   ├── integration-tests.yml # ✅ Integration tests only
+│   ├── e2e-tests.yml       # ✅ E2E tests only
+│   ├── lint.yml            # ✅ Code linting (ruff)
+│   └── type-check.yml      # ✅ Type checking (mypy)
 ├── GIT_WORKFLOW.md         # ✅ Workflow documentation
 ├── BRANCH_PROTECTION.md    # ✅ Protection setup guide
 └── pull_request_template.md # ✅ PR template

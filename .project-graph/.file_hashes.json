@@ -1,9 +1,7 @@
 {
-  "docs/deployment_guide.md": "3d1918398bf043cc9d08352efd002d3f1c82b01ef878cd58e185317e1bff9648",
-  "telegram_bot_stack/cli/utils/backup.py": "85c52e51e0c152ac2ffe037f07bf247f41a164cc3058e39efb3cd7271e4ebc3b",
-  "telegram_bot_stack/cli/utils/vps.py": "38528c04ead83332b537117c4bdafb463e754e0ca0402c274ccdd6f8f93e0cdf",
-  ".github/workflows/integration-tests.yml": "7e0388358df777773a23d13476b9f779685ba3370aa39ecc5140b0341191f017",
-  "pyproject.toml": "3e0d19e5402d581e7ecc4e1c3802c74f2af6e0b9c633089130716cf3f10775bc",
-  "telegram_bot_stack/cli/commands/deploy/operations.py": "5749039b7b5f15a4ab3242265e102ccff702361dffe51194bc553ce866e4a19a",
-  ".github/PROJECT_STATUS.md": "0d7560a1cce0f7426e9b63d83d2359b5241a06de7c4a3bc29cd71f5d8e330e1e"
+  "README.md": "4487bf830534b95d2b57246a9266860f633ed50e18d46a8af80c0a1cfe1e0610",
+  "docs/mcp-project-graph-setup.md": "d2058a207bbae067345ceabefc7cccb6c4175f4a79eec33b247052515af9b640",
+  ".github/workflows/type-check.yml": "43c3ce58d8cf9ef7b09edf68a2b8742283791cd47bb46bc5ee83631412b45e21",
+  ".github/workflows/release.yml": "6a127445bd38e1fdb8c77e861b3399e34308251744dd65d1f6c8229fb633451a",
+  ".github/workflows/unit-tests.yml": "22f98570896dcaa9d166fd30d180b9bcbeab40349b9f89190846edc39cd1e90e"
 }

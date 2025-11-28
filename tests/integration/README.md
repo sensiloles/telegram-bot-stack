@@ -147,7 +147,13 @@ open htmlcov/index.html
 
 ## CI/CD
 
-Tests run in GitHub Actions (`.github/workflows/integration-tests.yml`)
+Integration tests run in GitHub Actions:
+
+- **Workflow**: `.github/workflows/integration-tests.yml`
+- **Trigger**: Every push, PR (via ci.yml orchestrator)
+- **Matrix**: Python 3.11, 3.12
+- **Required**: Must pass for PR merge
+- **Part of**: Main CI pipeline (`.github/workflows/ci.yml`)
 
 ## Issues
 

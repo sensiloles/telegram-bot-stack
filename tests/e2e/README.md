@@ -100,13 +100,15 @@ pytest tests/e2e/  # Will skip all E2E tests
 
 ## CI/CD
 
-E2E tests run in GitHub Actions (`.github/workflows/integration-tests.yml`):
+E2E tests run in GitHub Actions:
 
+- **Workflow**: `.github/workflows/e2e-tests.yml`
 - **Trigger:** PRs to main/develop, manual dispatch
 - **Environment:** Ubuntu with Docker
 - **Status:** Non-blocking (won't prevent PR merge if they fail)
 - **Timeout:** 45 minutes
 - **Python:** 3.12 only (latest)
+- **Part of**: Release pipeline (`.github/workflows/release.yml`)
 
 ## Troubleshooting
 
