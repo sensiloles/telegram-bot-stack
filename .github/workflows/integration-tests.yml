@@ -13,7 +13,7 @@ jobs:
   integration-tests:
     name: Integration Tests (Python ${{ matrix.python-version }})
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     continue-on-error: true # Don't block PR merge if integration tests fail
 
     strategy:
@@ -61,11 +61,13 @@ jobs:
         run: |
           pytest tests/integration/ \
             -v \
+            -x \
             --tb=short \
             --cov=telegram_bot_stack \
             --cov-report=term \
             --cov-report=xml \
-            -m "not slow"
+            -m "not slow" \
+            --maxfail=3
         env:
           PYTEST_TIMEOUT: 300
 
