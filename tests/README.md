@@ -188,7 +188,7 @@ Tests run automatically in GitHub Actions on every pull request:
 - ✅ Required for PR merge
 - ⚡ Fast (1-2 minutes)
 - 🚫 No Docker required
-- 🐍 Python 3.11, 3.12
+- 🐍 Python 3.9, 3.10, 3.11, 3.12
 
 **E2E Tests** (`.github/workflows/e2e-tests.yml`):
 

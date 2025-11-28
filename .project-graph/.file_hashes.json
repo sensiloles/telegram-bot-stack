@@ -1,5 +1,5 @@
 {
   ".github/workflows/e2e-tests.yml": "0a796366e2608ceae9e73bbb09cae37d918425b5deabacf2d48823025eff2e45",
-  ".github/workflows/integration-tests.yml": "4b217e9da6402f069e36e2a6e50f71033713cf8fd0a445a69bf10cdf7bf8f577",
+  ".github/workflows/integration-tests.yml": "172840d5c7920c50beca77d74ba388646755e8a1e1f30e69a746d4c511c03f61",
   ".github/workflows/unit-tests.yml": "616405ea5a528af0c85c408f6250123b1655f74b29e4943fccf8cd483113bce5"
 }
