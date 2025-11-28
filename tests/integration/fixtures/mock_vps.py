@@ -49,20 +49,20 @@ class MockVPS:
         """Clean up test bot containers (not the Mock VPS itself)."""
         logger.info("[MockVPS] Cleaning up test containers...")
         # Stop and remove bot containers created during tests
-        # Note: Use grep -v trick to avoid xargs errors on empty input (xargs -r is GNU-only)
+        # Use bash -c and grep to avoid xargs errors on empty input
         self.exec(
-            "docker ps -a --filter name=test-bot --filter name=bot- -q 2>/dev/null | "
-            "grep . | xargs docker stop 2>/dev/null || true"
+            "/bin/bash -c 'IDS=$(docker ps -a --filter name=test-bot --filter name=bot- -q 2>/dev/null); "
+            '[ -n "$IDS" ] && echo "$IDS" | xargs docker stop 2>/dev/null || true\''
         )
         self.exec(
-            "docker ps -a --filter name=test-bot --filter name=bot- -q 2>/dev/null | "
-            "grep . | xargs docker rm 2>/dev/null || true"
+            "/bin/bash -c 'IDS=$(docker ps -a --filter name=test-bot --filter name=bot- -q 2>/dev/null); "
+            '[ -n "$IDS" ] && echo "$IDS" | xargs docker rm 2>/dev/null || true\''
         )
 
         # Remove test volumes
         self.exec(
-            "docker volume ls --filter name=test-bot --filter name=bot- -q 2>/dev/null | "
-            "grep . | xargs docker volume rm 2>/dev/null || true"
+            "/bin/bash -c 'VOLS=$(docker volume ls --filter name=test-bot --filter name=bot- -q 2>/dev/null); "
+            '[ -n "$VOLS" ] && echo "$VOLS" | xargs docker volume rm 2>/dev/null || true\''
         )
         logger.info("[MockVPS] Cleanup complete")
 
@@ -137,6 +137,7 @@ def mock_vps() -> Generator[MockVPS, None, None]:
         DockerContainer("mock-vps:latest")
         .with_bind_ports(22, None)  # Auto-assign port
         .with_name(container_name)
+        .with_volume_mapping("/var/run/docker.sock", "/var/run/docker.sock", mode="rw")
         .with_kwargs(privileged=True)  # For Docker-in-Docker
     )
 
