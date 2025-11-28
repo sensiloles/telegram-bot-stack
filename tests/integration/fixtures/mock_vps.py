@@ -41,13 +41,13 @@ class MockVPS:
         """Get path for SSH key (will be copied from container).
 
         Returns:
-            Path where private key will be stored
+            Absolute path where private key will be stored
         """
         key_dir = Path(__file__).parent / ".ssh-test"
         key_dir.mkdir(exist_ok=True)
         key_path = key_dir / "id_rsa"
 
-        return str(key_path)
+        return str(key_path.absolute())
 
     def start(self) -> None:
         """Start Mock VPS container."""
@@ -86,11 +86,14 @@ class MockVPS:
                 cwd=str(fixtures_dir),
             )
 
-        # Wait for SSH to be ready
-        self._wait_for_ssh()
+        # Wait a bit for container to start
+        time.sleep(3)
 
-        # Copy SSH key to container
+        # Copy SSH key from container first
         self._setup_ssh_key()
+
+        # Wait for SSH to be ready (now we have the key to test connection)
+        self._wait_for_ssh()
 
         self._started = True
 
@@ -156,7 +159,33 @@ class MockVPS:
                 if result.returncode == 0 and result.stdout.strip():
                     # Give SSH a moment to fully initialize
                     time.sleep(2)
-                    return
+
+                    # Test actual SSH connection
+                    try:
+                        ssh_test = subprocess.run(
+                            [
+                                "ssh",
+                                "-i",
+                                self.ssh_key_path,
+                                "-p",
+                                str(self.port),
+                                "-o",
+                                "StrictHostKeyChecking=no",
+                                "-o",
+                                "UserKnownHostsFile=/dev/null",
+                                "-o",
+                                "ConnectTimeout=5",
+                                f"{self.user}@{self.host}",
+                                "echo 'SSH ready'",
+                            ],
+                            capture_output=True,
+                            timeout=10,
+                        )
+                        if ssh_test.returncode == 0:
+                            return
+                    except (subprocess.TimeoutExpired, subprocess.SubprocessError):
+                        pass
+
             except (subprocess.TimeoutExpired, subprocess.SubprocessError):
                 pass
 
@@ -246,16 +275,23 @@ class MockVPS:
         return stdout
 
     def cleanup(self) -> None:
-        """Clean up all test containers and volumes."""
-        # Stop all bot containers
-        self.exec("docker stop $(docker ps -aq) 2>/dev/null || true")
-        self.exec("docker rm $(docker ps -aq) 2>/dev/null || true")
+        """Clean up test bot containers and volumes (but NOT the Mock VPS itself)."""
+        # Stop and remove bot containers (but not the Mock VPS container)
+        # Look for containers that match typical bot names
+        self.exec(
+            "docker ps -a --filter 'name=test-bot' --filter 'name=bot-' -q | "
+            "xargs -r docker stop 2>/dev/null || true"
+        )
+        self.exec(
+            "docker ps -a --filter 'name=test-bot' --filter 'name=bot-' -q | "
+            "xargs -r docker rm 2>/dev/null || true"
+        )
 
-        # Remove test volumes
-        self.exec("docker volume prune -f")
-
-        # Remove test images
-        self.exec("docker image prune -af")
+        # Remove test volumes (but preserve mock-vps volumes)
+        self.exec(
+            "docker volume ls --filter 'name=test-bot' --filter 'name=bot-' -q | "
+            "xargs -r docker volume rm 2>/dev/null || true"
+        )
 
 
 @pytest.fixture(scope="session")
@@ -285,7 +321,7 @@ def mock_vps() -> Generator[MockVPS, None, None]:
 
 @pytest.fixture
 def clean_vps(mock_vps: MockVPS) -> Generator[MockVPS, None, None]:
-    """Pytest fixture for clean VPS (cleanup before and after test).
+    """Pytest fixture for clean VPS (cleanup after test).
 
     Args:
         mock_vps: Mock VPS fixture
@@ -293,6 +329,8 @@ def clean_vps(mock_vps: MockVPS) -> Generator[MockVPS, None, None]:
     Yields:
         Clean MockVPS instance
     """
-    mock_vps.cleanup()
+    # Don't cleanup before test - the Mock VPS might not be fully ready
+    # and cleanup() runs docker commands inside the container
     yield mock_vps
+    # Cleanup after test to remove any bot containers created during the test
     mock_vps.cleanup()

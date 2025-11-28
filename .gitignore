@@ -78,3 +78,5 @@ backups/
 
 # Bot lock files (dev mode)
 .bot.lock
+# Integration test SSH keys (temporary)
+tests/integration/fixtures/.ssh*/
