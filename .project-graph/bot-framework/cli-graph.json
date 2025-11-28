@@ -254,7 +254,7 @@
       "category": "implementation",
       "path": "telegram_bot_stack/cli/utils/vps.py",
       "description": "VPS operations utilities for deployment.",
-      "lines_of_code": 552,
+      "lines_of_code": 545,
       "complexity_score": 1,
       "exports": [
         "VPSConnection",

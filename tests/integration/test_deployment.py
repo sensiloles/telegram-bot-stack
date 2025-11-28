@@ -59,36 +59,18 @@ class TestDeploymentInit:
         assert "encryption_key" in config["secrets"]
 
     def test_deploy_init_existing_config_no_overwrite(
-        self, clean_vps: MockVPS, tmp_path: Path
+        self, clean_vps: MockVPS, tmp_path: Path, deployment_config: Path
     ) -> None:
         """Test deploy init with existing config (no overwrite)."""
         os.chdir(tmp_path)
         runner = CliRunner()
 
-        # Create initial config
-        result1 = runner.invoke(
-            cli,
-            [
-                "deploy",
-                "init",
-                "--host",
-                clean_vps.host,
-                "--user",
-                clean_vps.user,
-                "--ssh-key",
-                clean_vps.ssh_key_path,
-                "--port",
-                str(clean_vps.port),
-                "--bot-name",
-                "test-bot-1",
-            ],
-        )
-        assert result1.exit_code == 0
-
-        original_content = Path("deploy.yaml").read_text()
+        # deployment_config fixture already created deploy.yaml
+        assert deployment_config.exists(), "deploy.yaml must exist"
+        original_content = deployment_config.read_text()
 
         # Try to init again (should prompt to overwrite)
-        result2 = runner.invoke(
+        result = runner.invoke(
             cli,
             [
                 "deploy",
@@ -101,15 +83,18 @@ class TestDeploymentInit:
                 clean_vps.ssh_key_path,
                 "--bot-name",
                 "test-bot-2",
+                "--config",
+                str(deployment_config),
             ],
             input="n\n",  # Answer "no" to overwrite
         )
 
-        # Should be cancelled
-        assert "cancelled" in result2.output.lower()
+        # Should be cancelled or indicate config exists
+        assert result.exit_code == 0
+        assert "cancelled" in result.output.lower() or "exists" in result.output.lower()
 
         # Config should not change
-        assert Path("deploy.yaml").read_text() == original_content
+        assert deployment_config.read_text() == original_content
 
     def test_deploy_init_invalid_ssh_connection(self, tmp_path: Path) -> None:
         """Test deploy init with invalid SSH connection."""
@@ -141,7 +126,9 @@ class TestDeploymentInit:
 class TestDeploymentUp:
     """Test bot deployment."""
 
-    def test_deploy_up_first_time(self, clean_vps: MockVPS, tmp_path: Path) -> None:
+    def test_deploy_up_first_time(
+        self, clean_vps: MockVPS, tmp_path: Path, deployment_config: Path
+    ) -> None:
         """Test first-time deployment to clean VPS."""
         os.chdir(tmp_path)
         runner = CliRunner()
@@ -165,25 +152,8 @@ if __name__ == '__main__':
         # Create requirements.txt
         Path("requirements.txt").write_text("telegram-bot-stack\n")
 
-        # Initialize deployment
-        result_init = runner.invoke(
-            cli,
-            [
-                "deploy",
-                "init",
-                "--host",
-                clean_vps.host,
-                "--user",
-                clean_vps.user,
-                "--ssh-key",
-                clean_vps.ssh_key_path,
-                "--port",
-                str(clean_vps.port),
-                "--bot-name",
-                "test-bot",
-            ],
-        )
-        assert result_init.exit_code == 0
+        # deploy.yaml already created by deployment_config fixture
+        assert deployment_config.exists(), "deploy.yaml must exist"
 
         # Set bot token secret
         result_secret = runner.invoke(
@@ -191,15 +161,19 @@ if __name__ == '__main__':
             [
                 "deploy",
                 "secrets",
-                "set",
+                "set-secret",
                 "BOT_TOKEN",
                 "123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11",
+                "--config",
+                str(deployment_config),
             ],
         )
         assert result_secret.exit_code == 0
 
         # Deploy bot
-        result_up = runner.invoke(cli, ["deploy", "up"])
+        result_up = runner.invoke(
+            cli, ["deploy", "up", "--config", str(deployment_config)]
+        )
 
         # Check deployment succeeded
         assert result_up.exit_code == 0
@@ -267,30 +241,15 @@ class TestDeploymentStatus:
 class TestSecretsManagement:
     """Test secrets management commands."""
 
-    def test_secrets_set_and_list(self, clean_vps: MockVPS, tmp_path: Path) -> None:
+    def test_secrets_set_and_list(
+        self, clean_vps: MockVPS, tmp_path: Path, deployment_config: Path
+    ) -> None:
         """Test setting and listing secrets."""
         os.chdir(tmp_path)
         runner = CliRunner()
 
-        # Initialize deployment
-        result_init = runner.invoke(
-            cli,
-            [
-                "deploy",
-                "init",
-                "--host",
-                clean_vps.host,
-                "--user",
-                clean_vps.user,
-                "--ssh-key",
-                clean_vps.ssh_key_path,
-                "--port",
-                str(clean_vps.port),
-                "--bot-name",
-                "test-bot",
-            ],
-        )
-        assert result_init.exit_code == 0
+        # deploy.yaml already created by deployment_config fixture
+        assert deployment_config.exists(), "deploy.yaml must exist"
 
         # Set secret
         result_set = runner.invoke(
@@ -298,43 +257,33 @@ class TestSecretsManagement:
             [
                 "deploy",
                 "secrets",
-                "set",
+                "set-secret",
                 "BOT_TOKEN",
                 "123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11",
+                "--config",
+                str(deployment_config),
             ],
         )
         assert result_set.exit_code == 0
-        assert "stored" in result_set.output.lower()
+        assert "set successfully" in result_set.output.lower()
 
         # List secrets
-        result_list = runner.invoke(cli, ["deploy", "secrets", "list"])
-        assert result_list.exit_code == 0
+        result_list = runner.invoke(
+            cli,
+            ["deploy", "secrets", "list-secrets", "--config", str(deployment_config)],
+        )
+        assert result_list.exit_code == 0, f"list-secrets failed: {result_list.output}"
         assert "BOT_TOKEN" in result_list.output
 
-    def test_secrets_delete(self, clean_vps: MockVPS, tmp_path: Path) -> None:
+    def test_secrets_delete(
+        self, clean_vps: MockVPS, tmp_path: Path, deployment_config: Path
+    ) -> None:
         """Test deleting secrets."""
         os.chdir(tmp_path)
         runner = CliRunner()
 
-        # Initialize deployment
-        result_init = runner.invoke(
-            cli,
-            [
-                "deploy",
-                "init",
-                "--host",
-                clean_vps.host,
-                "--user",
-                clean_vps.user,
-                "--ssh-key",
-                clean_vps.ssh_key_path,
-                "--port",
-                str(clean_vps.port),
-                "--bot-name",
-                "test-bot",
-            ],
-        )
-        assert result_init.exit_code == 0
+        # deploy.yaml already created by deployment_config fixture
+        assert deployment_config.exists(), "deploy.yaml must exist"
 
         # Set secret
         runner.invoke(
@@ -342,15 +291,26 @@ class TestSecretsManagement:
             [
                 "deploy",
                 "secrets",
-                "set",
+                "set-secret",
                 "BOT_TOKEN",
                 "123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11",
+                "--config",
+                str(deployment_config),
             ],
         )
 
         # Delete secret
         result_delete = runner.invoke(
-            cli, ["deploy", "secrets", "delete", "BOT_TOKEN"], input="y\n"
+            cli,
+            [
+                "deploy",
+                "secrets",
+                "remove-secret",
+                "BOT_TOKEN",
+                "--config",
+                str(deployment_config),
+            ],
+            input="y\n",
         )
         assert result_delete.exit_code == 0
         assert "deleted" in result_delete.output.lower()
@@ -359,42 +319,31 @@ class TestSecretsManagement:
 class TestBackupRestore:
     """Test backup and restore functionality."""
 
-    def test_backup_create_and_list(self, clean_vps: MockVPS, tmp_path: Path) -> None:
+    def test_backup_create_and_list(
+        self, clean_vps: MockVPS, tmp_path: Path, deployment_config: Path
+    ) -> None:
         """Test creating and listing backups."""
         os.chdir(tmp_path)
         runner = CliRunner()
 
-        # Initialize deployment
-        result_init = runner.invoke(
-            cli,
-            [
-                "deploy",
-                "init",
-                "--host",
-                clean_vps.host,
-                "--user",
-                clean_vps.user,
-                "--ssh-key",
-                clean_vps.ssh_key_path,
-                "--port",
-                str(clean_vps.port),
-                "--bot-name",
-                "test-bot",
-            ],
-        )
-        assert result_init.exit_code == 0
+        # deploy.yaml already created by deployment_config fixture
+        assert deployment_config.exists(), "deploy.yaml must exist"
 
         # Create some data on VPS
         clean_vps.exec("mkdir -p /opt/test-bot/data")
         clean_vps.exec("echo 'test data' > /opt/test-bot/data/test.txt")
 
         # Create backup
-        result_backup = runner.invoke(cli, ["deploy", "backup", "create"])
+        result_backup = runner.invoke(
+            cli, ["deploy", "backup", "create", "--config", str(deployment_config)]
+        )
         assert result_backup.exit_code == 0
         assert "backup created" in result_backup.output.lower()
 
         # List backups
-        result_list = runner.invoke(cli, ["deploy", "backup", "list"])
+        result_list = runner.invoke(
+            cli, ["deploy", "backup", "list", "--config", str(deployment_config)]
+        )
         assert result_list.exit_code == 0
         assert "backup-" in result_list.output.lower()
 

@@ -397,21 +397,14 @@ class VPSConnection:
             # Note: base64.b64encode always returns properly padded strings, so no padding fix needed
             temp_file_quoted = shlex.quote(temp_file)
             content_b64_quoted = shlex.quote(content_b64)
+            # Use Python one-liner to decode and write file
+            # Split into multiple lines in shell command using semicolons
             python_cmd = (
-                f'python3 -c "'
-                f"import sys, base64; "
-                f"temp_file=sys.argv[1]; "
-                f"content_b64=sys.argv[2]; "
-                f"try: "
-                f"  # base64.b64decode handles padding automatically "
-                f"  decoded = base64.b64decode(content_b64); "
-                f"  f = open(temp_file, 'wb'); "
-                f"  f.write(decoded); "
-                f"  f.close(); "
-                f"except Exception as e: "
-                f"  print('Error: ' + str(e), file=sys.stderr); "
-                f"  sys.exit(1)"
-                f'" -- {temp_file_quoted} {content_b64_quoted}'
+                f"python3 -c 'import sys, base64; "
+                f'f=open(sys.argv[1], "wb"); '
+                f"f.write(base64.b64decode(sys.argv[2])); "
+                f"f.close()' "
+                f"{temp_file_quoted} {content_b64_quoted}"
             )
             conn.run(python_cmd, hide=True)
 

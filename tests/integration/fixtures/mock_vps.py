@@ -321,7 +321,7 @@ def mock_vps() -> Generator[MockVPS, None, None]:
 
 @pytest.fixture
 def clean_vps(mock_vps: MockVPS) -> Generator[MockVPS, None, None]:
-    """Pytest fixture for clean VPS (cleanup after test).
+    """Pytest fixture for clean VPS.
 
     Args:
         mock_vps: Mock VPS fixture
@@ -329,8 +329,15 @@ def clean_vps(mock_vps: MockVPS) -> Generator[MockVPS, None, None]:
     Yields:
         Clean MockVPS instance
     """
-    # Don't cleanup before test - the Mock VPS might not be fully ready
-    # and cleanup() runs docker commands inside the container
+    # Verify Mock VPS is started
+    assert mock_vps._started, "Mock VPS must be started"
+
+    # Give SSH a moment to be ready (simple approach)
+    import time
+
+    time.sleep(1)
+
     yield mock_vps
+
     # Cleanup after test to remove any bot containers created during the test
     mock_vps.cleanup()

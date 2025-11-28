@@ -64,31 +64,14 @@ class TestDockerRequirements:
         )
 
     def test_deploy_up_docker_not_running(
-        self, clean_vps: MockVPS, tmp_path: Path
+        self, clean_vps: MockVPS, tmp_path: Path, deployment_config: Path
     ) -> None:
         """Test deployment handles Docker daemon not running."""
         os.chdir(tmp_path)
         runner = CliRunner()
 
-        # Initialize deployment
-        result_init = runner.invoke(
-            cli,
-            [
-                "deploy",
-                "init",
-                "--host",
-                clean_vps.host,
-                "--user",
-                clean_vps.user,
-                "--ssh-key",
-                clean_vps.ssh_key_path,
-                "--port",
-                str(clean_vps.port),
-                "--bot-name",
-                "test-bot",
-            ],
-        )
-        assert result_init.exit_code == 0
+        # deploy.yaml already created by deployment_config fixture
+        assert deployment_config.exists(), "deploy.yaml must exist"
 
         # Stop Docker daemon
         clean_vps.exec("systemctl stop docker || service docker stop")
@@ -109,31 +92,14 @@ class TestDockerRequirements:
         )
 
     def test_deploy_up_no_docker_compose(
-        self, clean_vps: MockVPS, tmp_path: Path
+        self, clean_vps: MockVPS, tmp_path: Path, deployment_config: Path
     ) -> None:
         """Test deployment handles missing Docker Compose."""
         os.chdir(tmp_path)
         runner = CliRunner()
 
-        # Initialize deployment
-        result_init = runner.invoke(
-            cli,
-            [
-                "deploy",
-                "init",
-                "--host",
-                clean_vps.host,
-                "--user",
-                clean_vps.user,
-                "--ssh-key",
-                clean_vps.ssh_key_path,
-                "--port",
-                str(clean_vps.port),
-                "--bot-name",
-                "test-bot",
-            ],
-        )
-        assert result_init.exit_code == 0
+        # deploy.yaml already created by deployment_config fixture
+        assert deployment_config.exists(), "deploy.yaml must exist"
 
         # Remove Docker Compose
         clean_vps.exec("rm -f /usr/local/bin/docker-compose")
@@ -157,30 +123,15 @@ class TestDockerRequirements:
 class TestPythonRequirements:
     """Test Python version requirements validation."""
 
-    def test_deploy_up_old_python(self, clean_vps: MockVPS, tmp_path: Path) -> None:
+    def test_deploy_up_old_python(
+        self, clean_vps: MockVPS, tmp_path: Path, deployment_config: Path
+    ) -> None:
         """Test deployment warns about old Python version."""
         os.chdir(tmp_path)
         runner = CliRunner()
 
-        # Initialize deployment
-        result_init = runner.invoke(
-            cli,
-            [
-                "deploy",
-                "init",
-                "--host",
-                clean_vps.host,
-                "--user",
-                clean_vps.user,
-                "--ssh-key",
-                clean_vps.ssh_key_path,
-                "--port",
-                str(clean_vps.port),
-                "--bot-name",
-                "test-bot",
-            ],
-        )
-        assert result_init.exit_code == 0
+        # deploy.yaml already created by deployment_config fixture
+        assert deployment_config.exists(), "deploy.yaml must exist"
 
         # Check current Python version
         exit_code, stdout, _ = clean_vps.exec("python3 --version")
