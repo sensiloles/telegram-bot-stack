@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Any, Dict, Optional
 
 from fabric import Connection
+from invoke import Config
 from rich.console import Console
 
 console = Console()
@@ -90,11 +91,26 @@ class VPSConnection:
             # Will prompt for password if no key provided
             connect_kwargs["look_for_keys"] = True
 
+        # Configure Fabric to work with pytest's capture system
+        # Disable all I/O threads to avoid ThreadException when pytest captures output
+        # Use /dev/null for stdin to prevent thread from trying to read from closed stream
+
+        config = Config(
+            overrides={
+                "run": {
+                    "in_stream": False,  # Disable stdin thread (fixes ThreadException)
+                    "watchers": [],  # Disable watchers
+                }
+            }
+        )
+
         return Connection(
             host=self.host,
             user=self.user,
             port=self.port,
             connect_kwargs=connect_kwargs,
+            config=config,
+            inline_ssh_env=True,  # Use inline env vars instead of shell source
         )
 
     def run_command(self, command: str, hide: bool = False) -> bool:
@@ -116,9 +132,9 @@ class VPSConnection:
                 console.print(
                     "[dim]   Running command (output will appear when complete)...[/dim]"
                 )
-            result = conn.run(
-                command, hide=hide, pty=not hide
-            )  # Use pty for better output streaming
+            # Disable pty and in_stream to prevent ThreadException in tests
+            # pty=False is safer for automated scripts, in_stream=False prevents stdin thread
+            result = conn.run(command, hide=hide, pty=False, in_stream=False)
             return bool(result.ok)
         except Exception as e:
             console.print(f"[red]Command failed: {e}[/red]")
