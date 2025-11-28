@@ -13,9 +13,17 @@ import yaml
 from click.testing import CliRunner
 
 from telegram_bot_stack.cli.main import cli
+from tests.integration.conftest import (
+    assert_cli_success,
+    get_cli_output,
+)
 from tests.integration.fixtures.mock_vps import MockVPS
 
 logger = logging.getLogger(__name__)
+
+# Test constants
+TEST_BOT_NAME = "test-bot"
+TEST_BOT_TOKEN = "8382012914:AAEAfngi20CYFrxhIxXY7EyFYun1mG_qIjU"
 
 
 class TestDeploymentInit:
@@ -42,13 +50,13 @@ class TestDeploymentInit:
                 "--port",
                 str(clean_vps.port),
                 "--bot-name",
-                "test-bot",
+                TEST_BOT_NAME,
             ],
         )
 
         # Check command succeeded
         logger.info(f"→ Command exit code: {result.exit_code}")
-        assert result.exit_code == 0, f"Command failed: {result.output}"
+        assert_cli_success(result, runner, "deploy.yaml")
 
         # Check deploy.yaml was created
         logger.info("→ Verifying deploy.yaml was created...")
@@ -66,7 +74,7 @@ class TestDeploymentInit:
         assert config["vps"]["host"] == clean_vps.host
         assert config["vps"]["user"] == clean_vps.user
         assert config["vps"]["port"] == clean_vps.port
-        assert config["bot"]["name"] == "test-bot"
+        assert config["bot"]["name"] == TEST_BOT_NAME
         assert "secrets" in config
         assert "encryption_key" in config["secrets"]
 
@@ -100,14 +108,15 @@ class TestDeploymentInit:
                         "--ssh-key",
                         clean_vps.ssh_key_path,
                         "--bot-name",
-                        "test-bot-1",
+                        f"{TEST_BOT_NAME}-1",
                     ],
                 )
-                assert result1.exit_code == 0, f"First init failed: {result1.output}"
+                assert_cli_success(result1, runner)
                 assert Path("deploy.yaml").exists()
 
                 # Try to init again (should prompt to overwrite)
-                result2 = runner.invoke(
+                # Use new runner to avoid file descriptor issues
+                result2 = CliRunner().invoke(
                     cli,
                     [
                         "deploy",
@@ -119,14 +128,15 @@ class TestDeploymentInit:
                         "--ssh-key",
                         clean_vps.ssh_key_path,
                         "--bot-name",
-                        "test-bot-2",
+                        f"{TEST_BOT_NAME}-2",
                     ],
                     input="n\n",  # Answer "no" to overwrite
                 )
 
                 # Should be cancelled
+                result2_output = get_cli_output(result2)
                 assert result2.exit_code == 0
-                assert "cancelled" in result2.output.lower()
+                assert "cancelled" in result2_output.lower()
 
     def test_deploy_init_invalid_ssh_connection(self, tmp_path: Path) -> None:
         """Test deploy init with invalid SSH connection."""
@@ -146,23 +156,35 @@ class TestDeploymentInit:
                 "--ssh-key",
                 "~/.ssh/id_rsa",
                 "--bot-name",
-                "test-bot",
+                TEST_BOT_NAME,
             ],
         )
 
         # Should fail with SSH connection error
+        output = get_cli_output(result, runner)
         assert result.exit_code == 0  # Command itself succeeds
-        assert "SSH connection failed" in result.output
+        assert "SSH connection failed" in output
 
 
 class TestDeploymentUp:
     """Test bot deployment."""
 
-    @pytest.mark.skip(reason="CliRunner file descriptor issue - needs refactoring")
+    @pytest.mark.slow
+    @pytest.mark.skip(
+        reason="Docker-in-Docker build not fully supported in test environment"
+    )
     def test_deploy_up_first_time(
         self, clean_vps: MockVPS, tmp_path: Path, deployment_config: Path
     ) -> None:
-        """Test first-time deployment to clean VPS."""
+        """Test first-time deployment to clean VPS.
+
+        Note: This test may take a while as it performs actual deployment
+        including Docker image building. In Docker-in-Docker environments,
+        this may be slow or fail.
+
+        Marked as slow - use `pytest -m "not slow"` to skip.
+        Skipped by default due to Docker-in-Docker limitations.
+        """
         os.chdir(tmp_path)
 
         # Create simple bot
@@ -188,28 +210,29 @@ if __name__ == '__main__':
         assert deployment_config.exists(), "deploy.yaml must exist"
 
         # Set bot token secret (create new runner for each command to avoid file descriptor issues)
-        result_secret = CliRunner().invoke(
+        runner_secret = CliRunner()
+        result_secret = runner_secret.invoke(
             cli,
             [
                 "deploy",
                 "secrets",
                 "set-secret",
                 "BOT_TOKEN",
-                "123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11",
+                TEST_BOT_TOKEN,
                 "--config",
                 str(deployment_config),
             ],
         )
-        assert result_secret.exit_code == 0
+        assert_cli_success(result_secret, runner_secret, "set successfully")
 
         # Deploy bot (use new runner to avoid I/O closed file error)
-        result_up = CliRunner().invoke(
+        runner_up = CliRunner()
+        result_up = runner_up.invoke(
             cli, ["deploy", "up", "--config", str(deployment_config)]
         )
 
         # Check deployment succeeded
-        assert result_up.exit_code == 0
-        assert "deployed successfully" in result_up.output.lower()
+        assert_cli_success(result_up, runner_up, "deployed successfully")
 
         # Verify bot container is running
         # Note: This may not work if Docker-in-Docker is not fully configured
@@ -246,11 +269,12 @@ class TestDeploymentStatus:
 
         # Should show error or indicate bot not deployed
         # Exit code may be non-zero since deployment doesn't exist
+        output = get_cli_output(result, runner)
         assert (
-            "not running" in result.output.lower()
-            or "not found" in result.output.lower()
-            or "no rule to make target" in result.output.lower()
-            or "failed" in result.output.lower()
+            "not running" in output.lower()
+            or "not found" in output.lower()
+            or "no rule to make target" in output.lower()
+            or "failed" in output.lower()
         )
 
 
@@ -269,34 +293,34 @@ class TestSecretsManagement:
 
         # Set secret
         logger.info("→ Setting BOT_TOKEN secret...")
-        result_set = runner.invoke(
+        runner_set = CliRunner()
+        result_set = runner_set.invoke(
             cli,
             [
                 "deploy",
                 "secrets",
                 "set-secret",
                 "BOT_TOKEN",
-                "123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11",
+                TEST_BOT_TOKEN,
                 "--config",
                 str(deployment_config),
             ],
         )
         logger.info(f"  ✓ Set secret exit code: {result_set.exit_code}")
-        assert result_set.exit_code == 0
-        assert "set successfully" in result_set.output.lower()
+        assert_cli_success(result_set, runner_set, "set successfully")
 
-        # List secrets
+        # List secrets (use new runner to avoid file descriptor issues)
         logger.info("→ Listing secrets...")
-        result_list = runner.invoke(
+        runner_list = CliRunner()
+        result_list = runner_list.invoke(
             cli,
             ["deploy", "secrets", "list-secrets", "--config", str(deployment_config)],
         )
+        list_output = get_cli_output(result_list, runner_list)
         logger.info(f"  ✓ List secrets exit code: {result_list.exit_code}")
-        logger.info(
-            f"  ✓ BOT_TOKEN found in output: {'BOT_TOKEN' in result_list.output}"
-        )
-        assert result_list.exit_code == 0, f"list-secrets failed: {result_list.output}"
-        assert "BOT_TOKEN" in result_list.output
+        logger.info(f"  ✓ BOT_TOKEN found in output: {'BOT_TOKEN' in list_output}")
+        assert_cli_success(result_list, runner_list)
+        assert "BOT_TOKEN" in list_output
 
     def test_secrets_delete(
         self, clean_vps: MockVPS, tmp_path: Path, deployment_config: Path
@@ -309,22 +333,24 @@ class TestSecretsManagement:
         assert deployment_config.exists(), "deploy.yaml must exist"
 
         # Set secret
-        result_set = runner.invoke(
+        runner_set = CliRunner()
+        result_set = runner_set.invoke(
             cli,
             [
                 "deploy",
                 "secrets",
                 "set-secret",
                 "BOT_TOKEN",
-                "123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11",
+                TEST_BOT_TOKEN,
                 "--config",
                 str(deployment_config),
             ],
         )
-        assert result_set.exit_code == 0, f"set-secret failed: {result_set.output}"
+        assert_cli_success(result_set, runner_set, "set successfully")
 
-        # Delete secret
-        result_delete = runner.invoke(
+        # Delete secret (use new runner to avoid file descriptor issues)
+        runner_delete = CliRunner()
+        result_delete = runner_delete.invoke(
             cli,
             [
                 "deploy",
@@ -336,12 +362,14 @@ class TestSecretsManagement:
             ],
             input="y\n",
         )
+        delete_output = get_cli_output(result_delete, runner_delete)
+
         # Should handle deletion (even if secret not found due to CliRunner isolation)
         assert (
-            "deleted" in result_delete.output.lower()
-            or "not found" in result_delete.output.lower()
-            or "removed" in result_delete.output.lower()
-        ), f"Unexpected output: {result_delete.output}"
+            "deleted" in delete_output.lower()
+            or "not found" in delete_output.lower()
+            or "removed" in delete_output.lower()
+        ), f"Unexpected output: {delete_output}"
 
 
 class TestBackupRestore:
@@ -370,8 +398,9 @@ class TestBackupRestore:
         # 1. Create backup successfully (if bot is deployed)
         # 2. Fail gracefully (if bot not deployed yet)
         # Both are acceptable for this test
+        backup_output = get_cli_output(result_backup, runner)
         if result_backup.exit_code == 0:
-            assert "backup created" in result_backup.output.lower()
+            assert "backup created" in backup_output.lower()
         # If backup failed (bot not deployed), that's also OK for this integration test
 
 
@@ -398,14 +427,16 @@ class TestDeploymentDown:
                 "--port",
                 str(clean_vps.port),
                 "--bot-name",
-                "test-bot",
+                TEST_BOT_NAME,
             ],
         )
-        assert result_init.exit_code == 0
+        assert_cli_success(result_init, runner)
 
         # Teardown (should work even if nothing deployed)
-        result_down = runner.invoke(cli, ["deploy", "down"], input="y\n")
-        assert result_down.exit_code == 0
+        # Use new runner to avoid file descriptor issues
+        runner_down = CliRunner()
+        result_down = runner_down.invoke(cli, ["deploy", "down"], input="y\n")
+        assert_cli_success(result_down, runner_down)
 
 
 class TestHealthChecks:
@@ -431,13 +462,14 @@ class TestHealthChecks:
                 "--port",
                 str(clean_vps.port),
                 "--bot-name",
-                "test-bot",
+                TEST_BOT_NAME,
             ],
         )
-        assert result_init.exit_code == 0
+        assert_cli_success(result_init, runner)
 
-        # Run health check
-        result_health = runner.invoke(cli, ["deploy", "health"])
+        # Run health check (use new runner to avoid file descriptor issues)
+        runner_health = CliRunner()
+        result_health = runner_health.invoke(cli, ["deploy", "health"])
 
         # Should complete (even if no deployment)
-        assert result_health.exit_code == 0
+        assert_cli_success(result_health, runner_health)
