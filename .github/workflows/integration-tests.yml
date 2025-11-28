@@ -62,6 +62,7 @@ jobs:
           pytest tests/integration/ \
             -v \
             -x \
+            -n auto \
             --tb=short \
             --cov=telegram_bot_stack \
             --cov-report=term \

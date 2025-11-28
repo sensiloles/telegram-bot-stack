@@ -64,9 +64,10 @@ esac
 
 echo ""
 
-# Run with coverage
+# Run with coverage and parallel execution
 pytest "$TEST_PATH" \
     -v \
+    -n auto \
     --tb=short \
     --cov=telegram_bot_stack \
     --cov-report=term \
