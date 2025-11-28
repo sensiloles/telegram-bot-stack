@@ -66,7 +66,7 @@ class TestVPSConnection:
             result = vps.run_command("echo test")
 
             assert result is True
-            mock_conn.run.assert_called_once_with("echo test", hide=False)
+            mock_conn.run.assert_called_once_with("echo test", hide=False, pty=True)
 
     def test_run_command_failure(self):
         """Test failed command execution."""
