@@ -4,15 +4,6 @@ name: Unit Tests
 # Run locally: pytest --ignore=tests/integration --ignore=tests/e2e
 
 on:
-  push:
-    branches: [main, develop]
-    paths-ignore:
-      - "**.md"
-      - "docs/**"
-      - ".github/PROJECT_STATUS.md"
-      - "LICENSE"
-      - ".gitignore"
-      - ".cursorrules"
   pull_request:
     branches: [main, develop]
     paths-ignore:
@@ -22,7 +13,8 @@ on:
       - "LICENSE"
       - ".gitignore"
       - ".cursorrules"
-  workflow_call: # Allow being called by other workflows (ci.yml, release.yml)
+  workflow_call: # Allow being called by release.yml
+  workflow_dispatch: # Allow manual trigger
 
 jobs:
   unit-tests:

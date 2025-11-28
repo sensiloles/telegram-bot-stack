@@ -174,13 +174,7 @@ pytest tests/unit/ -n auto
 
 ### CI/CD
 
-Tests run automatically in GitHub Actions via modular workflows:
-
-**Main CI Pipeline** (`.github/workflows/ci.yml`):
-- Orchestrates all checks in parallel for PRs
-- Required for PR merge
-
-**Individual Workflows:**
+Tests run automatically in GitHub Actions on every pull request:
 
 **Unit Tests** (`.github/workflows/unit-tests.yml`):
 

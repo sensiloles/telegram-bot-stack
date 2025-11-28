@@ -4,12 +4,10 @@ name: Integration Tests
 # Run locally: pytest tests/integration/bot/ tests/integration/deployment/test_config.py
 
 on:
-  push:
-    branches: [main, develop]
   pull_request:
     branches: [main, develop]
+  workflow_call: # Allow being called by release.yml
   workflow_dispatch: # Allow manual trigger
-  workflow_call: # Allow being called by other workflows (ci.yml, release.yml)
 
 jobs:
   integration:

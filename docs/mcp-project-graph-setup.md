@@ -249,7 +249,7 @@ infra = fetch_mcp_resource("project-graph", "graph://infrastructure")
 # → Returns 639 lines covering all CI/CD
 
 # 3. Find relevant workflow
-# (Graph shows: .github/workflows/ci.yml, unit-tests.yml, etc.)
+# (Graph shows: .github/workflows/unit-tests.yml, integration-tests.yml, etc.)
 
 # 4. Fix issue and update
 ```

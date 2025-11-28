@@ -1,7 +1,6 @@
 {
-  "README.md": "4487bf830534b95d2b57246a9266860f633ed50e18d46a8af80c0a1cfe1e0610",
-  "docs/mcp-project-graph-setup.md": "d2058a207bbae067345ceabefc7cccb6c4175f4a79eec33b247052515af9b640",
-  ".github/workflows/type-check.yml": "43c3ce58d8cf9ef7b09edf68a2b8742283791cd47bb46bc5ee83631412b45e21",
-  ".github/workflows/release.yml": "6a127445bd38e1fdb8c77e861b3399e34308251744dd65d1f6c8229fb633451a",
-  ".github/workflows/unit-tests.yml": "22f98570896dcaa9d166fd30d180b9bcbeab40349b9f89190846edc39cd1e90e"
+  ".github/workflows/type-check.yml": "3b2d4075383e67189f252bf857157bfd1a53c1d6ba504a3f02bec5840ee74d45",
+  "README.md": "a7030f8182c06a43b5123bfc3d3908443560d74c1afe2ed9d37909bc60ec2ec7",
+  "docs/mcp-project-graph-setup.md": "45939c87791e194c6c12aa2e257e6132e6b40836a41d2e42fb9a8570371fa646",
+  ".github/workflows/unit-tests.yml": "97daca1e154c0b6a138628a5e12874d3a074882b225c918c8750548d68f89c28"
 }
