@@ -2,9 +2,10 @@
 
 help:
 	@echo "Available commands:"
-	@echo "  make test              - Run all tests"
-	@echo "  make test-unit         - Run unit tests only"
+	@echo "  make test              - Run all tests (unit + integration)"
+	@echo "  make test-unit         - Run unit tests only (fast, no Docker)"
 	@echo "  make test-integration  - Run integration tests (requires Docker)"
+	@echo "  make test-all-versions - Run tests on Python 3.9-3.12 (via tox)"
 	@echo "  make coverage          - Run tests with coverage report"
 	@echo "  make lint              - Run linters (ruff, mypy)"
 	@echo "  make format            - Auto-format code"
@@ -16,7 +17,7 @@ test:
 	pytest
 
 test-unit:
-	pytest tests/ --ignore=tests/integration/
+	pytest tests/unit/ -v
 
 test-integration:
 	@echo "Running integration tests (requires Docker)..."
