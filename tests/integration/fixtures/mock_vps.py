@@ -92,26 +92,71 @@ def mock_vps() -> Generator[MockVPS, None, None]:
     container.start()
 
     # Wait a moment for container to be fully up
-    time.sleep(2)
+    time.sleep(1)
 
-    # Copy SSH key to container
-    pub_key_content = (key_path.parent / f"{key_path.name}.pub").read_text()
-    container.exec(
-        f"bash -c \"echo '{pub_key_content}' >> /root/.ssh/authorized_keys\""
-    )
-    container.exec("chmod 600 /root/.ssh/authorized_keys")
+    # Copy SSH public key to container using docker cp (more reliable than exec)
+    import subprocess
+    import tempfile
 
-    # Wait for SSH daemon to be ready
-    max_retries = 10
+    pub_key_path = key_path.parent / f"{key_path.name}.pub"
+
+    # Write public key to temp file
+    with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".pub") as tmp:
+        tmp.write(pub_key_path.read_text())
+        tmp_path = tmp.name
+
+    try:
+        # Copy public key to container
+        container_id = container.get_wrapped_container().id
+        subprocess.run(
+            ["docker", "cp", tmp_path, f"{container_id}:/root/.ssh/authorized_keys"],
+            check=True,
+            timeout=5,
+            capture_output=True,
+        )
+        # Set correct permissions and ownership
+        subprocess.run(
+            [
+                "docker",
+                "exec",
+                container_id,
+                "chown",
+                "root:root",
+                "/root/.ssh/authorized_keys",
+            ],
+            check=True,
+            timeout=5,
+            capture_output=True,
+        )
+        subprocess.run(
+            [
+                "docker",
+                "exec",
+                container_id,
+                "chmod",
+                "600",
+                "/root/.ssh/authorized_keys",
+            ],
+            check=True,
+            timeout=5,
+            capture_output=True,
+        )
+    finally:
+        Path(tmp_path).unlink(missing_ok=True)
+
+    # Wait for SSH daemon to be ready with timeout
+    import socket
+    import subprocess
+
+    max_retries = 30
+    ssh_port = int(container.get_exposed_port(22))
+
     for attempt in range(max_retries):
         try:
-            result = container.exec("pgrep sshd")
-            if result.exit_code == 0:
-                # SSH daemon is running, wait a bit more for it to be ready
-                time.sleep(1)
-
-                # Test SSH connection
-                import subprocess
+            # Try to connect to SSH port (faster than exec or full SSH)
+            with socket.create_connection(("127.0.0.1", ssh_port), timeout=1):
+                # Port is open, wait a bit more and test SSH
+                time.sleep(0.5)
 
                 ssh_result = subprocess.run(
                     [
@@ -119,29 +164,33 @@ def mock_vps() -> Generator[MockVPS, None, None]:
                         "-i",
                         str(key_path.absolute()),
                         "-p",
-                        str(container.get_exposed_port(22)),
+                        str(ssh_port),
                         "-o",
                         "StrictHostKeyChecking=no",
                         "-o",
                         "UserKnownHostsFile=/dev/null",
                         "-o",
-                        "ConnectTimeout=5",
+                        "ConnectTimeout=2",
+                        "-o",
+                        "ServerAliveInterval=1",
                         "root@127.0.0.1",
                         "echo ready",
                     ],
                     capture_output=True,
-                    timeout=10,
+                    timeout=5,
                 )
                 if ssh_result.returncode == 0:
                     break
-        except Exception:
+        except (OSError, subprocess.TimeoutExpired, Exception):
             pass
 
         if attempt < max_retries - 1:
-            time.sleep(2)
+            time.sleep(1)
     else:
         container.stop()
-        raise RuntimeError("Mock VPS SSH not ready after retries")
+        raise RuntimeError(
+            f"Mock VPS SSH not ready after {max_retries} retries on port {ssh_port}"
+        )
 
     # Create MockVPS instance
     vps = MockVPS(container, str(key_path.absolute()))
