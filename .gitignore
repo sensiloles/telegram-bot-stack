@@ -50,6 +50,7 @@ coverage.xml
 coverage.json
 htmlcov/
 .pytest_cache/
+.tox/
 
 # Linting & Type checking
 .mypy_cache/
