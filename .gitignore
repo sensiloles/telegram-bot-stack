@@ -50,6 +50,10 @@ coverage.xml
 coverage.json
 htmlcov/
 .pytest_cache/
+.tox/
+*.log
+tests/**/*.log
+tests/integration/.env
 
 # Linting & Type checking
 .mypy_cache/
@@ -77,3 +81,8 @@ backups/
 
 # Bot lock files (dev mode)
 .bot.lock
+# Integration test SSH keys (temporary)
+tests/integration/fixtures/.ssh*/
+
+# Integration test SSH keys (generated locally)
+tests/integration/fixtures/.ssh-test/

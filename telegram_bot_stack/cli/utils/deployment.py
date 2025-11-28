@@ -3,11 +3,12 @@ Deployment configuration and template rendering utilities.
 """
 
 import os
+import sys
 from pathlib import Path
 from typing import Any, Dict
 
 import yaml  # type: ignore[import-untyped]
-from jinja2 import Environment, FileSystemLoader
+from jinja2 import Environment, FileSystemLoader, TemplateNotFound
 from rich.console import Console
 
 console = Console()
@@ -149,6 +150,50 @@ class DeploymentConfig:
         return True
 
 
+def _find_templates_dir(template_type: str) -> Path:
+    """Find templates directory using multiple fallback strategies.
+
+    Args:
+        template_type: Type of templates (e.g., 'docker', 'systemd')
+
+    Returns:
+        Path to templates directory
+
+    Raises:
+        FileNotFoundError: If templates directory not found
+    """
+    # Strategy 1: Relative to this file (development)
+    base_dir = Path(__file__).parent.parent
+    templates_dir = base_dir / "templates" / template_type
+    if templates_dir.exists():
+        return templates_dir
+
+    # Strategy 2: Relative to package root (installed package)
+    # Try to find telegram_bot_stack package location
+    try:
+        import telegram_bot_stack.cli.templates
+
+        package_path = Path(telegram_bot_stack.cli.templates.__file__).parent
+        templates_dir = package_path / template_type
+        if templates_dir.exists():
+            return templates_dir
+    except (ImportError, AttributeError):
+        pass
+
+    # Strategy 3: Check common installation paths
+    for path in sys.path:
+        templates_dir = (
+            Path(path) / "telegram_bot_stack" / "cli" / "templates" / template_type
+        )
+        if templates_dir.exists():
+            return templates_dir
+
+    raise FileNotFoundError(
+        f"Templates directory not found for '{template_type}'. "
+        f"Expected: {base_dir / 'templates' / template_type}"
+    )
+
+
 class DockerTemplateRenderer:
     """Renders Docker templates with configuration."""
 
@@ -162,8 +207,18 @@ class DockerTemplateRenderer:
         self.config = config
         self.has_secrets = has_secrets
 
-        # Get templates directory
-        templates_dir = Path(__file__).parent.parent / "templates" / "docker"
+        # Get templates directory with fallback strategies
+        try:
+            templates_dir = _find_templates_dir("docker")
+        except FileNotFoundError as e:
+            console.print(f"[red]❌ {e}[/red]")
+            raise
+
+        if not templates_dir.exists():
+            raise FileNotFoundError(
+                f"Docker templates directory not found: {templates_dir}"
+            )
+
         self.env = Environment(loader=FileSystemLoader(str(templates_dir)))
 
     def render_dockerfile(self) -> str:
@@ -171,8 +226,17 @@ class DockerTemplateRenderer:
 
         Returns:
             Rendered Dockerfile content
+
+        Raises:
+            TemplateNotFound: If template file not found
         """
-        template = self.env.get_template("Dockerfile.template")
+        try:
+            template = self.env.get_template("Dockerfile.template")
+        except TemplateNotFound:
+            raise FileNotFoundError(
+                "Dockerfile.template not found. "
+                "Please ensure templates are installed correctly."
+            )
 
         return template.render(
             bot_name=self.config.get("bot.name", "telegram-bot"),
@@ -185,8 +249,17 @@ class DockerTemplateRenderer:
 
         Returns:
             Rendered docker-compose.yml content
+
+        Raises:
+            TemplateNotFound: If template file not found
         """
-        template = self.env.get_template("docker-compose.yml.template")
+        try:
+            template = self.env.get_template("docker-compose.yml.template")
+        except TemplateNotFound:
+            raise FileNotFoundError(
+                "docker-compose.yml.template not found. "
+                "Please ensure templates are installed correctly."
+            )
 
         return template.render(
             bot_name=self.config.get("bot.name", "telegram-bot"),
@@ -206,8 +279,17 @@ class DockerTemplateRenderer:
 
         Returns:
             Rendered .dockerignore content
+
+        Raises:
+            TemplateNotFound: If template file not found
         """
-        template = self.env.get_template(".dockerignore.template")
+        try:
+            template = self.env.get_template(".dockerignore.template")
+        except TemplateNotFound:
+            raise FileNotFoundError(
+                ".dockerignore.template not found. "
+                "Please ensure templates are installed correctly."
+            )
         return template.render()
 
     def render_makefile(self) -> str:
@@ -215,8 +297,17 @@ class DockerTemplateRenderer:
 
         Returns:
             Rendered Makefile content
+
+        Raises:
+            TemplateNotFound: If template file not found
         """
-        template = self.env.get_template("Makefile.template")
+        try:
+            template = self.env.get_template("Makefile.template")
+        except TemplateNotFound:
+            raise FileNotFoundError(
+                "Makefile.template not found. "
+                "Please ensure templates are installed correctly."
+            )
 
         return template.render(
             bot_name=self.config.get("bot.name", "telegram-bot"),
@@ -249,6 +340,86 @@ class DockerTemplateRenderer:
         makefile = output_dir / "Makefile"
         makefile.write_text(self.render_makefile())
         console.print(f"[green]✓ Generated {makefile}[/green]")
+
+
+class SystemdTemplateRenderer:
+    """Renders systemd templates with configuration."""
+
+    def __init__(self, config: DeploymentConfig, has_secrets: bool = False):
+        """Initialize template renderer.
+
+        Args:
+            config: Deployment configuration
+            has_secrets: Whether secrets are configured
+        """
+        self.config = config
+        self.has_secrets = has_secrets
+
+        # Get templates directory with fallback strategies
+        try:
+            templates_dir = _find_templates_dir("systemd")
+        except FileNotFoundError:
+            # If systemd templates don't exist, create them inline
+            templates_dir = None
+        self.templates_dir = templates_dir
+
+    def render_service_file(self) -> str:
+        """Render systemd service file.
+
+        Returns:
+            Rendered systemd service file content
+        """
+        bot_name = self.config.get("bot.name", "telegram-bot")
+        bot_entry_point = self.config.get("bot.entry_point", "bot.py")
+        remote_dir = f"/opt/{bot_name}"
+        python_version = self.config.get("bot.python_version", "3.11")
+        user = self.config.get("vps.user", "root")
+        timezone = self.config.get("environment.timezone", "UTC")
+        log_level = self.config.get("logging.level", "INFO")
+
+        # Generate service file content
+        service_content = f"""[Unit]
+Description=Telegram Bot: {bot_name}
+After=network.target
+
+[Service]
+Type=simple
+User={user}
+WorkingDirectory={remote_dir}
+Environment="PATH=/usr/local/bin:/usr/bin:/bin"
+Environment="TZ={timezone}"
+Environment="LOG_LEVEL={log_level}"
+Environment="PRODUCTION=true"
+ExecStart=/usr/bin/python{python_version} {remote_dir}/{bot_entry_point}
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier={bot_name}
+
+# Resource limits
+MemoryLimit={self.config.get("resources.memory_limit", "256M")}
+CPUQuota={self.config.get("resources.cpu_limit", "50")}%
+
+[Install]
+WantedBy=multi-user.target
+"""
+
+        return service_content
+
+    def render_all(self, output_dir: Path) -> None:
+        """Render all templates to output directory.
+
+        Args:
+            output_dir: Directory to write rendered templates
+        """
+        output_dir.mkdir(parents=True, exist_ok=True)
+
+        # Render and write systemd service file
+        bot_name = self.config.get("bot.name", "telegram-bot")
+        service_file = output_dir / f"{bot_name}.service"
+        service_file.write_text(self.render_service_file())
+        console.print(f"[green]✓ Generated {service_file}[/green]")
 
 
 def create_env_file(

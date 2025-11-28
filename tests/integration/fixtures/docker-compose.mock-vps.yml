@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  mock-vps:
+    build:
+      context: .
+      dockerfile: Dockerfile.mock-vps
+    container_name: telegram-bot-stack-mock-vps
+    privileged: true  # Required for Docker-in-Docker
+    ports:
+      - "2222:22"  # SSH on custom port to avoid conflicts
+    networks:
+      - test-network
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock  # Docker socket for container management
+      - mock-vps-data:/opt  # Persistent storage for bot deployments
+    healthcheck:
+      test: ["CMD", "ssh", "-o", "StrictHostKeyChecking=no", "root@localhost", "echo", "ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+networks:
+  test-network:
+    driver: bridge
+
+volumes:
+  mock-vps-data:

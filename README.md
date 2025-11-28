@@ -209,6 +209,32 @@ make test-py312  # Python 3.12
 
 See [Multi-Version Testing Guide](docs/multi-version-testing.md) for setup instructions and detailed usage.
 
+**Integration Testing with Mock VPS:**
+
+The framework includes a complete integration testing environment for VPS deployment:
+
+```bash
+# Run integration tests (requires Docker)
+pytest tests/integration/ -v
+
+# Run specific deployment tests
+pytest tests/integration/test_deployment.py::TestDeploymentInit -v
+
+# Skip integration tests
+pytest tests/ --ignore=tests/integration/
+```
+
+Integration tests use a Docker-based mock VPS to verify:
+
+- SSH connection and authentication
+- Docker installation and deployment
+- Secrets management
+- Backup/restore functionality
+- Health checks and monitoring
+- Complete deployment lifecycle
+
+See [Integration Testing Guide](tests/integration/README.md) for setup and usage details.
+
 ## Architecture
 
 The framework follows a layered architecture:

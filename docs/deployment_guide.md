@@ -538,14 +538,16 @@ Docker is the default and recommended deployment method. It provides:
 Docker is automatically installed during first deployment. If you want to install manually:
 
 ```bash
-# On VPS
+# On VPS - installs Docker with built-in Compose v2
 curl -fsSL https://get.docker.com -o get-docker.sh
 sudo sh get-docker.sh
 
-# Install Docker Compose
-sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-sudo chmod +x /usr/local/bin/docker-compose
+# Verify installation (Compose v2 is built-in)
+docker --version
+docker compose version
 ```
+
+**Note:** Modern Docker (20.10+) includes Docker Compose v2 as `docker compose` (built-in). The old standalone `docker-compose` is no longer needed.
 
 ### Systemd Deployment (Alternative)
 
@@ -857,7 +859,7 @@ docker tag mybot:v1706274600-789bcde mybot:latest
 
 # Restart with that image
 cd /opt/mybot
-docker-compose restart
+docker compose restart
 ```
 
 ### Custom Domain with HTTPS
@@ -1759,7 +1761,7 @@ telegram-bot-stack deploy update
 ssh root@your-vps-ip "ping -c 3 8.8.8.8"
 
 # Try building with no cache
-ssh root@your-vps-ip "cd /opt/your-bot && docker-compose build --no-cache"
+ssh root@your-vps-ip "cd /opt/your-bot && docker compose build --no-cache"
 ```
 
 **6.3 Disk Space Full:**
@@ -2046,8 +2048,8 @@ docker run -d --name bot-recovery previous-image:tag
 
 # Or rebuild from clean state
 cd /opt/your-bot
-docker-compose down
-docker-compose up -d --build
+docker compose down
+docker compose up -d --build
 ```
 
 ---
@@ -2884,7 +2886,7 @@ cd /opt/your-bot
 echo "BOT_TOKEN=your-token" > .env
 
 # Restart bot
-docker-compose restart
+docker compose restart
 ```
 
 ### 25. Time Zone Issues

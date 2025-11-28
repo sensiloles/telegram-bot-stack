@@ -6,6 +6,7 @@ from telegram_bot_stack.cli.utils.vps import (
     VPSConnection,
     check_docker_compose_installed,
     get_container_health,
+    get_docker_compose_command,
     get_recent_errors,
 )
 
@@ -65,7 +66,9 @@ class TestVPSConnection:
             result = vps.run_command("echo test")
 
             assert result is True
-            mock_conn.run.assert_called_once_with("echo test", hide=False)
+            mock_conn.run.assert_called_once_with(
+                "echo test", hide=False, pty=False, in_stream=False
+            )
 
     def test_run_command_failure(self):
         """Test failed command execution."""
@@ -105,7 +108,17 @@ class TestVPSConnection:
         """Test successful Docker installation."""
         vps = VPSConnection(host="test.example.com", user="root")
 
-        with patch.object(vps, "run_command") as mock_run:
+        # Mock connection and os detection
+        mock_conn = MagicMock()
+        mock_result = MagicMock()
+        mock_result.ok = True
+        mock_result.stdout = "ubuntu"
+        mock_conn.run.return_value = mock_result
+
+        with (
+            patch.object(vps, "connect", return_value=mock_conn),
+            patch.object(vps, "run_command") as mock_run,
+        ):
             mock_run.return_value = True
 
             result = vps.install_docker()
@@ -118,7 +131,17 @@ class TestVPSConnection:
         """Test failed Docker installation."""
         vps = VPSConnection(host="test.example.com", user="root")
 
-        with patch.object(vps, "run_command") as mock_run:
+        # Mock connection and os detection
+        mock_conn = MagicMock()
+        mock_result = MagicMock()
+        mock_result.ok = True
+        mock_result.stdout = "ubuntu"
+        mock_conn.run.return_value = mock_result
+
+        with (
+            patch.object(vps, "connect", return_value=mock_conn),
+            patch.object(vps, "run_command") as mock_run,
+        ):
             mock_run.return_value = False
 
             result = vps.install_docker()
@@ -151,7 +174,10 @@ class TestCheckDockerComposeInstalled:
         result = check_docker_compose_installed(mock_conn)
 
         assert result is True
-        mock_conn.run.assert_called_once_with("docker-compose --version", hide=True)
+        # Should try v2 first
+        mock_conn.run.assert_called_with(
+            "docker compose version", hide=True, warn=True, pty=False, in_stream=False
+        )
 
     def test_docker_compose_not_installed(self):
         """Test Docker Compose installed check (not installed)."""
@@ -163,6 +189,50 @@ class TestCheckDockerComposeInstalled:
         assert result is False
 
 
+class TestGetDockerComposeCommand:
+    """Tests for get_docker_compose_command function."""
+
+    def test_docker_compose_v2_available(self):
+        """Test when Docker Compose v2 (built-in) is available."""
+        mock_conn = MagicMock()
+        mock_result = MagicMock()
+        mock_result.ok = True
+        mock_conn.run.return_value = mock_result
+
+        result = get_docker_compose_command(mock_conn)
+
+        assert result == "docker compose"
+        mock_conn.run.assert_called_with(
+            "docker compose version", hide=True, warn=True, pty=False, in_stream=False
+        )
+
+    def test_docker_compose_v1_fallback(self):
+        """Test fallback to Docker Compose v1 (standalone)."""
+        mock_conn = MagicMock()
+        mock_v2_result = MagicMock()
+        mock_v2_result.ok = False
+        mock_v1_result = MagicMock()
+        mock_v1_result.ok = True
+        mock_conn.run.side_effect = [mock_v2_result, mock_v1_result]
+
+        result = get_docker_compose_command(mock_conn)
+
+        assert result == "docker-compose"
+        assert mock_conn.run.call_count == 2
+
+    def test_docker_compose_not_available(self):
+        """Test when neither v2 nor v1 is available (returns v2 as default)."""
+        mock_conn = MagicMock()
+        mock_result = MagicMock()
+        mock_result.ok = False
+        mock_conn.run.return_value = mock_result
+
+        result = get_docker_compose_command(mock_conn)
+
+        # Should default to v2 even if not available (will fail later)
+        assert result == "docker compose"
+
+
 class TestGetContainerHealth:
     """Tests for get_container_health function."""
 
@@ -171,7 +241,7 @@ class TestGetContainerHealth:
         mock_conn = MagicMock()
 
         # Mock responses for different docker inspect commands
-        def mock_run(cmd, hide=False, warn=False):
+        def mock_run(cmd, hide=False, warn=False, pty=False, in_stream=False):
             result = MagicMock()
             result.ok = True
             if "State.Running" in cmd:
@@ -197,7 +267,7 @@ class TestGetContainerHealth:
         """Test health check for stopped container."""
         mock_conn = MagicMock()
 
-        def mock_run(cmd, hide=False, warn=False):
+        def mock_run(cmd, hide=False, warn=False, pty=False, in_stream=False):
             result = MagicMock()
             result.ok = True
             if "State.Running" in cmd:
@@ -217,7 +287,7 @@ class TestGetContainerHealth:
         """Test health check for unhealthy container."""
         mock_conn = MagicMock()
 
-        def mock_run(cmd, hide=False, warn=False):
+        def mock_run(cmd, hide=False, warn=False, pty=False, in_stream=False):
             result = MagicMock()
             result.ok = True
             if "State.Running" in cmd:
@@ -242,7 +312,7 @@ class TestGetContainerHealth:
         """Test health check for starting container."""
         mock_conn = MagicMock()
 
-        def mock_run(cmd, hide=False, warn=False):
+        def mock_run(cmd, hide=False, warn=False, pty=False, in_stream=False):
             result = MagicMock()
             result.ok = True
             if "State.Running" in cmd:
@@ -266,7 +336,7 @@ class TestGetContainerHealth:
         """Test health check for non-existent container."""
         mock_conn = MagicMock()
 
-        def mock_run(cmd, hide=False, warn=False):
+        def mock_run(cmd, hide=False, warn=False, pty=False, in_stream=False):
             result = MagicMock()
             result.ok = False
             return result

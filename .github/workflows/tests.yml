@@ -1,5 +1,9 @@
 name: Tests
 
+# Unit tests (fast, no Docker required)
+# Integration tests run separately in integration-tests.yml
+# Run locally: make test-unit
+
 on:
   push:
     branches: [main, develop]
@@ -79,11 +83,12 @@ jobs:
         id: pytest
         continue-on-error: true
         run: |
-          echo "::group::🧪 Running tests"
+          echo "::group::🧪 Running unit tests (excluding integration tests)"
           pytest --cov=telegram_bot_stack \
                  --cov-report=xml \
                  --cov-report=term-missing \
                  --cov-report=html \
+                 --ignore=tests/integration \
                  -v \
                  --tb=short 2>&1 | tee pytest_output.log
           PYTEST_EXIT_CODE=${PIPESTATUS[0]}

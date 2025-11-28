@@ -41,15 +41,12 @@ def status(config: str) -> None:
     bot_name = deploy_config.get("bot.name")
     remote_dir = f"/opt/{bot_name}"
 
-    # Show container status
+    # Show container status (make status includes both ps and stats)
     console.print("[cyan]Container Status:[/cyan]")
-    vps.run_command(f"cd {remote_dir} && docker-compose ps")
-
-    console.print("\n[cyan]Resource Usage:[/cyan]")
-    vps.run_command(f"docker stats --no-stream {bot_name}")
+    vps.run_command(f"cd {remote_dir} && make status")
 
     console.print("\n[cyan]Recent Logs:[/cyan]")
-    vps.run_command(f"cd {remote_dir} && docker-compose logs --tail=20")
+    vps.run_command(f"cd {remote_dir} && TAIL=20 FOLLOW= make logs")
 
     vps.close()
 
@@ -80,10 +77,8 @@ def logs(config: str, follow: bool, tail: int) -> None:
     remote_dir = f"/opt/{deploy_config.get('bot.name')}"
 
     # Stream logs
-    follow_flag = "-f" if follow else ""
-    vps.run_command(
-        f"cd {remote_dir} && docker-compose logs {follow_flag} --tail={tail}"
-    )
+    follow_flag = "f" if follow else ""
+    vps.run_command(f"cd {remote_dir} && TAIL={tail} FOLLOW={follow_flag} make logs")
 
     vps.close()
 

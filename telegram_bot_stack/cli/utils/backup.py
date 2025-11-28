@@ -11,7 +11,7 @@ from typing import List, Optional
 
 from rich.console import Console
 
-from telegram_bot_stack.cli.utils.vps import VPSConnection
+from telegram_bot_stack.cli.utils.vps import VPSConnection, get_docker_compose_command
 
 console = Console()
 
@@ -59,19 +59,33 @@ class BackupManager:
         container_running = False
         if not auto_backup:
             console.print("[cyan]Checking bot status...[/cyan]")
-        # Check if container is running
-        result = vps.connect().run(
-            f"cd {shlex.quote(self.remote_dir)} && docker-compose ps -q",
-            hide=True,
+
+        # Check if docker-compose.yml exists before trying to check container status
+        compose_file = f"{self.remote_dir}/docker-compose.yml"
+        compose_exists = vps.run_command(
+            f"test -f {shlex.quote(compose_file)}", hide=True
         )
-        if result.ok and result.stdout.strip():
-            container_running = True
-            if not auto_backup:
-                console.print("[cyan]Stopping bot container temporarily...[/cyan]")
-            vps.run_command(
-                f"cd {shlex.quote(self.remote_dir)} && docker-compose stop",
+
+        if compose_exists:
+            # Get appropriate docker compose command (v2 or v1)
+            compose_cmd = get_docker_compose_command(vps.connect())
+
+            # Check if container is running
+            result = vps.connect().run(
+                f"cd {shlex.quote(self.remote_dir)} && {compose_cmd} ps -q",
                 hide=True,
+                pty=False,
+                in_stream=False,
+                warn=True,  # Don't raise exception if compose ps fails
             )
+            if result.ok and result.stdout.strip():
+                container_running = True
+                if not auto_backup:
+                    console.print("[cyan]Stopping bot container temporarily...[/cyan]")
+                vps.run_command(
+                    f"cd {shlex.quote(self.remote_dir)} && {compose_cmd} stop",
+                    hide=True,
+                )
 
         try:
             # Create backup tarball
@@ -111,7 +125,7 @@ class BackupManager:
 
             # Get backup size
             size_cmd = f"du -h {shlex.quote(backup_path)} | cut -f1"
-            result = vps.connect().run(size_cmd, hide=True)
+            result = vps.connect().run(size_cmd, hide=True, pty=False, in_stream=False)
             backup_size = result.stdout.strip() if result.ok else "unknown"
 
             if not auto_backup:
@@ -159,7 +173,7 @@ class BackupManager:
             f"ls -lh {shlex.quote(self.backups_dir)}/backup-*.tar.gz 2>/dev/null | "
             f"awk '{{print $9, $5, $6, $7, $8}}'"
         )
-        result = vps.connect().run(list_cmd, hide=True)
+        result = vps.connect().run(list_cmd, hide=True, pty=False, in_stream=False)
 
         backups = []
         if result.ok and result.stdout.strip():
@@ -233,10 +247,13 @@ class BackupManager:
                 console.print("[yellow]Restore cancelled[/yellow]")
                 return False
 
+        # Get appropriate docker compose command (v2 or v1)
+        compose_cmd = get_docker_compose_command(vps.connect())
+
         # Stop bot container
         console.print("[cyan]Stopping bot container...[/cyan]")
         vps.run_command(
-            f"cd {shlex.quote(self.remote_dir)} && docker-compose stop",
+            f"cd {shlex.quote(self.remote_dir)} && {compose_cmd} stop",
             hide=True,
         )
         console.print("[green]✓ Bot container stopped[/green]\n")
