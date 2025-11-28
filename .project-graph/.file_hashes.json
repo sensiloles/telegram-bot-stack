@@ -10,7 +10,7 @@
   "telegram_bot_stack/cli/utils/git.py": "470f80b9d6e22854bed39b53a884e0d94381e141d6b7f06933942ce70fc500d6",
   "telegram_bot_stack/cli/commands/deploy/operations.py": "8dd918800b67d71d00e7e7630893a6e658b846d19e8695e2e19c2a2bc44ae685",
   "telegram_bot_stack/cli/utils/deployment.py": "37e837e28fd4e4f0409d7498492b776b76cde5a077635622b516cd3871f0c0b8",
-  ".github/workflows/integration-tests.yml": "87f0fb01ddf963f8bbb55ad8b71e8d87a4a33490d0297786cc3080b844f8c7f9",
+  ".github/workflows/integration-tests.yml": "d50ddc3951fce48a359c3ce8134b6cd09effbfa0d6017dd7b636e0901d942cc1",
   "README.md": "57b2ecd61cac568eaa8b1257fd7c80146c83ecda5b11b1e8be61a86c2d2d0bac",
   "pyproject.toml": "89a95b98dc7b1ffedde75ed304b095bdd2b0e81e03347e7e95a3d0e62f8e72bf"
 }

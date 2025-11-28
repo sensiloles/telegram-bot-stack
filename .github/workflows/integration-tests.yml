@@ -49,7 +49,7 @@ jobs:
       - name: Check Docker
         run: |
           docker --version
-          docker-compose --version
+          docker compose version
 
       - name: Run integration tests
         run: |
@@ -74,5 +74,5 @@ jobs:
       - name: Cleanup Docker resources
         if: always()
         run: |
-          docker-compose -f tests/integration/fixtures/docker-compose.mock-vps.yml down -v || true
+          docker compose -f tests/integration/fixtures/docker-compose.mock-vps.yml down -v || true
           docker system prune -af || true
