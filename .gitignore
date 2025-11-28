@@ -51,6 +51,7 @@ coverage.json
 htmlcov/
 .pytest_cache/
 .tox/
+tests/integration_tests.log
 
 # Linting & Type checking
 .mypy_cache/

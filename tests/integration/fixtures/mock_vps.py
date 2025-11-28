@@ -1,11 +1,16 @@
 """Mock VPS fixture using Testcontainers for integration testing."""
 
+import logging
 import time
 from pathlib import Path
 from typing import Generator
 
 import pytest
 from testcontainers.core.container import DockerContainer
+
+# Configure logging for integration tests
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 
 class MockVPS:
@@ -33,11 +38,15 @@ class MockVPS:
         Returns:
             Command output
         """
+        logger.debug(f"[MockVPS] Executing command: {command[:100]}")
         result = self.container.exec(command)
-        return result.output.decode("utf-8") if result.output else ""
+        output = result.output.decode("utf-8") if result.output else ""
+        logger.debug(f"[MockVPS] Command output: {output[:200]}")
+        return output
 
     def cleanup(self) -> None:
         """Clean up test bot containers (not the Mock VPS itself)."""
+        logger.info("[MockVPS] Cleaning up test containers...")
         # Stop and remove bot containers created during tests
         self.exec(
             "docker ps -a --filter 'name=test-bot' --filter 'name=bot-' -q | "
@@ -53,6 +62,7 @@ class MockVPS:
             "docker volume ls --filter 'name=test-bot' --filter 'name=bot-' -q | "
             "xargs -r docker volume rm 2>/dev/null || true"
         )
+        logger.info("[MockVPS] Cleanup complete")
 
 
 @pytest.fixture(scope="session")
@@ -65,6 +75,10 @@ def mock_vps() -> Generator[MockVPS, None, None]:
     Yields:
         MockVPS instance
     """
+    logger.info("=" * 80)
+    logger.info("[MockVPS] Starting Mock VPS container setup...")
+    logger.info("=" * 80)
+
     # Generate SSH key
     key_dir = Path(__file__).parent / ".ssh-test"
     key_dir.mkdir(exist_ok=True)
@@ -74,24 +88,37 @@ def mock_vps() -> Generator[MockVPS, None, None]:
     if not key_path.exists():
         import subprocess
 
+        logger.info(f"[MockVPS] Generating SSH key at {key_path}")
         subprocess.run(
             ["ssh-keygen", "-t", "rsa", "-b", "4096", "-f", str(key_path), "-N", ""],
             check=True,
             capture_output=True,
         )
+        logger.info("[MockVPS] SSH key generated successfully")
+    else:
+        logger.info(f"[MockVPS] Using existing SSH key at {key_path}")
 
     # Create and start container using Testcontainers
+    container_name = f"mock-vps-test-{int(time.time())}"
+    logger.info(
+        f"[MockVPS] Creating container '{container_name}' from image 'mock-vps:latest'"
+    )
+
     container = (
         DockerContainer("mock-vps:latest")
         .with_bind_ports(22, None)  # Auto-assign port
-        .with_name(f"mock-vps-test-{int(time.time())}")
+        .with_name(container_name)
         .with_kwargs(privileged=True)  # For Docker-in-Docker
     )
 
     # Start container
+    logger.info("[MockVPS] Starting container...")
     container.start()
+    container_id = container.get_wrapped_container().id[:12]
+    logger.info(f"[MockVPS] Container started: {container_id}")
 
     # Wait a moment for container to be fully up
+    logger.info("[MockVPS] Waiting for container initialization...")
     time.sleep(1)
 
     # Copy SSH public key to container using docker cp (more reliable than exec)
@@ -108,12 +135,16 @@ def mock_vps() -> Generator[MockVPS, None, None]:
     try:
         # Copy public key to container
         container_id = container.get_wrapped_container().id
+        logger.info(
+            f"[MockVPS] Copying SSH public key to container {container_id[:12]}"
+        )
         subprocess.run(
             ["docker", "cp", tmp_path, f"{container_id}:/root/.ssh/authorized_keys"],
             check=True,
             timeout=5,
             capture_output=True,
         )
+        logger.debug("[MockVPS] Setting SSH key permissions...")
         # Set correct permissions and ownership
         subprocess.run(
             [
@@ -141,6 +172,7 @@ def mock_vps() -> Generator[MockVPS, None, None]:
             timeout=5,
             capture_output=True,
         )
+        logger.info("[MockVPS] SSH key configured successfully")
     finally:
         Path(tmp_path).unlink(missing_ok=True)
 
@@ -150,6 +182,8 @@ def mock_vps() -> Generator[MockVPS, None, None]:
 
     max_retries = 30
     ssh_port = int(container.get_exposed_port(22))
+    logger.info(f"[MockVPS] Waiting for SSH daemon on port {ssh_port}...")
+    logger.info(f"[MockVPS] Will retry up to {max_retries} times (max ~30 seconds)")
 
     for attempt in range(max_retries):
         try:
@@ -158,6 +192,9 @@ def mock_vps() -> Generator[MockVPS, None, None]:
                 # Port is open, wait a bit more and test SSH
                 time.sleep(0.5)
 
+                logger.debug(
+                    f"[MockVPS] Attempt {attempt + 1}/{max_retries}: Testing SSH connection..."
+                )
                 ssh_result = subprocess.run(
                     [
                         "ssh",
@@ -180,13 +217,37 @@ def mock_vps() -> Generator[MockVPS, None, None]:
                     timeout=5,
                 )
                 if ssh_result.returncode == 0:
+                    logger.info(
+                        f"[MockVPS] SSH connection successful on attempt {attempt + 1}"
+                    )
                     break
-        except (OSError, subprocess.TimeoutExpired, Exception):
-            pass
+                else:
+                    logger.debug(
+                        f"[MockVPS] SSH test failed: {ssh_result.stderr[:100]}"
+                    )
+        except (OSError, subprocess.TimeoutExpired, Exception) as e:
+            logger.debug(
+                f"[MockVPS] Connection attempt {attempt + 1} failed: {type(e).__name__}"
+            )
 
         if attempt < max_retries - 1:
             time.sleep(1)
     else:
+        logger.error(f"[MockVPS] SSH not ready after {max_retries} retries!")
+        logger.error("[MockVPS] Fetching container logs for debugging...")
+        try:
+            import subprocess
+
+            logs = subprocess.run(
+                ["docker", "logs", container_id, "--tail", "50"],
+                capture_output=True,
+                timeout=5,
+            )
+            logger.error(f"[MockVPS] Container logs:\n{logs.stdout.decode('utf-8')}")
+            logger.error(f"[MockVPS] Container errors:\n{logs.stderr.decode('utf-8')}")
+        except Exception as e:
+            logger.error(f"[MockVPS] Failed to fetch logs: {e}")
+
         container.stop()
         raise RuntimeError(
             f"Mock VPS SSH not ready after {max_retries} retries on port {ssh_port}"
@@ -194,14 +255,22 @@ def mock_vps() -> Generator[MockVPS, None, None]:
 
     # Create MockVPS instance
     vps = MockVPS(container, str(key_path.absolute()))
+    logger.info("=" * 80)
+    logger.info(f"[MockVPS] Mock VPS ready! SSH: root@127.0.0.1:{ssh_port}")
+    logger.info(f"[MockVPS] Container ID: {container_id}")
+    logger.info("=" * 80)
 
     yield vps
 
     # Cleanup: stop container
+    logger.info("=" * 80)
+    logger.info("[MockVPS] Stopping Mock VPS container...")
     try:
         container.stop()
-    except Exception:
-        pass  # Container might already be stopped
+        logger.info("[MockVPS] Container stopped successfully")
+    except Exception as e:
+        logger.warning(f"[MockVPS] Error stopping container: {e}")
+    logger.info("=" * 80)
 
 
 @pytest.fixture
@@ -216,31 +285,39 @@ def clean_vps(mock_vps: MockVPS) -> Generator[MockVPS, None, None]:
     Yields:
         Clean MockVPS instance
     """
+    logger.info("[clean_vps] Preparing clean VPS for test...")
+
     # Cleanup before test
     mock_vps.cleanup()
 
     # Fix any broken apt packages from previous tests
+    logger.debug("[clean_vps] Fixing any broken packages...")
     try:
         mock_vps.container.exec("dpkg --configure -a 2>&1 || true")
         mock_vps.container.exec("apt-get --fix-broken install -y 2>&1 || true")
         mock_vps.container.exec("apt-get update 2>&1 || true")
-    except Exception:
-        pass  # Ignore errors during cleanup
+    except Exception as e:
+        logger.debug(f"[clean_vps] Package fix error (ignored): {e}")
 
     # Ensure Docker daemon is stopped (to avoid conflicts)
+    logger.debug("[clean_vps] Stopping Docker daemon...")
     try:
         mock_vps.container.exec("pkill dockerd 2>&1 || true")
-    except Exception:
-        pass
+    except Exception as e:
+        logger.debug(f"[clean_vps] Docker stop error (ignored): {e}")
 
+    logger.info("[clean_vps] Clean VPS ready for test")
     yield mock_vps
 
     # Cleanup after test
+    logger.info("[clean_vps] Cleaning up after test...")
     mock_vps.cleanup()
 
     # Fix packages again after test
     try:
         mock_vps.container.exec("dpkg --configure -a 2>&1 || true")
         mock_vps.container.exec("apt-get --fix-broken install -y 2>&1 || true")
-    except Exception:
-        pass
+    except Exception as e:
+        logger.debug(f"[clean_vps] Post-test cleanup error (ignored): {e}")
+
+    logger.info("[clean_vps] Test cleanup complete")

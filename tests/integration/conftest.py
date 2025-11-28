@@ -1,14 +1,81 @@
 """Pytest configuration for integration tests."""
 
+import functools
+import logging
 import os
+import sys
 from pathlib import Path
 from typing import Generator
 
 import pytest
 import yaml
 
+# Configure logging for integration tests
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    stream=sys.stdout,
+    force=True,  # Override any existing config
+)
+
+# Set specific loggers to DEBUG for more details
+logging.getLogger("tests.integration.fixtures.mock_vps").setLevel(logging.DEBUG)
+
+logger = logging.getLogger(__name__)
+
+
+def log_test(func):
+    """Decorator to add logging to integration tests."""
+
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        test_name = func.__name__
+        logger.info("=" * 80)
+        logger.info(f"TEST: {test_name} - Starting")
+        logger.info("=" * 80)
+        try:
+            result = func(*args, **kwargs)
+            logger.info(f"TEST: {test_name} - PASSED ✓")
+            logger.info("=" * 80)
+            return result
+        except Exception as e:
+            logger.error(f"TEST: {test_name} - FAILED ✗")
+            logger.error(f"Error: {e}")
+            logger.info("=" * 80)
+            raise
+
+    return wrapper
+
+
+# Pytest hooks for automatic test logging
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_call(item):
+    """Log test execution with detailed information."""
+    test_name = item.nodeid
+    logger.info("")
+    logger.info("▶" * 40)
+    logger.info(f"▶▶▶ TEST STARTING: {test_name}")
+    logger.info("▶" * 40)
+    logger.info("")
+
+    outcome = yield
+
+    logger.info("")
+    if outcome.excinfo is None:
+        logger.info("✓" * 40)
+        logger.info(f"✓✓✓ TEST PASSED: {test_name}")
+        logger.info("✓" * 40)
+    else:
+        logger.error("✗" * 40)
+        logger.error(f"✗✗✗ TEST FAILED: {test_name}")
+        logger.error(f"Error type: {outcome.excinfo[0].__name__}")
+        logger.error(f"Error message: {str(outcome.excinfo[1])[:200]}")
+        logger.error("✗" * 40)
+    logger.info("")
+
+
 # Import fixtures to make them available
-from tests.integration.fixtures.mock_vps import (  # noqa: F401
+from tests.integration.fixtures.mock_vps import (  # noqa: F401, E402
     MockVPS,
     clean_vps,
     mock_vps,
