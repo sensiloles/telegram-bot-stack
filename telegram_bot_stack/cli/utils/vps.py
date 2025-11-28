@@ -58,7 +58,9 @@ class VPSConnection:
         try:
             with console.status("[cyan]Testing SSH connection..."):
                 conn = self._create_connection()
-                result = conn.run("echo 'Connection test'", hide=True)
+                result = conn.run(
+                    "echo 'Connection test'", hide=True, pty=False, in_stream=False
+                )
                 return bool(result.ok)
         except Exception as e:
             console.print(f"[red]Connection failed: {e}[/red]")
@@ -159,7 +161,10 @@ class VPSConnection:
         # Detect OS
         conn = self.connect()
         os_info = conn.run(
-            "cat /etc/os-release | grep '^ID=' | cut -d'=' -f2", hide=True
+            "cat /etc/os-release | grep '^ID=' | cut -d'=' -f2",
+            hide=True,
+            pty=False,
+            in_stream=False,
         )
         os_id = os_info.stdout.strip().strip('"') if os_info.ok else "ubuntu"
 
@@ -218,7 +223,10 @@ class VPSConnection:
             conn = self.connect()
             # Try python3 first, then python
             result = conn.run(
-                "python3 --version 2>&1 || python --version 2>&1", hide=True
+                "python3 --version 2>&1 || python --version 2>&1",
+                hide=True,
+                pty=False,
+                in_stream=False,
             )
             if not result.ok:
                 return (False, None)
@@ -256,7 +264,10 @@ class VPSConnection:
         # Detect OS
         conn = self.connect()
         os_info = conn.run(
-            "cat /etc/os-release | grep '^ID=' | cut -d'=' -f2", hide=True
+            "cat /etc/os-release | grep '^ID=' | cut -d'=' -f2",
+            hide=True,
+            pty=False,
+            in_stream=False,
         )
         os_id = os_info.stdout.strip().strip('"') if os_info.ok else "ubuntu"
 
@@ -461,7 +472,12 @@ class VPSConnection:
             remote_dir = "/".join(remote_path.split("/")[:-1])
             if remote_dir:
                 # Properly escape remote_dir to prevent command injection
-                conn.run(f"mkdir -p {shlex.quote(remote_dir)}", hide=True)
+                conn.run(
+                    f"mkdir -p {shlex.quote(remote_dir)}",
+                    hide=True,
+                    pty=False,
+                    in_stream=False,
+                )
 
             # Write to temporary file first, then move (atomic operation)
             temp_file = f"{remote_path}.tmp"
@@ -487,14 +503,22 @@ class VPSConnection:
                 f"f.close()' "
                 f"{temp_file_quoted} {content_b64_quoted}"
             )
-            conn.run(python_cmd, hide=True)
+            conn.run(python_cmd, hide=True, pty=False, in_stream=False)
 
             # Move to final location and set permissions
             # Properly escape file paths to prevent command injection
             conn.run(
-                f"mv {shlex.quote(temp_file)} {shlex.quote(remote_path)}", hide=True
+                f"mv {shlex.quote(temp_file)} {shlex.quote(remote_path)}",
+                hide=True,
+                pty=False,
+                in_stream=False,
             )
-            conn.run(f"chmod {mode} {shlex.quote(remote_path)}", hide=True)
+            conn.run(
+                f"chmod {mode} {shlex.quote(remote_path)}",
+                hide=True,
+                pty=False,
+                in_stream=False,
+            )
 
             return True
         except Exception as e:
@@ -521,7 +545,9 @@ def get_docker_compose_command(conn: Connection) -> str:
     """
     try:
         # Try new built-in command first (Docker Compose v2)
-        result = conn.run("docker compose version", hide=True, warn=True)
+        result = conn.run(
+            "docker compose version", hide=True, warn=True, pty=False, in_stream=False
+        )
         if result.ok:
             return "docker compose"
     except Exception:
@@ -529,7 +555,13 @@ def get_docker_compose_command(conn: Connection) -> str:
 
     try:
         # Fall back to standalone docker-compose (v1)
-        result = conn.run("docker-compose --version", hide=True, warn=True)
+        result = conn.run(
+            "docker-compose --version",
+            hide=True,
+            warn=True,
+            pty=False,
+            in_stream=False,
+        )
         if result.ok:
             return "docker-compose"
     except Exception:
@@ -550,7 +582,9 @@ def check_docker_compose_installed(conn: Connection) -> bool:
     """
     try:
         # Try v2 first
-        result = conn.run("docker compose version", hide=True, warn=True)
+        result = conn.run(
+            "docker compose version", hide=True, warn=True, pty=False, in_stream=False
+        )
         if result.ok:
             return True
     except Exception:
@@ -558,7 +592,13 @@ def check_docker_compose_installed(conn: Connection) -> bool:
 
     try:
         # Fall back to v1
-        result = conn.run("docker-compose --version", hide=True, warn=True)
+        result = conn.run(
+            "docker-compose --version",
+            hide=True,
+            warn=True,
+            pty=False,
+            in_stream=False,
+        )
         return bool(result.ok)
     except Exception:
         return False
@@ -589,6 +629,8 @@ def get_container_health(conn: Connection, container_name: str) -> Dict[str, Any
             f"docker inspect --format='{{{{.State.Running}}}}' {container_name}",
             hide=True,
             warn=True,
+            pty=False,
+            in_stream=False,
         )
         if result.ok and result.stdout.strip() == "true":
             health_info["running"] = True
@@ -598,6 +640,8 @@ def get_container_health(conn: Connection, container_name: str) -> Dict[str, Any
                 f"docker inspect --format='{{{{.State.Health.Status}}}}' {container_name}",
                 hide=True,
                 warn=True,
+                pty=False,
+                in_stream=False,
             )
             if result.ok and result.stdout.strip():
                 health_info["health_status"] = result.stdout.strip()
@@ -607,6 +651,8 @@ def get_container_health(conn: Connection, container_name: str) -> Dict[str, Any
                 f"docker inspect --format='{{{{.State.StartedAt}}}}' {container_name}",
                 hide=True,
                 warn=True,
+                pty=False,
+                in_stream=False,
             )
             if result.ok:
                 health_info["uptime"] = result.stdout.strip()
@@ -616,6 +662,8 @@ def get_container_health(conn: Connection, container_name: str) -> Dict[str, Any
                 f"docker inspect --format='{{{{.RestartCount}}}}' {container_name}",
                 hide=True,
                 warn=True,
+                pty=False,
+                in_stream=False,
             )
             if result.ok:
                 try:
@@ -629,6 +677,8 @@ def get_container_health(conn: Connection, container_name: str) -> Dict[str, Any
                 f"docker inspect --format='{{{{.State.ExitCode}}}}' {container_name}",
                 hide=True,
                 warn=True,
+                pty=False,
+                in_stream=False,
             )
             if result.ok:
                 try:
@@ -658,6 +708,8 @@ def get_recent_errors(conn: Connection, container_name: str, lines: int = 50) ->
             f"docker logs --tail={lines} {container_name} 2>&1 | grep -i 'error\\|exception\\|failed\\|critical' || true",
             hide=True,
             warn=True,
+            pty=False,
+            in_stream=False,
         )
         if result.ok and result.stdout:
             return str(result.stdout.strip())
