@@ -27,10 +27,20 @@ The mock VPS is a Docker container that simulates a real VPS server:
 
 ### Prerequisites
 
-- Docker installed and running
-- Docker Compose v2.0+
-- Python 3.9+
-- pip packages: `pip install -e ".[dev]"`
+1. **Environment Variables** (Optional for security):
+
+   ```bash
+   # Copy example environment file
+   cp tests/integration/env.example tests/integration/.env
+   # Edit .env and set TEST_BOT_TOKEN if testing with real Telegram API
+   # Default fake token works for most tests
+   ```
+
+2. **System Requirements**:
+   - Docker installed and running
+   - Docker Compose v2.0+
+   - Python 3.9+
+   - pip packages: `pip install -e ".[dev]"`
 
 ### Run All Integration Tests
 

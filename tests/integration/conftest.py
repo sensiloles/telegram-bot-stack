@@ -11,6 +11,19 @@ import pytest
 import yaml
 from click.testing import Result
 
+# Load environment variables from .env file if it exists
+_env_file = Path(__file__).parent / ".env"
+if _env_file.exists():
+    from dotenv import load_dotenv
+
+    load_dotenv(_env_file)
+elif not os.getenv("TEST_BOT_TOKEN"):
+    # Provide default fake token for testing if .env doesn't exist
+    os.environ.setdefault(
+        "TEST_BOT_TOKEN",
+        "1234567890:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA_",  # Fake token for testing
+    )
+
 # Configure logging for integration tests
 logging.basicConfig(
     level=logging.INFO,

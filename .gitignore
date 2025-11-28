@@ -52,6 +52,7 @@ htmlcov/
 .pytest_cache/
 .tox/
 tests/integration_tests.log
+tests/integration/.env
 
 # Linting & Type checking
 .mypy_cache/
