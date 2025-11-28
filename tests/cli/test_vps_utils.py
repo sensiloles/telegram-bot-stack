@@ -105,7 +105,17 @@ class TestVPSConnection:
         """Test successful Docker installation."""
         vps = VPSConnection(host="test.example.com", user="root")
 
-        with patch.object(vps, "run_command") as mock_run:
+        # Mock connection and os detection
+        mock_conn = MagicMock()
+        mock_result = MagicMock()
+        mock_result.ok = True
+        mock_result.stdout = "ubuntu"
+        mock_conn.run.return_value = mock_result
+
+        with (
+            patch.object(vps, "connect", return_value=mock_conn),
+            patch.object(vps, "run_command") as mock_run,
+        ):
             mock_run.return_value = True
 
             result = vps.install_docker()
@@ -118,7 +128,17 @@ class TestVPSConnection:
         """Test failed Docker installation."""
         vps = VPSConnection(host="test.example.com", user="root")
 
-        with patch.object(vps, "run_command") as mock_run:
+        # Mock connection and os detection
+        mock_conn = MagicMock()
+        mock_result = MagicMock()
+        mock_result.ok = True
+        mock_result.stdout = "ubuntu"
+        mock_conn.run.return_value = mock_result
+
+        with (
+            patch.object(vps, "connect", return_value=mock_conn),
+            patch.object(vps, "run_command") as mock_run,
+        ):
             mock_run.return_value = False
 
             result = vps.install_docker()

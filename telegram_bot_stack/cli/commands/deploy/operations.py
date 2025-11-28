@@ -98,6 +98,7 @@ def up(config: str, verbose: bool) -> None:
             # This determines whether .secrets.env should be included in docker-compose.yml
             encryption_key = deploy_config.get("secrets.encryption_key")
             has_secrets = False
+            secrets_manager = None
 
             if encryption_key:
                 secrets_manager = SecretsManager(bot_name, remote_dir, encryption_key)

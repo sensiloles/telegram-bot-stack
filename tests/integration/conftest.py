@@ -2,5 +2,3 @@
 
 # Import fixtures to make them available
 from tests.integration.fixtures.mock_vps import clean_vps, mock_vps  # noqa: F401
-
-pytest_plugins = ["tests.integration.fixtures.mock_vps"]

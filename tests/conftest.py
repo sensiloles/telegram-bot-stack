@@ -9,6 +9,9 @@ from telegram_bot_stack.admin_manager import AdminManager
 from telegram_bot_stack.storage import MemoryStorage
 from telegram_bot_stack.user_manager import UserManager
 
+# Register integration test plugins
+pytest_plugins = ["tests.integration.fixtures.mock_vps"]
+
 
 @pytest.fixture(scope="session")
 def event_loop():

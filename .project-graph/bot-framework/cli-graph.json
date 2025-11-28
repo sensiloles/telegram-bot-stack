@@ -1,7 +1,7 @@
 {
   "metadata": {
     "version": "3.0.0",
-    "generated_at": "2025-11-27",
+    "generated_at": "2025-11-28",
     "graph_id": "bot_framework_cli",
     "graph_name": "Bot Framework - CLI",
     "graph_type": "sub_graph",
@@ -614,7 +614,7 @@
       "category": "implementation",
       "path": "telegram_bot_stack/cli/commands/deploy/operations.py",
       "description": "Deployment operations (up, update, down).",
-      "lines_of_code": 811,
+      "lines_of_code": 812,
       "complexity_score": 1,
       "exports": [
         "up",
