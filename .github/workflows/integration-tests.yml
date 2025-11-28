@@ -57,20 +57,62 @@ jobs:
           docker compose version
           docker images | grep mock-vps
 
+      - name: Monitor Docker in background
+        run: |
+          # Start background Docker monitoring
+          (
+            while true; do
+              sleep 30
+              echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+              echo "🐳 Docker Status at $(date '+%H:%M:%S')"
+              echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+              docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Image}}" 2>/dev/null || true
+
+              # Show recent logs from mock VPS if it exists
+              CONTAINER=$(docker ps --filter "name=mock-vps" --format "{{.Names}}" 2>/dev/null | head -1)
+              if [ -n "$CONTAINER" ]; then
+                echo ""
+                echo "📋 Recent Mock VPS logs:"
+                docker logs --tail 5 "$CONTAINER" 2>&1 || true
+              fi
+              echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+              echo ""
+            done
+          ) &
+          echo "DOCKER_MONITOR_PID=$!" >> $GITHUB_ENV
+
       - name: Run integration tests
         run: |
+          echo "🚀 Starting integration tests at $(date '+%Y-%m-%d %H:%M:%S')"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo ""
+
           pytest tests/integration/ \
             -v \
             -x \
             -n auto \
             --tb=short \
+            --log-cli-level=INFO \
+            --log-cli-format="%(asctime)s [%(levelname)s] %(message)s" \
+            --log-cli-date-format="%H:%M:%S" \
             --cov=telegram_bot_stack \
             --cov-report=term \
             --cov-report=xml \
             -m "not slow" \
             --maxfail=3
+
+          echo ""
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "✅ Integration tests completed at $(date '+%Y-%m-%d %H:%M:%S')"
         env:
           PYTEST_TIMEOUT: 300
+
+      - name: Stop Docker monitoring
+        if: always()
+        run: |
+          if [ -n "${{ env.DOCKER_MONITOR_PID }}" ]; then
+            kill ${{ env.DOCKER_MONITOR_PID }} 2>/dev/null || true
+          fi
 
       - name: Upload coverage to Codecov
         if: matrix.python-version == '3.12'
@@ -80,8 +122,28 @@ jobs:
           flags: integration
           name: integration-tests
 
+      - name: Show Docker logs on failure
+        if: failure()
+        run: |
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "🔍 Docker Containers Status"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          docker ps -a || true
+          echo ""
+
+          # Show logs from all containers
+          for container in $(docker ps -a --format "{{.Names}}" 2>/dev/null); do
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            echo "📋 Logs from: $container"
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            docker logs --tail 100 "$container" 2>&1 || true
+            echo ""
+          done
+
       - name: Cleanup Docker resources
         if: always()
         run: |
+          echo "🧹 Cleaning up Docker resources..."
           docker compose -f tests/integration/fixtures/docker-compose.mock-vps.yml down -v || true
           docker system prune -af || true
+          echo "✅ Cleanup complete"
