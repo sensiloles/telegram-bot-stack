@@ -6,17 +6,24 @@ Comprehensive test suite for telegram-bot-stack framework.
 
 ```
 tests/
-├── unit/              # Unit tests (fast, isolated)
+├── unit/              # Unit tests (fast, isolated, no Docker)
 │   ├── agent/         # Agent functionality tests
 │   ├── cli/           # CLI commands tests
 │   ├── core/          # Core framework tests
 │   └── examples/      # Example bots tests
 │
-├── integration/       # Integration tests (slow, Docker required)
-│   ├── fixtures/      # Mock VPS and test infrastructure
-│   ├── test_deployment.py
-│   ├── test_full_flow.py
-│   └── test_vps_requirements.py
+├── integration/       # Integration tests (fast, no Mock VPS)
+│   ├── bot/           # Bot user flow tests
+│   ├── deployment/    # Config, Docker templates, CLI
+│   └── fixtures/      # Test infrastructure (Mock VPS)
+│
+├── e2e/               # E2E tests (slow, requires Mock VPS + Docker)
+│   └── deployment/    # Full deployment workflow tests
+│       ├── test_full_deployment_flow.py
+│       ├── test_secrets_management.py
+│       ├── test_backup_restore.py
+│       ├── test_rollback_version_tracking.py
+│       └── test_health_monitoring.py
 │
 └── conftest.py        # Shared pytest fixtures
 ```
@@ -32,13 +39,24 @@ pytest tests/
 ### Run by Type
 
 ```bash
-# Unit tests only (fast, no Docker)
-pytest tests/unit/ -v
+# Unit tests only (fastest, no Docker)
 make test-unit
+pytest tests/unit/ -v
 
-# Integration tests only (slow, requires Docker)
-pytest tests/integration/ -v
+# Fast tests (unit + basic integration, ~1min)
+make test-fast
+
+# Integration tests (basic, no Mock VPS)
 make test-integration
+pytest tests/integration/ -v
+
+# E2E deployment tests (requires Mock VPS, ~5-30min)
+make test-deploy
+pytest tests/e2e/deployment/ -v
+
+# All E2E tests
+make test-e2e
+pytest tests/e2e/ -v
 ```
 
 ### Run with Coverage
@@ -70,18 +88,33 @@ pytest tests/unit/ --cov=telegram_bot_stack --cov-report=term
 
 ### 🔗 Integration Tests (`tests/integration/`)
 
-**What**: Test component interactions with real infrastructure
+**What**: Test component interactions (basic, no full deployment)
 
 **Characteristics**:
 
-- 🐌 **Slow**: Seconds to minutes per test
-- 🐳 **Docker**: Requires Mock VPS container
-- 🔄 **Realistic**: Tests real deployment flows
+- ⚡ **Fast**: ~1-2 minutes total
+- 🚫 **No Docker**: No Mock VPS required
+- 🧩 **Components**: Config, templates, CLI, bot flows
 - 📊 **Coverage**: 25+ tests
 
 **Run**: `pytest tests/integration/` or `make test-integration`
 
 **Docs**: [`tests/integration/README.md`](integration/README.md)
+
+### 🎯 E2E Tests (`tests/e2e/`)
+
+**What**: Full deployment workflows with Mock VPS
+
+**Characteristics**:
+
+- 🐌 **Slow**: ~5-30 minutes (Docker builds)
+- 🐳 **Docker**: Requires Mock VPS container
+- 🔄 **Realistic**: Complete deployment cycles
+- 📊 **Coverage**: 60+ tests
+
+**Run**: `pytest tests/e2e/` or `make test-e2e`
+
+**Docs**: [`tests/e2e/README.md`](e2e/README.md)
 
 ## Running Tests
 
@@ -98,10 +131,14 @@ docker --version  # Docker required
 ### Make Commands
 
 ```bash
-make test                  # Run all tests
-make test-unit            # Run unit tests only
-make test-integration     # Run integration tests (Docker required)
-make coverage             # Run with coverage report
+make test                  # Run all tests (514 tests, ~1min for fast ones)
+make test-fast            # ⚡ Quick validation (unit + basic integration, ~1min)
+make test-unit            # Unit tests only (~30s)
+make test-integration     # Integration tests (basic, ~30s)
+make test-deploy          # E2E deployment tests (requires Mock VPS, ~5-30min)
+make test-e2e             # All E2E tests (~5-30min)
+make coverage             # Run tests with coverage report
+make build-mock-vps       # Build Mock VPS image (required for E2E)
 make test-all-versions    # Test on Python 3.9-3.12 (via tox)
 ```
 
@@ -140,10 +177,19 @@ Tests run automatically in GitHub Actions:
 
 **Integration Tests** (`.github/workflows/integration-tests.yml`):
 
-- ⚠️ Non-blocking (won't prevent merge)
-- 🐳 Requires Docker
+**Fast Integration:**
+
+- ✅ Required for PR merge
+- ⚡ Fast (1-2 minutes)
+- 🚫 No Docker required
 - 🐍 Python 3.11, 3.12
-- ⏱️ Timeout: 30 minutes
+
+**E2E Tests:**
+
+- ⚠️ Non-blocking (won't prevent merge)
+- 🐳 Requires Docker + Mock VPS
+- 🐍 Python 3.12 only
+- ⏱️ Timeout: 45 minutes
 
 ## Coverage
 
@@ -225,8 +271,17 @@ class TestMyClass:
 
 ### Integration Fixtures (`tests/integration/conftest.py`)
 
+- `deployment_config` - Deployment configuration
+- `get_cli_output` - Helper for CLI command testing
+- `assert_cli_success` - Assert CLI command succeeded
+- `assert_cli_error` - Assert CLI command failed
+
+### E2E Fixtures (`tests/e2e/conftest.py`, `tests/integration/fixtures/mock_vps.py`)
+
 - `mock_vps` - Mock VPS (session-scoped, reused)
 - `clean_vps` - Clean VPS (function-scoped, isolated)
+- `test_bot_project` - Test bot project setup
+- `deployed_bot` - Fully deployed bot on Mock VPS
 
 ## Configuration
 
@@ -349,11 +404,15 @@ pytest --durations=0
 
 **Current Stats** (as of 2025-11-28):
 
-- Total tests: ~465
-- Unit tests: ~440 (95%)
-- Integration tests: ~25 (5%)
-- Average execution time: ~30s (unit), ~5min (integration)
-- Coverage: 70%
+- Total tests: **514**
+  - Unit tests: ~450 (88%)
+  - Integration tests: ~25 (5%)
+  - E2E tests: ~60 (12%) - deployment workflows
+- Average execution time:
+  - Unit: ~30s
+  - Integration (fast): ~30s
+  - E2E: ~5-30min (Docker builds)
+- Coverage: 70% (unit only)
 
 ---
 
@@ -361,3 +420,4 @@ For specific test type documentation, see:
 
 - [`tests/unit/README.md`](unit/README.md) - Unit testing guide
 - [`tests/integration/README.md`](integration/README.md) - Integration testing guide
+- [`tests/e2e/README.md`](e2e/README.md) - E2E testing guide

@@ -1,7 +1,7 @@
 # Project Status - telegram-bot-stack
 
 **Version:** v1.25.0 → v2.0.0 MVP
-**Updated:** 2025-11-27
+**Updated:** 2025-11-28
 **Status:** 🏗️ Phase 2 - Hardening Killer Feature
 
 ---
@@ -78,10 +78,10 @@ Total: ~10 minutes to live bot 🚀
 | **#79** | Secrets management            | ✅ YES         | ✅ DONE | 5-6h  | -      |
 | **#81** | Backup/restore                | ✅ YES         | ✅ DONE | 5-6h  | -      |
 | **#84** | Troubleshooting guide         | ✅ YES (docs)  | ✅ DONE | 3-4h  | -      |
-| **#85** | Integration tests             | ✅ YES (tests) | ⏳ TODO | 8-10h | -      |
+| **#85** | Integration tests             | ✅ YES (tests) | ✅ DONE | 8-10h | -      |
 | **#88** | Doctor command                | 🔧 CLI tool    | ⏳ TODO | 6-8h  | -      |
 
-**Total Critical Path:** ~24-31 hours (4-5 days) - **5 issues completed!**
+**Total Critical Path:** ~32-41 hours (5-6 days) - **6/7 critical issues completed!**
 
 **IMPORTANT Issues (do after critical):**
 
@@ -117,7 +117,7 @@ Total: ~10 minutes to live bot 🚀
 | #79 | **Secrets management** | Deploy   | ✅ DONE           | #27     | -        |
 | #81 | **Backup/restore**     | Deploy   | ✅ DONE           | #27     | -        |
 | #84 | **Troubleshooting**    | Docs     | ✅ DONE           | #27     | -        |
-| #85 | **Deploy tests**       | Tests    | ⏳ TODO           | #27     | -        |
+| #85 | **Deploy tests**       | Tests    | ✅ DONE           | #27     | -        |
 | #88 | **Doctor command**     | CLI      | ⏳ TODO           | -       | -        |
 
 **Other Critical:**
@@ -127,7 +127,7 @@ Total: ~10 minutes to live bot 🚀
 | #40 | Full Dev Setup | ✅ DONE (v1.17.0) | Killer Feature #1 |
 | #60 | Agent Optimize | 🏗️ In Progress    | Ongoing           |
 
-**Total Critical: 4 TODO + 8 DONE = 12 issues**
+**Total Critical: 1 TODO + 9 DONE = 10 issues**
 
 ---
 
@@ -312,9 +312,9 @@ Supporting Infrastructure (parallel):
 
 **⏳ Remaining:**
 
-- Testing & Tooling (#85, #88)
+- Tooling (#88 Doctor command)
 
-**Milestone:** Production-safe deployment (5/5 critical features done) ✅
+**Milestone:** Production-safe deployment (6/7 critical features done) ✅
 
 ### 🚀 Week 9: Advanced Features
 
@@ -381,7 +381,7 @@ Supporting Infrastructure (parallel):
 - [x] Secrets management (#79) ✅
 - [x] Backup/restore (#81) ✅
 - [x] Troubleshooting guide (#84) ✅
-- [ ] Integration tests (#85)
+- [x] Integration tests (#85) ✅
 - [ ] Doctor command (#88)
 - [ ] Zero-downtime updates (#78)
 - [ ] Monitoring (#82)
@@ -533,7 +533,7 @@ Supporting Infrastructure (parallel):
 ---
 
 **Status:** 🏗️ Killer Feature #2 deployed, now hardening for production
-**Progress:** 5/7 critical hardening tasks completed (#79 Secrets, #81 Backup, #76 Rollback, #77 Health, #84 Troubleshooting) ✅
-**Current Focus:** Testing & Tooling (#85 Integration Tests, #88 Doctor)
+**Progress:** 6/7 critical hardening tasks completed (#76 Rollback, #77 Health, #79 Secrets, #81 Backup, #84 Troubleshooting, #85 Integration Tests) ✅
+**Current Focus:** Tooling (#88 Doctor command)
 **Next Milestone:** v2.0.0 MVP (Week 10)
 **Next Review:** After completing critical hardening (Week 8)

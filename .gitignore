@@ -51,7 +51,8 @@ coverage.json
 htmlcov/
 .pytest_cache/
 .tox/
-tests/integration_tests.log
+*.log
+tests/**/*.log
 tests/integration/.env
 
 # Linting & Type checking

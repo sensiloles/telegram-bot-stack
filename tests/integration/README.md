@@ -44,30 +44,47 @@ python3 -m pytest tests/integration/ --cov=telegram_bot_stack --cov-report=term
 
 **test_config.py** - Configuration management
 
-- Config creation and save
-- Nested keys handling
-- Validation (missing fields)
+- Config creation and save, nested keys, validation
 
 **test_docker.py** - Docker file generation
 
-- Dockerfile rendering (Python versions, entrypoints)
-- docker-compose.yml rendering (resources, limits)
-- Makefile generation (targets, compose detection)
+- Dockerfile, docker-compose.yml, Makefile rendering
 
 **test_cli.py** - CLI commands
 
-- `deploy init` command
-- `deploy up` command
-- `deploy status` command
-- `deploy down` command
-- Error handling (missing config)
+- deploy init/up/status/down commands, error handling
 
 **test_vps.py** - VPS connections
 
-- Connection object creation
-- Custom ports and users
-- Invalid host handling
-- Context manager support
+- Connection creation, ports, invalid hosts, context managers
+
+**test_full_deployment_flow.py** - End-to-end deployment ⭐
+
+- Complete Docker deployment workflow
+- Python/Docker auto-installation
+- Multi-bot deployments, error scenarios
+
+**test_secrets_management.py** - Secrets encryption ⭐
+
+- Encryption/decryption, CRUD operations
+- File security (encrypted at rest, 600 permissions)
+- Special characters handling
+
+**test_backup_restore.py** - Backup & restore ⭐
+
+- Backup creation, listing, restoration
+- Retention policies, local downloads
+- Encrypted secrets in backups
+
+**test_rollback_version_tracking.py** - Version tracking ⭐
+
+- Deployment versioning, rollback to previous/specific version
+- Docker image cleanup, git commit tracking
+
+**test_health_monitoring.py** - Health checks ⭐
+
+- Container health status, error logs
+- Restart detection, Docker Compose detection
 
 ### Bot Tests (`bot/`)
 
@@ -101,16 +118,16 @@ pytest tests/integration/ -v -s
 pytest tests/integration/ -v -n auto
 ```
 
-## Mock VPS (Optional)
+## Mock VPS (Required for E2E tests)
 
-For advanced SSH testing, build Mock VPS container:
+For comprehensive deployment tests (⭐ marked), build Mock VPS:
 
 ```bash
 cd tests/integration/fixtures
 docker build -t mock-vps:latest -f Dockerfile.mock-vps .
 ```
 
-**Note:** Most tests don't require Mock VPS and run without Docker.
+**Note:** Basic tests run without Docker. E2E tests use Docker-in-Docker (~5-15min builds).
 
 ## Coverage
 
@@ -124,9 +141,9 @@ open htmlcov/index.html
 
 ## Test Results
 
-**Status:** ✅ 26/26 tests passing (100%)
-**Speed:** ⚡ ~0.8 seconds
-**Dependencies:** Minimal (no Docker required)
+**Status:** ✅ 26 basic + 60+ E2E tests
+**Speed:** Basic ~1s | E2E ~5-30min (Docker builds)
+**Coverage:** Deployment workflow, secrets, backup, rollback, health
 
 ## CI/CD
 
