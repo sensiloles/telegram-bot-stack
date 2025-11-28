@@ -66,7 +66,9 @@ class TestVPSConnection:
             result = vps.run_command("echo test")
 
             assert result is True
-            mock_conn.run.assert_called_once_with("echo test", hide=False, pty=True)
+            mock_conn.run.assert_called_once_with(
+                "echo test", hide=False, pty=False, in_stream=False
+            )
 
     def test_run_command_failure(self):
         """Test failed command execution."""
@@ -173,7 +175,9 @@ class TestCheckDockerComposeInstalled:
 
         assert result is True
         # Should try v2 first
-        mock_conn.run.assert_called_with("docker compose version", hide=True, warn=True)
+        mock_conn.run.assert_called_with(
+            "docker compose version", hide=True, warn=True, pty=False, in_stream=False
+        )
 
     def test_docker_compose_not_installed(self):
         """Test Docker Compose installed check (not installed)."""
@@ -198,7 +202,9 @@ class TestGetDockerComposeCommand:
         result = get_docker_compose_command(mock_conn)
 
         assert result == "docker compose"
-        mock_conn.run.assert_called_with("docker compose version", hide=True, warn=True)
+        mock_conn.run.assert_called_with(
+            "docker compose version", hide=True, warn=True, pty=False, in_stream=False
+        )
 
     def test_docker_compose_v1_fallback(self):
         """Test fallback to Docker Compose v1 (standalone)."""
@@ -235,7 +241,7 @@ class TestGetContainerHealth:
         mock_conn = MagicMock()
 
         # Mock responses for different docker inspect commands
-        def mock_run(cmd, hide=False, warn=False):
+        def mock_run(cmd, hide=False, warn=False, pty=False, in_stream=False):
             result = MagicMock()
             result.ok = True
             if "State.Running" in cmd:
@@ -261,7 +267,7 @@ class TestGetContainerHealth:
         """Test health check for stopped container."""
         mock_conn = MagicMock()
 
-        def mock_run(cmd, hide=False, warn=False):
+        def mock_run(cmd, hide=False, warn=False, pty=False, in_stream=False):
             result = MagicMock()
             result.ok = True
             if "State.Running" in cmd:
@@ -281,7 +287,7 @@ class TestGetContainerHealth:
         """Test health check for unhealthy container."""
         mock_conn = MagicMock()
 
-        def mock_run(cmd, hide=False, warn=False):
+        def mock_run(cmd, hide=False, warn=False, pty=False, in_stream=False):
             result = MagicMock()
             result.ok = True
             if "State.Running" in cmd:
@@ -306,7 +312,7 @@ class TestGetContainerHealth:
         """Test health check for starting container."""
         mock_conn = MagicMock()
 
-        def mock_run(cmd, hide=False, warn=False):
+        def mock_run(cmd, hide=False, warn=False, pty=False, in_stream=False):
             result = MagicMock()
             result.ok = True
             if "State.Running" in cmd:
@@ -330,7 +336,7 @@ class TestGetContainerHealth:
         """Test health check for non-existent container."""
         mock_conn = MagicMock()
 
-        def mock_run(cmd, hide=False, warn=False):
+        def mock_run(cmd, hide=False, warn=False, pty=False, in_stream=False):
             result = MagicMock()
             result.ok = False
             return result
