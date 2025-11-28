@@ -452,8 +452,7 @@ class TestMinimumVersions:
         assert result_init.exit_code == 0
 
         # Check Docker version
-        exit_code, stdout, _ = clean_vps.exec("docker --version")
-        assert exit_code == 0
+        stdout = clean_vps.exec("docker --version")
         assert "Docker version" in stdout
 
         # Deployment should check minimum version (e.g., >= 20.10)
@@ -484,8 +483,7 @@ class TestMinimumVersions:
         assert result_init.exit_code == 0
 
         # Check Python version
-        exit_code, stdout, _ = clean_vps.exec("python3 --version")
-        assert exit_code == 0
+        stdout = clean_vps.exec("python3 --version")
 
         # Should be Python 3.9+ (framework minimum)
         version_str = stdout.strip().split()[-1]  # "Python 3.11.x" -> "3.11.x"
