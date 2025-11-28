@@ -369,27 +369,75 @@ class VPSConnection:
 
             # Create remote directory if it doesn't exist
             # Properly escape remote_path to prevent command injection
-            conn.run(f"mkdir -p {shlex.quote(remote_path)}", hide=True)
+            conn.run(
+                f"mkdir -p {shlex.quote(remote_path)}",
+                hide=True,
+                pty=False,
+                in_stream=False,
+            )
 
-            # Use rsync for efficient file transfer
             console.print(f"[cyan]Transferring files to {remote_path}...[/cyan]")
 
-            # Build rsync command
-            # Properly escape all paths and SSH key to prevent command injection
-            if self.ssh_key:
-                ssh_key_quoted = shlex.quote(self.ssh_key)
-                # rsync -e option expects a shell command string
-                ssh_cmd = f"ssh -i {ssh_key_quoted}"
+            # Try rsync first (faster), fallback to SFTP if unavailable
+            import glob
+            import subprocess
+
+            try:
+                # Build rsync command with SSH options
+                ssh_opts = "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR"
+
+                if self.ssh_key:
+                    ssh_key_quoted = shlex.quote(self.ssh_key)
+                    ssh_cmd = f"ssh -i {ssh_key_quoted} -p {self.port} {ssh_opts}"
+                else:
+                    ssh_cmd = f"ssh -p {self.port} {ssh_opts}"
+
                 ssh_key_arg = f"-e {shlex.quote(ssh_cmd)}"
-            else:
-                ssh_key_arg = ""
-            local_path_quoted = shlex.quote(str(local_path))
-            remote_path_quoted = shlex.quote(remote_path)
-            rsync_cmd = f"rsync -avz --delete {ssh_key_arg} {local_path_quoted}/ {self.user}@{self.host}:{remote_path_quoted}/"
+                local_path_quoted = shlex.quote(str(local_path))
+                remote_path_quoted = shlex.quote(remote_path)
+                rsync_cmd = f"rsync -avz --delete {ssh_key_arg} {local_path_quoted}/ {self.user}@{self.host}:{remote_path_quoted}/"
 
-            os.system(rsync_cmd)
+                result = subprocess.run(
+                    rsync_cmd, shell=True, capture_output=True, text=True, timeout=60
+                )
 
-            console.print("[green]✓ Files transferred successfully[/green]")
+                if result.returncode == 0:
+                    console.print(
+                        "[green]✓ Files transferred successfully (rsync)[/green]"
+                    )
+                    return True
+                # If rsync failed, fall through to SFTP fallback
+                console.print(
+                    "[yellow]rsync not available, using SFTP fallback...[/yellow]"
+                )
+            except Exception:
+                console.print("[yellow]Using SFTP for file transfer...[/yellow]")
+
+            # Fallback: Use Fabric's put (SFTP) to transfer files
+            file_count = 0
+            for item in glob.glob(f"{local_path}/**/*", recursive=True):
+                item_path = Path(item)
+                if item_path.is_file():
+                    # Calculate relative path
+                    rel_path = item_path.relative_to(local_path)
+                    remote_file_path = f"{remote_path}/{rel_path}"
+
+                    # Create parent directory on remote
+                    remote_parent = str(Path(remote_file_path).parent)
+                    conn.run(
+                        f"mkdir -p {shlex.quote(remote_parent)}",
+                        hide=True,
+                        pty=False,
+                        in_stream=False,
+                    )
+
+                    # Transfer file
+                    conn.put(str(item_path), remote_file_path)
+                    file_count += 1
+
+            console.print(
+                f"[green]✓ {file_count} files transferred successfully (SFTP)[/green]"
+            )
             return True
         except Exception as e:
             console.print(f"[red]File transfer failed: {e}[/red]")
