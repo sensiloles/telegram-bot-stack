@@ -186,14 +186,11 @@ python_classes = ["Test*"]
 python_functions = ["test_*"]
 asyncio_mode = "auto"
 addopts = [
-"--cov=telegram_bot_stack",
-"--cov-config=pyproject.toml",
-"--cov-report=html",
-"--cov-report=term-missing",
-"--cov-report=xml",
 "--strict-markers",
-"-v",
+"-ra",
 ]
+# Coverage is now run explicitly via 'make coverage' or 'pytest --cov'
+# This prevents coverage checks from failing when running subset of tests
 # Live logging configuration for integration tests
 log_cli = true
 log_cli_level = "INFO"
@@ -208,6 +205,7 @@ markers = [
 "integration: mark test as integration test",
 "unit: mark test as unit test",
 "slow: mark test as slow (skipped in CI)",
+"e2e: mark test as E2E test (requires Mock VPS, Docker-in-Docker)",
 ]
 filterwarnings = [
 "ignore::DeprecationWarning",

@@ -131,22 +131,30 @@ docker --version  # Docker required
 ### Make Commands
 
 ```bash
-make test                  # Run all tests (514 tests, ~1min for fast ones)
-make test-fast            # ⚡ Quick validation (unit + basic integration, ~1min)
-make test-unit            # Unit tests only (~30s)
-make test-integration     # Integration tests (basic, ~30s)
+make test                  # Run all tests (461 tests, ~16s) - E2E skipped by default
+make test-fast            # ⚡ Quick validation (unit + basic integration, ~16s)
+make test-unit            # Unit tests only (~10s)
+make test-integration     # Integration tests (basic, ~1s)
 make test-deploy          # E2E deployment tests (requires Mock VPS, ~5-30min)
-make test-e2e             # All E2E tests (~5-30min)
+make test-e2e             # All E2E tests (~5-30min, runs with --run-e2e)
 make coverage             # Run tests with coverage report
 make build-mock-vps       # Build Mock VPS image (required for E2E)
 make test-all-versions    # Test on Python 3.9-3.12 (via tox)
 ```
+
+**Note:** E2E tests (53 tests in `tests/e2e/`) are skipped by default to avoid Docker-in-Docker issues locally. Use `make test-e2e` or `pytest --run-e2e` to run them explicitly.
 
 ### Pytest Options
 
 ```bash
 # Verbose output
 pytest tests/ -v
+
+# Run with coverage
+pytest tests/ --cov=telegram_bot_stack --cov-report=term
+
+# Run E2E tests (skipped by default)
+pytest tests/ --run-e2e
 
 # Stop on first failure
 pytest tests/ -x

@@ -13,6 +13,39 @@ from telegram_bot_stack.user_manager import UserManager
 pytest_plugins = ["tests.integration.fixtures.mock_vps"]
 
 
+def pytest_addoption(parser):
+    """Add custom command line options."""
+    parser.addoption(
+        "--run-e2e",
+        action="store_true",
+        default=False,
+        help="Run E2E tests (requires Mock VPS with Docker-in-Docker)",
+    )
+
+
+def pytest_configure(config):
+    """Configure pytest with custom markers and settings."""
+    config.addinivalue_line(
+        "markers", "e2e: mark test as E2E test (requires Mock VPS, Docker-in-Docker)"
+    )
+
+
+def pytest_collection_modifyitems(config, items):
+    """Modify test collection to skip E2E tests by default."""
+    if config.getoption("--run-e2e"):
+        # --run-e2e given in cli: do not skip E2E tests
+        return
+
+    skip_e2e = pytest.mark.skip(reason="E2E tests skipped (use --run-e2e to run)")
+    for item in items:
+        # Skip all tests in tests/e2e/ directory
+        if "tests/e2e/" in str(item.fspath):
+            item.add_marker(skip_e2e)
+        # Also skip tests marked with @pytest.mark.e2e
+        elif "e2e" in item.keywords:
+            item.add_marker(skip_e2e)
+
+
 @pytest.fixture(scope="session")
 def event_loop():
     """Create event loop for async tests."""

@@ -36,9 +36,10 @@ help:
 	@echo "  make test              # Full validation before commit"
 	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
-# Run all tests (recommended for CI/CD)
+# Run all tests (unit + integration, skip E2E by default)
 test:
-	@echo "🧪 Running all tests..."
+	@echo "🧪 Running all tests (unit + integration)..."
+	@echo "   E2E tests skipped (use 'make test-e2e' to run)"
 	pytest --no-cov -q
 
 # Fast tests for development (unit + basic integration, no E2E)
@@ -70,13 +71,13 @@ test-integration:
 test-deploy:
 	@echo "🚀 Running deployment E2E tests..."
 	@echo "⚠️  Requires Mock VPS image (run 'make build-mock-vps' first)"
-	pytest tests/e2e/deployment/ -v --no-cov
+	pytest tests/e2e/deployment/ -v --no-cov --run-e2e
 
 # Full E2E tests (slow, requires Mock VPS + Docker-in-Docker)
 test-e2e:
 	@echo "🎯 Running full E2E tests (this may take 5-30 minutes)..."
 	@echo "⚠️  Requires Mock VPS image with Docker-in-Docker support"
-	pytest tests/e2e/ -v --no-cov
+	pytest tests/e2e/ -v --no-cov --run-e2e
 
 test-all-versions:
 	tox -p

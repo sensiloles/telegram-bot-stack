@@ -38,18 +38,26 @@ docker build -t mock-vps:latest -f Dockerfile.mock-vps .
 
 ### 2. Run Tests
 
+**Note:** E2E tests are skipped by default (to avoid Docker-in-Docker issues locally). Use `--run-e2e` flag to run them.
+
 ```bash
-# All E2E tests
+# All E2E tests (recommended - uses Makefile)
 make test-e2e
 
 # Deployment E2E tests only
 make test-deploy
 
+# With pytest directly (requires --run-e2e flag)
+pytest tests/e2e/ -v --run-e2e
+
 # Specific test file
-pytest tests/e2e/deployment/test_full_deployment_flow.py -v
+pytest tests/e2e/deployment/test_full_deployment_flow.py -v --run-e2e
 
 # Specific test
-pytest tests/e2e/deployment/test_secrets_management.py::TestSecretsEncryption::test_encrypt_decrypt_secret -v
+pytest tests/e2e/deployment/test_secrets_management.py::TestSecretsEncryption::test_encrypt_decrypt_secret -v --run-e2e
+
+# Without --run-e2e flag, tests will be skipped
+pytest tests/e2e/  # Will skip all E2E tests
 ```
 
 ## Test Coverage

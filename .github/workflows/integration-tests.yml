@@ -54,7 +54,6 @@ jobs:
 
           echo "✅ Fast integration tests completed"
 
-
   # Full E2E tests with Docker (optional, non-blocking)
   integration-e2e:
     name: Integration Tests - E2E (Python ${{ matrix.python-version }})
@@ -109,6 +108,7 @@ jobs:
             --tb=short \
             --log-cli-level=INFO \
             --no-cov \
+            --run-e2e \
             --maxfail=5
 
           echo "✅ E2E tests completed"
