@@ -5,8 +5,6 @@ name: Integration Tests
 # Run locally: pytest tests/integration/ -v
 
 on:
-  push:
-    branches: [main, develop, "feature/**", "fix/**"]
   pull_request:
     branches: [main, develop]
   workflow_dispatch: # Allow manual trigger
