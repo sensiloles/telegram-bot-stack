@@ -7,7 +7,7 @@ environment using Docker containers for integration testing.
 import subprocess
 import time
 from pathlib import Path
-from typing import Generator
+from typing import Generator, Optional
 
 import pytest
 
@@ -20,7 +20,7 @@ class MockVPS:
         host: str = "localhost",
         port: int = 2222,
         user: str = "root",
-        ssh_key_path: str | None = None,
+        ssh_key_path: Optional[str] = None,
     ):
         """Initialize Mock VPS.
 
