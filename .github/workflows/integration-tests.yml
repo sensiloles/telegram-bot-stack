@@ -50,19 +50,10 @@ jobs:
             tests/integration/deployment/test_vps.py \
             -v \
             --tb=short \
-            --cov=telegram_bot_stack \
-            --cov-report=term \
-            --cov-report=xml
+            --no-cov
 
           echo "✅ Fast integration tests completed"
 
-      - name: Upload coverage to Codecov
-        if: matrix.python-version == '3.12'
-        uses: codecov/codecov-action@v4
-        with:
-          file: ./coverage.xml
-          flags: integration-fast
-          name: integration-fast-tests
 
   # Full E2E tests with Docker (optional, non-blocking)
   integration-e2e:
@@ -117,20 +108,10 @@ jobs:
             -v \
             --tb=short \
             --log-cli-level=INFO \
-            --cov=telegram_bot_stack \
-            --cov-report=term \
-            --cov-report=xml \
+            --no-cov \
             --maxfail=5
 
           echo "✅ E2E tests completed"
-
-      - name: Upload E2E coverage to Codecov
-        if: always()
-        uses: codecov/codecov-action@v4
-        with:
-          file: ./coverage.xml
-          flags: integration-e2e
-          name: integration-e2e-tests
 
       - name: Show Docker logs on failure
         if: failure()

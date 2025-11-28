@@ -2,7 +2,7 @@
   "docs/deployment_guide.md": "3d1918398bf043cc9d08352efd002d3f1c82b01ef878cd58e185317e1bff9648",
   "telegram_bot_stack/cli/utils/backup.py": "85c52e51e0c152ac2ffe037f07bf247f41a164cc3058e39efb3cd7271e4ebc3b",
   "telegram_bot_stack/cli/utils/vps.py": "38528c04ead83332b537117c4bdafb463e754e0ca0402c274ccdd6f8f93e0cdf",
-  ".github/workflows/integration-tests.yml": "8feac26d0afc5f0294c0db35ec39f4121cdb2494140922f790a74bc2decd40c2",
+  ".github/workflows/integration-tests.yml": "1885b3323856565a017e5b0d2d52a9ce89cd4c5bb8216e1ed4262def2d20e2da",
   "pyproject.toml": "6fe6782d4588ccca046247e73ccf87435da39bd265705af610f1d96a5435d049",
   "telegram_bot_stack/cli/commands/deploy/operations.py": "5749039b7b5f15a4ab3242265e102ccff702361dffe51194bc553ce866e4a19a",
   ".github/PROJECT_STATUS.md": "0d7560a1cce0f7426e9b63d83d2359b5241a06de7c4a3bc29cd71f5d8e330e1e"
