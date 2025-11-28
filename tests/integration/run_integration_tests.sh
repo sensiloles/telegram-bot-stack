@@ -111,6 +111,7 @@ pytest "$TEST_PATH" \
     --cov=telegram_bot_stack \
     --cov-report=term \
     --cov-report=html \
+    --cov-fail-under=10 \
     -m "not slow"
 
 TEST_EXIT_CODE=$?
