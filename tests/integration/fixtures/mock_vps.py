@@ -170,7 +170,28 @@ def clean_vps(mock_vps: MockVPS) -> Generator[MockVPS, None, None]:
     # Cleanup before test
     mock_vps.cleanup()
 
+    # Fix any broken apt packages from previous tests
+    try:
+        mock_vps.container.exec("dpkg --configure -a 2>&1 || true")
+        mock_vps.container.exec("apt-get --fix-broken install -y 2>&1 || true")
+        mock_vps.container.exec("apt-get update 2>&1 || true")
+    except Exception:
+        pass  # Ignore errors during cleanup
+
+    # Ensure Docker daemon is stopped (to avoid conflicts)
+    try:
+        mock_vps.container.exec("pkill dockerd 2>&1 || true")
+    except Exception:
+        pass
+
     yield mock_vps
 
     # Cleanup after test
     mock_vps.cleanup()
+
+    # Fix packages again after test
+    try:
+        mock_vps.container.exec("dpkg --configure -a 2>&1 || true")
+        mock_vps.container.exec("apt-get --fix-broken install -y 2>&1 || true")
+    except Exception:
+        pass
