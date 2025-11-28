@@ -15,7 +15,7 @@ on:
 
 jobs:
   mypy:
-    name: Type Check with mypy
+    name: mypy
     runs-on: ubuntu-latest
     timeout-minutes: 5
 

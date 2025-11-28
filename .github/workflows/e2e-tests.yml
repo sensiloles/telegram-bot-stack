@@ -11,7 +11,7 @@ on:
 
 jobs:
   e2e:
-    name: E2E Tests - Python ${{ matrix.python-version }}
+    name: Python ${{ matrix.python-version }}
     runs-on: ubuntu-latest
     timeout-minutes: 45
     continue-on-error: true # Don't block PR merge if E2E tests fail

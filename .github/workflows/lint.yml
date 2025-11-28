@@ -15,7 +15,7 @@ on:
 
 jobs:
   ruff:
-    name: Ruff Linter + Formatter
+    name: Ruff
     runs-on: ubuntu-latest
     timeout-minutes: 5
 
