@@ -712,7 +712,12 @@ def get_recent_errors(conn: Connection, container_name: str, lines: int = 50) ->
             in_stream=False,
         )
         if result.ok and result.stdout:
-            return str(result.stdout.strip())
+            output = str(result.stdout.strip())
+            # If container doesn't exist, docker logs returns error message
+            # Return empty string for non-existent containers
+            if "No such container" in output or "Error response from daemon" in output:
+                return ""
+            return output
         return ""
     except Exception:
         return ""
