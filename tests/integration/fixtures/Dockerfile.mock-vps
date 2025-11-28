@@ -39,10 +39,14 @@ RUN useradd -m -s /bin/bash testuser && \
     usermod -aG sudo,docker testuser && \
     echo "testuser ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
-# Allow root login with key authentication
+# Allow root login with key authentication and increase connection limits
 RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config && \
     sed -i 's/#PubkeyAuthentication yes/PubkeyAuthentication yes/' /etc/ssh/sshd_config && \
-    sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
+    sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config && \
+    sed -i 's/#MaxStartups.*/MaxStartups 100:30:200/' /etc/ssh/sshd_config && \
+    sed -i 's/#MaxSessions.*/MaxSessions 100/' /etc/ssh/sshd_config && \
+    echo "ClientAliveInterval 30" >> /etc/ssh/sshd_config && \
+    echo "ClientAliveCountMax 10" >> /etc/ssh/sshd_config
 
 # Create SSH key for testing
 RUN ssh-keygen -t rsa -b 4096 -f /root/.ssh/id_rsa -N "" && \

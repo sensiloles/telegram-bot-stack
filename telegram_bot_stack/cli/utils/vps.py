@@ -40,6 +40,14 @@ class VPSConnection:
         self.port = port
         self.connection: Optional[Connection] = None
 
+    def __enter__(self) -> "VPSConnection":
+        """Enter context manager."""
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:  # type: ignore
+        """Exit context manager and close connection."""
+        self.close()
+
     def test_connection(self) -> bool:
         """Test SSH connection to VPS.
 
