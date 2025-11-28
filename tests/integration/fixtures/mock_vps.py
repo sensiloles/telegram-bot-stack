@@ -81,22 +81,47 @@ def mock_vps() -> Generator[MockVPS, None, None]:
     logger.info("[MockVPS] Starting Mock VPS container setup...")
     logger.info("=" * 80)
 
-    # Generate SSH key
+    # Generate SSH key with unique name for parallel execution
+    # Use worker ID if available (pytest-xdist), otherwise use PID
+    import subprocess
+
+    worker_id = os.environ.get("PYTEST_XDIST_WORKER", f"pid{os.getpid()}")
     key_dir = Path(__file__).parent / ".ssh-test"
     key_dir.mkdir(exist_ok=True)
-    key_path = key_dir / "id_rsa"
+    key_path = key_dir / f"id_rsa_{worker_id}"
 
-    # Generate SSH key if it doesn't exist
+    # Generate SSH key if it doesn't exist (with file locking for safety)
     if not key_path.exists():
-        import subprocess
-
         logger.info(f"[MockVPS] Generating SSH key at {key_path}")
-        subprocess.run(
-            ["ssh-keygen", "-t", "rsa", "-b", "4096", "-f", str(key_path), "-N", ""],
-            check=True,
-            capture_output=True,
-        )
-        logger.info("[MockVPS] SSH key generated successfully")
+        try:
+            subprocess.run(
+                [
+                    "ssh-keygen",
+                    "-t",
+                    "rsa",
+                    "-b",
+                    "4096",
+                    "-f",
+                    str(key_path),
+                    "-N",
+                    "",
+                ],
+                check=True,
+                capture_output=True,
+                timeout=10,
+            )
+            logger.info("[MockVPS] SSH key generated successfully")
+        except subprocess.CalledProcessError as e:
+            # If key was created by another process, that's OK
+            if key_path.exists():
+                logger.info(
+                    f"[MockVPS] Using SSH key created by another process: {key_path}"
+                )
+            else:
+                logger.error(
+                    f"[MockVPS] SSH key generation failed: {e.stderr.decode() if e.stderr else str(e)}"
+                )
+                raise
     else:
         logger.info(f"[MockVPS] Using existing SSH key at {key_path}")
 
