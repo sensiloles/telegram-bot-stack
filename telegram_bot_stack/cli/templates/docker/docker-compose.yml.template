@@ -4,70 +4,71 @@ version: "3.8"
 name: {{ bot_name }}
 
 services:
-bot:
-build:
-context: .
-dockerfile: Dockerfile
-image: {{ bot_name }}:latest
-container_name: {{ bot_name }}
-restart: always
+  bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: {{ bot_name }}:latest
+    container_name: {{ bot_name }}
+    restart: always
 
-# Production resource limits for stability
-deploy:
-resources:
-limits:
-memory: {{ memory_limit }}
-cpus: "{{ cpu_limit }}"
-reservations:
-memory: {{ memory_reservation }}
-cpus: "{{ cpu_reservation }}"
+    # Production resource limits for stability
+    deploy:
+      resources:
+        limits:
+          memory: {{ memory_limit }}
+          cpus: "{{ cpu_limit }}"
+        reservations:
+          memory: {{ memory_reservation }}
+          cpus: "{{ cpu_reservation }}"
 
-# Environment configuration
-env_file:
-- .env
-{% if has_secrets %}- .secrets.env # Decrypted secrets (created during deployment from .secrets.env.encrypted)
-{% endif %}environment:
-- TZ={{ timezone }}
-- PYTHONPATH=/app
-- LOG_LEVEL={{ log_level }}
-- PRODUCTION=true
+    # Environment configuration
+    env_file:
+      - .env
+{% if has_secrets %}      - .secrets.env # Decrypted secrets (created during deployment from .secrets.env.encrypted)
+{% endif %}
+    environment:
+      - TZ={{ timezone }}
+      - PYTHONPATH=/app
+      - LOG_LEVEL={{ log_level }}
+      - PRODUCTION=true
 
-# Data persistence
-volumes:
-- ./data:/app/data:rw
-- ./logs:/app/logs:rw
+    # Data persistence
+    volumes:
+      - ./data:/app/data:rw
+      - ./logs:/app/logs:rw
 
-# Production logging configuration
-logging:
-driver: "json-file"
-options:
-max-size: "{{ log_max_size }}"
-max-file: "{{ log_max_files }}"
-compress: "true"
+    # Production logging configuration
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "{{ log_max_size }}"
+        max-file: "{{ log_max_files }}"
+        compress: "true"
 
-# Health monitoring
-healthcheck:
-test: ["CMD", "pgrep", "-f", "python.*bot"]
-interval: 30s
-timeout: 10s
-retries: 3
-start_period: 30s
+    # Health monitoring
+    healthcheck:
+      test: ["CMD", "pgrep", "-f", "python.*bot"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
-# Security and stability
-security_opt:
-- no-new-privileges:true
+    # Security and stability
+    security_opt:
+      - no-new-privileges:true
 
-# Production labels for container identification
-labels:
-- "project.name={{ bot_name }}"
-- "project.environment=production"
-- "project.framework=telegram-bot-stack"
+    # Production labels for container identification
+    labels:
+      - "project.name={{ bot_name }}"
+      - "project.environment=production"
+      - "project.framework=telegram-bot-stack"
 
-# Network isolation
+    # Network isolation
+    networks:
+      - bot-network
+
 networks:
-- bot-network
-
-networks:
-bot-network:
-driver: bridge
-name: {{ bot_name }}-network
+  bot-network:
+    driver: bridge
+    name: {{ bot_name }}-network

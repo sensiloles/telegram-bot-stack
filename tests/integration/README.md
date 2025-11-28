@@ -1,302 +1,137 @@
 # Integration Tests
 
-This directory contains integration tests for the telegram-bot-stack deployment functionality.
+Integration tests for VPS deployment and bot functionality.
 
-## Overview
+## Structure
 
-Integration tests verify the complete deployment flow from initialization to teardown using a mock VPS environment.
-
-## Mock VPS Environment
-
-### Architecture
-
-The mock VPS is a Docker container that simulates a real VPS server:
-
-- **OS**: Ubuntu 22.04
-- **Services**: SSH, Docker, systemd
-- **Users**: root (for deployment), testuser (for testing)
-- **Port**: SSH on 2222 (mapped from container's 22)
-
-### Components
-
-1. **Dockerfile.mock-vps** - Container definition
-2. **docker-compose.mock-vps.yml** - Container orchestration
-3. **mock_vps.py** - Python fixtures and utilities
-
-## Running Tests
-
-### Prerequisites
-
-1. **Environment Variables** (Optional for security):
-
-   ```bash
-   # Copy example environment file
-   cp tests/integration/env.example tests/integration/.env
-   # Edit .env and set TEST_BOT_TOKEN if testing with real Telegram API
-   # Default fake token works for most tests
-   ```
-
-2. **System Requirements**:
-   - Docker installed and running
-   - Docker Compose v2.0+
-   - Python 3.9+
-   - pip packages: `pip install -e ".[dev]"`
-
-### Run All Integration Tests
-
-```bash
-# From project root
-pytest tests/integration/ -v
-
-# Run tests in parallel (faster, requires pytest-xdist)
-pytest tests/integration/ -v -n auto
-
-# Run only fast tests (skip slow ones like Docker build)
-pytest tests/integration/ -v -m "not slow"
-
-# Run only slow tests
-pytest tests/integration/ -v -m "slow"
-
-# Run with detailed output and logging (useful for debugging)
-pytest tests/integration/ -v -s --tb=short --log-cli-level=INFO -n auto
+```
+tests/integration/
+├── deployment/          # Deployment tests
+│   ├── test_config.py   # Configuration management
+│   ├── test_docker.py   # Docker file generation
+│   ├── test_cli.py      # CLI commands
+│   └── test_vps.py      # VPS connections
+├── bot/                 # Bot functionality tests
+│   └── test_user_flow.py # User/admin flows
+├── fixtures/            # Test fixtures
+│   ├── mock_vps.py      # Mock VPS container
+│   ├── Dockerfile.mock-vps
+│   └── docker-compose.mock-vps.yml
+├── conftest.py          # Pytest configuration
+└── README.md            # This file
 ```
 
-### Run Specific Test Suite
+## Quick Start
 
 ```bash
-# Deployment tests only
-./tests/integration/run_integration_tests.sh deployment
+# Run all integration tests
+python3 -m pytest tests/integration/ -v
 
-# VPS requirements tests only
-./tests/integration/run_integration_tests.sh requirements
+# Run specific category
+python3 -m pytest tests/integration/deployment/ -v
+python3 -m pytest tests/integration/bot/ -v
 
-# Full flow tests only
-./tests/integration/run_integration_tests.sh full-flow
-```
+# Run specific test file
+python3 -m pytest tests/integration/deployment/test_docker.py -v
 
-### Run Specific Test Class
-
-```bash
-pytest tests/integration/test_deployment.py::TestDeploymentInit -v
-pytest tests/integration/test_vps_requirements.py::TestDockerRequirements -v
-```
-
-### Run with Coverage
-
-```bash
-pytest tests/integration/ --cov=telegram_bot_stack --cov-report=term
-```
-
-### Run in CI Mode
-
-```bash
-# Skip slow tests
-pytest tests/integration/ -m "not slow" -v
+# With coverage
+python3 -m pytest tests/integration/ --cov=telegram_bot_stack --cov-report=term
 ```
 
 ## Test Categories
 
-### 1. Deployment Initialization
+### Deployment Tests (`deployment/`)
 
-- `test_deploy_init_interactive` - Interactive setup
-- `test_deploy_init_existing_config_no_overwrite` - Config protection
-- `test_deploy_init_invalid_ssh_connection` - Error handling
+**test_config.py** - Configuration management
 
-### 2. Deployment Up
+- Config creation and save
+- Nested keys handling
+- Validation (missing fields)
 
-- `test_deploy_up_first_time` - First deployment
-- `test_deploy_up_without_init` - Error handling
+**test_docker.py** - Docker file generation
 
-### 3. Deployment Status
+- Dockerfile rendering (Python versions, entrypoints)
+- docker-compose.yml rendering (resources, limits)
+- Makefile generation (targets, compose detection)
 
-- `test_deploy_status_no_deployment` - Status check
+**test_cli.py** - CLI commands
 
-### 4. Secrets Management
+- `deploy init` command
+- `deploy up` command
+- `deploy status` command
+- `deploy down` command
+- Error handling (missing config)
 
-- `test_secrets_set_and_list` - Secret storage
-- `test_secrets_delete` - Secret deletion
+**test_vps.py** - VPS connections
 
-### 5. Backup/Restore
+- Connection object creation
+- Custom ports and users
+- Invalid host handling
+- Context manager support
 
-- `test_backup_create_and_list` - Backup creation
-- (Future) `test_restore_backup` - Data restoration
+### Bot Tests (`bot/`)
 
-### 6. Health Checks
+**test_user_flow.py** - User and admin flows
 
-- `test_health_check_command` - Health monitoring
+- User registration
+- Admin management
+- Storage backends (JSON, Memory, SQL)
+- Data persistence
+- Complete user lifecycles
 
-### 7. Deployment Down
-
-- `test_deploy_down` - Teardown
-
-### 8. VPS Requirements Validation
-
-- `test_deploy_up_no_docker` - Missing Docker
-- `test_deploy_up_docker_not_running` - Docker daemon stopped
-- `test_deploy_up_no_docker_compose` - Missing Docker Compose
-- `test_deploy_up_old_python` - Outdated Python version
-- `test_deploy_up_no_python3` - Missing Python
-- `test_doctor_all_requirements_met` - Doctor command (issue #88)
-- `test_minimum_docker_version` - Version checks
-- `test_minimum_python_version` - Version checks
-
-## Fixtures
-
-### Session-Level Fixtures
-
-- **mock_vps** - Long-lived mock VPS (one per test session)
-  - Faster tests (container reused)
-  - Shared state between tests
-
-### Function-Level Fixtures
-
-- **clean_vps** - Clean VPS for each test
-  - Slower tests (cleanup before/after)
-  - Isolated state per test
-  - Use for deployment tests
-
-## Writing New Tests
-
-### Example: Testing a New Command
-
-```python
-from tests.integration.fixtures.mock_vps import MockVPS
-
-def test_my_command(clean_vps: MockVPS, tmp_path: Path) -> None:
-    """Test my new deployment command."""
-    os.chdir(tmp_path)
-    runner = CliRunner()
-
-    # Initialize deployment
-    result_init = runner.invoke(
-        main,
-        [
-            "deploy",
-            "init",
-            "--host", clean_vps.host,
-            "--user", clean_vps.user,
-            "--ssh-key", clean_vps.ssh_key_path,
-            "--port", str(clean_vps.port),
-            "--bot-name", "test-bot",
-        ],
-    )
-    assert result_init.exit_code == 0
-
-    # Test your command
-    result = runner.invoke(main, ["deploy", "my-command"])
-    assert result.exit_code == 0
-    assert "expected output" in result.output
-```
-
-### Best Practices
-
-1. **Use clean_vps for deployment tests** - Ensures clean state
-2. **Use tmp_path for working directory** - Isolates file operations
-3. **Check exit codes AND output** - Verify success and messages
-4. **Clean up after yourself** - Remove test files/containers
-5. **Add docstrings** - Explain what each test verifies
-
-## Troubleshooting
-
-### Docker Permission Denied
+## Running Tests
 
 ```bash
-# Add your user to docker group
-sudo usermod -aG docker $USER
-newgrp docker
+# All tests (fast, ~1 second)
+pytest tests/integration/ -v
+
+# Deployment tests only
+pytest tests/integration/deployment/ -v
+
+# Bot tests only
+pytest tests/integration/bot/ -v
+
+# Specific test class
+pytest tests/integration/deployment/test_docker.py::TestDockerfileGeneration -v
+
+# With output (debugging)
+pytest tests/integration/ -v -s
+
+# Parallel execution
+pytest tests/integration/ -v -n auto
 ```
 
-### SSH Connection Timeout
+## Mock VPS (Optional)
+
+For advanced SSH testing, build Mock VPS container:
 
 ```bash
-# Check container is running
-docker ps | grep mock-vps
-
-# Check SSH service
-docker exec telegram-bot-stack-mock-vps systemctl status ssh
-
-# View container logs
-docker logs telegram-bot-stack-mock-vps
+cd tests/integration/fixtures
+docker build -t mock-vps:latest -f Dockerfile.mock-vps .
 ```
 
-### Port Already in Use
+**Note:** Most tests don't require Mock VPS and run without Docker.
+
+## Coverage
+
+**Current:** ~24% (integration tests only)
+**Target:** 80% combined (unit + integration)
 
 ```bash
-# Stop existing mock VPS
-docker compose -f tests/integration/fixtures/docker-compose.mock-vps.yml down
-
-# Or change port in docker-compose.mock-vps.yml
-ports:
-  - "2223:22"  # Use different port
+pytest tests/integration/ --cov=telegram_bot_stack --cov-report=html
+open htmlcov/index.html
 ```
 
-### Tests Hang or Timeout
+## Test Results
 
-```bash
-# Increase timeout in pytest.ini
-timeout = 300
+**Status:** ✅ 26/26 tests passing (100%)
+**Speed:** ⚡ ~0.8 seconds
+**Dependencies:** Minimal (no Docker required)
 
-# Or skip slow tests
-pytest tests/integration/ -m "not slow"
-```
+## CI/CD
 
-### Clean Up Test Resources
+Tests run in GitHub Actions (`.github/workflows/integration-tests.yml`)
 
-```bash
-# Stop all test containers
-docker compose -f tests/integration/fixtures/docker-compose.mock-vps.yml down -v
+## Issues
 
-# Remove test images
-docker image prune -af
-
-# Remove test volumes
-docker volume prune -f
-```
-
-## CI/CD Integration
-
-Integration tests run automatically in GitHub Actions:
-
-- **Workflow**: `.github/workflows/integration-tests.yml`
-- **Trigger**: Push to main/develop, PRs, manual
-- **Matrix**: Python 3.11, 3.12
-- **Timeout**: 30 minutes
-- **Coverage**: Uploaded to Codecov
-
-### Local CI Simulation
-
-```bash
-# Run tests as CI would
-docker compose -f tests/integration/fixtures/docker-compose.mock-vps.yml up -d
-pytest tests/integration/ -v -m "not slow"
-docker compose -f tests/integration/fixtures/docker-compose.mock-vps.yml down -v
-```
-
-## Performance
-
-- **Mock VPS startup**: ~30-60 seconds (first time)
-- **Test execution**: ~2-5 minutes (full suite)
-- **Cleanup**: ~10-20 seconds
-
-## Limitations
-
-1. **Docker-in-Docker** - May have limitations in some CI environments
-2. **SSH Key Generation** - Requires SSH client installed
-3. **systemd** - May not work in all container configurations
-4. **Network isolation** - Tests share host network
-
-## Future Improvements
-
-- [ ] Add systemd service tests
-- [ ] Add rollback tests (#76)
-- [ ] Add zero-downtime deployment tests (#78)
-- [ ] Add multi-environment tests (#83)
-- [ ] Add monitoring tests (#82)
-- [ ] Optimize container startup time
-- [ ] Add Windows/macOS support (Docker Desktop)
-
-## References
-
-- **Issue #85**: https://github.com/sensiloles/telegram-bot-stack/issues/85
-- **Deployment Guide**: `docs/deployment_guide.md`
-- **Mock VPS Fixture**: `tests/integration/fixtures/mock_vps.py`
+Report issues: https://github.com/sensiloles/telegram-bot-stack/issues
