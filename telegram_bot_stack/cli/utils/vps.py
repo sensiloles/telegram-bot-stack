@@ -109,7 +109,16 @@ class VPSConnection:
         """
         try:
             conn = self.connect()
-            result = conn.run(command, hide=hide)
+            # For long-running commands, show periodic updates
+            if not hide and (
+                "docker build" in command.lower() or "make build" in command.lower()
+            ):
+                console.print(
+                    "[dim]   Running command (output will appear when complete)...[/dim]"
+                )
+            result = conn.run(
+                command, hide=hide, pty=not hide
+            )  # Use pty for better output streaming
             return bool(result.ok)
         except Exception as e:
             console.print(f"[red]Command failed: {e}[/red]")
@@ -142,16 +151,16 @@ class VPSConnection:
         if os_id in ["ubuntu", "debian"]:
             commands = [
                 # Update package list
-                "apt-get update",
+                "DEBIAN_FRONTEND=noninteractive apt-get update",
                 # Install prerequisites
-                "apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release",
+                "DEBIAN_FRONTEND=noninteractive apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release",
                 # Add Docker GPG key
                 "curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg",
                 # Add Docker repository
                 'echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null',
                 # Install Docker
-                "apt-get update",
-                "apt-get install -y docker-ce docker-ce-cli containerd.io",
+                "DEBIAN_FRONTEND=noninteractive apt-get update",
+                "DEBIAN_FRONTEND=noninteractive apt-get install -y docker-ce docker-ce-cli containerd.io",
                 # Install Docker Compose
                 "curl -L 'https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)' -o /usr/local/bin/docker-compose",
                 "chmod +x /usr/local/bin/docker-compose",
@@ -241,11 +250,11 @@ class VPSConnection:
         if os_id in ["ubuntu", "debian"]:
             # For Ubuntu/Debian, use deadsnakes PPA for newer Python versions
             commands = [
-                "apt-get update",
-                "apt-get install -y software-properties-common",
-                "add-apt-repository -y ppa:deadsnakes/ppa",
-                "apt-get update",
-                f"apt-get install -y python{version} python{version}-venv python{version}-dev python3-pip",
+                "DEBIAN_FRONTEND=noninteractive apt-get update",
+                "DEBIAN_FRONTEND=noninteractive apt-get install -y software-properties-common",
+                "DEBIAN_FRONTEND=noninteractive add-apt-repository -y ppa:deadsnakes/ppa",
+                "DEBIAN_FRONTEND=noninteractive apt-get update",
+                f"DEBIAN_FRONTEND=noninteractive apt-get install -y python{version} python{version}-venv python{version}-dev python3-pip",
                 f"update-alternatives --install /usr/bin/python3 python3 /usr/bin/python{version} 1",
             ]
         elif os_id in ["centos", "rhel"]:

@@ -1,6 +1,7 @@
 """Mock VPS fixture using Testcontainers for integration testing."""
 
 import logging
+import os
 import time
 from pathlib import Path
 from typing import Generator
@@ -48,19 +49,20 @@ class MockVPS:
         """Clean up test bot containers (not the Mock VPS itself)."""
         logger.info("[MockVPS] Cleaning up test containers...")
         # Stop and remove bot containers created during tests
+        # Note: Use grep -v trick to avoid xargs errors on empty input (xargs -r is GNU-only)
         self.exec(
-            "docker ps -a --filter 'name=test-bot' --filter 'name=bot-' -q | "
-            "xargs -r docker stop 2>/dev/null || true"
+            "docker ps -a --filter name=test-bot --filter name=bot- -q 2>/dev/null | "
+            "grep . | xargs docker stop 2>/dev/null || true"
         )
         self.exec(
-            "docker ps -a --filter 'name=test-bot' --filter 'name=bot-' -q | "
-            "xargs -r docker rm 2>/dev/null || true"
+            "docker ps -a --filter name=test-bot --filter name=bot- -q 2>/dev/null | "
+            "grep . | xargs docker rm 2>/dev/null || true"
         )
 
         # Remove test volumes
         self.exec(
-            "docker volume ls --filter 'name=test-bot' --filter 'name=bot-' -q | "
-            "xargs -r docker volume rm 2>/dev/null || true"
+            "docker volume ls --filter name=test-bot --filter name=bot- -q 2>/dev/null | "
+            "grep . | xargs docker volume rm 2>/dev/null || true"
         )
         logger.info("[MockVPS] Cleanup complete")
 
@@ -99,7 +101,9 @@ def mock_vps() -> Generator[MockVPS, None, None]:
         logger.info(f"[MockVPS] Using existing SSH key at {key_path}")
 
     # Create and start container using Testcontainers
-    container_name = f"mock-vps-test-{int(time.time())}"
+    # Use PID + timestamp to ensure unique names when running in parallel
+    unique_id = f"{os.getpid()}-{int(time.time())}"
+    container_name = f"mock-vps-test-{unique_id}"
     logger.info(
         f"[MockVPS] Creating container '{container_name}' from image 'mock-vps:latest'"
     )
@@ -141,7 +145,7 @@ def mock_vps() -> Generator[MockVPS, None, None]:
         subprocess.run(
             ["docker", "cp", tmp_path, f"{container_id}:/root/.ssh/authorized_keys"],
             check=True,
-            timeout=5,
+            timeout=10,  # Increased timeout for reliability
             capture_output=True,
         )
         logger.debug("[MockVPS] Setting SSH key permissions...")
@@ -156,7 +160,7 @@ def mock_vps() -> Generator[MockVPS, None, None]:
                 "/root/.ssh/authorized_keys",
             ],
             check=True,
-            timeout=5,
+            timeout=10,  # Increased timeout for reliability
             capture_output=True,
         )
         subprocess.run(
@@ -169,7 +173,7 @@ def mock_vps() -> Generator[MockVPS, None, None]:
                 "/root/.ssh/authorized_keys",
             ],
             check=True,
-            timeout=5,
+            timeout=10,  # Increased timeout for reliability
             capture_output=True,
         )
         logger.info("[MockVPS] SSH key configured successfully")
@@ -214,7 +218,7 @@ def mock_vps() -> Generator[MockVPS, None, None]:
                         "echo ready",
                     ],
                     capture_output=True,
-                    timeout=5,
+                    timeout=10,  # Increased timeout for reliability
                 )
                 if ssh_result.returncode == 0:
                     logger.info(
@@ -241,7 +245,7 @@ def mock_vps() -> Generator[MockVPS, None, None]:
             logs = subprocess.run(
                 ["docker", "logs", container_id, "--tail", "50"],
                 capture_output=True,
-                timeout=5,
+                timeout=10,  # Increased timeout for reliability
             )
             logger.error(f"[MockVPS] Container logs:\n{logs.stdout.decode('utf-8')}")
             logger.error(f"[MockVPS] Container errors:\n{logs.stderr.decode('utf-8')}")
@@ -278,6 +282,7 @@ def clean_vps(mock_vps: MockVPS) -> Generator[MockVPS, None, None]:
     """Pytest fixture for clean VPS.
 
     Cleans up any test containers before and after each test.
+    Uses lightweight cleanup for better performance.
 
     Args:
         mock_vps: Mock VPS fixture
@@ -287,36 +292,42 @@ def clean_vps(mock_vps: MockVPS) -> Generator[MockVPS, None, None]:
     """
     logger.info("[clean_vps] Preparing clean VPS for test...")
 
-    # Cleanup before test
+    # Lightweight cleanup before test (only containers, not full package fix)
     mock_vps.cleanup()
 
-    # Fix any broken apt packages from previous tests
-    logger.debug("[clean_vps] Fixing any broken packages...")
+    # Only fix packages if there are actual errors (check first)
+    logger.debug("[clean_vps] Checking for broken packages...")
     try:
-        mock_vps.container.exec("dpkg --configure -a 2>&1 || true")
-        mock_vps.container.exec("apt-get --fix-broken install -y 2>&1 || true")
-        mock_vps.container.exec("apt-get update 2>&1 || true")
+        # Use bash -c to properly handle shell redirections
+        check_result = mock_vps.exec("/bin/bash -c 'dpkg --audit 2>&1'")
+        if check_result.strip():  # Only fix if there are broken packages
+            logger.debug("[clean_vps] Fixing broken packages...")
+            mock_vps.exec("/bin/bash -c 'dpkg --configure -a 2>&1 || true'")
+            mock_vps.exec("/bin/bash -c 'apt-get --fix-broken install -y 2>&1 || true'")
     except Exception as e:
-        logger.debug(f"[clean_vps] Package fix error (ignored): {e}")
+        logger.debug(f"[clean_vps] Package check error (ignored): {e}")
 
     # Ensure Docker daemon is stopped (to avoid conflicts)
     logger.debug("[clean_vps] Stopping Docker daemon...")
     try:
-        mock_vps.container.exec("pkill dockerd 2>&1 || true")
+        mock_vps.exec("pkill dockerd 2>&1 || true")
     except Exception as e:
         logger.debug(f"[clean_vps] Docker stop error (ignored): {e}")
 
     logger.info("[clean_vps] Clean VPS ready for test")
     yield mock_vps
 
-    # Cleanup after test
+    # Lightweight cleanup after test
     logger.info("[clean_vps] Cleaning up after test...")
     mock_vps.cleanup()
 
-    # Fix packages again after test
+    # Only fix packages if needed (lightweight check)
+    logger.debug("[clean_vps] Post-test cleanup...")
     try:
-        mock_vps.container.exec("dpkg --configure -a 2>&1 || true")
-        mock_vps.container.exec("apt-get --fix-broken install -y 2>&1 || true")
+        # Use bash -c to properly handle shell redirections
+        check_result = mock_vps.exec("/bin/bash -c 'dpkg --audit 2>&1'")
+        if check_result.strip():
+            mock_vps.exec("/bin/bash -c 'dpkg --configure -a 2>&1 || true'")
     except Exception as e:
         logger.debug(f"[clean_vps] Post-test cleanup error (ignored): {e}")
 
