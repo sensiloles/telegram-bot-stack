@@ -20,7 +20,7 @@ def log_agent_action(metrics_file, monkeypatch):
     """Provide log_agent_action module with mocked metrics file."""
     import sys
 
-    sys.path.insert(0, str(Path(__file__).parents[2] / ".github/workflows/scripts"))
+    sys.path.insert(0, str(Path(__file__).parents[3] / ".github/workflows/scripts"))
 
     import log_agent_action
 
@@ -33,7 +33,7 @@ def agent_metrics_dashboard(metrics_file, monkeypatch):
     """Provide agent_metrics_dashboard module with mocked metrics file."""
     import sys
 
-    sys.path.insert(0, str(Path(__file__).parents[2] / ".github/workflows/scripts"))
+    sys.path.insert(0, str(Path(__file__).parents[3] / ".github/workflows/scripts"))
 
     import agent_metrics_dashboard
 

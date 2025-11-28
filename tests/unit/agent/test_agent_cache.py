@@ -20,7 +20,7 @@ def agent_cache(cache_file, monkeypatch):
     """Provide agent_cache module with mocked cache file."""
     import sys
 
-    sys.path.insert(0, str(Path(__file__).parents[2] / ".github/workflows/scripts"))
+    sys.path.insert(0, str(Path(__file__).parents[3] / ".github/workflows/scripts"))
 
     import agent_cache
 

@@ -9,7 +9,7 @@ import pytest
 from telegram_bot_stack.storage import create_storage
 
 # Get project root
-project_root = Path(__file__).parent.parent.parent
+project_root = Path(__file__).parent.parent.parent.parent
 bot_path = project_root / "examples" / "counter_bot" / "bot.py"
 
 
