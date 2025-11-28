@@ -3,5 +3,6 @@
   "telegram_bot_stack/cli/utils/backup.py": "85c52e51e0c152ac2ffe037f07bf247f41a164cc3058e39efb3cd7271e4ebc3b",
   "telegram_bot_stack/cli/utils/vps.py": "38528c04ead83332b537117c4bdafb463e754e0ca0402c274ccdd6f8f93e0cdf",
   ".github/workflows/integration-tests.yml": "2bb2f8378a3c19a6656615d30cfe9df3c58dfa401724d7f47165a5ff80fadc24",
-  "pyproject.toml": "69afafeea73c26843121ae6bb7da435f42e5af1d1863cad6fd749eecd564e2f6"
+  "pyproject.toml": "6fe6782d4588ccca046247e73ccf87435da39bd265705af610f1d96a5435d049",
+  "telegram_bot_stack/cli/commands/deploy/operations.py": "5749039b7b5f15a4ab3242265e102ccff702361dffe51194bc553ce866e4a19a"
 }

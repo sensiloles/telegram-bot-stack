@@ -333,12 +333,25 @@ if __name__ == "__main__":
 
     # Build and start bot
     console.print("[cyan]🏗️  Building Docker image...[/cyan]")
-    if not vps.run_command(f"cd {remote_dir} && make build-tag TAG={docker_tag}"):
+    console.print(
+        "[yellow]⏳ This may take 5-15 minutes (Docker-in-Docker is slow)...[/yellow]"
+    )
+    console.print(
+        "[dim]   Output will appear when build completes (may be buffered)[/dim]\n"
+    )
+
+    # Run build with visible output for progress tracking
+    build_success = vps.run_command(
+        f"cd {remote_dir} && make build-tag TAG={docker_tag}",
+        hide=False,  # Show output for progress visibility
+    )
+
+    if not build_success:
         console.print("[red]❌ Failed to build Docker image[/red]")
         version_tracker.add_deployment(vps, docker_tag, status="failed")
         return False
 
-    console.print("[green]✓ Docker image built[/green]\n")
+    console.print("\n[green]✓ Docker image built successfully[/green]\n")
 
     console.print("[cyan]🚀 Starting bot...[/cyan]")
     if not vps.run_command(f"cd {remote_dir} && make up"):

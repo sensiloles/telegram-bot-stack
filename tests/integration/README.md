@@ -37,6 +37,18 @@ The mock VPS is a Docker container that simulates a real VPS server:
 ```bash
 # From project root
 pytest tests/integration/ -v
+
+# Run tests in parallel (faster, requires pytest-xdist)
+pytest tests/integration/ -v -n auto
+
+# Run only fast tests (skip slow ones like Docker build)
+pytest tests/integration/ -v -m "not slow"
+
+# Run only slow tests
+pytest tests/integration/ -v -m "slow"
+
+# Run with detailed output and logging (useful for debugging)
+pytest tests/integration/ -v -s --tb=short --log-cli-level=INFO -n auto
 ```
 
 ### Run Specific Test Suite

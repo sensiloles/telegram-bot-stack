@@ -9,6 +9,7 @@ from typing import Generator
 
 import pytest
 import yaml
+from click.testing import Result
 
 # Configure logging for integration tests
 logging.basicConfig(
@@ -21,7 +22,91 @@ logging.basicConfig(
 # Set specific loggers to DEBUG for more details
 logging.getLogger("tests.integration.fixtures.mock_vps").setLevel(logging.DEBUG)
 
+# Reduce logging to avoid spam from keepalive requests and config loading
+logging.getLogger("paramiko").setLevel(logging.WARNING)
+logging.getLogger("paramiko.transport").setLevel(logging.WARNING)
+logging.getLogger("invoke").setLevel(logging.WARNING)
+logging.getLogger("fabric").setLevel(logging.WARNING)
+
 logger = logging.getLogger(__name__)
+
+
+# Helper functions for CLI testing
+def get_cli_output(result: Result, runner=None) -> str:
+    """Safely extract output from CliRunner result.
+
+    This function handles the case where CliRunner closes file descriptors
+    after invoke(), making result.output inaccessible.
+
+    Args:
+        result: CliRunner result object
+        runner: Optional CliRunner instance (for charset detection)
+
+    Returns:
+        Decoded output string, empty string if extraction fails
+    """
+    try:
+        return result.output
+    except (ValueError, OSError):
+        # Fallback: try to read from stdout_bytes directly
+        charset = "utf-8"
+        if runner and hasattr(runner, "charset"):
+            charset = runner.charset
+
+        stdout_bytes = getattr(result, "stdout_bytes", None)
+        if stdout_bytes:
+            try:
+                return stdout_bytes.decode(charset, "replace").replace("\r\n", "\n")
+            except (ValueError, AttributeError, OSError):
+                pass
+
+    return ""
+
+
+def assert_cli_success(
+    result: Result, runner=None, expected_output: str = None
+) -> None:
+    """Assert CLI command succeeded.
+
+    Args:
+        result: CliRunner result object
+        runner: Optional CliRunner instance
+        expected_output: Optional string that should be in output
+
+    Raises:
+        AssertionError: If command failed or expected output not found
+    """
+    output = get_cli_output(result, runner)
+    assert (
+        result.exit_code == 0
+    ), f"Command failed with exit code {result.exit_code}: {output}"
+
+    if expected_output:
+        assert (
+            expected_output.lower() in output.lower()
+        ), f"Expected output '{expected_output}' not found in: {output[:200]}"
+
+
+def assert_cli_error(result: Result, runner=None, error_message: str = None) -> None:
+    """Assert CLI command failed.
+
+    Args:
+        result: CliRunner result object
+        runner: Optional CliRunner instance
+        error_message: Optional string that should be in error output
+
+    Raises:
+        AssertionError: If command succeeded or error message not found
+    """
+    output = get_cli_output(result, runner)
+    assert (
+        result.exit_code != 0
+    ), f"Command should have failed but succeeded: {output[:200]}"
+
+    if error_message:
+        assert (
+            error_message.lower() in output.lower()
+        ), f"Expected error message '{error_message}' not found in: {output[:200]}"
 
 
 def log_test(func):
@@ -110,7 +195,7 @@ def deployment_config(
             "port": clean_vps.port,
         },
         "bot": {
-            "name": "test-bot",
+            "name": "test-bot",  # Keep as literal for fixture, tests use TEST_BOT_NAME constant
             "token_env": "BOT_TOKEN",
             "entry_point": "bot.py",
             "python_version": "3.11",

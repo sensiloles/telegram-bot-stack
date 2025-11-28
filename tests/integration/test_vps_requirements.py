@@ -14,7 +14,11 @@ import pytest
 from click.testing import CliRunner
 
 from telegram_bot_stack.cli.main import cli
+from tests.integration.conftest import get_cli_output
 from tests.integration.fixtures.mock_vps import MockVPS
+
+# Test constants
+TEST_BOT_NAME = "test-bot"
 
 
 class TestDockerRequirements:
@@ -40,7 +44,7 @@ class TestDockerRequirements:
                 "--port",
                 str(clean_vps.port),
                 "--bot-name",
-                "test-bot",
+                TEST_BOT_NAME,
             ],
         )
         assert result_init.exit_code == 0
@@ -54,14 +58,17 @@ class TestDockerRequirements:
         Path("requirements.txt").write_text("telegram-bot-stack\n")
 
         # Try to deploy (should fail with helpful message)
-        result_up = runner.invoke(cli, ["deploy", "up"])
+        # Use new runner to avoid file descriptor issues
+        runner_up = CliRunner()
+        result_up = runner_up.invoke(cli, ["deploy", "up"])
 
         # Should detect missing Docker
+        output = get_cli_output(result_up, runner_up)
         assert (
             result_up.exit_code != 0
-            or "docker" in result_up.output.lower()
-            or "not found" in result_up.output.lower()
-        )
+            or "docker" in output.lower()
+            or "not found" in output.lower()
+        ), f"Should detect missing Docker: exit_code={result_up.exit_code}, output={output[:200]}"
 
     def test_deploy_up_docker_not_running(
         self, clean_vps: MockVPS, tmp_path: Path, deployment_config: Path
@@ -81,15 +88,18 @@ class TestDockerRequirements:
         Path("requirements.txt").write_text("telegram-bot-stack\n")
 
         # Try to deploy (should fail with helpful message)
-        result_up = runner.invoke(cli, ["deploy", "up"])
+        # Use new runner to avoid file descriptor issues
+        runner_up = CliRunner()
+        result_up = runner_up.invoke(cli, ["deploy", "up"])
 
         # Should detect Docker not running
+        output = get_cli_output(result_up, runner_up)
         assert (
             result_up.exit_code != 0
-            or "docker" in result_up.output.lower()
-            or "not running" in result_up.output.lower()
-            or "daemon" in result_up.output.lower()
-        )
+            or "docker" in output.lower()
+            or "not running" in output.lower()
+            or "daemon" in output.lower()
+        ), f"Should detect Docker not running: exit_code={result_up.exit_code}, output={output[:200]}"
 
     def test_deploy_up_no_docker_compose(
         self, clean_vps: MockVPS, tmp_path: Path, deployment_config: Path
@@ -110,20 +120,23 @@ class TestDockerRequirements:
         Path("requirements.txt").write_text("telegram-bot-stack\n")
 
         # Try to deploy (should fail with helpful message)
-        result_up = runner.invoke(cli, ["deploy", "up"])
+        # Use new runner to avoid file descriptor issues
+        runner_up = CliRunner()
+        result_up = runner_up.invoke(cli, ["deploy", "up"])
 
         # Should detect missing requirements or fail with validation error
         # Acceptable outcomes:
         # 1. Missing docker-compose detected
         # 2. VPS validation failed (due to broken packages or missing Docker)
         # 3. Deployment failed with non-zero exit code
+        output = get_cli_output(result_up, runner_up)
         assert (
             result_up.exit_code != 0  # Deployment should fail
-            or "docker-compose" in result_up.output.lower()
-            or "compose" in result_up.output.lower()
-            or "validation failed" in result_up.output.lower()
-            or "failed to install" in result_up.output.lower()
-        )
+            or "docker-compose" in output.lower()
+            or "compose" in output.lower()
+            or "validation failed" in output.lower()
+            or "failed to install" in output.lower()
+        ), f"Should detect missing docker-compose: exit_code={result_up.exit_code}, output={output[:200]}"
 
 
 class TestPythonRequirements:
@@ -156,10 +169,19 @@ class TestPythonRequirements:
             yaml.dump(config, f)
 
         # Try to deploy
-        result_up = runner.invoke(cli, ["deploy", "up"])
+        # Use new runner to avoid file descriptor issues
+        runner_up = CliRunner()
+        result_up = runner_up.invoke(cli, ["deploy", "up"])
 
         # Should warn about Python version (or proceed with available version)
         # This test verifies the system handles version mismatches gracefully
+        output = get_cli_output(result_up, runner_up)
+        # Either succeeds with warning, or fails with version error
+        assert (
+            result_up.exit_code == 0
+            or "python" in output.lower()
+            or "version" in output.lower()
+        ), f"Unexpected result: exit_code={result_up.exit_code}, output={output[:200]}"
 
     def test_deploy_up_no_python3(self, clean_vps: MockVPS, tmp_path: Path) -> None:
         """Test deployment handles missing Python 3."""
@@ -181,7 +203,7 @@ class TestPythonRequirements:
                 "--port",
                 str(clean_vps.port),
                 "--bot-name",
-                "test-bot",
+                TEST_BOT_NAME,
             ],
         )
         assert result_init.exit_code == 0
@@ -195,14 +217,17 @@ class TestPythonRequirements:
         Path("requirements.txt").write_text("telegram-bot-stack\n")
 
         # Try to deploy (should fail with helpful message)
-        result_up = runner.invoke(cli, ["deploy", "up"])
+        # Use new runner to avoid file descriptor issues
+        runner_up = CliRunner()
+        result_up = runner_up.invoke(cli, ["deploy", "up"])
 
         # Should detect missing Python
+        output = get_cli_output(result_up, runner_up)
         assert (
             result_up.exit_code != 0
-            or "python" in result_up.output.lower()
-            or "not found" in result_up.output.lower()
-        )
+            or "python" in output.lower()
+            or "not found" in output.lower()
+        ), f"Should detect missing Python: exit_code={result_up.exit_code}, output={output[:200]}"
 
         # Restore Python
         clean_vps.exec("mv /usr/bin/python3.backup /usr/bin/python3 || true")
@@ -232,7 +257,7 @@ class TestSystemPackages:
                 "--port",
                 str(clean_vps.port),
                 "--bot-name",
-                "test-bot",
+                TEST_BOT_NAME,
             ],
         )
         assert result_init.exit_code == 0
@@ -269,16 +294,26 @@ class TestDoctorCommand:
                 "--port",
                 str(clean_vps.port),
                 "--bot-name",
-                "test-bot",
+                TEST_BOT_NAME,
             ],
         )
         assert result_init.exit_code == 0
 
         # Run doctor command (if implemented)
-        result = runner.invoke(cli, ["deploy", "doctor"])
+        # Use new runner to avoid file descriptor issues
+        runner_doctor = CliRunner()
+        result = runner_doctor.invoke(cli, ["deploy", "doctor"])
 
         # Should pass or report that command doesn't exist yet
         # This is a placeholder for issue #88
+        output = get_cli_output(result, runner_doctor)
+        # Command may not exist yet, or may succeed
+        assert (
+            result.exit_code == 0
+            or "not found" in output.lower()
+            or "unknown" in output.lower()
+            or "error" in output.lower()
+        ), f"Unexpected doctor command result: exit_code={result.exit_code}, output={output[:200]}"
 
     def test_doctor_missing_docker(self, clean_vps: MockVPS, tmp_path: Path) -> None:
         """Test doctor command detects missing Docker."""
@@ -300,7 +335,7 @@ class TestDoctorCommand:
                 "--port",
                 str(clean_vps.port),
                 "--bot-name",
-                "test-bot",
+                TEST_BOT_NAME,
             ],
         )
         assert result_init.exit_code == 0
@@ -309,10 +344,20 @@ class TestDoctorCommand:
         clean_vps.exec("apt-get remove -y docker-ce docker-ce-cli containerd.io")
 
         # Run doctor command (if implemented)
-        result = runner.invoke(cli, ["deploy", "doctor"])
+        # Use new runner to avoid file descriptor issues
+        runner_doctor = CliRunner()
+        result = runner_doctor.invoke(cli, ["deploy", "doctor"])
 
         # Should detect missing Docker or report command not implemented
         # Placeholder for issue #88
+        output = get_cli_output(result, runner_doctor)
+        # Command may detect Docker issue, or may not exist yet
+        assert (
+            result.exit_code != 0
+            or "docker" in output.lower()
+            or "not found" in output.lower()
+            or "unknown" in output.lower()
+        ), f"Should detect missing Docker or report command not implemented: exit_code={result.exit_code}, output={output[:200]}"
 
     def test_doctor_output_format(self, clean_vps: MockVPS, tmp_path: Path) -> None:
         """Test doctor command output is user-friendly."""
@@ -334,19 +379,29 @@ class TestDoctorCommand:
                 "--port",
                 str(clean_vps.port),
                 "--bot-name",
-                "test-bot",
+                TEST_BOT_NAME,
             ],
         )
         assert result_init.exit_code == 0
 
         # Run doctor command (if implemented)
-        result = runner.invoke(cli, ["deploy", "doctor"])
+        # Use new runner to avoid file descriptor issues
+        runner_doctor = CliRunner()
+        result = runner_doctor.invoke(cli, ["deploy", "doctor"])
 
         # Should have clear output with:
         # - List of checks performed
         # - Status for each check (✓ or ✗)
         # - Suggestions for fixing issues
         # Placeholder for issue #88
+        output = get_cli_output(result, runner_doctor)
+        # Command may not exist yet, or may have formatted output
+        assert (
+            result.exit_code == 0
+            or "not found" in output.lower()
+            or "unknown" in output.lower()
+            or "error" in output.lower()
+        ), f"Unexpected doctor command result: exit_code={result.exit_code}, output={output[:200]}"
 
 
 class TestRequirementsValidation:
@@ -374,7 +429,7 @@ class TestRequirementsValidation:
                 "--port",
                 str(clean_vps.port),
                 "--bot-name",
-                "test-bot",
+                TEST_BOT_NAME,
             ],
         )
         assert result_init.exit_code == 0
@@ -387,7 +442,8 @@ class TestRequirementsValidation:
         clean_vps.exec("systemctl stop docker")
 
         # Try to deploy
-        result_up = runner.invoke(cli, ["deploy", "up"])
+        # Use new runner to avoid file descriptor issues
+        result_up = CliRunner().invoke(cli, ["deploy", "up"])
 
         # Should fail before uploading files (fast fail)
         # If validation happens early, deployment should fail quickly
@@ -414,7 +470,7 @@ class TestRequirementsValidation:
                 "--port",
                 str(clean_vps.port),
                 "--bot-name",
-                "test-bot",
+                TEST_BOT_NAME,
             ],
         )
         assert result_init.exit_code == 0
@@ -452,7 +508,7 @@ class TestMinimumVersions:
                 "--port",
                 str(clean_vps.port),
                 "--bot-name",
-                "test-bot",
+                TEST_BOT_NAME,
             ],
         )
         assert result_init.exit_code == 0
@@ -501,7 +557,7 @@ class TestMinimumVersions:
                 "--port",
                 str(clean_vps.port),
                 "--bot-name",
-                "test-bot",
+                TEST_BOT_NAME,
             ],
         )
         assert result_init.exit_code == 0
@@ -546,17 +602,19 @@ class TestAutoInstallation:
         Path("requirements.txt").write_text("telegram-bot-stack\n")
 
         # Deploy - should auto-install Docker
+        # Use new runner to avoid file descriptor issues
+        runner = CliRunner()
         result = runner.invoke(cli, ["deploy", "up"])
 
         # Check that deployment attempted Docker installation
         # May succeed or fail depending on VPS state, but should show installation attempt
+        output = get_cli_output(result, runner)
         assert (
-            "installing docker" in result.output.lower()
-            or "docker not found" in result.output.lower()
-            or "docker installed" in result.output.lower()
-            or "validation failed"
-            in result.output.lower()  # May fail due to broken packages
-        ), f"Expected Docker auto-install messages, got: {result.output[:500]}"
+            "installing docker" in output.lower()
+            or "docker not found" in output.lower()
+            or "docker installed" in output.lower()
+            or "validation failed" in output.lower()  # May fail due to broken packages
+        ), f"Expected Docker auto-install messages, got: {output[:500]}"
 
     def test_auto_install_python(
         self, clean_vps: MockVPS, tmp_path: Path, deployment_config: Path
@@ -576,13 +634,15 @@ class TestAutoInstallation:
         Path("requirements.txt").write_text("telegram-bot-stack\n")
 
         # Deploy - should attempt to install Python 3.11
+        # Use new runner to avoid file descriptor issues
+        runner = CliRunner()
         result = runner.invoke(cli, ["deploy", "up"])
 
         # Check that deployment attempted Python installation or upgrade
         # May succeed or fail, but should show attempt
+        output = get_cli_output(result, runner)
         assert (
-            "python version" in result.output.lower()
-            or "installing python" in result.output.lower()
-            or "validation failed"
-            in result.output.lower()  # May fail due to broken packages
-        ), f"Expected Python version check messages, got: {result.output[:500]}"
+            "python version" in output.lower()
+            or "installing python" in output.lower()
+            or "validation failed" in output.lower()  # May fail due to broken packages
+        ), f"Expected Python version check messages, got: {output[:500]}"
