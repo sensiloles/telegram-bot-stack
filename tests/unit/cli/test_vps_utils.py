@@ -6,6 +6,7 @@ from telegram_bot_stack.cli.utils.vps import (
     VPSConnection,
     check_docker_compose_installed,
     get_container_health,
+    get_docker_compose_command,
     get_recent_errors,
 )
 
@@ -171,7 +172,8 @@ class TestCheckDockerComposeInstalled:
         result = check_docker_compose_installed(mock_conn)
 
         assert result is True
-        mock_conn.run.assert_called_once_with("docker-compose --version", hide=True)
+        # Should try v2 first
+        mock_conn.run.assert_called_with("docker compose version", hide=True, warn=True)
 
     def test_docker_compose_not_installed(self):
         """Test Docker Compose installed check (not installed)."""
@@ -181,6 +183,48 @@ class TestCheckDockerComposeInstalled:
         result = check_docker_compose_installed(mock_conn)
 
         assert result is False
+
+
+class TestGetDockerComposeCommand:
+    """Tests for get_docker_compose_command function."""
+
+    def test_docker_compose_v2_available(self):
+        """Test when Docker Compose v2 (built-in) is available."""
+        mock_conn = MagicMock()
+        mock_result = MagicMock()
+        mock_result.ok = True
+        mock_conn.run.return_value = mock_result
+
+        result = get_docker_compose_command(mock_conn)
+
+        assert result == "docker compose"
+        mock_conn.run.assert_called_with("docker compose version", hide=True, warn=True)
+
+    def test_docker_compose_v1_fallback(self):
+        """Test fallback to Docker Compose v1 (standalone)."""
+        mock_conn = MagicMock()
+        mock_v2_result = MagicMock()
+        mock_v2_result.ok = False
+        mock_v1_result = MagicMock()
+        mock_v1_result.ok = True
+        mock_conn.run.side_effect = [mock_v2_result, mock_v1_result]
+
+        result = get_docker_compose_command(mock_conn)
+
+        assert result == "docker-compose"
+        assert mock_conn.run.call_count == 2
+
+    def test_docker_compose_not_available(self):
+        """Test when neither v2 nor v1 is available (returns v2 as default)."""
+        mock_conn = MagicMock()
+        mock_result = MagicMock()
+        mock_result.ok = False
+        mock_conn.run.return_value = mock_result
+
+        result = get_docker_compose_command(mock_conn)
+
+        # Should default to v2 even if not available (will fail later)
+        assert result == "docker compose"
 
 
 class TestGetContainerHealth:

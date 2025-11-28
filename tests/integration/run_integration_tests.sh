@@ -76,7 +76,7 @@ pytest "$TEST_PATH" \
 # Cleanup
 echo ""
 echo "Cleaning up Docker resources..."
-docker-compose -f tests/integration/fixtures/docker-compose.mock-vps.yml down -v 2>/dev/null || true
+docker compose -f tests/integration/fixtures/docker-compose.mock-vps.yml down -v 2>/dev/null || true
 
 echo ""
 echo "✅ Integration tests complete!"

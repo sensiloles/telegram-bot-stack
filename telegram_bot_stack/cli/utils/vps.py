@@ -435,6 +435,37 @@ class VPSConnection:
             self.connection = None
 
 
+def get_docker_compose_command(conn: Connection) -> str:
+    """Get the appropriate docker compose command (v2 or v1).
+
+    Tries 'docker compose' (v2, built-in) first, falls back to 'docker-compose' (v1, standalone).
+
+    Args:
+        conn: Fabric Connection object
+
+    Returns:
+        'docker compose' or 'docker-compose' depending on what's available
+    """
+    try:
+        # Try new built-in command first (Docker Compose v2)
+        result = conn.run("docker compose version", hide=True, warn=True)
+        if result.ok:
+            return "docker compose"
+    except Exception:
+        pass
+
+    try:
+        # Fall back to standalone docker-compose (v1)
+        result = conn.run("docker-compose --version", hide=True, warn=True)
+        if result.ok:
+            return "docker-compose"
+    except Exception:
+        pass
+
+    # Default to v2 (will fail if not installed, but that's expected)
+    return "docker compose"
+
+
 def check_docker_compose_installed(conn: Connection) -> bool:
     """Check if Docker Compose is installed.
 
@@ -445,7 +476,16 @@ def check_docker_compose_installed(conn: Connection) -> bool:
         True if Docker Compose is installed, False otherwise
     """
     try:
-        result = conn.run("docker-compose --version", hide=True)
+        # Try v2 first
+        result = conn.run("docker compose version", hide=True, warn=True)
+        if result.ok:
+            return True
+    except Exception:
+        pass
+
+    try:
+        # Fall back to v1
+        result = conn.run("docker-compose --version", hide=True, warn=True)
         return bool(result.ok)
     except Exception:
         return False

@@ -1,16 +1,5 @@
 {
-  "docs/deployment_guide.md": "40aa8d23bb7c492b636220db4481861ca0234073ec4ed9d8dc9af7f4a01e0373",
-  "telegram_bot_stack/cli/commands/deploy/__init__.py": "9ffaee12493adce3d58d6ebf4bbd91d771dbe5023924adb884fdb1b14ff387c7",
-  "telegram_bot_stack/cli/commands/deploy/monitoring.py": "a3c3364f7923bfbcb6dfd37d5d1e90db5fada31d58fc92b84430c74ef42733b5",
-  "telegram_bot_stack/cli/utils/vps.py": "749036fdd8223942a20482f42acb3607262a74252185f5fdd38fb199c7a5ba5d",
-  ".github/PROJECT_STATUS.md": "1258f9b2ab52339987e7356fe421e44621d3c76673b8dfbc532c3a7bcc95c81d",
-  ".github/workflows/docs.yml": "0aa605badab2318f39aa4f960f4f21f81d597c832f2b1fd7e9d027a7e171b36f",
-  ".github/workflows/tests.yml": "5aaed029626679f71edb4913e9fd7c603af200140a1480a220b32cc69b3e0770",
-  ".github/workflows/pypi-publish.yml": "c5b9dec1244ea8c8feb2424d35bf641ec95d88f112596d7fb878ebcc0fcf39a4",
-  "telegram_bot_stack/cli/utils/git.py": "470f80b9d6e22854bed39b53a884e0d94381e141d6b7f06933942ce70fc500d6",
-  "telegram_bot_stack/cli/commands/deploy/operations.py": "8dd918800b67d71d00e7e7630893a6e658b846d19e8695e2e19c2a2bc44ae685",
-  "telegram_bot_stack/cli/utils/deployment.py": "37e837e28fd4e4f0409d7498492b776b76cde5a077635622b516cd3871f0c0b8",
-  ".github/workflows/integration-tests.yml": "df612e3b8e70ee71ce0ca3b70fee0f45501d65f07f1c4fa9e19508f0994d5902",
-  "README.md": "57b2ecd61cac568eaa8b1257fd7c80146c83ecda5b11b1e8be61a86c2d2d0bac",
-  "pyproject.toml": "89a95b98dc7b1ffedde75ed304b095bdd2b0e81e03347e7e95a3d0e62f8e72bf"
+  "docs/deployment_guide.md": "3d1918398bf043cc9d08352efd002d3f1c82b01ef878cd58e185317e1bff9648",
+  "telegram_bot_stack/cli/utils/backup.py": "85c52e51e0c152ac2ffe037f07bf247f41a164cc3058e39efb3cd7271e4ebc3b",
+  "telegram_bot_stack/cli/utils/vps.py": "bdf9d096d627187b5eda1e2a97a9770490116b6a85394ec56114a3a7a0f78904"
 }

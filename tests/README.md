@@ -58,6 +58,7 @@ pytest tests/unit/ --cov=telegram_bot_stack --cov-report=term
 **What**: Test individual functions, methods, classes in isolation
 
 **Characteristics**:
+
 - ⚡ **Fast**: Milliseconds per test
 - 🔒 **Isolated**: Use mocks, no external dependencies
 - 🎯 **Focused**: One component per test
@@ -72,6 +73,7 @@ pytest tests/unit/ --cov=telegram_bot_stack --cov-report=term
 **What**: Test component interactions with real infrastructure
 
 **Characteristics**:
+
 - 🐌 **Slow**: Seconds to minutes per test
 - 🐳 **Docker**: Requires Mock VPS container
 - 🔄 **Realistic**: Tests real deployment flows
@@ -130,16 +132,18 @@ pytest tests/unit/ -n auto
 Tests run automatically in GitHub Actions:
 
 **Unit Tests** (`.github/workflows/tests.yml`):
+
 - ✅ Required for PR merge
 - 🚀 Fast (2-3 minutes)
 - 🐍 Python 3.9, 3.10, 3.11, 3.12
 - 📊 Coverage uploaded to Codecov
 
 **Integration Tests** (`.github/workflows/integration-tests.yml`):
-- ⚠️  Non-blocking (won't prevent merge)
+
+- ⚠️ Non-blocking (won't prevent merge)
 - 🐳 Requires Docker
 - 🐍 Python 3.11, 3.12
-- ⏱️  Timeout: 30 minutes
+- ⏱️ Timeout: 30 minutes
 
 ## Coverage
 
@@ -274,7 +278,7 @@ pip install -e ".[dev]"
 docker ps
 
 # Clean up containers
-docker-compose -f tests/integration/fixtures/docker-compose.mock-vps.yml down -v
+docker compose -f tests/integration/fixtures/docker-compose.mock-vps.yml down -v
 ```
 
 ### Slow Tests
@@ -306,18 +310,21 @@ pytest --cov-report=term-missing
 See GitHub issues with `testing` label for planned improvements.
 
 ### High Priority
+
 - [ ] Increase unit test coverage to 85%+
 - [ ] Add E2E tests for complete bot lifecycle
 - [ ] Add performance/load testing
 - [ ] Add contract/API tests
 
 ### Medium Priority
+
 - [ ] Add property-based testing (Hypothesis)
 - [ ] Add mutation testing (mutmut)
 - [ ] Add snapshot testing
 - [ ] Add visual regression tests (for CLI output)
 
 ### Low Priority
+
 - [ ] Add fuzz testing
 - [ ] Add security testing (Bandit integration)
 - [ ] Add dependency vulnerability scanning
@@ -341,6 +348,7 @@ pytest --durations=0
 ```
 
 **Current Stats** (as of 2025-11-28):
+
 - Total tests: ~465
 - Unit tests: ~440 (95%)
 - Integration tests: ~25 (5%)
@@ -350,5 +358,6 @@ pytest --durations=0
 ---
 
 For specific test type documentation, see:
+
 - [`tests/unit/README.md`](unit/README.md) - Unit testing guide
 - [`tests/integration/README.md`](integration/README.md) - Integration testing guide

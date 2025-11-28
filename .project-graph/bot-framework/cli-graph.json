@@ -82,7 +82,7 @@
       "category": "implementation",
       "path": "telegram_bot_stack/cli/utils/backup.py",
       "description": "Backup and restore utilities for bot data.",
-      "lines_of_code": 354,
+      "lines_of_code": 361,
       "complexity_score": 1,
       "exports": [
         "BackupManager",
@@ -254,10 +254,11 @@
       "category": "implementation",
       "path": "telegram_bot_stack/cli/utils/vps.py",
       "description": "VPS operations utilities for deployment.",
-      "lines_of_code": 553,
+      "lines_of_code": 593,
       "complexity_score": 1,
       "exports": [
         "VPSConnection",
+        "get_docker_compose_command",
         "check_docker_compose_installed",
         "get_container_health",
         "get_recent_errors",
@@ -278,6 +279,7 @@
         "VPSConnection"
       ],
       "functions": [
+        "get_docker_compose_command",
         "check_docker_compose_installed",
         "get_container_health",
         "get_recent_errors",

@@ -38,7 +38,7 @@ pip install -e ".[dev]"
 ```bash
 # Check Docker
 docker --version
-docker-compose --version
+docker compose version
 
 # Test Docker
 docker ps

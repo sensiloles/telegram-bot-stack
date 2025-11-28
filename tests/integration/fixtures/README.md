@@ -33,7 +33,7 @@ def test_deployment(clean_vps: MockVPS):
 ```bash
 # Build and start mock VPS
 cd tests/integration/fixtures
-docker-compose -f docker-compose.mock-vps.yml up -d --build
+docker compose -f docker-compose.mock-vps.yml up -d --build
 
 # Wait for SSH to be ready (~30 seconds)
 docker logs -f telegram-bot-stack-mock-vps
@@ -42,7 +42,7 @@ docker logs -f telegram-bot-stack-mock-vps
 ssh -i .ssh-test/id_rsa -p 2222 root@localhost
 
 # Stop and cleanup
-docker-compose -f docker-compose.mock-vps.yml down -v
+docker compose -f docker-compose.mock-vps.yml down -v
 ```
 
 ## Mock VPS Features
@@ -133,7 +133,7 @@ docker ps
 docker logs telegram-bot-stack-mock-vps
 
 # Rebuild container
-docker-compose -f docker-compose.mock-vps.yml build --no-cache
+docker compose -f docker-compose.mock-vps.yml build --no-cache
 ```
 
 ### SSH Connection Refused

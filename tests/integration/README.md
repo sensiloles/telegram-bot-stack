@@ -201,7 +201,7 @@ docker logs telegram-bot-stack-mock-vps
 
 ```bash
 # Stop existing mock VPS
-docker-compose -f tests/integration/fixtures/docker-compose.mock-vps.yml down
+docker compose -f tests/integration/fixtures/docker-compose.mock-vps.yml down
 
 # Or change port in docker-compose.mock-vps.yml
 ports:
@@ -222,7 +222,7 @@ pytest tests/integration/ -m "not slow"
 
 ```bash
 # Stop all test containers
-docker-compose -f tests/integration/fixtures/docker-compose.mock-vps.yml down -v
+docker compose -f tests/integration/fixtures/docker-compose.mock-vps.yml down -v
 
 # Remove test images
 docker image prune -af
@@ -245,9 +245,9 @@ Integration tests run automatically in GitHub Actions:
 
 ```bash
 # Run tests as CI would
-docker-compose -f tests/integration/fixtures/docker-compose.mock-vps.yml up -d
+docker compose -f tests/integration/fixtures/docker-compose.mock-vps.yml up -d
 pytest tests/integration/ -v -m "not slow"
-docker-compose -f tests/integration/fixtures/docker-compose.mock-vps.yml down -v
+docker compose -f tests/integration/fixtures/docker-compose.mock-vps.yml down -v
 ```
 
 ## Performance
