@@ -1,6 +1,7 @@
 """Pytest configuration for deployment E2E tests."""
 
 import os
+import re
 from pathlib import Path
 from typing import Generator
 
@@ -167,3 +168,76 @@ def deployed_bot(
         vps.run_command(f"rm -rf {remote_dir}", hide=True)
     finally:
         vps.close()
+
+
+def convert_bind_mounts_to_volumes(compose_content: str, bot_name: str) -> str:
+    """Convert bind mounts to named volumes for Docker-in-Docker compatibility.
+
+    In E2E tests with Docker-in-Docker, bind mounts like ./data:/app/data don't work
+    because the host Docker daemon can't access paths inside the Mock VPS container.
+    This function converts them to named volumes which work correctly in DinD.
+
+    Args:
+        compose_content: Original docker-compose.yml content
+        bot_name: Bot name for volume naming
+
+    Returns:
+        Modified docker-compose.yml content with named volumes
+
+    Example:
+        Input:  volumes:\n      - ./data:/app/data:rw
+        Output: volumes:\n      - test-bot-data:/app/data:rw
+                ...
+                volumes:
+                  test-bot-data:
+                    driver: local
+    """
+    # Replace bind mounts with named volumes
+    # Pattern: ./path:/container/path or ./path:/container/path:rw
+    modified_content = compose_content
+
+    # Track which volumes we need to create
+    volumes_to_create = []
+
+    # Replace ./data mount
+    if "./data:/app/data" in modified_content:
+        volume_name = f"{bot_name}-data"
+        modified_content = re.sub(
+            r"\./data:/app/data(:\w+)?",
+            f"{volume_name}:/app/data\\1",
+            modified_content,
+        )
+        volumes_to_create.append(volume_name)
+
+    # Replace ./logs mount
+    if "./logs:/app/logs" in modified_content:
+        volume_name = f"{bot_name}-logs"
+        modified_content = re.sub(
+            r"\./logs:/app/logs(:\w+)?",
+            f"{volume_name}:/app/logs\\1",
+            modified_content,
+        )
+        volumes_to_create.append(volume_name)
+
+    # Add volumes section if we have volumes to create
+    if volumes_to_create:
+        # Check if volumes section already exists
+        if "\nvolumes:\n" in modified_content:
+            # Append to existing volumes section
+            volumes_section = "\nvolumes:\n"
+            for vol_name in volumes_to_create:
+                volumes_section += f"  {vol_name}:\n    driver: local\n"
+            # Find the networks section and insert before it
+            modified_content = modified_content.replace(
+                "\nnetworks:\n", f"{volumes_section}\nnetworks:\n"
+            )
+        else:
+            # Add new volumes section before networks
+            volumes_section = "\nvolumes:\n"
+            for vol_name in volumes_to_create:
+                volumes_section += f"  {vol_name}:\n    driver: local\n"
+            modified_content = modified_content.replace(
+                "\nnetworks:\n", f"{volumes_section}\nnetworks:\n"
+            )
+
+    return modified_content

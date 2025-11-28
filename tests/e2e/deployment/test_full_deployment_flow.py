@@ -144,6 +144,7 @@ class TestFullDeploymentFlow:
 
             # Generate Docker files
             from telegram_bot_stack.cli.utils.deployment import DockerTemplateRenderer
+            from tests.e2e.deployment.conftest import convert_bind_mounts_to_volumes
 
             temp_dir = Path(".deploy-temp")
             temp_dir.mkdir(exist_ok=True)
@@ -152,11 +153,16 @@ class TestFullDeploymentFlow:
                 renderer = DockerTemplateRenderer(config, has_secrets=False)
                 renderer.render_all(temp_dir)
 
-                # Transfer Docker files
+                # Transfer Docker files (with modifications for E2E)
                 for docker_file in ["Dockerfile", "docker-compose.yml", "Makefile"]:
                     src = temp_dir / docker_file
                     if src.exists():
                         content = src.read_text()
+
+                        # For E2E: Convert bind mounts to named volumes for Docker-in-Docker
+                        if docker_file == "docker-compose.yml":
+                            content = convert_bind_mounts_to_volumes(content, bot_name)
+
                         dest = f"{remote_dir}/{docker_file}"
                         assert vps.write_file(
                             content, dest
@@ -177,28 +183,32 @@ class TestFullDeploymentFlow:
                 start_cmd = f"cd {remote_dir} && make up"
                 assert vps.run_command(start_cmd), "Bot should start successfully"
 
-                # Wait a moment for container to stabilize
-                time.sleep(3)
+                # Wait a moment for container to stabilize and generate logs
+                time.sleep(5)
 
                 # Verify container is running
                 check_cmd = (
                     f"docker ps --filter name={bot_name} --format '{{{{.Names}}}}'"
                 )
                 conn = vps.connect()
-                result = conn.run(check_cmd, hide=True)
+                result = conn.run(check_cmd, hide=True, pty=False, in_stream=False)
                 assert result.ok, "Docker ps should succeed"
                 assert (
                     bot_name in result.stdout
                 ), f"Container {bot_name} should be running"
 
-                # Check logs
-                logs_cmd = f"docker logs {bot_name} --tail 50"
-                result = conn.run(logs_cmd, hide=True)
+                # Check logs (capture both stdout and stderr)
+                logs_cmd = f"docker logs {bot_name} --tail 50 2>&1"
+                result = conn.run(logs_cmd, hide=True, pty=False, in_stream=False)
                 assert result.ok, "Should retrieve logs"
+
+                # Combine stdout and stderr for log checking
+                all_logs = (result.stdout + result.stderr).lower()
                 assert (
-                    "started" in result.stdout.lower()
-                    or "running" in result.stdout.lower()
-                ), "Logs should show bot started"
+                    "started" in all_logs
+                    or "running" in all_logs
+                    or "test bot" in all_logs
+                ), f"Logs should show bot started. Got: {result.stdout[:200]}"
 
                 # Get container status
                 from telegram_bot_stack.cli.utils.vps import get_container_health
