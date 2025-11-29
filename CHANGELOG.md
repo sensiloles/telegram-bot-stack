@@ -2,6 +2,29 @@
 
 <!-- version list -->
 
+## v1.34.0 (2025-11-29)
+
+### Bug Fixes
+
+- **ci**: Prevent workflow cancellation on main branch pushes
+  ([`f3edccc`](https://github.com/sensiloles/telegram-bot-stack/commit/f3edcccd55309d21027635b5ca8de5c0ac30a45d))
+
+### Continuous Integration
+
+- Add concurrency control to auto-cancel outdated CI runs
+  ([`a2affdf`](https://github.com/sensiloles/telegram-bot-stack/commit/a2affdfeda90dc573dbdc6fc693ffcd8e850ab7e))
+
+### Documentation
+
+- **status**: Mark #132 Makefile alternatives as DONE
+  ([`276ff05`](https://github.com/sensiloles/telegram-bot-stack/commit/276ff05a759d716f150240bafd94d218d32cff0a))
+
+### Features
+
+- **dx**: Add cross-platform task runner as Makefile alternative for Windows
+  ([`9e06c65`](https://github.com/sensiloles/telegram-bot-stack/commit/9e06c65536980a0ff01f5ca6f55de36aaf635cbd))
+
+
 ## v1.33.0 (2025-11-29)
 
 ### Bug Fixes
