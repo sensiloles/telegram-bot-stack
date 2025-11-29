@@ -5,12 +5,15 @@ Handles SSH connections, file transfers, and remote command execution.
 """
 
 import os
+import platform
 import re
 import shlex
 import subprocess
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Union
 
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import ed25519, rsa
 from fabric import Connection
 from invoke import Config
 from rich.console import Console
@@ -74,71 +77,129 @@ def check_ssh_agent() -> bool:
         return False
 
 
+def _set_key_permissions(key_path: Path) -> None:
+    """Set secure permissions on SSH key (cross-platform).
+
+    On Unix systems: Sets 0o600 for private key and 0o644 for public key.
+    On Windows: Uses icacls to restrict access to current user only.
+
+    Args:
+        key_path: Path to the private key file
+    """
+    if platform.system() == "Windows":
+        # Windows: Use icacls to set permissions
+        try:
+            username = os.getenv("USERNAME", "CURRENT_USER")
+            # Remove inheritance and grant full control to user only
+            subprocess.run(
+                [
+                    "icacls",
+                    str(key_path),
+                    "/inheritance:r",  # Remove inheritance
+                    "/grant:r",
+                    f"{username}:F",  # Grant full control to user only
+                ],
+                check=False,
+                capture_output=True,
+            )
+        except Exception:
+            # If icacls fails, continue (better to have key than fail)
+            pass
+    else:
+        # Unix: Use chmod
+        key_path.chmod(0o600)
+        public_key_path = Path(f"{key_path}.pub")
+        if public_key_path.exists():
+            public_key_path.chmod(0o644)
+
+
 def generate_ssh_key(
     key_path: Optional[Path] = None,
     key_type: str = "ed25519",
     comment: Optional[str] = None,
     passphrase: Optional[str] = None,
 ) -> Tuple[bool, str]:
-    """Generate SSH key pair.
+    """Generate SSH key pair (cross-platform).
+
+    Uses the cryptography library for cross-platform key generation,
+    avoiding dependency on external ssh-keygen command.
 
     Args:
         key_path: Path where to save the key (default: ~/.ssh/id_ed25519)
-        key_type: Key type - 'ed25519' (recommended), 'rsa', 'ecdsa', 'dsa'
+        key_type: Key type - 'ed25519' (recommended) or 'rsa'
         comment: Comment for the key (default: user@hostname)
         passphrase: Passphrase for the key (optional but recommended)
 
     Returns:
         Tuple of (success, message)
     """
-    ssh_dir = Path.home() / ".ssh"
-    ssh_dir.mkdir(mode=0o700, exist_ok=True)
-
-    # Set default key path based on key type
-    if key_path is None:
-        key_path = ssh_dir / f"id_{key_type}"
-
-    # Check if key already exists
-    if key_path.exists():
-        return (False, f"SSH key already exists: {key_path}")
-
-    # Build ssh-keygen command
-    cmd = ["ssh-keygen", "-t", key_type, "-f", str(key_path)]
-
-    # Add comment if provided
-    if comment:
-        cmd.extend(["-C", comment])
-
-    # Add passphrase
-    if passphrase:
-        cmd.extend(["-N", passphrase])
-    else:
-        # No passphrase (not recommended but sometimes needed)
-        cmd.extend(["-N", ""])
-
     try:
-        # Generate key
-        result = subprocess.run(
-            cmd,
-            capture_output=True,
-            text=True,
-            timeout=30,
+        # Create .ssh directory if it doesn't exist
+        ssh_dir = Path.home() / ".ssh"
+        ssh_dir.mkdir(mode=0o700, exist_ok=True)
+
+        # Set default key path based on key type
+        if key_path is None:
+            key_path = ssh_dir / f"id_{key_type}"
+
+        # Check if key already exists
+        if key_path.exists():
+            return (False, f"SSH key already exists: {key_path}")
+
+        # Generate key pair based on type
+        private_key: Union[
+            ed25519.Ed25519PrivateKey, rsa.RSAPrivateKey
+        ]  # Type annotation for mypy
+        if key_type == "ed25519":
+            private_key = ed25519.Ed25519PrivateKey.generate()
+        elif key_type == "rsa":
+            private_key = rsa.generate_private_key(
+                public_exponent=65537,
+                key_size=4096,
+            )
+        else:
+            return (False, f"Unsupported key type: {key_type} (use 'ed25519' or 'rsa')")
+
+        # Set up encryption for private key
+        encryption_algorithm: Union[
+            serialization.BestAvailableEncryption, serialization.NoEncryption
+        ]  # Type annotation for mypy
+        if passphrase:
+            encryption_algorithm = serialization.BestAvailableEncryption(
+                passphrase.encode()
+            )
+        else:
+            encryption_algorithm = serialization.NoEncryption()
+
+        # Serialize private key
+        private_pem = private_key.private_bytes(
+            encoding=serialization.Encoding.PEM,
+            format=serialization.PrivateFormat.OpenSSH,
+            encryption_algorithm=encryption_algorithm,
         )
 
-        if result.returncode == 0:
-            # Set proper permissions
-            key_path.chmod(0o600)
-            public_key_path = Path(f"{key_path}.pub")
-            if public_key_path.exists():
-                public_key_path.chmod(0o644)
+        # Save private key
+        key_path.write_bytes(private_pem)
 
-            return (True, f"SSH key generated successfully: {key_path}")
-        else:
-            error_msg = result.stderr.strip() if result.stderr else "Unknown error"
-            return (False, f"Failed to generate SSH key: {error_msg}")
+        # Generate and save public key
+        public_key = private_key.public_key()
+        public_ssh = public_key.public_bytes(
+            encoding=serialization.Encoding.OpenSSH,
+            format=serialization.PublicFormat.OpenSSH,
+        )
 
-    except subprocess.TimeoutExpired:
-        return (False, "SSH key generation timed out (>30s)")
+        # Add comment if provided
+        if comment:
+            public_ssh = public_ssh + f" {comment}".encode()
+
+        public_key_path = Path(f"{key_path}.pub")
+        public_key_path.write_bytes(public_ssh)
+
+        # Set secure permissions (platform-specific)
+        _set_key_permissions(key_path)
+
+        return (True, f"SSH key generated successfully: {key_path}")
+
     except Exception as e:
         return (False, f"Failed to generate SSH key: {e}")
 
