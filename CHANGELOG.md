@@ -2,6 +2,19 @@
 
 <!-- version list -->
 
+## v1.34.1 (2025-11-29)
+
+### Bug Fixes
+
+- **cli**: Resolve init command issues with editable installs and version management
+  ([`ed967b9`](https://github.com/sensiloles/telegram-bot-stack/commit/ed967b9964c23d9a7a060abf7a45275649e49724))
+
+### Documentation
+
+- **platform**: Add comprehensive Windows developer setup guide
+  ([`472815c`](https://github.com/sensiloles/telegram-bot-stack/commit/472815cc95a9b7f0df70da97d88fb01b7f506952))
+
+
 ## v1.34.0 (2025-11-29)
 
 ### Bug Fixes
