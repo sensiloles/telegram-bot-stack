@@ -200,30 +200,29 @@ Found and fixed **12 critical deployment bugs** during E2E testing:
 | #29 | Deploy Docs        | Docs     | #27, #28 | Extended guide   |
 | #89 | Production example | Examples | multiple | Task manager bot |
 
-**Legacy High Priority:**
-
-| #   | Issue              | Notes             |
-| --- | ------------------ | ----------------- |
-| #43 | Security hardening | Post-MVP          |
-| #44 | Multi-instance     | Needs #87 (Redis) |
-
-**Total High: 13 issues**
+**Total High: 11 issues**
 
 ---
 
-### 🟡 MEDIUM - Future Enhancements (v2.1.0+)
+### 🟡 MEDIUM - Quality Improvements (v2.1.0)
 
-**Retry & Resilience:**
+**Milestone:** v2.1.0 - Medium Priority Enhancements (due: Feb 7, 2026)
 
-- #19 Webhooks support
-- #46 Retry mechanism
-- #47 Migration tools
+**Production Features:**
+
+| #   | Issue              | Category    | Notes                      |
+| --- | ------------------ | ----------- | -------------------------- |
+| #19 | Webhooks support   | Production  | Alternative to polling     |
+| #46 | Retry mechanism    | Reliability | Circuit breaker pattern    |
+| #47 | Migration tools    | Tooling     | Data migration utilities   |
+| #48 | Benchmarking tools | Performance | Profiling and optimization |
 
 **Developer Experience:**
 
-- #45 i18n support
-- #30 MyPy strict mode
-- #33 Auto graph generation
+| #   | Issue            | Category | Notes                 |
+| --- | ---------------- | -------- | --------------------- |
+| #30 | MyPy strict mode | Quality  | Enforce strict typing |
+| #45 | i18n support     | Feature  | Multilingual bots     |
 
 **Total Medium: 6 issues**
 
@@ -231,26 +230,42 @@ Found and fixed **12 critical deployment bugs** during E2E testing:
 
 ### 🟢 LOW - Long-term Vision (v3.0+)
 
-**Infrastructure:**
+**Milestone:** v3.0+ - Long-term Vision (no due date)
 
-- #31 PyPI auto-publish
-- #48 Benchmarking tools
-- #50 Load testing
+**Infrastructure & Automation:**
 
-**Extensibility:**
+| #   | Issue                         | Notes                     |
+| --- | ----------------------------- | ------------------------- |
+| #31 | PyPI auto-publish             | Automated releases        |
+| #33 | Auto graph generation         | AI-enhanced documentation |
+| #67 | Pre-commit/CI sync            | Config consistency        |
+| #74 | Extract project-graph package | Reusable tooling          |
+| #75 | Extract GitHub automation     | Reusable workflow tools   |
+| #92 | Centralize mypy config        | Configuration management  |
 
-- #49 Advanced examples
-- #51 Plugin system
-- #52 Admin dashboard
-- #74 Extract project-graph package
-- #75 Extract GitHub automation package
+**Extensibility & Platform:**
 
-**Testing:**
+| #   | Issue                  | Notes                       |
+| --- | ---------------------- | --------------------------- |
+| #43 | Security hardening     | Advanced security features  |
+| #44 | Multi-instance         | Horizontal scaling (→ #87)  |
+| #51 | Plugin system          | Extensibility framework     |
+| #52 | Admin dashboard        | Web-based management        |
+| #94 | Medium-complexity bots | Framework expansion         |
+| #98 | PR comment automation  | GitHub workflow enhancement |
 
-- #71 Python 3.9 subprocess mocking
-- #67 Pre-commit/CI sync
+**Testing & Quality:**
 
-**Total Low: 9 issues**
+| #    | Issue                          | Notes                      |
+| ---- | ------------------------------ | -------------------------- |
+| #50  | Load testing framework         | Stress testing             |
+| #71  | Python 3.9 subprocess mocking  | Test compatibility         |
+| #109 | Increase coverage to 85%       | Quality metrics            |
+| #110 | E2E tests lifecycle            | Full bot lifecycle testing |
+| #111 | Performance/load testing suite | Comprehensive testing      |
+| #112 | Property-based testing         | Hypothesis integration     |
+
+**Total Low: 18 issues**
 
 ---
 
@@ -274,7 +289,24 @@ Found and fixed **12 critical deployment bugs** during E2E testing:
    Week 13-16: #29, #86, #87, #89, #90  Polish + Scaling
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ✅ v2.0.1 PRODUCTION-HARDENED (Week 16)
+
+   Week 17-20: v2.1.0 - Quality & DX improvements
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ v2.1.0 Medium Priority Enhancements (Week 20)
+
+   Future: v3.0+ - Long-term vision
 ```
+
+### Milestones Overview
+
+| Milestone                                 | Due Date   | Issues | Progress | Status     |
+| ----------------------------------------- | ---------- | ------ | -------- | ---------- |
+| **v2.0.0 MVP**                            | 2025-12-20 | 7      | 0/7 (0%) | 🏗️ Active  |
+| **v2.0.1 Production-Hardened**            | 2026-01-17 | 8      | 0/8 (0%) | ⏳ Planned |
+| **v2.1.0 - Medium Priority Enhancements** | 2026-02-07 | 6      | 0/6 (0%) | ⏳ Planned |
+| **v3.0+ - Long-term Vision**              | TBD        | 18     | 0/18     | 💡 Backlog |
+
+**Total Open Issues:** 39 (all assigned to milestones ✅)
 
 ### Dependency Graph
 
@@ -664,28 +696,51 @@ Supporting Infrastructure (v2.0.1):
 
 ### Open Issues by Priority
 
-- 🔴 **CRITICAL:** 14 issues - 10 completed, 4 remaining (including release)
-- 🟠 **HIGH:** 13 issues (deployment + advanced features)
-- 🟡 **MEDIUM:** 6 issues (future enhancements)
-- 🟢 **LOW:** 9 issues (long-term vision)
+- 🔴 **CRITICAL:** 14 issues (10 done ✅, 4 remaining for v2.0.0)
+- 🟠 **HIGH:** 11 issues (deployment + advanced features)
+- 🟡 **MEDIUM:** 6 issues (quality improvements - v2.1.0)
+- 🟢 **LOW:** 18 issues (long-term vision - v3.0+)
 
-**Total:** 42 open issues (5 new issues added for v2.0.0 preparation)
+**Open Issues:** 39 (all properly assigned to milestones)
+**Closed Issues:** 82
+**Total Issues:** 121
+
+**Closed as duplicates:** 3 issues (#41 → #87, #42 → #82+#90, #49 → #89)
 
 ### Milestones
 
-- ✅ Week 0-3: v1.17.0 - CLI + Dev Environment (DONE)
-- ✅ Week 4-6: v1.19.0-v1.21.0 - Basic Deployment (DONE)
-- ✅ Week 7-8: Phase 1 Critical Hardening (DONE - 6 issues)
-- 🏗️ Week 8-9: Phase 2 Critical Scenarios (IN PROGRESS - 4 issues)
-- ⏳ Week 10-11: Pre-Release Testing (#120 - Quality Gate)
-- ⏳ Week 12: v2.0.0 MVP Launch (#121) 🚀
-- ⏳ Week 13-16: v2.0.1 Production-Hardened
+**Completed:**
+
+- ✅ Week 0-3: v1.17.0 - CLI + Dev Environment
+- ✅ Week 4-6: v1.19.0-v1.21.0 - Basic Deployment
+- ✅ Week 7-8: Phase 1 Critical Hardening (6 issues)
+
+**Current & Upcoming:**
+
+- 🏗️ Week 8-9: Phase 2 Critical Scenarios (4 issues)
+- ⏳ Week 10-11: Pre-Release Testing (#120)
+- ⏳ Week 12: **v2.0.0 MVP Launch** (#121) 🚀
+- ⏳ Week 13-16: **v2.0.1 Production-Hardened** (8 issues)
+- ⏳ Week 17-20: **v2.1.0 Medium Priority** (6 issues)
+- 💡 Future: **v3.0+ Long-term Vision** (18 issues)
 
 ---
 
 **Status:** 🏗️ Phase 1 hardening complete, moving to Phase 2 critical scenarios
-**Progress:** 10/14 critical tasks completed ✅ | 4 remaining before E2E testing
-**Current Focus:** Critical deployment scenarios (#119 Already Running, #117 Multi-bot, #118 SSH keys, #88 Doctor)
-**Next Milestone:** Pre-release E2E testing (#120) - Week 10-11
-**Final Milestone:** v2.0.0 MVP Launch (#121) - Week 12
+**Progress:** 10/14 critical tasks done ✅ | 4 remaining before E2E testing
+**Current Focus:** #119 Already Running, #117 Multi-bot, #118 SSH keys, #88 Doctor
+**Next Gate:** #120 Pre-release E2E testing (Week 10-11)
+**Target Release:** v2.0.0 MVP (#121) - Week 12
+
+**Milestones:**
+
+- 🎯 v2.0.0 MVP: 7 issues (due: Dec 20, 2025)
+- 📦 v2.0.1 Production: 8 issues (due: Jan 17, 2026)
+- 🔧 v2.1.0 Enhancements: 6 issues (due: Feb 7, 2026)
+- 💡 v3.0+ Vision: 18 issues (backlog)
+
+**Organization:** ✅ All 39 open issues assigned to milestones
+**Duplicates Closed:** 3 issues (#41→#87, #42→#82+#90, #49→#89)
+**Total Issues:** 121 (39 open, 82 closed)
+
 **Updated:** 2025-11-29
