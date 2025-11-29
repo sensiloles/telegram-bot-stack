@@ -2,6 +2,20 @@
 
 <!-- version list -->
 
+## v1.28.0 (2025-11-29)
+
+### Documentation
+
+- **roadmap**: Organize all 121 issues into milestones and update roadmap
+  ([`7ff9afd`](https://github.com/sensiloles/telegram-bot-stack/commit/7ff9afd0d10d2a567b28ed21e0091594aaeb190b))
+
+### Features
+
+- **deploy**: Handle bot already running/deployed scenarios
+  ([#119](https://github.com/sensiloles/telegram-bot-stack/pull/119),
+  [`bb62e72`](https://github.com/sensiloles/telegram-bot-stack/commit/bb62e720398ffb08d8a35a50937a44f80e396b6d))
+
+
 ## v1.27.0 (2025-11-29)
 
 ### Documentation
