@@ -323,6 +323,10 @@ def test_init_with_package_manager_pdm(tmp_path):
 
 def test_init_creates_requirements_txt(tmp_path):
     """Test that init creates requirements.txt for Docker deployment."""
+    from telegram_bot_stack.cli.utils.dependencies import (
+        get_telegram_bot_stack_version,
+    )
+
     runner = CliRunner()
 
     with runner.isolated_filesystem(temp_dir=tmp_path):
@@ -337,9 +341,10 @@ def test_init_creates_requirements_txt(tmp_path):
         requirements_file = Path("test-bot") / "requirements.txt"
         assert requirements_file.exists()
 
-        # Verify content
+        # Verify content includes current version
         content = requirements_file.read_text()
-        assert "telegram-bot-stack>=1.0.0" in content
+        current_version = get_telegram_bot_stack_version()
+        assert f"telegram-bot-stack>={current_version}" in content
         assert "Production dependencies" in content
 
 

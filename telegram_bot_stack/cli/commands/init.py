@@ -136,9 +136,10 @@ def _install_with_pip(
         _install_from_local_repo(pip, stack_repo, run_subprocess)
 
     # Install project in editable mode
-    cmd = [str(pip), "install", "-e", ".", "--quiet"]
+    install_target = "."
     if with_linting or with_testing:
-        cmd.append(DEV_EXTRA)
+        install_target = f".{DEV_EXTRA}"
+    cmd = [str(pip), "install", "-e", install_target, "--quiet"]
 
     result = run_subprocess(
         cmd,
@@ -599,14 +600,28 @@ A Telegram bot built with [telegram-bot-stack](https://github.com/sensiloles/tel
 
 ### Getting Started
 
-1. **Get your bot token** from [@BotFather](https://t.me/BotFather)
+1. **Open in VS Code/Cursor** (if using VS Code):
+   ```bash
+   code .
+   ```
 
-2. **Create `.env` file** with your token:
+   Then **select Python interpreter**:
+   - Press `Cmd+Shift+P` (Mac) or `Ctrl+Shift+P` (Windows/Linux)
+   - Type "Python: Select Interpreter"
+   - Choose the one ending with `('./{bot_name}/venv': venv)`
+
+   **Note:** If you see import errors (red squiggles), reload the window:
+   - Press `Cmd+Shift+P` / `Ctrl+Shift+P`
+   - Type "Developer: Reload Window"
+
+2. **Get your bot token** from [@BotFather](https://t.me/BotFather)
+
+3. **Create `.env` file** with your token:
    ```bash
    echo "BOT_TOKEN=your_token_here" > .env
    ```
 
-3. **Run the bot** (recommended - automatically uses virtual environment):
+4. **Run the bot** (recommended - automatically uses virtual environment):
    ```bash
    telegram-bot-stack dev
    ```
@@ -730,9 +745,28 @@ pip install -e .
 
 ## Common Issues
 
+### Import errors in VS Code (red squiggles under imports)
+
+If you see `Import "telegram_bot_stack" could not be resolved` or similar errors:
+
+1. **Select the correct Python interpreter:**
+   - Press `Cmd+Shift+P` (Mac) or `Ctrl+Shift+P` (Windows/Linux)
+   - Type "Python: Select Interpreter"
+   - Choose the one with `venv` in the path
+
+2. **Reload the VS Code window:**
+   - Press `Cmd+Shift+P` / `Ctrl+Shift+P`
+   - Type "Developer: Reload Window"
+
+3. **If still not working, verify the package is installed:**
+   ```bash
+   source venv/bin/activate
+   python -c "import telegram_bot_stack; print('OK')"
+   ```
+
 ### ModuleNotFoundError: No module named 'dotenv'
 
-If you see this error, it means dependencies weren't installed correctly. Fix it with:
+If you see this error when running the bot:
 
 ```bash
 source venv/bin/activate  # On Windows: venv\\Scripts\\activate
@@ -741,7 +775,7 @@ pip install --upgrade telegram-bot-stack
 pip install -e .
 ```
 
-**Note:** `python-dotenv` is automatically included when you install `telegram-bot-stack`. You don't need to install it separately.
+**Note:** `python-dotenv` is automatically included when you install `telegram-bot-stack`.
 
 ### BOT_TOKEN not found
 
@@ -764,9 +798,16 @@ MIT
 
     (project_path / "README.md").write_text(readme)
 
+    # Get current telegram-bot-stack version
+    from telegram_bot_stack.cli.utils.dependencies import (
+        get_telegram_bot_stack_version,
+    )
+
+    current_version = get_telegram_bot_stack_version()
+
     # Create requirements.txt for Docker deployment
-    requirements_content = """# Production dependencies
-telegram-bot-stack>=1.0.0
+    requirements_content = f"""# Production dependencies
+telegram-bot-stack>={current_version}
 
 # Optional: Uncomment for specific storage backends
 # redis>=4.5.0  # For Redis storage
@@ -818,6 +859,15 @@ def _print_success_message(
     if with_linting:
         click.echo("  • Format code: make format or ruff format .")
         click.echo("  • Lint code: make lint or ruff check .")
+
+    click.echo("\n⚠️  VS Code/Cursor users:")
+    click.echo(
+        "  • Select Python interpreter: Cmd+Shift+P → 'Python: Select Interpreter'"
+    )
+    click.echo("  • Choose the one with 'venv' in the path")
+    click.echo(
+        "  • If you see import errors, reload window: Cmd+Shift+P → 'Reload Window'"
+    )
 
     click.echo("\n📚 Documentation:")
     click.echo("  https://github.com/sensiloles/telegram-bot-stack\n")

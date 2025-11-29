@@ -5,6 +5,8 @@ from pathlib import Path
 
 import click
 
+from telegram_bot_stack.cli.utils.dependencies import get_telegram_bot_stack_version
+
 
 def create_precommit_config(project_path: Path) -> Path:
     """Create a .pre-commit-config.yaml file.
@@ -17,7 +19,10 @@ def create_precommit_config(project_path: Path) -> Path:
     """
     precommit_file = project_path / ".pre-commit-config.yaml"
 
-    content = """repos:
+    # Get current version for mypy dependencies
+    current_version = get_telegram_bot_stack_version()
+
+    content = f"""repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.8.4
     hooks:
@@ -29,7 +34,7 @@ def create_precommit_config(project_path: Path) -> Path:
     rev: v1.17.0
     hooks:
       - id: mypy
-        additional_dependencies: [telegram-bot-stack>=1.15.0]
+        additional_dependencies: [telegram-bot-stack>={current_version}]
         args: [--ignore-missing-imports]
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
