@@ -1,5 +1,6 @@
 """Tests for VPS utilities."""
 
+from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 from telegram_bot_stack.cli.utils.vps import (
@@ -643,93 +644,162 @@ class TestSSHKeyAuth:
 
 
 class TestSSHKeyGeneration:
-    """Tests for SSH key generation utilities."""
+    """Tests for SSH key generation utilities using cryptography library."""
 
-    @patch("telegram_bot_stack.cli.utils.vps.subprocess.run")
-    @patch("telegram_bot_stack.cli.utils.vps.Path.exists")
-    def test_generate_ssh_key_success(self, mock_exists, mock_run):
-        """Test successful SSH key generation."""
-        mock_exists.return_value = False  # Key doesn't exist yet
-        mock_result = MagicMock()
-        mock_result.returncode = 0
-        mock_run.return_value = mock_result
+    def test_generate_ssh_key_ed25519_success(self, tmp_path):
+        """Test successful SSH key generation with ed25519."""
+        key_path = tmp_path / "test_id_ed25519"
 
-        with patch("telegram_bot_stack.cli.utils.vps.Path.mkdir"):
-            with patch("telegram_bot_stack.cli.utils.vps.Path.chmod"):
-                success, message = generate_ssh_key(
-                    key_type="ed25519",
-                    comment="test@localhost",
-                    passphrase="test123",
-                )
+        success, message = generate_ssh_key(
+            key_path=key_path,
+            key_type="ed25519",
+            comment="test@localhost",
+            passphrase="test123",
+        )
 
         assert success is True
         assert "generated successfully" in message.lower()
-        mock_run.assert_called_once()
+        assert key_path.exists()
+        assert Path(f"{key_path}.pub").exists()
 
-    @patch("telegram_bot_stack.cli.utils.vps.Path.exists")
-    def test_generate_ssh_key_already_exists(self, mock_exists):
+        # Verify private key content
+        private_key_content = key_path.read_text()
+        assert "BEGIN OPENSSH PRIVATE KEY" in private_key_content
+        assert "END OPENSSH PRIVATE KEY" in private_key_content
+
+        # Verify public key content
+        public_key_content = Path(f"{key_path}.pub").read_text()
+        assert public_key_content.startswith("ssh-ed25519 ")
+        assert "test@localhost" in public_key_content
+
+    def test_generate_ssh_key_rsa_success(self, tmp_path):
+        """Test successful SSH key generation with RSA."""
+        key_path = tmp_path / "test_id_rsa"
+
+        success, message = generate_ssh_key(
+            key_path=key_path,
+            key_type="rsa",
+            comment="test@localhost",
+            passphrase=None,
+        )
+
+        assert success is True
+        assert "generated successfully" in message.lower()
+        assert key_path.exists()
+        assert Path(f"{key_path}.pub").exists()
+
+        # Verify private key content
+        private_key_content = key_path.read_text()
+        assert "BEGIN OPENSSH PRIVATE KEY" in private_key_content
+
+        # Verify public key content
+        public_key_content = Path(f"{key_path}.pub").read_text()
+        assert public_key_content.startswith("ssh-rsa ")
+        assert "test@localhost" in public_key_content
+
+    def test_generate_ssh_key_already_exists(self, tmp_path):
         """Test SSH key generation when key already exists."""
-        mock_exists.return_value = True  # Key already exists
+        key_path = tmp_path / "existing_key"
+        key_path.touch()  # Create existing file
 
-        with patch("telegram_bot_stack.cli.utils.vps.Path.mkdir"):
-            success, message = generate_ssh_key(key_type="ed25519")
+        success, message = generate_ssh_key(key_path=key_path, key_type="ed25519")
 
         assert success is False
         assert "already exists" in message.lower()
 
-    @patch("telegram_bot_stack.cli.utils.vps.subprocess.run")
-    @patch("telegram_bot_stack.cli.utils.vps.Path.exists")
-    def test_generate_ssh_key_command_failure(self, mock_exists, mock_run):
-        """Test SSH key generation when ssh-keygen fails."""
-        mock_exists.return_value = False
-        mock_result = MagicMock()
-        mock_result.returncode = 1
-        mock_result.stderr = "Permission denied"
-        mock_run.return_value = mock_result
+    def test_generate_ssh_key_unsupported_type(self, tmp_path):
+        """Test SSH key generation with unsupported key type."""
+        key_path = tmp_path / "test_key"
 
-        with patch("telegram_bot_stack.cli.utils.vps.Path.mkdir"):
-            success, message = generate_ssh_key(key_type="ed25519")
+        success, message = generate_ssh_key(
+            key_path=key_path,
+            key_type="ecdsa",  # Not supported in new implementation
+        )
 
         assert success is False
-        assert "failed" in message.lower()
+        assert "unsupported" in message.lower()
 
-    @patch("telegram_bot_stack.cli.utils.vps.subprocess.run")
-    @patch("telegram_bot_stack.cli.utils.vps.Path.exists")
-    def test_generate_ssh_key_with_rsa(self, mock_exists, mock_run):
-        """Test SSH key generation with RSA type."""
-        mock_exists.return_value = False
-        mock_result = MagicMock()
-        mock_result.returncode = 0
-        mock_run.return_value = mock_result
-
-        with patch("telegram_bot_stack.cli.utils.vps.Path.mkdir"):
-            with patch("telegram_bot_stack.cli.utils.vps.Path.chmod"):
-                success, _ = generate_ssh_key(key_type="rsa")
-
-        assert success is True
-        # Verify ssh-keygen was called with RSA
-        args = mock_run.call_args[0][0]
-        assert "-t" in args
-        assert "rsa" in args
-
-    @patch("telegram_bot_stack.cli.utils.vps.subprocess.run")
-    @patch("telegram_bot_stack.cli.utils.vps.Path.exists")
-    def test_generate_ssh_key_no_passphrase(self, mock_exists, mock_run):
+    def test_generate_ssh_key_no_passphrase(self, tmp_path):
         """Test SSH key generation without passphrase."""
-        mock_exists.return_value = False
-        mock_result = MagicMock()
-        mock_result.returncode = 0
-        mock_run.return_value = mock_result
+        key_path = tmp_path / "test_id_ed25519"
 
-        with patch("telegram_bot_stack.cli.utils.vps.Path.mkdir"):
-            with patch("telegram_bot_stack.cli.utils.vps.Path.chmod"):
-                success, _ = generate_ssh_key(key_type="ed25519", passphrase=None)
+        success, message = generate_ssh_key(
+            key_path=key_path, key_type="ed25519", passphrase=None
+        )
 
         assert success is True
-        # Verify empty passphrase was passed
-        args = mock_run.call_args[0][0]
-        assert "-N" in args
-        assert "" in args
+        assert key_path.exists()
+
+        # Key should not be encrypted
+        private_key_content = key_path.read_text()
+        assert "BEGIN OPENSSH PRIVATE KEY" in private_key_content
+
+    def test_generate_ssh_key_with_passphrase(self, tmp_path):
+        """Test SSH key generation with passphrase."""
+        key_path = tmp_path / "test_id_ed25519"
+
+        success, message = generate_ssh_key(
+            key_path=key_path, key_type="ed25519", passphrase="secure_password"
+        )
+
+        assert success is True
+        assert key_path.exists()
+
+        # Key should be encrypted (contains encryption marker)
+        private_key_content = key_path.read_text()
+        assert "BEGIN OPENSSH PRIVATE KEY" in private_key_content
+
+    def test_generate_ssh_key_default_path(self, tmp_path, monkeypatch):
+        """Test SSH key generation with default path (~/.ssh/id_ed25519)."""
+        # Mock Path.home() to return tmp_path
+        monkeypatch.setattr("pathlib.Path.home", lambda: tmp_path)
+
+        success, message = generate_ssh_key(key_type="ed25519")
+
+        assert success is True
+        expected_path = tmp_path / ".ssh" / "id_ed25519"
+        assert expected_path.exists()
+        assert Path(f"{expected_path}.pub").exists()
+
+    @patch("platform.system")
+    @patch("telegram_bot_stack.cli.utils.vps.subprocess.run")
+    def test_set_key_permissions_windows(
+        self, mock_subprocess, mock_platform, tmp_path
+    ):
+        """Test setting key permissions on Windows."""
+        from telegram_bot_stack.cli.utils.vps import _set_key_permissions
+
+        mock_platform.return_value = "Windows"
+        key_path = tmp_path / "test_key"
+        key_path.touch()
+        pub_path = tmp_path / "test_key.pub"
+        pub_path.touch()
+
+        _set_key_permissions(key_path)
+
+        # Verify icacls was called
+        assert mock_subprocess.called
+
+    @patch("platform.system")
+    def test_set_key_permissions_unix(self, mock_platform, tmp_path):
+        """Test setting key permissions on Unix."""
+        from telegram_bot_stack.cli.utils.vps import _set_key_permissions
+
+        mock_platform.return_value = "Linux"
+        key_path = tmp_path / "test_key"
+        key_path.touch()
+        pub_path = tmp_path / "test_key.pub"
+        pub_path.touch()
+
+        _set_key_permissions(key_path)
+
+        # Verify permissions were set (0o600 for private, 0o644 for public)
+        # Note: This only works on Unix systems
+        import platform
+
+        if platform.system() != "Windows":
+            assert oct(key_path.stat().st_mode)[-3:] == "600"
+            assert oct(pub_path.stat().st_mode)[-3:] == "644"
 
 
 class TestSSHKeyDelivery:

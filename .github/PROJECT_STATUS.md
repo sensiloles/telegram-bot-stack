@@ -1,7 +1,7 @@
 # Project Status - telegram-bot-stack
 
-**Version:** v1.31.0 → v2.0.0 MVP
-**Updated:** 2025-11-29 (added Windows cross-platform support #130-#135)
+**Version:** v1.32.0 → v2.0.0 MVP
+**Updated:** 2025-11-29 (completed #131 Windows SSH key generation)
 **Status:** 🏗️ Week 10 - Windows Developer Support + Pre-release Testing
 
 ---
@@ -477,10 +477,10 @@ Supporting Infrastructure (v2.0.1):
 **MUST complete for v2.0.0:**
 
 ```bash
-1. #131 Windows SSH key generation (3-4h) ← CRITICAL
-   → Replace ssh-keygen with cryptography library
-   → Cross-platform key generation
-   → Fix file permissions on Windows
+1. ✅ #131 Windows SSH key generation (3-4h) ← DONE
+   → Replaced ssh-keygen with cryptography library ✅
+   → Cross-platform key generation (ed25519, rsa) ✅
+   → Fixed file permissions on Windows (icacls) ✅
 
 2. #132 Makefile alternatives (4-5h) ← HIGH
    → Create tasks.py for Windows developers
@@ -621,7 +621,7 @@ Supporting Infrastructure (v2.0.1):
 
 **Cross-Platform Support (NEW for v2.0.0):**
 
-- [ ] Windows SSH key generation (#131) ⏳ CRITICAL
+- [x] Windows SSH key generation (#131) ✅ DONE
 - [ ] Makefile alternatives for Windows (#132) ⏳ HIGH
 - [ ] Windows documentation (#133) ⏳ HIGH
 - [ ] Works on Windows 10/11 (PowerShell, cmd, Git Bash)
@@ -720,7 +720,7 @@ Supporting Infrastructure (v2.0.1):
 
 **In Progress (Week 10 - Windows Support):**
 
-- #131: Windows SSH key generation ⏳ CRITICAL
+- #131: Windows SSH key generation ✅ DONE
 - #132: Makefile alternatives for Windows ⏳ HIGH
 - #133: Windows documentation ⏳ HIGH
 
@@ -834,8 +834,8 @@ Supporting Infrastructure (v2.0.1):
 ---
 
 **Status:** 🏗️ Week 10 - Windows cross-platform support in progress
-**Progress:** 12/15 critical tasks done ✅ | 3 Windows support tasks + E2E testing remaining
-**Current Focus:** #131, #132, #133 - Windows developer support
+**Progress:** 13/15 critical tasks done ✅ | 2 Windows support tasks + E2E testing remaining
+**Current Focus:** #132, #133 - Windows developer support (Makefile alternatives + docs)
 **Next Gate:** #120 Pre-release E2E testing (Week 11)
 **Target Release:** v2.0.0 MVP (#121) - Week 12
 
