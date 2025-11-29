@@ -18,6 +18,7 @@ from telegram_bot_stack.cli.utils.vps import (
     VPSConnection,
     check_ssh_agent,
     find_ssh_keys,
+    setup_ssh_key_interactive,
 )
 
 console = Console()
@@ -98,12 +99,43 @@ def init(
                 )
                 ssh_key = ""  # Will use agent
             else:
+                # Offer to generate SSH key automatically
                 console.print(
-                    "[yellow]Tip: Generate an SSH key with: ssh-keygen -t ed25519[/yellow]"
+                    "\n[yellow]SSH key authentication is recommended for security[/yellow]"
                 )
-                ssh_key = Prompt.ask(
-                    "SSH Key Path (or leave empty for password auth)", default=""
+                generate_key = Confirm.ask(
+                    "Would you like to generate an SSH key now?",
+                    default=True,
                 )
+
+                if generate_key:
+                    # Interactive SSH key setup
+                    success, generated_key_path = setup_ssh_key_interactive(
+                        host=host,
+                        user=user,
+                        port=port,
+                    )
+
+                    if success and generated_key_path:
+                        ssh_key = generated_key_path
+                        console.print(
+                            f"\n[green]✓ SSH key setup complete: {ssh_key}[/green]"
+                        )
+                    else:
+                        console.print(
+                            "\n[yellow]SSH key setup failed. You can configure it later.[/yellow]"
+                        )
+                        ssh_key = Prompt.ask(
+                            "SSH Key Path (or leave empty for password auth)",
+                            default="",
+                        )
+                else:
+                    console.print(
+                        "[dim]Tip: You can generate an SSH key later with: ssh-keygen -t ed25519[/dim]"
+                    )
+                    ssh_key = Prompt.ask(
+                        "SSH Key Path (or leave empty for password auth)", default=""
+                    )
 
     # If still no ssh_key and not using agent, prompt
     if not ssh_key and auth_method == "key":

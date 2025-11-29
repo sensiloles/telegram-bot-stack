@@ -620,27 +620,172 @@ telegram-bot-stack deploy up
 
 ## SSH Setup
 
-### Generate SSH Key (if you don't have one)
+### Automatic SSH Setup (Recommended)
+
+When running `telegram-bot-stack deploy init`, the system will automatically:
+
+1. **Check for existing SSH keys** in `~/.ssh/` (ed25519, ecdsa, rsa, dsa)
+2. **Offer to generate a new key** if none found
+3. **Deliver the public key to VPS** automatically
+4. **Verify key-based authentication** works
+
+**Example Interactive Flow:**
 
 ```bash
+telegram-bot-stack deploy init
+
+🚀 VPS Deployment Setup
+
+VPS Host: 142.93.100.50
+SSH User: root
+
+🔑 SSH Key Setup
+
+No SSH keys found in ~/.ssh/
+
+SSH key authentication is recommended for security
+Would you like to generate an SSH key now? [Y/n]: y
+
+Generating new SSH key...
+Key type [ed25519/rsa] (ed25519): ed25519
+
+⚠️  Passphrase protection is recommended for security
+Set a passphrase for the key? [Y/n]: y
+Enter passphrase: ********
+Confirm passphrase: ********
+
+✓ SSH key generated successfully: ~/.ssh/id_ed25519
+
+Copying SSH key to root@142.93.100.50...
+You may be prompted for your VPS password
+Password: ********
+
+✓ SSH key delivered successfully using ssh-copy-id
+✓ SSH key authentication works!
+
+Bot Name: my-awesome-bot
+✅ Configuration saved to deploy.yaml
+```
+
+This automated setup handles:
+
+- **Key generation** with modern Ed25519 algorithm (recommended) or RSA fallback
+- **Passphrase protection** for enhanced security
+- **Automatic delivery** using `ssh-copy-id` or fallback manual method
+- **Connection verification** to ensure everything works
+
+### Manual SSH Setup (Alternative)
+
+If you prefer manual setup or automated setup fails:
+
+#### 1. Generate SSH Key
+
+```bash
+# Modern Ed25519 (recommended - fast, secure, small)
+ssh-keygen -t ed25519 -C "your-email@example.com"
+
+# Or RSA (compatible with older systems)
 ssh-keygen -t rsa -b 4096 -C "your-email@example.com"
 ```
 
-### Add SSH Key to VPS
+**Key Features:**
+
+- **Ed25519:** Modern, fast, secure (256-bit security)
+- **RSA 4096:** Traditional, widely compatible
+- **Passphrase:** Adds extra security layer (recommended)
+
+#### 2. Add SSH Key to VPS
+
+**Method 1: Using ssh-copy-id (easiest)**
 
 ```bash
-ssh-copy-id root@your-vps-ip
+ssh-copy-id -i ~/.ssh/id_ed25519.pub root@your-vps-ip
 ```
 
-Or manually:
+**Method 2: Manual (if ssh-copy-id unavailable)**
 
 ```bash
-cat ~/.ssh/id_rsa.pub | ssh root@your-vps-ip "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys"
+cat ~/.ssh/id_ed25519.pub | ssh root@your-vps-ip "mkdir -p ~/.ssh && chmod 700 ~/.ssh && cat >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys"
 ```
 
-### Test SSH Connection
+**Method 3: Through VPS Control Panel**
+
+Many VPS providers allow adding SSH keys through their web interface:
+
+- **DigitalOcean:** Settings → Security → SSH Keys
+- **AWS EC2:** Key Pairs section
+- **Hetzner:** Security → SSH Keys
+- **Linode:** Profile → SSH Keys
+
+#### 3. Verify SSH Connection
 
 ```bash
+# Test connection with verbose output
+ssh -v root@your-vps-ip
+
+# Should connect without password prompt
+# If successful, you're ready to deploy!
+```
+
+### SSH Key Types Comparison
+
+| Type         | Security   | Speed     | Key Size | Recommendation              |
+| ------------ | ---------- | --------- | -------- | --------------------------- |
+| **Ed25519**  | ⭐⭐⭐⭐⭐ | Very Fast | 68 chars | ✅ Best choice (modern)     |
+| **ECDSA**    | ⭐⭐⭐⭐   | Fast      | ~256     | Good alternative            |
+| **RSA 4096** | ⭐⭐⭐     | Slower    | ~3200    | Compatible with old systems |
+| **RSA 2048** | ⭐⭐       | Medium    | ~1600    | Minimum acceptable          |
+| **DSA**      | ⭐         | Fast      | ~1024    | ❌ Deprecated, don't use    |
+
+### Troubleshooting SSH Setup
+
+**Issue: "Permission denied (publickey)"**
+
+```bash
+# Check key permissions
+chmod 600 ~/.ssh/id_ed25519
+chmod 700 ~/.ssh
+
+# Verify key is added to VPS
+ssh root@your-vps-ip "cat ~/.ssh/authorized_keys"
+
+# Try re-copying key
+ssh-copy-id -i ~/.ssh/id_ed25519.pub root@your-vps-ip
+```
+
+**Issue: "ssh-copy-id not found"**
+
+```bash
+# Manual method
+cat ~/.ssh/id_ed25519.pub | ssh root@your-vps-ip "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys"
+
+# Set correct permissions on VPS
+ssh root@your-vps-ip "chmod 700 ~/.ssh && chmod 600 ~/.ssh/authorized_keys"
+```
+
+**Issue: "Connection refused"**
+
+```bash
+# Check if VPS is reachable
+ping your-vps-ip
+
+# Check SSH port
+nc -zv your-vps-ip 22
+
+# Try with custom port
+ssh -p 2222 root@your-vps-ip
+```
+
+**Issue: Key exists but not working**
+
+```bash
+# Start SSH agent
+eval "$(ssh-agent -s)"
+
+# Add key to agent
+ssh-add ~/.ssh/id_ed25519
+
+# Try connecting again
 ssh root@your-vps-ip
 ```
 

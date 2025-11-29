@@ -1,7 +1,7 @@
 # Project Status - telegram-bot-stack
 
 **Version:** v1.25.0 → v2.0.0 MVP
-**Updated:** 2025-11-29 (after #117 Multi-bot deployment completion)
+**Updated:** 2025-11-29 (after #127 SSH key generation completion)
 **Status:** 🏗️ Phase 2 - Hardening Killer Feature
 
 ---
@@ -113,12 +113,12 @@ Found and fixed **12 critical deployment bugs** during E2E testing:
 | **#85**  | Integration tests             | ✅ YES (tests) | ✅ DONE | 8-10h  | -      |
 | **#88**  | Doctor command                | 🔧 CLI tool    | ✅ DONE | 6-8h   | -      |
 | **#119** | Already running detection     | ✅ YES         | ✅ DONE | 8-10h  | -      |
-| **#127** | SSH key generation & delivery | ✅ YES         | ⏳ TODO | 3-4h   | #118   |
+| **#127** | SSH key generation & delivery | ✅ YES         | ✅ DONE | 3-4h   | #118   |
 | **#120** | Pre-release E2E testing       | ✅ QA          | ⏳ TODO | 16-24h | #121   |
 | **#121** | v2.0.0 Release                | 🎯 Milestone   | ⏳ TODO | 24-32h | All    |
 | **NEW**  | **Deployment bug fixes**      | ✅ YES         | ✅ DONE | 12h    | -      |
 
-**Total Critical Path:** ~82-111 hours (10-14 days) - **9/12 critical issues completed!**
+**Total Critical Path:** ~69-91 hours (9-12 days) - **10/12 critical issues completed!**
 
 **IMPORTANT Issues (do after critical or for v2.0.1):**
 
@@ -159,7 +159,7 @@ Found and fixed **12 critical deployment bugs** during E2E testing:
 | #85  | **Deploy tests**           | Tests    | ✅ DONE           | #27     | -        |
 | #88  | **Doctor command**         | CLI      | ✅ DONE           | -       | -        |
 | #119 | **Already running detect** | Deploy   | ✅ DONE           | #27     | -        |
-| #127 | **SSH key generation**     | Deploy   | ⏳ TODO           | #118    | -        |
+| #127 | **SSH key generation**     | Deploy   | ✅ DONE           | #118    | -        |
 | #120 | **Pre-release E2E tests**  | QA       | ⏳ TODO           | All     | #121     |
 | #121 | **v2.0.0 Release**         | Release  | ⏳ TODO           | All     | -        |
 
@@ -729,8 +729,8 @@ Supporting Infrastructure (v2.0.1):
 ---
 
 **Status:** 🏗️ Phase 2 critical scenarios in progress
-**Progress:** 11/15 critical tasks done ✅ | 4 remaining before E2E testing
-**Current Focus:** #127 SSH key generation (critical task remaining)
+**Progress:** 12/15 critical tasks done ✅ | 3 remaining before E2E testing
+**Current Focus:** #120 Pre-release E2E testing (final gate before release)
 **Next Gate:** #120 Pre-release E2E testing (Week 10-11)
 **Target Release:** v2.0.0 MVP (#121) - Week 12
 

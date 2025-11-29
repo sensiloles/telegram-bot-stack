@@ -7,12 +7,14 @@ Handles SSH connections, file transfers, and remote command execution.
 import os
 import re
 import shlex
+import subprocess
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 from fabric import Connection
 from invoke import Config
 from rich.console import Console
+from rich.prompt import Confirm, Prompt
 
 console = Console()
 
@@ -58,8 +60,6 @@ def check_ssh_agent() -> bool:
         True if SSH agent is available with keys, False otherwise
     """
     try:
-        import subprocess
-
         result = subprocess.run(
             ["ssh-add", "-l"],
             capture_output=True,
@@ -72,6 +72,354 @@ def check_ssh_agent() -> bool:
         return result.returncode == 0
     except Exception:
         return False
+
+
+def generate_ssh_key(
+    key_path: Optional[Path] = None,
+    key_type: str = "ed25519",
+    comment: Optional[str] = None,
+    passphrase: Optional[str] = None,
+) -> Tuple[bool, str]:
+    """Generate SSH key pair.
+
+    Args:
+        key_path: Path where to save the key (default: ~/.ssh/id_ed25519)
+        key_type: Key type - 'ed25519' (recommended), 'rsa', 'ecdsa', 'dsa'
+        comment: Comment for the key (default: user@hostname)
+        passphrase: Passphrase for the key (optional but recommended)
+
+    Returns:
+        Tuple of (success, message)
+    """
+    ssh_dir = Path.home() / ".ssh"
+    ssh_dir.mkdir(mode=0o700, exist_ok=True)
+
+    # Set default key path based on key type
+    if key_path is None:
+        key_path = ssh_dir / f"id_{key_type}"
+
+    # Check if key already exists
+    if key_path.exists():
+        return (False, f"SSH key already exists: {key_path}")
+
+    # Build ssh-keygen command
+    cmd = ["ssh-keygen", "-t", key_type, "-f", str(key_path)]
+
+    # Add comment if provided
+    if comment:
+        cmd.extend(["-C", comment])
+
+    # Add passphrase
+    if passphrase:
+        cmd.extend(["-N", passphrase])
+    else:
+        # No passphrase (not recommended but sometimes needed)
+        cmd.extend(["-N", ""])
+
+    try:
+        # Generate key
+        result = subprocess.run(
+            cmd,
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+
+        if result.returncode == 0:
+            # Set proper permissions
+            key_path.chmod(0o600)
+            public_key_path = Path(f"{key_path}.pub")
+            if public_key_path.exists():
+                public_key_path.chmod(0o644)
+
+            return (True, f"SSH key generated successfully: {key_path}")
+        else:
+            error_msg = result.stderr.strip() if result.stderr else "Unknown error"
+            return (False, f"Failed to generate SSH key: {error_msg}")
+
+    except subprocess.TimeoutExpired:
+        return (False, "SSH key generation timed out (>30s)")
+    except Exception as e:
+        return (False, f"Failed to generate SSH key: {e}")
+
+
+def deliver_ssh_key_to_vps(
+    host: str,
+    user: str,
+    public_key_path: Path,
+    port: int = 22,
+    password: Optional[str] = None,
+) -> Tuple[bool, str]:
+    """Deliver SSH public key to VPS using ssh-copy-id or fallback method.
+
+    Args:
+        host: VPS hostname or IP address
+        user: SSH user
+        public_key_path: Path to SSH public key file
+        port: SSH port (default: 22)
+        password: SSH password (optional, will prompt if needed)
+
+    Returns:
+        Tuple of (success, message)
+    """
+    if not public_key_path.exists():
+        return (False, f"Public key not found: {public_key_path}")
+
+    # Read public key content
+    try:
+        with open(public_key_path) as f:
+            public_key = f.read().strip()
+    except Exception as e:
+        return (False, f"Failed to read public key: {e}")
+
+    # Method 1: Try ssh-copy-id (standard tool, best approach)
+    try:
+        cmd = [
+            "ssh-copy-id",
+            "-i",
+            str(public_key_path),
+            "-p",
+            str(port),
+            f"{user}@{host}",
+        ]
+
+        # If password provided, we can't pass it directly to ssh-copy-id
+        # User will be prompted interactively
+        console.print(f"[cyan]Copying SSH key to {user}@{host}...[/cyan]")
+        console.print("[dim]You may be prompted for your VPS password[/dim]")
+
+        result = subprocess.run(
+            cmd,
+            capture_output=False,  # Allow interactive password prompt
+            text=True,
+            timeout=60,
+        )
+
+        if result.returncode == 0:
+            return (True, "SSH key delivered successfully using ssh-copy-id")
+
+        # If ssh-copy-id failed, fall through to manual method
+        console.print("[yellow]ssh-copy-id failed, trying manual delivery...[/yellow]")
+
+    except FileNotFoundError:
+        # ssh-copy-id not available, use fallback
+        console.print(
+            "[yellow]ssh-copy-id not found, using manual delivery...[/yellow]"
+        )
+    except subprocess.TimeoutExpired:
+        return (False, "SSH key delivery timed out (>60s)")
+    except Exception as e:
+        console.print(
+            f"[yellow]ssh-copy-id error: {e}, trying manual delivery...[/yellow]"
+        )
+
+    # Method 2: Manual delivery using SSH + echo (fallback)
+    try:
+        # Escape public key for shell
+        public_key_escaped = shlex.quote(public_key)
+
+        # Command to append key to authorized_keys
+        remote_cmd = (
+            f"mkdir -p ~/.ssh && chmod 700 ~/.ssh && "
+            f"echo {public_key_escaped} >> ~/.ssh/authorized_keys && "
+            f"chmod 600 ~/.ssh/authorized_keys && "
+            f"echo 'SSH key added successfully'"
+        )
+
+        ssh_cmd = [
+            "ssh",
+            "-p",
+            str(port),
+            "-o",
+            "StrictHostKeyChecking=no",
+            f"{user}@{host}",
+            remote_cmd,
+        ]
+
+        console.print("[cyan]Manually adding SSH key to VPS...[/cyan]")
+        console.print("[dim]You may be prompted for your VPS password[/dim]")
+
+        result = subprocess.run(
+            ssh_cmd,
+            capture_output=False,  # Allow interactive password prompt
+            text=True,
+            timeout=60,
+        )
+
+        if result.returncode == 0:
+            return (True, "SSH key delivered successfully (manual method)")
+        else:
+            return (
+                False,
+                "Failed to deliver SSH key. Please add it manually to ~/.ssh/authorized_keys on VPS",
+            )
+
+    except subprocess.TimeoutExpired:
+        return (False, "SSH key delivery timed out (>60s)")
+    except Exception as e:
+        return (False, f"Failed to deliver SSH key: {e}")
+
+
+def setup_ssh_key_interactive(
+    host: str,
+    user: str,
+    port: int = 22,
+    force_generate: bool = False,
+) -> Tuple[bool, Optional[str]]:
+    """Interactive SSH key setup workflow.
+
+    This is the main function to call for complete SSH setup.
+    It will:
+    1. Check for existing SSH keys
+    2. Offer to generate new key if none found or force_generate=True
+    3. Deliver public key to VPS
+    4. Verify key-based authentication works
+
+    Args:
+        host: VPS hostname or IP address
+        user: SSH user
+        port: SSH port (default: 22)
+        force_generate: Force generation of new key even if keys exist
+
+    Returns:
+        Tuple of (success, ssh_key_path)
+    """
+    console.print("\n[bold cyan]🔑 SSH Key Setup[/bold cyan]\n")
+
+    # Step 1: Check for existing keys
+    existing_keys = find_ssh_keys()
+
+    if existing_keys and not force_generate:
+        console.print("[green]✓ Found existing SSH keys:[/green]")
+        for i, key in enumerate(existing_keys, 1):
+            console.print(f"  {i}. {key}")
+
+        # Ask if user wants to use existing key or generate new one
+        use_existing = Confirm.ask(
+            "\nDo you want to use an existing SSH key?",
+            default=True,
+        )
+
+        if use_existing:
+            if len(existing_keys) == 1:
+                selected_key = existing_keys[0]
+            else:
+                # Let user choose which key to use
+                choice = Prompt.ask(
+                    "Select SSH key to use",
+                    choices=[str(i) for i in range(1, len(existing_keys) + 1)],
+                    default="1",
+                )
+                selected_key = existing_keys[int(choice) - 1]
+
+            console.print(f"[cyan]Using SSH key: {selected_key}[/cyan]")
+
+            # Check if key is already on VPS
+            console.print(
+                f"[yellow]Make sure this key is authorized on {user}@{host}[/yellow]"
+            )
+
+            if Confirm.ask(
+                "Do you want to deliver/update this key on VPS?", default=True
+            ):
+                public_key_path = Path(f"{selected_key}.pub")
+                success, message = deliver_ssh_key_to_vps(
+                    host, user, public_key_path, port
+                )
+                console.print(
+                    f"[{'green' if success else 'red'}]{message}[/{'green' if success else 'red'}]"
+                )
+                if not success:
+                    return (False, None)
+
+            return (True, str(selected_key))
+
+    # Step 2: Generate new SSH key
+    console.print("\n[cyan]Generating new SSH key...[/cyan]")
+
+    # Ask for key type
+    key_type = Prompt.ask(
+        "Key type",
+        choices=["ed25519", "rsa"],
+        default="ed25519",
+    )
+
+    # Ask for passphrase
+    console.print(
+        "\n[yellow]⚠️  Passphrase protection is recommended for security[/yellow]"
+    )
+    console.print("[dim]Press Enter for no passphrase (not recommended)[/dim]")
+    use_passphrase = Confirm.ask("Set a passphrase for the key?", default=True)
+
+    passphrase = None
+    if use_passphrase:
+        passphrase = Prompt.ask("Enter passphrase", password=True)
+        passphrase_confirm = Prompt.ask("Confirm passphrase", password=True)
+
+        if passphrase != passphrase_confirm:
+            console.print("[red]Passphrases don't match![/red]")
+            return (False, None)
+
+    # Generate comment
+    import socket
+
+    comment = f"{user}@{socket.gethostname()}"
+
+    # Generate key
+    success, message = generate_ssh_key(
+        key_type=key_type,
+        comment=comment,
+        passphrase=passphrase,
+    )
+
+    if not success:
+        console.print(f"[red]❌ {message}[/red]")
+        return (False, None)
+
+    console.print(f"[green]✓ {message}[/green]")
+
+    # Get the generated key path
+    ssh_dir = Path.home() / ".ssh"
+    key_path = ssh_dir / f"id_{key_type}"
+    public_key_path = Path(f"{key_path}.pub")
+
+    # Step 3: Deliver key to VPS
+    console.print(f"\n[cyan]Delivering SSH key to {user}@{host}...[/cyan]")
+
+    success, message = deliver_ssh_key_to_vps(host, user, public_key_path, port)
+
+    if not success:
+        console.print(f"[red]❌ {message}[/red]")
+        console.print("\n[yellow]Manual setup required:[/yellow]")
+        console.print(f"1. Copy your public key: cat {public_key_path}")
+        console.print(f"2. SSH to VPS: ssh {user}@{host}")
+        console.print("3. Add key to: ~/.ssh/authorized_keys")
+        return (False, None)
+
+    console.print(f"[green]✓ {message}[/green]")
+
+    # Step 4: Verify key-based authentication
+    console.print("\n[cyan]Verifying SSH key authentication...[/cyan]")
+
+    vps = VPSConnection(
+        host=host,
+        user=user,
+        ssh_key=str(key_path),
+        port=port,
+        auth_method="key",
+    )
+
+    try:
+        if vps.test_connection():
+            console.print("[green]✓ SSH key authentication works![/green]")
+            return (True, str(key_path))
+        else:
+            console.print(
+                "[red]❌ SSH key authentication failed. Please check VPS configuration.[/red]"
+            )
+            return (False, None)
+    finally:
+        vps.close()
 
 
 class VPSConnection:
