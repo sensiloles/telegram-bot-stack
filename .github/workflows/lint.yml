@@ -28,9 +28,7 @@ jobs:
         with:
           python-version: "3.12"
           cache: "pip"
-          cache-dependency-path: |
-            pyproject.toml
-            requirements*.txt
+          cache-dependency-path: "pyproject.toml"
 
       - name: Cache Ruff
         uses: actions/cache@v4

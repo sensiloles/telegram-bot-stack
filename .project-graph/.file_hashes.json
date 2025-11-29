@@ -1,6 +1,7 @@
 {
-  ".github/workflows/e2e-tests.yml": "efde148c72577b05a6f1489741afda2ee005e8248c90a90dff9cad800d67b7aa",
-  ".github/workflows/integration-tests.yml": "a6d4e2d963ece67ba31942340722fe9d7811f5ec30197ea133575d9ec378b449",
-  ".github/workflows/type-check.yml": "cd9d0b8dad319190b9c6dbb9b27843c0a5714c8675f777a58c757708f2d92e45",
-  ".github/workflows/unit-tests.yml": "c9bf9ff6f1256153cca7db469d089384507c44081680fe99cfbac872a584df77"
+  ".github/workflows/e2e-tests.yml": "5a2207d79ec22908a0c3a2cbda7adffdaf0b87943634b93928de1251300a77d6",
+  ".github/workflows/integration-tests.yml": "92b12ebe050d835a131a44bb8c78518776626cd5c32486f6c2e4ea0c414e19a1",
+  ".github/workflows/type-check.yml": "d7807b8d3723c5c61f662bc9a70cfcb677e9546b53d97f9b263f8ca0f9672c43",
+  ".github/workflows/unit-tests.yml": "751b386958dd0b638d159de0655a2544e15c68c57295b093e107b14aa608e2c4",
+  ".github/workflows/release.yml": "997d131964e4edf951754f1c7cc95f66775d43d507c1f2cfa953753ae93c364b"
 }
