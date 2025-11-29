@@ -13,11 +13,6 @@ on:
   workflow_call: # Allow being called by release.yml
   workflow_dispatch: # Allow manual trigger
 
-# Cancel previous runs when new commits are pushed to the same PR
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
   mypy:
     name: mypy
