@@ -6,10 +6,13 @@ from telegram_bot_stack.cli.utils.vps import (
     VPSConnection,
     check_docker_compose_installed,
     check_ssh_agent,
+    deliver_ssh_key_to_vps,
     find_ssh_keys,
+    generate_ssh_key,
     get_container_health,
     get_docker_compose_command,
     get_recent_errors,
+    setup_ssh_key_interactive,
 )
 
 
@@ -637,3 +640,309 @@ class TestSSHKeyAuth:
         info = vps._get_auth_info()
 
         assert "agent" in info.lower()
+
+
+class TestSSHKeyGeneration:
+    """Tests for SSH key generation utilities."""
+
+    @patch("telegram_bot_stack.cli.utils.vps.subprocess.run")
+    @patch("telegram_bot_stack.cli.utils.vps.Path.exists")
+    def test_generate_ssh_key_success(self, mock_exists, mock_run):
+        """Test successful SSH key generation."""
+        mock_exists.return_value = False  # Key doesn't exist yet
+        mock_result = MagicMock()
+        mock_result.returncode = 0
+        mock_run.return_value = mock_result
+
+        with patch("telegram_bot_stack.cli.utils.vps.Path.mkdir"):
+            with patch("telegram_bot_stack.cli.utils.vps.Path.chmod"):
+                success, message = generate_ssh_key(
+                    key_type="ed25519",
+                    comment="test@localhost",
+                    passphrase="test123",
+                )
+
+        assert success is True
+        assert "generated successfully" in message.lower()
+        mock_run.assert_called_once()
+
+    @patch("telegram_bot_stack.cli.utils.vps.Path.exists")
+    def test_generate_ssh_key_already_exists(self, mock_exists):
+        """Test SSH key generation when key already exists."""
+        mock_exists.return_value = True  # Key already exists
+
+        with patch("telegram_bot_stack.cli.utils.vps.Path.mkdir"):
+            success, message = generate_ssh_key(key_type="ed25519")
+
+        assert success is False
+        assert "already exists" in message.lower()
+
+    @patch("telegram_bot_stack.cli.utils.vps.subprocess.run")
+    @patch("telegram_bot_stack.cli.utils.vps.Path.exists")
+    def test_generate_ssh_key_command_failure(self, mock_exists, mock_run):
+        """Test SSH key generation when ssh-keygen fails."""
+        mock_exists.return_value = False
+        mock_result = MagicMock()
+        mock_result.returncode = 1
+        mock_result.stderr = "Permission denied"
+        mock_run.return_value = mock_result
+
+        with patch("telegram_bot_stack.cli.utils.vps.Path.mkdir"):
+            success, message = generate_ssh_key(key_type="ed25519")
+
+        assert success is False
+        assert "failed" in message.lower()
+
+    @patch("telegram_bot_stack.cli.utils.vps.subprocess.run")
+    @patch("telegram_bot_stack.cli.utils.vps.Path.exists")
+    def test_generate_ssh_key_with_rsa(self, mock_exists, mock_run):
+        """Test SSH key generation with RSA type."""
+        mock_exists.return_value = False
+        mock_result = MagicMock()
+        mock_result.returncode = 0
+        mock_run.return_value = mock_result
+
+        with patch("telegram_bot_stack.cli.utils.vps.Path.mkdir"):
+            with patch("telegram_bot_stack.cli.utils.vps.Path.chmod"):
+                success, _ = generate_ssh_key(key_type="rsa")
+
+        assert success is True
+        # Verify ssh-keygen was called with RSA
+        args = mock_run.call_args[0][0]
+        assert "-t" in args
+        assert "rsa" in args
+
+    @patch("telegram_bot_stack.cli.utils.vps.subprocess.run")
+    @patch("telegram_bot_stack.cli.utils.vps.Path.exists")
+    def test_generate_ssh_key_no_passphrase(self, mock_exists, mock_run):
+        """Test SSH key generation without passphrase."""
+        mock_exists.return_value = False
+        mock_result = MagicMock()
+        mock_result.returncode = 0
+        mock_run.return_value = mock_result
+
+        with patch("telegram_bot_stack.cli.utils.vps.Path.mkdir"):
+            with patch("telegram_bot_stack.cli.utils.vps.Path.chmod"):
+                success, _ = generate_ssh_key(key_type="ed25519", passphrase=None)
+
+        assert success is True
+        # Verify empty passphrase was passed
+        args = mock_run.call_args[0][0]
+        assert "-N" in args
+        assert "" in args
+
+
+class TestSSHKeyDelivery:
+    """Tests for SSH key delivery utilities."""
+
+    @patch("telegram_bot_stack.cli.utils.vps.Path.exists")
+    def test_deliver_ssh_key_file_not_found(self, mock_exists):
+        """Test SSH key delivery when public key file doesn't exist."""
+        from pathlib import Path
+
+        mock_exists.return_value = False
+
+        success, message = deliver_ssh_key_to_vps(
+            host="test.example.com",
+            user="root",
+            public_key_path=Path("/nonexistent/id_rsa.pub"),
+        )
+
+        assert success is False
+        assert "not found" in message.lower()
+
+    @patch("builtins.open")
+    @patch("telegram_bot_stack.cli.utils.vps.subprocess.run")
+    @patch("telegram_bot_stack.cli.utils.vps.Path.exists")
+    def test_deliver_ssh_key_success_with_ssh_copy_id(
+        self, mock_exists, mock_run, mock_open
+    ):
+        """Test successful SSH key delivery using ssh-copy-id."""
+        from pathlib import Path
+
+        mock_exists.return_value = True
+        mock_open.return_value.__enter__.return_value.read.return_value = (
+            "ssh-ed25519 AAAAC3... test@localhost"
+        )
+        mock_result = MagicMock()
+        mock_result.returncode = 0
+        mock_run.return_value = mock_result
+
+        success, message = deliver_ssh_key_to_vps(
+            host="test.example.com",
+            user="root",
+            public_key_path=Path("~/.ssh/id_ed25519.pub"),
+        )
+
+        assert success is True
+        assert "ssh-copy-id" in message.lower()
+
+    @patch("builtins.open")
+    @patch("telegram_bot_stack.cli.utils.vps.subprocess.run")
+    @patch("telegram_bot_stack.cli.utils.vps.Path.exists")
+    def test_deliver_ssh_key_fallback_to_manual(self, mock_exists, mock_run, mock_open):
+        """Test SSH key delivery fallback to manual method."""
+        from pathlib import Path
+
+        mock_exists.return_value = True
+        mock_open.return_value.__enter__.return_value.read.return_value = (
+            "ssh-ed25519 AAAAC3... test@localhost"
+        )
+
+        # First call (ssh-copy-id) fails, second call (manual) succeeds
+        mock_run.side_effect = [
+            FileNotFoundError("ssh-copy-id not found"),
+            MagicMock(returncode=0),
+        ]
+
+        success, message = deliver_ssh_key_to_vps(
+            host="test.example.com",
+            user="root",
+            public_key_path=Path("~/.ssh/id_ed25519.pub"),
+        )
+
+        assert success is True
+        assert "manual" in message.lower()
+
+    @patch("builtins.open")
+    @patch("telegram_bot_stack.cli.utils.vps.subprocess.run")
+    @patch("telegram_bot_stack.cli.utils.vps.Path.exists")
+    def test_deliver_ssh_key_custom_port(self, mock_exists, mock_run, mock_open):
+        """Test SSH key delivery with custom port."""
+        from pathlib import Path
+
+        mock_exists.return_value = True
+        mock_open.return_value.__enter__.return_value.read.return_value = (
+            "ssh-ed25519 AAAAC3... test@localhost"
+        )
+        mock_result = MagicMock()
+        mock_result.returncode = 0
+        mock_run.return_value = mock_result
+
+        success, _ = deliver_ssh_key_to_vps(
+            host="test.example.com",
+            user="root",
+            public_key_path=Path("~/.ssh/id_ed25519.pub"),
+            port=2222,
+        )
+
+        assert success is True
+        # Verify custom port was used
+        args = mock_run.call_args[0][0]
+        assert "2222" in args
+
+
+class TestSSHKeySetupInteractive:
+    """Tests for interactive SSH key setup."""
+
+    @patch("telegram_bot_stack.cli.utils.vps.find_ssh_keys")
+    @patch("telegram_bot_stack.cli.utils.vps.Confirm.ask")
+    @patch("telegram_bot_stack.cli.utils.vps.deliver_ssh_key_to_vps")
+    @patch("telegram_bot_stack.cli.utils.vps.VPSConnection")
+    def test_setup_ssh_key_use_existing(
+        self, mock_vps_class, mock_deliver, mock_confirm, mock_find_keys
+    ):
+        """Test SSH setup using existing key."""
+        from pathlib import Path
+
+        # Mock existing keys found
+        mock_find_keys.return_value = [Path("~/.ssh/id_ed25519")]
+
+        # User wants to use existing key and deliver it
+        mock_confirm.side_effect = [True, True]  # Use existing, deliver to VPS
+
+        # Mock successful delivery
+        mock_deliver.return_value = (True, "Key delivered")
+
+        # Mock successful connection test
+        mock_vps = MagicMock()
+        mock_vps.test_connection.return_value = True
+        mock_vps_class.return_value.__enter__.return_value = mock_vps
+
+        success, key_path = setup_ssh_key_interactive(
+            host="test.example.com",
+            user="root",
+        )
+
+        assert success is True
+        assert key_path is not None
+        mock_deliver.assert_called_once()
+
+    @patch("telegram_bot_stack.cli.utils.vps.find_ssh_keys")
+    @patch("telegram_bot_stack.cli.utils.vps.Confirm.ask")
+    @patch("telegram_bot_stack.cli.utils.vps.Prompt.ask")
+    @patch("telegram_bot_stack.cli.utils.vps.generate_ssh_key")
+    @patch("telegram_bot_stack.cli.utils.vps.deliver_ssh_key_to_vps")
+    @patch("telegram_bot_stack.cli.utils.vps.VPSConnection")
+    @patch("socket.gethostname")
+    def test_setup_ssh_key_generate_new(
+        self,
+        mock_hostname,
+        mock_vps_class,
+        mock_deliver,
+        mock_generate,
+        mock_prompt,
+        mock_confirm,
+        mock_find_keys,
+    ):
+        """Test SSH setup generating new key."""
+        # No existing keys
+        mock_find_keys.return_value = []
+
+        # Mock hostname
+        mock_hostname.return_value = "localhost"
+
+        # User chooses to generate new key with passphrase
+        mock_confirm.return_value = True  # Use passphrase
+        mock_prompt.side_effect = [
+            "ed25519",  # Key type
+            "pass123",  # Passphrase
+            "pass123",  # Confirm passphrase
+        ]
+
+        # Mock successful key generation
+        mock_generate.return_value = (True, "Key generated")
+
+        # Mock successful delivery
+        mock_deliver.return_value = (True, "Key delivered")
+
+        # Mock successful connection test
+        mock_vps = MagicMock()
+        mock_vps.test_connection.return_value = True
+        mock_vps_class.return_value.__enter__.return_value = mock_vps
+
+        success, key_path = setup_ssh_key_interactive(
+            host="test.example.com",
+            user="root",
+        )
+
+        assert success is True
+        assert key_path is not None
+        mock_generate.assert_called_once()
+        mock_deliver.assert_called_once()
+
+    @patch("telegram_bot_stack.cli.utils.vps.find_ssh_keys")
+    @patch("telegram_bot_stack.cli.utils.vps.Confirm.ask")
+    @patch("telegram_bot_stack.cli.utils.vps.Prompt.ask")
+    def test_setup_ssh_key_passphrase_mismatch(
+        self, mock_prompt, mock_confirm, mock_find_keys
+    ):
+        """Test SSH setup with mismatched passphrases."""
+        # No existing keys
+        mock_find_keys.return_value = []
+
+        # User chooses to generate key with passphrase
+        mock_confirm.return_value = True  # Use passphrase
+        mock_prompt.side_effect = [
+            "ed25519",  # Key type
+            "pass123",  # Passphrase
+            "different",  # Confirm passphrase (mismatch)
+        ]
+
+        success, key_path = setup_ssh_key_interactive(
+            host="test.example.com",
+            user="root",
+        )
+
+        assert success is False
+        assert key_path is None
