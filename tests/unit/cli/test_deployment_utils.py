@@ -295,3 +295,273 @@ class TestEscapeEnvValue:
             else:
                 # Simple value, should be unchanged
                 assert escaped == value
+
+
+class TestDockerComposeYmlCompatibility:
+    """Tests for docker-compose.yml compatibility."""
+
+    def test_no_version_field_in_template(self, tmp_path):
+        """Verify 'version' field is removed from docker-compose.yml template.
+
+        Docker Compose v2 marks 'version' field as obsolete.
+        """
+        config_file = tmp_path / "deploy.yaml"
+        config_file.write_text(
+            """
+vps:
+  host: test.com
+bot:
+  name: test-bot
+  python_version: "3.11"
+deployment:
+  method: docker
+resources:
+  memory_limit: 256M
+  cpu_limit: "0.5"
+  memory_reservation: 128M
+  cpu_reservation: "0.25"
+logging:
+  level: INFO
+  max_size: 5m
+  max_files: "5"
+environment:
+  timezone: UTC
+"""
+        )
+
+        deploy_config = DeploymentConfig(str(config_file))
+        renderer = DockerTemplateRenderer(deploy_config, has_secrets=False)
+
+        output_dir = tmp_path / "output"
+        output_dir.mkdir()
+        renderer.render_all(output_dir)
+
+        compose_file = output_dir / "docker-compose.yml"
+        content = compose_file.read_text()
+
+        # Verify NO version field
+        assert "version:" not in content
+        # But services should be present
+        assert "services:" in content
+
+    def test_no_name_field_in_template(self, tmp_path):
+        """Verify 'name' field is removed from docker-compose.yml template.
+
+        The 'name' field at project level is incompatible with version 3.8.
+        Network names are allowed.
+        """
+        config_file = tmp_path / "deploy.yaml"
+        config_file.write_text(
+            """
+vps:
+  host: test.com
+bot:
+  name: test-bot
+  python_version: "3.11"
+deployment:
+  method: docker
+resources:
+  memory_limit: 256M
+  cpu_limit: "0.5"
+  memory_reservation: 128M
+  cpu_reservation: "0.25"
+logging:
+  level: INFO
+  max_size: 5m
+  max_files: "5"
+environment:
+  timezone: UTC
+"""
+        )
+
+        deploy_config = DeploymentConfig(str(config_file))
+        renderer = DockerTemplateRenderer(deploy_config, has_secrets=False)
+
+        output_dir = tmp_path / "output"
+        output_dir.mkdir()
+        renderer.render_all(output_dir)
+
+        compose_file = output_dir / "docker-compose.yml"
+        content = compose_file.read_text()
+        lines = content.split("\n")
+
+        # Verify NO name field at project level (before 'services:')
+        # Network names are OK, project name is not
+        services_line_idx = next(
+            i for i, line in enumerate(lines) if "services:" in line
+        )
+        project_level = "\n".join(lines[:services_line_idx])
+
+        assert (
+            "name:" not in project_level
+        ), "Project-level 'name:' field should not be present"
+
+        # But network name should be present
+        assert "name: test-bot-network" in content, "Network name should be present"
+
+    def test_secrets_env_optional_when_no_secrets(self, tmp_path):
+        """Verify .secrets.env is NOT included when has_secrets=False."""
+        config_file = tmp_path / "deploy.yaml"
+        config_file.write_text(
+            """
+vps:
+  host: test.com
+bot:
+  name: test-bot
+  python_version: "3.11"
+deployment:
+  method: docker
+resources:
+  memory_limit: 256M
+  cpu_limit: "0.5"
+  memory_reservation: 128M
+  cpu_reservation: "0.25"
+logging:
+  level: INFO
+  max_size: 5m
+  max_files: "5"
+environment:
+  timezone: UTC
+"""
+        )
+
+        deploy_config = DeploymentConfig(str(config_file))
+        renderer = DockerTemplateRenderer(deploy_config, has_secrets=False)
+
+        output_dir = tmp_path / "output"
+        output_dir.mkdir()
+        renderer.render_all(output_dir)
+
+        compose_file = output_dir / "docker-compose.yml"
+        content = compose_file.read_text()
+
+        # Should NOT have .secrets.env reference when no secrets
+        assert ".secrets.env" not in content
+
+    def test_secrets_env_included_when_has_secrets(self, tmp_path):
+        """Verify .secrets.env IS included when has_secrets=True."""
+        config_file = tmp_path / "deploy.yaml"
+        config_file.write_text(
+            """
+vps:
+  host: test.com
+bot:
+  name: test-bot
+  python_version: "3.11"
+deployment:
+  method: docker
+resources:
+  memory_limit: 256M
+  cpu_limit: "0.5"
+  memory_reservation: 128M
+  cpu_reservation: "0.25"
+logging:
+  level: INFO
+  max_size: 5m
+  max_files: "5"
+environment:
+  timezone: UTC
+"""
+        )
+
+        deploy_config = DeploymentConfig(str(config_file))
+        renderer = DockerTemplateRenderer(deploy_config, has_secrets=True)
+
+        output_dir = tmp_path / "output"
+        output_dir.mkdir()
+        renderer.render_all(output_dir)
+
+        compose_file = output_dir / "docker-compose.yml"
+        content = compose_file.read_text()
+
+        # Should have .secrets.env reference when secrets exist
+        assert ".secrets.env" in content
+
+
+class TestDockerfileImprovements:
+    """Tests for Dockerfile improvements."""
+
+    def test_debian_frontend_noninteractive_set(self, tmp_path):
+        """Verify DEBIAN_FRONTEND=noninteractive is set in Dockerfile.
+
+        This prevents warnings during apt-get operations in Docker build.
+        """
+        config_file = tmp_path / "deploy.yaml"
+        config_file.write_text(
+            """
+vps:
+  host: test.com
+bot:
+  name: test-bot
+  python_version: "3.11"
+deployment:
+  method: docker
+resources:
+  memory_limit: 256M
+  cpu_limit: "0.5"
+  memory_reservation: 128M
+  cpu_reservation: "0.25"
+logging:
+  level: INFO
+  max_size: 5m
+  max_files: "5"
+environment:
+  timezone: UTC
+"""
+        )
+
+        deploy_config = DeploymentConfig(str(config_file))
+        renderer = DockerTemplateRenderer(deploy_config, has_secrets=False)
+
+        output_dir = tmp_path / "output"
+        output_dir.mkdir()
+        renderer.render_all(output_dir)
+
+        dockerfile = output_dir / "Dockerfile"
+        content = dockerfile.read_text()
+
+        # Verify DEBIAN_FRONTEND is set
+        assert "DEBIAN_FRONTEND=noninteractive" in content
+        # Should be in ENV directive
+        assert "ENV" in content
+
+    def test_requirements_txt_copied_in_dockerfile(self, tmp_path):
+        """Verify Dockerfile copies and uses requirements.txt."""
+        config_file = tmp_path / "deploy.yaml"
+        config_file.write_text(
+            """
+vps:
+  host: test.com
+bot:
+  name: test-bot
+  python_version: "3.11"
+deployment:
+  method: docker
+resources:
+  memory_limit: 256M
+  cpu_limit: "0.5"
+  memory_reservation: 128M
+  cpu_reservation: "0.25"
+logging:
+  level: INFO
+  max_size: 5m
+  max_files: "5"
+environment:
+  timezone: UTC
+"""
+        )
+
+        deploy_config = DeploymentConfig(str(config_file))
+        renderer = DockerTemplateRenderer(deploy_config, has_secrets=False)
+
+        output_dir = tmp_path / "output"
+        output_dir.mkdir()
+        renderer.render_all(output_dir)
+
+        dockerfile = output_dir / "Dockerfile"
+        content = dockerfile.read_text()
+
+        # Verify requirements.txt is used
+        assert "COPY requirements.txt" in content
+        assert "pip install" in content
+        assert "-r requirements.txt" in content

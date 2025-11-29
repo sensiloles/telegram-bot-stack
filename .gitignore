@@ -86,3 +86,6 @@ tests/integration/fixtures/.ssh*/
 
 # Integration test SSH keys (generated locally)
 tests/integration/fixtures/.ssh-test/
+
+# Test bot projects
+.test-bot/

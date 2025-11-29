@@ -1,7 +1,6 @@
 {
-  ".github/workflows/e2e-tests.yml": "5a2207d79ec22908a0c3a2cbda7adffdaf0b87943634b93928de1251300a77d6",
-  ".github/workflows/integration-tests.yml": "92b12ebe050d835a131a44bb8c78518776626cd5c32486f6c2e4ea0c414e19a1",
-  ".github/workflows/type-check.yml": "d7807b8d3723c5c61f662bc9a70cfcb677e9546b53d97f9b263f8ca0f9672c43",
-  ".github/workflows/unit-tests.yml": "751b386958dd0b638d159de0655a2544e15c68c57295b093e107b14aa608e2c4",
-  ".github/workflows/release.yml": "997d131964e4edf951754f1c7cc95f66775d43d507c1f2cfa953753ae93c364b"
+  ".github/PROJECT_STATUS.md": "493d2d503bfe494d7db7207eefda2e7f7b2de9cc8f9fb5ebdabe182aeb4f4749",
+  "telegram_bot_stack/cli/commands/deploy/operations.py": "4c71173f141f15882f69467ec6e6050c30ce29fdb1d71388abe78ee4accb28ce",
+  "telegram_bot_stack/cli/commands/init.py": "79eee2532d56b376ffe692775fc628db67cdae76acc76c6fc090decec1dd4509",
+  "telegram_bot_stack/cli/utils/vps.py": "1d11e65402fc893867a071498fe9ad707d8c1a7ef6b6304c46e5145168ab5693"
 }
