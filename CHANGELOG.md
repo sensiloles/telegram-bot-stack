@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.26.1 (2025-11-29)
+
+### Bug Fixes
+
+- **deploy**: Fix 12 critical deployment bugs found in E2E testing
+  ([`92b808b`](https://github.com/sensiloles/telegram-bot-stack/commit/92b808bf742e6d5f1841f91e5ad7fa2d9f553be6))
+
+
 ## v1.26.0 (2025-11-29)
 
 ### Features
