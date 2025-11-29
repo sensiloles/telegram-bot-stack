@@ -1,7 +1,7 @@
 # Project Status - telegram-bot-stack
 
 **Version:** v1.25.0 → v2.0.0 MVP
-**Updated:** 2025-11-29
+**Updated:** 2025-11-29 (after #88 Doctor command completion)
 **Status:** 🏗️ Phase 2 - Hardening Killer Feature
 
 ---
@@ -111,13 +111,13 @@ Found and fixed **12 critical deployment bugs** during E2E testing:
 | **#81**  | Backup/restore                | ✅ YES         | ✅ DONE | 5-6h   | -      |
 | **#84**  | Troubleshooting guide         | ✅ YES (docs)  | ✅ DONE | 3-4h   | -      |
 | **#85**  | Integration tests             | ✅ YES (tests) | ✅ DONE | 8-10h  | -      |
-| **#88**  | Doctor command                | 🔧 CLI tool    | ⏳ TODO | 6-8h   | -      |
+| **#88**  | Doctor command                | 🔧 CLI tool    | ✅ DONE | 6-8h   | -      |
 | **#119** | Already running detection     | ✅ YES         | ✅ DONE | 8-10h  | -      |
 | **#120** | Pre-release E2E testing       | ✅ QA          | ⏳ TODO | 16-24h | #121   |
 | **#121** | v2.0.0 Release                | 🎯 Milestone   | ⏳ TODO | 24-32h | All    |
 | **NEW**  | **Deployment bug fixes**      | ✅ YES         | ✅ DONE | 12h    | -      |
 
-**Total Critical Path:** ~79-107 hours (10-13 days) - **8/11 critical issues completed!**
+**Total Critical Path:** ~79-107 hours (10-13 days) - **9/11 critical issues completed!**
 
 **IMPORTANT Issues (do after critical or for v2.0.1):**
 
@@ -156,7 +156,7 @@ Found and fixed **12 critical deployment bugs** during E2E testing:
 | #81  | **Backup/restore**         | Deploy   | ✅ DONE           | #27     | -        |
 | #84  | **Troubleshooting**        | Docs     | ✅ DONE           | #27     | -        |
 | #85  | **Deploy tests**           | Tests    | ✅ DONE           | #27     | -        |
-| #88  | **Doctor command**         | CLI      | ⏳ TODO           | -       | -        |
+| #88  | **Doctor command**         | CLI      | ✅ DONE           | -       | -        |
 | #119 | **Already running detect** | Deploy   | ✅ DONE           | #27     | -        |
 | #120 | **Pre-release E2E tests**  | QA       | ⏳ TODO           | All     | #121     |
 | #121 | **v2.0.0 Release**         | Release  | ⏳ TODO           | All     | -        |
@@ -168,7 +168,7 @@ Found and fixed **12 critical deployment bugs** during E2E testing:
 | #40 | Full Dev Setup | ✅ DONE (v1.17.0) | Killer Feature #1 |
 | #60 | Agent Optimize | 🏗️ In Progress    | Ongoing           |
 
-**Total Critical: 3 TODO + 11 DONE = 14 issues**
+**Total Critical: 2 TODO + 12 DONE = 14 issues**
 
 ---
 
@@ -377,7 +377,7 @@ Supporting Infrastructure (v2.0.1):
 **Phase 2: Critical Deployment Scenarios (Week 8-9)**
 
 ```bash
-7. #119 Already running detection (8-10h) ← HIGH PRIORITY
+7. ✅ #119 Already running detection (8-10h) ← DONE
    → Prevent double deployments, handle restart scenarios
    → Critical for user experience
 
@@ -389,7 +389,7 @@ Supporting Infrastructure (v2.0.1):
    → Security best practice for production
    → Support keys + password methods
 
-10. #88 Doctor command (6-8h)
+10. ✅ #88 Doctor command (6-8h) ← DONE
     → Auto-diagnose all issues
     → Validates all critical scenarios
 ```
@@ -423,7 +423,7 @@ Supporting Infrastructure (v2.0.1):
 **MUST complete for v2.0.0:**
 
 ```bash
-1. #119 Already running detection (8-10h) ← CRITICAL DX
+1. ✅ #119 Already running detection (8-10h) ← DONE
    → Prevent double deploy, handle conflicts
    → Most common user error scenario
 
@@ -435,12 +435,12 @@ Supporting Infrastructure (v2.0.1):
    → Industry standard auth method
    → Production best practice
 
-4. #88 Doctor command (6-8h) ← DIAGNOSTICS
+4. ✅ #88 Doctor command (6-8h) ← DONE
    → Auto-detect all issues
    → Validates #119, #117, #118
 ```
 
-**Total: 25-33 hours (~1 week)**
+**Total: 11-15 hours (~2-3 days remaining)**
 
 **Milestone:** All critical deployment scenarios handled ✅
 
@@ -540,10 +540,10 @@ Supporting Infrastructure (v2.0.1):
 - [x] Backup/restore (#81) ✅
 - [x] Troubleshooting guide (#84) ✅
 - [x] Integration tests (#85) ✅
-- [x] Already running detection (#119) ✅ DONE
+- [x] Already running detection (#119) ✅
+- [x] Doctor command (#88) ✅
 - [ ] Multi-bot support (#117) ⏳
 - [ ] SSH key auth (#118) ⏳
-- [ ] Doctor command (#88) ⏳
 - [ ] E2E testing complete (#120) ⏳ GATE
 
 **Enhanced Features (NICE to have for v2.0.0, else v2.0.1):**
@@ -630,9 +630,9 @@ Supporting Infrastructure (v2.0.1):
 **In Progress (Week 8-9 - Critical Scenarios):**
 
 - #119: Already running detection ✅ DONE
+- #88: Doctor command ✅ DONE
 - #117: Multi-bot on one VPS ⏳
 - #118: SSH key authentication ⏳
-- #88: Doctor command ⏳
 
 **Quality Gate (Week 10-11):**
 
@@ -727,8 +727,8 @@ Supporting Infrastructure (v2.0.1):
 ---
 
 **Status:** 🏗️ Phase 2 critical scenarios in progress
-**Progress:** 11/14 critical tasks done ✅ | 3 remaining before E2E testing
-**Current Focus:** #117 Multi-bot, #118 SSH keys, #88 Doctor
+**Progress:** 12/14 critical tasks done ✅ | 2 remaining before E2E testing
+**Current Focus:** #117 Multi-bot, #118 SSH keys
 **Next Gate:** #120 Pre-release E2E testing (Week 10-11)
 **Target Release:** v2.0.0 MVP (#121) - Week 12
 

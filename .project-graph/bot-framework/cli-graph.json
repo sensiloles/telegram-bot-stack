@@ -11,8 +11,8 @@
     "description": "CLI tool for bot project management and development",
     "scope": "CLI tool for bot project management and development",
     "root_package": "telegram_bot_stack.cli",
-    "node_count": 31,
-    "edge_count": 40
+    "node_count": 32,
+    "edge_count": 50
   },
   "nodes": [
     {
@@ -38,7 +38,7 @@
       "category": "implementation",
       "path": "telegram_bot_stack/cli/main.py",
       "description": "Main CLI entry point for telegram-bot-stack.",
-      "lines_of_code": 41,
+      "lines_of_code": 42,
       "complexity_score": 1,
       "exports": [
         "cli",
@@ -850,6 +850,59 @@
       "dependencies": [],
       "dependents": [],
       "criticality": "medium"
+    },
+    {
+      "id": "telegram_bot_stack.cli.utils.health_checks",
+      "name": "health_checks",
+      "type": "module",
+      "category": "implementation",
+      "path": "telegram_bot_stack/cli/utils/health_checks.py",
+      "description": "Module health_checks",
+      "lines_of_code": 607,
+      "complexity_score": 1,
+      "exports": [
+        "HealthCheckResult",
+        "HealthReport",
+        "HealthChecker",
+        "print_health_report",
+        "auto_fix_issues",
+        "errors",
+        "warnings",
+        "passed",
+        "has_errors",
+        "add",
+        "check_python_version",
+        "check_dependencies",
+        "check_project_files",
+        "check_configuration",
+        "check_security",
+        "check_deployment",
+        "run_all_checks"
+      ],
+      "classes": [
+        "HealthCheckResult",
+        "HealthReport",
+        "HealthChecker"
+      ],
+      "functions": [
+        "print_health_report",
+        "auto_fix_issues",
+        "errors",
+        "warnings",
+        "passed",
+        "has_errors",
+        "add",
+        "check_python_version",
+        "check_dependencies",
+        "check_project_files",
+        "check_configuration",
+        "check_security",
+        "check_deployment",
+        "run_all_checks"
+      ],
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium"
     }
   ],
   "edges": [
@@ -1132,6 +1185,76 @@
       "target": "telegram_bot_stack.cli.utils",
       "type": "imports",
       "description": "Imports from telegram_bot_stack.cli.utils"
+    },
+    {
+      "id": "edge_45",
+      "source": "telegram_bot_stack.cli.commands",
+      "target": "telegram_bot_stack.cli.commands.validate",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.commands.validate"
+    },
+    {
+      "id": "edge_46",
+      "source": "telegram_bot_stack.cli.commands",
+      "target": "telegram_bot_stack.cli.commands.new",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.commands.new"
+    },
+    {
+      "id": "edge_47",
+      "source": "telegram_bot_stack.cli.commands",
+      "target": "telegram_bot_stack.cli.commands.deploy",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.commands.deploy"
+    },
+    {
+      "id": "edge_48",
+      "source": "telegram_bot_stack.cli.commands",
+      "target": "telegram_bot_stack.cli.commands.init",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.commands.init"
+    },
+    {
+      "id": "edge_49",
+      "source": "telegram_bot_stack.cli.commands",
+      "target": "telegram_bot_stack.cli.commands.dev",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.commands.dev"
+    },
+    {
+      "id": "edge_50",
+      "source": "telegram_bot_stack.cli.main",
+      "target": "telegram_bot_stack.cli.commands.deploy",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.commands.deploy"
+    },
+    {
+      "id": "edge_51",
+      "source": "telegram_bot_stack.cli.main",
+      "target": "telegram_bot_stack.cli.commands.validate",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.commands.validate"
+    },
+    {
+      "id": "edge_52",
+      "source": "telegram_bot_stack.cli.main",
+      "target": "telegram_bot_stack.cli.commands.new",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.commands.new"
+    },
+    {
+      "id": "edge_53",
+      "source": "telegram_bot_stack.cli.main",
+      "target": "telegram_bot_stack.cli.commands.dev",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.commands.dev"
+    },
+    {
+      "id": "edge_54",
+      "source": "telegram_bot_stack.cli.main",
+      "target": "telegram_bot_stack.cli.commands.init",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.commands.init"
     }
   ]
 }
