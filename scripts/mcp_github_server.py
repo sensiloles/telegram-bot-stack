@@ -814,6 +814,127 @@ class MCPServer:
                         },
                     },
                 },
+                {
+                    "name": "list_milestones",
+                    "description": "List GitHub milestones",
+                    "inputSchema": {
+                        "type": "object",
+                        "properties": {
+                            "state": {
+                                "type": "string",
+                                "enum": ["open", "closed", "all"],
+                                "description": "Filter by milestone state",
+                                "default": "open",
+                            },
+                            "sort": {
+                                "type": "string",
+                                "enum": ["due_on", "completeness"],
+                                "description": "Sort by field",
+                                "default": "due_on",
+                            },
+                            "direction": {
+                                "type": "string",
+                                "enum": ["asc", "desc"],
+                                "description": "Sort direction",
+                                "default": "asc",
+                            },
+                            "repo": {
+                                "type": "string",
+                                "description": "Repository in format owner/repo (auto-detected if not provided)",
+                            },
+                        },
+                    },
+                },
+                {
+                    "name": "create_milestone",
+                    "description": "Create a new GitHub milestone",
+                    "inputSchema": {
+                        "type": "object",
+                        "properties": {
+                            "title": {
+                                "type": "string",
+                                "description": "Milestone title",
+                            },
+                            "description": {
+                                "type": "string",
+                                "description": "Milestone description (markdown)",
+                            },
+                            "due_on": {
+                                "type": "string",
+                                "description": "Due date (ISO 8601 format: YYYY-MM-DD)",
+                            },
+                            "state": {
+                                "type": "string",
+                                "enum": ["open", "closed"],
+                                "description": "Milestone state",
+                                "default": "open",
+                            },
+                            "repo": {
+                                "type": "string",
+                                "description": "Repository in format owner/repo (auto-detected if not provided)",
+                            },
+                        },
+                        "required": ["title"],
+                    },
+                },
+                {
+                    "name": "update_milestone",
+                    "description": "Update an existing milestone",
+                    "inputSchema": {
+                        "type": "object",
+                        "properties": {
+                            "milestone_number": {
+                                "type": "integer",
+                                "description": "Milestone number",
+                            },
+                            "title": {
+                                "type": "string",
+                                "description": "New milestone title",
+                            },
+                            "description": {
+                                "type": "string",
+                                "description": "New milestone description",
+                            },
+                            "due_on": {
+                                "type": "string",
+                                "description": "New due date (ISO 8601 format)",
+                            },
+                            "state": {
+                                "type": "string",
+                                "enum": ["open", "closed"],
+                                "description": "New milestone state",
+                            },
+                            "repo": {
+                                "type": "string",
+                                "description": "Repository in format owner/repo (auto-detected if not provided)",
+                            },
+                        },
+                        "required": ["milestone_number"],
+                    },
+                },
+                {
+                    "name": "set_issue_milestone",
+                    "description": "Set milestone for one or more issues",
+                    "inputSchema": {
+                        "type": "object",
+                        "properties": {
+                            "issue_numbers": {
+                                "type": "array",
+                                "items": {"type": "integer"},
+                                "description": "Issue number(s) to update",
+                            },
+                            "milestone_number": {
+                                "type": "integer",
+                                "description": "Milestone number to assign (or null to remove)",
+                            },
+                            "repo": {
+                                "type": "string",
+                                "description": "Repository in format owner/repo (auto-detected if not provided)",
+                            },
+                        },
+                        "required": ["issue_numbers", "milestone_number"],
+                    },
+                },
             ]
         }
 
@@ -1356,6 +1477,187 @@ class MCPServer:
                 return {
                     "content": [{"type": "text", "text": response_text}],
                     "isError": False,
+                }
+
+            elif name == "list_milestones":
+                # Get milestones with filters
+                query_params = {
+                    "state": arguments.get("state", "open"),
+                    "sort": arguments.get("sort", "due_on"),
+                    "direction": arguments.get("direction", "asc"),
+                }
+
+                milestones = list(repo.get_milestones(**query_params))
+
+                if not milestones:
+                    return {
+                        "content": [{"type": "text", "text": "No milestones found."}],
+                        "isError": False,
+                    }
+
+                response_text = f"Found {len(milestones)} milestone(s):\n\n"
+                for milestone in milestones:
+                    state = "OPEN" if milestone.state == "open" else "CLOSED"
+                    response_text += (
+                        f"#{milestone.number} [{state}] {milestone.title}\n"
+                    )
+
+                    # Progress
+                    total = milestone.open_issues + milestone.closed_issues
+                    if total > 0:
+                        percent = int((milestone.closed_issues / total) * 100)
+                        response_text += f"   Progress: {milestone.closed_issues}/{total} ({percent}%)\n"
+
+                    # Due date
+                    if milestone.due_on:
+                        due_date = milestone.due_on.strftime("%Y-%m-%d")
+                        response_text += f"   Due: {due_date}\n"
+
+                    # Description (first line only)
+                    if milestone.description:
+                        first_line = milestone.description.split("\n")[0][:60]
+                        response_text += f"   {first_line}\n"
+
+                    response_text += f"   URL: {milestone.html_url}\n\n"
+
+                return {
+                    "content": [{"type": "text", "text": response_text}],
+                    "isError": False,
+                }
+
+            elif name == "create_milestone":
+                # Parse due_on if provided
+                due_on = None
+                if arguments.get("due_on"):
+                    try:
+                        due_on = datetime.fromisoformat(arguments["due_on"])
+                    except ValueError:
+                        return {
+                            "content": [
+                                {
+                                    "type": "text",
+                                    "text": "❌ Invalid due_on format. Use YYYY-MM-DD",
+                                }
+                            ],
+                            "isError": True,
+                        }
+
+                # Create milestone
+                milestone = repo.create_milestone(
+                    title=arguments["title"],
+                    state=arguments.get("state", "open"),
+                    description=arguments.get("description", ""),
+                    due_on=due_on,
+                )
+
+                response_text = f"✅ Milestone created: #{milestone.number}\n"
+                response_text += f"   Title: {milestone.title}\n"
+                response_text += f"   State: {milestone.state}\n"
+                if milestone.due_on:
+                    response_text += (
+                        f"   Due: {milestone.due_on.strftime('%Y-%m-%d')}\n"
+                    )
+                response_text += f"   URL: {milestone.html_url}"
+
+                return {
+                    "content": [{"type": "text", "text": response_text}],
+                    "isError": False,
+                }
+
+            elif name == "update_milestone":
+                milestone = repo.get_milestone(arguments["milestone_number"])
+
+                # Build update parameters
+                update_params = {}
+                if "title" in arguments:
+                    update_params["title"] = arguments["title"]
+                if "description" in arguments:
+                    update_params["description"] = arguments["description"]
+                if "state" in arguments:
+                    update_params["state"] = arguments["state"]
+                if "due_on" in arguments:
+                    try:
+                        update_params["due_on"] = datetime.fromisoformat(
+                            arguments["due_on"]
+                        )
+                    except ValueError:
+                        return {
+                            "content": [
+                                {
+                                    "type": "text",
+                                    "text": "❌ Invalid due_on format. Use YYYY-MM-DD",
+                                }
+                            ],
+                            "isError": True,
+                        }
+
+                # Update milestone
+                milestone.edit(**update_params)
+
+                response_text = f"✅ Milestone #{milestone.number} updated\n"
+                response_text += f"   Title: {milestone.title}\n"
+                response_text += f"   State: {milestone.state}\n"
+                if milestone.due_on:
+                    response_text += (
+                        f"   Due: {milestone.due_on.strftime('%Y-%m-%d')}\n"
+                    )
+                response_text += f"   URL: {milestone.html_url}"
+
+                return {
+                    "content": [{"type": "text", "text": response_text}],
+                    "isError": False,
+                }
+
+            elif name == "set_issue_milestone":
+                issue_numbers = arguments["issue_numbers"]
+                milestone_number = arguments.get("milestone_number")
+
+                # Get milestone object or None
+                milestone = None
+                if milestone_number is not None:
+                    try:
+                        milestone = repo.get_milestone(milestone_number)
+                    except Exception as e:
+                        return {
+                            "content": [
+                                {
+                                    "type": "text",
+                                    "text": f"❌ Milestone #{milestone_number} not found: {e}",
+                                }
+                            ],
+                            "isError": True,
+                        }
+
+                # Update issues
+                results = []
+                errors = []
+
+                for issue_num in issue_numbers:
+                    try:
+                        issue = repo.get_issue(issue_num)
+                        issue.edit(milestone=milestone)
+
+                        if milestone:
+                            results.append(
+                                f"✅ #{issue_num}: Set milestone to '{milestone.title}'"
+                            )
+                        else:
+                            results.append(f"✅ #{issue_num}: Removed milestone")
+                    except Exception as e:
+                        errors.append(f"❌ #{issue_num}: {str(e)}")
+
+                # Format response
+                response_text = "📦 Milestone assignment completed\n\n"
+                response_text += f"✅ Successful: {len(results)}/{len(issue_numbers)}\n"
+                if errors:
+                    response_text += f"❌ Failed: {len(errors)}/{len(issue_numbers)}\n"
+                response_text += "\n" + "\n".join(results)
+                if errors:
+                    response_text += "\n\nErrors:\n" + "\n".join(errors)
+
+                return {
+                    "content": [{"type": "text", "text": response_text}],
+                    "isError": len(errors) > 0,
                 }
 
             else:
