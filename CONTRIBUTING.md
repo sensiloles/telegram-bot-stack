@@ -14,16 +14,55 @@ cd telegram-bot-stack
 
 ### 2. Set Up Development Environment
 
+**Unix (Linux, macOS):**
+
 ```bash
 # Create virtual environment
 python3 -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+source venv/bin/activate
 
 # Install in development mode
 pip install -e ".[dev]"
 
 # Install pre-commit hooks
 pre-commit install
+```
+
+**Windows (PowerShell):**
+
+```powershell
+# Create virtual environment
+python -m venv venv
+venv\Scripts\Activate.ps1
+
+# Install in development mode
+pip install -e ".[dev]"
+
+# Install pre-commit hooks
+pre-commit install
+```
+
+**Windows (cmd):**
+
+```cmd
+# Create virtual environment
+python -m venv venv
+venv\Scripts\activate.bat
+
+# Install in development mode
+pip install -e ".[dev]"
+
+# Install pre-commit hooks
+pre-commit install
+```
+
+**Using cross-platform task runner:**
+
+All platforms can use `scripts/tasks.py` for development:
+
+```bash
+# Setup development environment (cross-platform)
+python scripts/tasks.py dev
 ```
 
 ### 3. Configure GitHub Automation (Optional)
@@ -66,6 +105,40 @@ git checkout -b feature/my-feature
 - Follow code style (see below)
 
 ### 3. Test Your Changes
+
+**Option A: Using Makefile (Unix only):**
+
+```bash
+# Run tests
+make test-fast
+
+# Check coverage
+make coverage
+
+# Run linter
+make lint
+
+# Format code
+make format
+```
+
+**Option B: Using scripts/tasks.py (cross-platform, recommended for Windows):**
+
+```bash
+# Run tests
+python scripts/tasks.py test-fast
+
+# Check coverage
+python scripts/tasks.py coverage
+
+# Run linter
+python scripts/tasks.py lint
+
+# Format code
+python scripts/tasks.py format
+```
+
+**Option C: Direct commands (all platforms):**
 
 ```bash
 # Run tests
