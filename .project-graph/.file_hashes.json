@@ -3,7 +3,7 @@
   "telegram_bot_stack/cli/commands/deploy/deploy.py": "17feaf31b2a27f6771b08918b31515910f8a2b08b5258dbeefcaedf2cea175a1",
   "telegram_bot_stack/cli/utils/port_manager.py": "0c95a97c7271b555d82de180d94fa8255cd69013e77827d0b42f4017f1a0c8f0",
   "telegram_bot_stack/cli/commands/deploy/operations.py": "f2a720fdab2d3e2b4f8e71998ec213d1d79c19ef002acd7415f9cbe1d3b9a437",
-  ".github/PROJECT_STATUS.md": "492315a2b5506f8ed006bc02e9441f3550738f76a7464c983a34f91bf610c083",
+  ".github/PROJECT_STATUS.md": "6ad55aaebdad18c7922d4b474ad2c03a8e75d440b27390f53c14a5c791504777",
   "docs/deployment_guide.md": "d1482d98349b3538fa6273750162bdbc77a904ea4d48b43597728cd05eb6269a",
   "telegram_bot_stack/cli/utils/vps.py": "3a0f001284801fb4c6d4821f07a2b2755bea242515e1ea664702afdd2ff6f709",
   ".github/workflows/scripts/merge_pr.py": "e739354c5138a28b9d965046e589d02ab4a25ea518476861001526a93e3dfb9a",
