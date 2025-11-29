@@ -14,6 +14,7 @@ New to the framework? Start here:
 
 - **[Installation Guide](installation.md)** - Install the framework
 - **[Quick Start Guide](quickstart.md)** - Build your first bot in minutes
+- **[Windows Setup Guide](windows-setup.md)** - Complete Windows developer guide
 
 ### Guides
 
@@ -45,6 +46,7 @@ docs/
 ├── README.md                    # This file - navigation hub
 ├── installation.md             # Getting Started
 ├── quickstart.md               # Getting Started
+├── windows-setup.md            # Getting Started - Windows
 ├── deployment_guide.md         # Guides - VPS deployment
 ├── storage_guide.md            # Guides
 ├── migration_guide.md          # Guides
@@ -62,6 +64,7 @@ Essential documentation for new users:
 
 - **Installation** - Setup instructions
 - **Quick Start** - First bot tutorial
+- **Windows Setup** - Complete Windows developer guide
 
 ### Guides (High Priority)
 

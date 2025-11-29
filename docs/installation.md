@@ -6,12 +6,23 @@
 
 ## ✅ Quick Install (Recommended)
 
+**Linux / macOS:**
+
 ```bash
 # Install latest stable version
-pip install git+https://github.com/sensiloles/telegram-bot-stack.git@v0.1.0
+pip install telegram-bot-stack
+```
+
+**Windows (PowerShell):**
+
+```powershell
+# Install latest stable version
+pip install telegram-bot-stack
 ```
 
 **That's it!** Package is now installed and ready to use.
+
+> **Windows Users:** See the comprehensive [Windows Setup Guide](windows-setup.md) for platform-specific instructions.
 
 ---
 
@@ -84,17 +95,146 @@ pip install git+ssh://git@github.com/sensiloles/telegram-bot-stack.git
 
 ## 🚀 Verify Installation
 
-```python
+**Linux / macOS:**
+
+```bash
 # Check version
 python -c "import telegram_bot_stack; print(telegram_bot_stack.__version__)"
-# Output: 0.1.0
 
+# Quick test
+python -c "from telegram_bot_stack import BotBase; print('✅ Installation successful!')"
+```
+
+**Windows (PowerShell):**
+
+```powershell
+# Check version
+python -c "import telegram_bot_stack; print(telegram_bot_stack.__version__)"
+
+# Quick test
+python -c "from telegram_bot_stack import BotBase; print('✅ Installation successful!')"
+```
+
+**Test in Python:**
+
+```python
 # Import components
 from telegram_bot_stack import BotBase, UserManager, AdminManager
 from telegram_bot_stack.storage import JSONStorage, MemoryStorage
 
 print("✅ telegram-bot-stack installed successfully!")
 ```
+
+---
+
+## 🪟 Windows-Specific Installation
+
+### Prerequisites
+
+**1. Python 3.9+ Installation:**
+
+Choose one:
+
+- **Python.org (Recommended):**
+  - Download from [python.org](https://www.python.org/downloads/)
+  - ✅ Check "Add Python to PATH" during installation
+- **Microsoft Store:**
+  - Search "Python 3.11" in Microsoft Store
+  - Automatically added to PATH
+
+**Verify:**
+
+```powershell
+python --version  # Should show 3.9+
+pip --version
+```
+
+**2. Git for Windows:**
+
+- Download from [git-scm.com](https://git-scm.com/download/win)
+- Use default installation settings
+
+```powershell
+git --version
+```
+
+### Installation
+
+**PowerShell:**
+
+```powershell
+# Install framework
+pip install telegram-bot-stack
+
+# Verify
+python -c "import telegram_bot_stack; print('✅ Installed!')"
+```
+
+**Command Prompt (cmd):**
+
+```cmd
+pip install telegram-bot-stack
+python -c "import telegram_bot_stack; print('✅ Installed!')"
+```
+
+### Virtual Environment (Recommended)
+
+**PowerShell:**
+
+```powershell
+# Create virtual environment
+python -m venv venv
+
+# Activate (if you see execution policy error, see below)
+.\venv\Scripts\Activate.ps1
+
+# Install framework
+pip install telegram-bot-stack
+```
+
+**Fix execution policy error:**
+
+```powershell
+# Allow running scripts for current user
+Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+```
+
+**Command Prompt:**
+
+```cmd
+python -m venv venv
+venv\Scripts\activate.bat
+pip install telegram-bot-stack
+```
+
+### Common Windows Issues
+
+**Issue: "python: command not found"**
+
+Solution:
+
+1. Reinstall Python from [python.org](https://www.python.org/downloads/)
+2. ✅ Check "Add Python to PATH" during installation
+3. Restart PowerShell/cmd
+
+**Issue: "pip: command not found"**
+
+```powershell
+# Use Python module syntax
+python -m pip install telegram-bot-stack
+```
+
+**Issue: Virtual environment activation fails**
+
+```powershell
+# PowerShell - allow script execution
+Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+
+# Then activate again
+.\venv\Scripts\Activate.ps1
+```
+
+For complete Windows setup instructions, see the [Windows Setup Guide](windows-setup.md).
 
 ---
 

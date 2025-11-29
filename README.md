@@ -26,6 +26,8 @@ A reusable Python framework for building production-ready Telegram bots with min
 
 ### Create New Bot Project
 
+**Linux / macOS:**
+
 ```bash
 # Install framework
 pip install telegram-bot-stack
@@ -42,6 +44,27 @@ echo "BOT_TOKEN=your_token_here" > .env
 # Run bot in development mode
 telegram-bot-stack dev
 ```
+
+**Windows (PowerShell):**
+
+```powershell
+# Install framework
+pip install telegram-bot-stack
+
+# Create new bot project with full dev environment
+telegram-bot-stack init my-bot
+
+# Navigate to project
+cd my-bot
+
+# Add your bot token (get it from @BotFather)
+$env:BOT_TOKEN = "your_token_here"
+
+# Run bot in development mode
+telegram-bot-stack dev
+```
+
+> **Windows Users:** See the [Windows Setup Guide](docs/windows-setup.md) for complete instructions.
 
 **What you get:**
 
@@ -138,6 +161,8 @@ The framework includes example bots demonstrating different features:
 
 ### Running Examples
 
+**Linux / macOS:**
+
 ```bash
 # Set your bot token
 export BOT_TOKEN="your_token_here"
@@ -145,6 +170,17 @@ export BOT_TOKEN="your_token_here"
 # Run any example bot
 cd examples/echo_bot
 python3 bot.py
+```
+
+**Windows (PowerShell):**
+
+```powershell
+# Set your bot token
+$env:BOT_TOKEN = "your_token_here"
+
+# Run any example bot
+cd examples\echo_bot
+python bot.py
 ```
 
 ## CLI Commands
