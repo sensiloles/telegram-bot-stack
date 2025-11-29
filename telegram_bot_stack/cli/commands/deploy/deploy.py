@@ -9,9 +9,16 @@ from rich.prompt import Confirm, Prompt
 from rich.table import Table
 
 from telegram_bot_stack.cli.utils.backup import BackupManager
-from telegram_bot_stack.cli.utils.deployment import DeploymentConfig
+from telegram_bot_stack.cli.utils.deployment import (
+    DeploymentConfig,
+    create_vps_connection_from_config,
+)
 from telegram_bot_stack.cli.utils.secrets import SecretsManager
-from telegram_bot_stack.cli.utils.vps import VPSConnection
+from telegram_bot_stack.cli.utils.vps import (
+    VPSConnection,
+    check_ssh_agent,
+    find_ssh_keys,
+)
 
 console = Console()
 
@@ -29,8 +36,20 @@ def deploy() -> None:
 @click.option("--port", default=22, help="SSH port (default: 22)")
 @click.option("--bot-name", help="Bot name (for container/image names)")
 @click.option("--bot-token-env", default="BOT_TOKEN", help="Bot token env var name")
+@click.option(
+    "--auth-method",
+    type=click.Choice(["auto", "key", "password", "agent"]),
+    default="auto",
+    help="SSH authentication method",
+)
 def init(
-    host: str, user: str, ssh_key: str, port: int, bot_name: str, bot_token_env: str
+    host: str,
+    user: str,
+    ssh_key: str,
+    port: int,
+    bot_name: str,
+    bot_token_env: str,
+    auth_method: str,
 ) -> None:
     """Initialize deployment configuration (interactive setup)."""
     console.print("🚀 [bold cyan]VPS Deployment Setup[/bold cyan]\n")
@@ -50,9 +69,45 @@ def init(
     if not user:
         user = Prompt.ask("SSH User", default="root")
 
-    if not ssh_key:
-        default_key = "~/.ssh/id_rsa"
-        ssh_key = Prompt.ask("SSH Key Path", default=default_key)
+    # Auto-detect SSH keys or prompt
+    if not ssh_key and auth_method in ["auto", "key"]:
+        # Try to find SSH keys
+        found_keys = find_ssh_keys()
+
+        if found_keys:
+            console.print("\n[cyan]Found SSH keys:[/cyan]")
+            for i, key in enumerate(found_keys, 1):
+                console.print(f"  {i}. {key}")
+
+            # Check if SSH agent has keys
+            if check_ssh_agent():
+                console.print("  [green]✓ SSH agent is running with keys[/green]")
+
+            # Use first found key as default
+            default_key = str(found_keys[0])
+            ssh_key = Prompt.ask(
+                "\nSSH Key Path (or press Enter to use first found key)",
+                default=default_key,
+            )
+        else:
+            console.print("\n[yellow]No SSH keys found in ~/.ssh/[/yellow]")
+
+            if check_ssh_agent():
+                console.print(
+                    "[green]✓ SSH agent is running - will use agent authentication[/green]"
+                )
+                ssh_key = ""  # Will use agent
+            else:
+                console.print(
+                    "[yellow]Tip: Generate an SSH key with: ssh-keygen -t ed25519[/yellow]"
+                )
+                ssh_key = Prompt.ask(
+                    "SSH Key Path (or leave empty for password auth)", default=""
+                )
+
+    # If still no ssh_key and not using agent, prompt
+    if not ssh_key and auth_method == "key":
+        ssh_key = Prompt.ask("SSH Key Path")
 
     if not bot_name:
         # Try to detect bot name from current directory
@@ -61,7 +116,13 @@ def init(
 
     # Test SSH connection
     console.print("\n[cyan]Testing SSH connection...[/cyan]")
-    vps = VPSConnection(host=host, user=user, ssh_key=ssh_key, port=port)
+    vps = VPSConnection(
+        host=host,
+        user=user,
+        ssh_key=ssh_key if ssh_key else None,
+        port=port,
+        auth_method=auth_method,
+    )
 
     try:
         if not vps.test_connection():
@@ -80,8 +141,9 @@ def init(
     config = DeploymentConfig("deploy.yaml")
     config.set("vps.host", host)
     config.set("vps.user", user)
-    config.set("vps.ssh_key", ssh_key)
+    config.set("vps.ssh_key", ssh_key if ssh_key else "")
     config.set("vps.port", port)
+    config.set("vps.auth_method", auth_method)
     config.set("bot.name", bot_name)
     config.set("bot.token_env", bot_token_env)
     config.set("bot.entry_point", "bot.py")
@@ -164,12 +226,7 @@ def create_backup(config: str) -> None:
         return
 
     # Connect to VPS
-    vps = VPSConnection(
-        host=deploy_config.get("vps.host"),
-        user=deploy_config.get("vps.user"),
-        ssh_key=deploy_config.get("vps.ssh_key"),
-        port=deploy_config.get("vps.port", 22),
-    )
+    vps = create_vps_connection_from_config(deploy_config)
 
     try:
         if not vps.test_connection():
@@ -213,12 +270,7 @@ def list_backups(config: str) -> None:
     deploy_config = DeploymentConfig(config)
 
     # Connect to VPS
-    vps = VPSConnection(
-        host=deploy_config.get("vps.host"),
-        user=deploy_config.get("vps.user"),
-        ssh_key=deploy_config.get("vps.ssh_key"),
-        port=deploy_config.get("vps.port", 22),
-    )
+    vps = create_vps_connection_from_config(deploy_config)
 
     try:
         bot_name = deploy_config.get("bot.name")
@@ -270,12 +322,7 @@ def download(config: str, backup_filename: str, output: str) -> None:
     deploy_config = DeploymentConfig(config)
 
     # Connect to VPS
-    vps = VPSConnection(
-        host=deploy_config.get("vps.host"),
-        user=deploy_config.get("vps.user"),
-        ssh_key=deploy_config.get("vps.ssh_key"),
-        port=deploy_config.get("vps.port", 22),
-    )
+    vps = create_vps_connection_from_config(deploy_config)
 
     try:
         if not vps.test_connection():
@@ -311,12 +358,7 @@ def restore(config: str, backup_filename: str, yes: bool) -> None:
     deploy_config = DeploymentConfig(config)
 
     # Connect to VPS
-    vps = VPSConnection(
-        host=deploy_config.get("vps.host"),
-        user=deploy_config.get("vps.user"),
-        ssh_key=deploy_config.get("vps.ssh_key"),
-        port=deploy_config.get("vps.port", 22),
-    )
+    vps = create_vps_connection_from_config(deploy_config)
 
     try:
         if not vps.test_connection():

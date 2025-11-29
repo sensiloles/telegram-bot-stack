@@ -8,13 +8,70 @@ import os
 import re
 import shlex
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 from fabric import Connection
 from invoke import Config
 from rich.console import Console
 
 console = Console()
+
+
+def find_ssh_keys() -> List[Path]:
+    """Find SSH keys in standard locations.
+
+    Returns:
+        List of paths to found SSH private keys
+    """
+    ssh_dir = Path.home() / ".ssh"
+    if not ssh_dir.exists():
+        return []
+
+    # Check for standard key names (in order of preference)
+    key_names = [
+        "id_ed25519",  # Ed25519 (modern, recommended)
+        "id_ecdsa",  # ECDSA (modern)
+        "id_rsa",  # RSA (widely compatible)
+        "id_dsa",  # DSA (legacy, but still supported)
+    ]
+
+    found_keys = []
+    for key_name in key_names:
+        key_path = ssh_dir / key_name
+        if key_path.exists() and key_path.is_file():
+            # Check if it's a private key (not .pub)
+            try:
+                with open(key_path) as f:
+                    first_line = f.readline().strip()
+                    if "PRIVATE KEY" in first_line:
+                        found_keys.append(key_path)
+            except Exception:
+                continue
+
+    return found_keys
+
+
+def check_ssh_agent() -> bool:
+    """Check if SSH agent is running and has keys.
+
+    Returns:
+        True if SSH agent is available with keys, False otherwise
+    """
+    try:
+        import subprocess
+
+        result = subprocess.run(
+            ["ssh-add", "-l"],
+            capture_output=True,
+            text=True,
+            timeout=2,
+        )
+        # Return code 0 means agent has keys
+        # Return code 1 means agent running but no keys
+        # Return code 2 means agent not running
+        return result.returncode == 0
+    except Exception:
+        return False
 
 
 class VPSConnection:
@@ -26,6 +83,8 @@ class VPSConnection:
         user: str = "root",
         ssh_key: Optional[str] = None,
         port: int = 22,
+        password: Optional[str] = None,
+        auth_method: str = "auto",
     ):
         """Initialize VPS connection parameters.
 
@@ -34,12 +93,27 @@ class VPSConnection:
             user: SSH user (default: root)
             ssh_key: Path to SSH private key (optional)
             port: SSH port (default: 22)
+            password: SSH password (optional, for password auth)
+            auth_method: Authentication method: 'auto', 'key', 'password', 'agent'
+                        (default: 'auto' - try keys/agent, then password)
         """
         self.host = host
         self.user = user
-        self.ssh_key = os.path.expanduser(ssh_key) if ssh_key else None
         self.port = port
+        self.password = password
+        self.auth_method = auth_method
         self.connection: Optional[Connection] = None
+
+        # Handle SSH key path
+        self.ssh_key: Optional[str]
+        if ssh_key:
+            self.ssh_key = os.path.expanduser(ssh_key)
+        elif auth_method in ["auto", "key"]:
+            # Auto-detect SSH key
+            found_keys = find_ssh_keys()
+            self.ssh_key = str(found_keys[0]) if found_keys else None
+        else:
+            self.ssh_key = None
 
     def __enter__(self) -> "VPSConnection":
         """Enter context manager."""
@@ -61,10 +135,76 @@ class VPSConnection:
                 result = conn.run(
                     "echo 'Connection test'", hide=True, pty=False, in_stream=False
                 )
+
+                if result.ok:
+                    # Show which auth method was used
+                    auth_info = self._get_auth_info()
+                    if auth_info:
+                        console.print(f"[dim]   Using {auth_info}[/dim]")
+
                 return bool(result.ok)
         except Exception as e:
             console.print(f"[red]Connection failed: {e}[/red]")
+
+            # Provide helpful hints based on error
+            error_str = str(e).lower()
+            if "authentication failed" in error_str or "permission denied" in error_str:
+                console.print("\n[yellow]Authentication failed. Try:[/yellow]")
+                if self.auth_method == "key" and self.ssh_key:
+                    console.print(
+                        f"  - Check SSH key permissions: chmod 600 {self.ssh_key}"
+                    )
+                    console.print(
+                        "  - Verify public key is in VPS ~/.ssh/authorized_keys"
+                    )
+                    console.print("  - Try using SSH agent: ssh-add <your-key>")
+                elif self.auth_method == "password":
+                    console.print("  - Verify password is correct")
+                    console.print(
+                        "  - Check if password auth is enabled on VPS (PasswordAuthentication yes)"
+                    )
+                else:
+                    console.print(
+                        "  - Check SSH key permissions and authorized_keys on VPS"
+                    )
+                    console.print(
+                        "  - Try specifying auth method: --auth-method key/password/agent"
+                    )
+            elif "connection refused" in error_str:
+                console.print("\n[yellow]Connection refused. Check:[/yellow]")
+                console.print(f"  - VPS is reachable: ping {self.host}")
+                console.print(f"  - SSH port {self.port} is open")
+                console.print("  - Firewall allows SSH connections")
+            elif "host key" in error_str:
+                console.print("\n[yellow]Host key verification failed. Try:[/yellow]")
+                console.print(f"  - Remove old host key: ssh-keygen -R {self.host}")
+                console.print("  - Connect manually first: ssh {self.user}@{self.host}")
+
             return False
+
+    def _get_auth_info(self) -> str:
+        """Get human-readable auth method description.
+
+        Returns:
+            Description of auth method being used
+        """
+        if self.auth_method == "password":
+            return "password authentication"
+        elif self.auth_method == "agent":
+            return "SSH agent"
+        elif self.auth_method == "key" and self.ssh_key:
+            key_type = Path(self.ssh_key).name  # e.g., "id_ed25519"
+            return f"SSH key ({key_type})"
+        elif self.auth_method == "auto":
+            if self.ssh_key:
+                key_type = Path(self.ssh_key).name
+                return f"auto-detected SSH key ({key_type})"
+            elif check_ssh_agent():
+                return "SSH agent (auto-detected)"
+            else:
+                return "auto-detection (keys/agent/password)"
+        else:
+            return f"{self.auth_method} authentication"
 
     def connect(self) -> Connection:
         """Establish SSH connection to VPS.
@@ -80,18 +220,62 @@ class VPSConnection:
         return self.connection
 
     def _create_connection(self) -> Connection:
-        """Create Fabric connection with SSH key or password.
+        """Create Fabric connection with SSH key, agent, or password.
 
         Returns:
             Fabric Connection object
+
+        Raises:
+            Exception: If connection fails with all attempted auth methods
         """
         connect_kwargs: Dict[str, Any] = {}
 
-        if self.ssh_key:
-            connect_kwargs["key_filename"] = self.ssh_key
-        else:
-            # Will prompt for password if no key provided
+        # Configure authentication based on method
+        if self.auth_method == "password":
+            # Password-only authentication
+            if self.password:
+                connect_kwargs["password"] = self.password
+            else:
+                # Will prompt for password interactively
+                connect_kwargs["look_for_keys"] = False
+                connect_kwargs["allow_agent"] = False
+
+        elif self.auth_method == "agent":
+            # SSH agent authentication
+            connect_kwargs["allow_agent"] = True
+            connect_kwargs["look_for_keys"] = False
+
+        elif self.auth_method == "key":
+            # SSH key authentication
+            if self.ssh_key and Path(self.ssh_key).exists():
+                connect_kwargs["key_filename"] = self.ssh_key
+                # Try agent as fallback if key fails
+                connect_kwargs["allow_agent"] = True
+            else:
+                console.print(
+                    f"[yellow]Warning: SSH key not found: {self.ssh_key}[/yellow]"
+                )
+                console.print("[yellow]Falling back to agent/password auth[/yellow]")
+                connect_kwargs["look_for_keys"] = True
+                connect_kwargs["allow_agent"] = True
+
+        else:  # auth_method == "auto"
+            # Auto-detect: try keys, agent, then password
+            if self.ssh_key and Path(self.ssh_key).exists():
+                connect_kwargs["key_filename"] = self.ssh_key
+
+            # Allow SSH agent
+            connect_kwargs["allow_agent"] = True
+            # Auto-detect other keys
             connect_kwargs["look_for_keys"] = True
+
+            # Use password if provided
+            if self.password:
+                connect_kwargs["password"] = self.password
+
+        # Passphrase for encrypted keys (if needed)
+        # Fabric will prompt for passphrase automatically if key is encrypted
+        # and no passphrase is provided in environment (SSH_ASKPASS)
 
         # Configure Fabric to work with pytest's capture system
         # Disable all I/O threads to avoid ThreadException when pytest captures output

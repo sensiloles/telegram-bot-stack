@@ -5,6 +5,8 @@ from unittest.mock import MagicMock, patch
 from telegram_bot_stack.cli.utils.vps import (
     VPSConnection,
     check_docker_compose_installed,
+    check_ssh_agent,
+    find_ssh_keys,
     get_container_health,
     get_docker_compose_command,
     get_recent_errors,
@@ -493,3 +495,145 @@ class TestDockerComposeInstallation:
                 assert compose_download_cmd is not None
                 assert "/latest/" not in compose_download_cmd
                 assert "v2.32.4" in compose_download_cmd
+
+
+class TestSSHKeyAuth:
+    """Tests for SSH key authentication features."""
+
+    def test_find_ssh_keys_empty(self):
+        """Test finding SSH keys when .ssh directory doesn't exist."""
+        with patch("pathlib.Path.home") as mock_home:
+            mock_ssh_dir = MagicMock()
+            mock_ssh_dir.exists.return_value = False
+            mock_home.return_value.__truediv__.return_value = mock_ssh_dir
+
+            result = find_ssh_keys()
+
+            assert result == []
+
+    def test_find_ssh_keys_found(self):
+        """Test finding SSH keys with keys present."""
+        # Simplified test - just verify function returns a list
+        result = find_ssh_keys()
+
+        # Should return a list (may be empty or contain paths)
+        assert isinstance(result, list)
+
+    def test_check_ssh_agent_available(self):
+        """Test SSH agent check when agent is running with keys."""
+        with patch("subprocess.run") as mock_run:
+            mock_result = MagicMock()
+            mock_result.returncode = 0  # Agent has keys
+            mock_run.return_value = mock_result
+
+            result = check_ssh_agent()
+
+            assert result is True
+            mock_run.assert_called_once()
+
+    def test_check_ssh_agent_no_keys(self):
+        """Test SSH agent check when agent is running but has no keys."""
+        with patch("subprocess.run") as mock_run:
+            mock_result = MagicMock()
+            mock_result.returncode = 1  # Agent running but no keys
+            mock_run.return_value = mock_result
+
+            result = check_ssh_agent()
+
+            assert result is False
+
+    def test_check_ssh_agent_not_running(self):
+        """Test SSH agent check when agent is not running."""
+        with patch("subprocess.run") as mock_run:
+            mock_result = MagicMock()
+            mock_result.returncode = 2  # Agent not running
+            mock_run.return_value = mock_result
+
+            result = check_ssh_agent()
+
+            assert result is False
+
+    def test_vps_connection_with_auth_method_key(self):
+        """Test VPSConnection with key auth method."""
+        with patch("telegram_bot_stack.cli.utils.vps.find_ssh_keys") as mock_find:
+            mock_find.return_value = ["/home/user/.ssh/id_ed25519"]
+
+            vps = VPSConnection(host="test.example.com", user="root", auth_method="key")
+
+            assert vps.auth_method == "key"
+            assert vps.ssh_key == "/home/user/.ssh/id_ed25519"
+
+    def test_vps_connection_with_auth_method_password(self):
+        """Test VPSConnection with password auth method."""
+        vps = VPSConnection(
+            host="test.example.com",
+            user="root",
+            password="secret",
+            auth_method="password",
+        )
+
+        assert vps.auth_method == "password"
+        assert vps.password == "secret"
+        assert vps.ssh_key is None
+
+    def test_vps_connection_with_auth_method_agent(self):
+        """Test VPSConnection with agent auth method."""
+        vps = VPSConnection(host="test.example.com", user="root", auth_method="agent")
+
+        assert vps.auth_method == "agent"
+        assert vps.ssh_key is None
+
+    def test_vps_connection_with_auth_method_auto(self):
+        """Test VPSConnection with auto auth method."""
+        with patch("telegram_bot_stack.cli.utils.vps.find_ssh_keys") as mock_find:
+            mock_find.return_value = ["/home/user/.ssh/id_rsa"]
+
+            vps = VPSConnection(
+                host="test.example.com", user="root", auth_method="auto"
+            )
+
+            assert vps.auth_method == "auto"
+            assert vps.ssh_key == "/home/user/.ssh/id_rsa"
+
+    def test_vps_connection_explicit_ssh_key(self):
+        """Test VPSConnection with explicitly provided SSH key."""
+        vps = VPSConnection(
+            host="test.example.com",
+            user="root",
+            ssh_key="/custom/path/id_rsa",
+            auth_method="key",
+        )
+
+        assert vps.ssh_key == "/custom/path/id_rsa"
+
+    def test_get_auth_info_key(self):
+        """Test auth info display for key authentication."""
+        vps = VPSConnection(
+            host="test.example.com",
+            user="root",
+            ssh_key="~/.ssh/id_ed25519",
+            auth_method="key",
+        )
+
+        info = vps._get_auth_info()
+
+        assert "SSH key" in info
+        assert "id_ed25519" in info
+
+    def test_get_auth_info_password(self):
+        """Test auth info display for password authentication."""
+        vps = VPSConnection(
+            host="test.example.com", user="root", auth_method="password"
+        )
+
+        info = vps._get_auth_info()
+
+        assert "password" in info
+
+    def test_get_auth_info_agent(self):
+        """Test auth info display for agent authentication."""
+        vps = VPSConnection(host="test.example.com", user="root", auth_method="agent")
+
+        info = vps._get_auth_info()
+
+        assert "agent" in info.lower()

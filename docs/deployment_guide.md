@@ -210,6 +210,125 @@ telegram-bot-stack deploy down --cleanup --no-backup
 
 ## Configuration
 
+### SSH Authentication
+
+`telegram-bot-stack` supports multiple SSH authentication methods for maximum flexibility and security:
+
+#### Auto-Detection (Recommended)
+
+The default `auto` method tries authentication in this order:
+
+1. **SSH key** (if specified or auto-detected)
+2. **SSH agent** (if running with keys)
+3. **Password** (interactive prompt if needed)
+
+```bash
+telegram-bot-stack deploy init --auth-method auto
+```
+
+#### Authentication Methods
+
+**SSH Key Authentication (Most Secure)**
+
+Best practice for production deployments. Automatically detects common keys:
+
+```bash
+# Auto-detect SSH keys (checks ~/.ssh/id_ed25519, id_ecdsa, id_rsa, id_dsa)
+telegram-bot-stack deploy init --auth-method key
+
+# Or specify custom key path
+telegram-bot-stack deploy init --ssh-key ~/.ssh/my_custom_key
+```
+
+**SSH Agent**
+
+Use SSH agent for better security (keys never stored on disk):
+
+```bash
+# 1. Add your key to SSH agent
+ssh-add ~/.ssh/id_ed25519
+
+# 2. Deploy using agent
+telegram-bot-stack deploy init --auth-method agent
+```
+
+**Password Authentication**
+
+Simple but less secure. Use only for initial setup:
+
+```bash
+telegram-bot-stack deploy init --auth-method password
+```
+
+#### Security Best Practices
+
+1. **Use SSH keys, not passwords** - More secure and no interactive prompts
+2. **Protect your private keys** - `chmod 600 ~/.ssh/id_*`
+3. **Use Ed25519 keys** - Modern, fast, secure:
+
+   ```bash
+   ssh-keygen -t ed25519 -C "your_email@example.com"
+   ```
+
+4. **Add public key to VPS** - Copy to `~/.ssh/authorized_keys` on VPS:
+
+   ```bash
+   ssh-copy-id -i ~/.ssh/id_ed25519.pub user@your-vps.com
+   ```
+
+5. **Use SSH agent** - Prevents key passphrase prompts:
+
+   ```bash
+   eval "$(ssh-agent -s)"
+   ssh-add ~/.ssh/id_ed25519
+   ```
+
+6. **Disable password auth on VPS** - Edit `/etc/ssh/sshd_config`:
+
+   ```
+   PasswordAuthentication no
+   PubkeyAuthentication yes
+   ```
+
+7. **Verify host keys** - On first connection, verify the host key fingerprint
+
+#### Troubleshooting SSH Authentication
+
+**"Permission denied (publickey)"**
+
+```bash
+# Check key permissions
+chmod 600 ~/.ssh/id_*
+chmod 700 ~/.ssh
+
+# Verify public key is on VPS
+cat ~/.ssh/id_ed25519.pub  # Copy this
+ssh user@vps  # Paste into ~/.ssh/authorized_keys on VPS
+```
+
+**"Connection refused"**
+
+```bash
+# Check VPS is reachable
+ping your-vps.com
+
+# Check SSH port
+nmap -p 22 your-vps.com
+
+# Try manual connection
+ssh -v user@your-vps.com  # Verbose output for debugging
+```
+
+**"Host key verification failed"**
+
+```bash
+# Remove old host key
+ssh-keygen -R your-vps.com
+
+# Reconnect and accept new key
+ssh user@your-vps.com
+```
+
 ### deploy.yaml
 
 The `deploy.yaml` file contains all deployment settings:
@@ -218,8 +337,9 @@ The `deploy.yaml` file contains all deployment settings:
 vps:
   host: "your-vps.com" # VPS hostname or IP
   user: "root" # SSH user
-  ssh_key: "~/.ssh/id_rsa" # SSH private key path
+  ssh_key: "~/.ssh/id_rsa" # SSH private key path (auto-detected if empty)
   port: 22 # SSH port
+  auth_method: "auto" # Authentication: auto, key, password, agent
 
 bot:
   name: "my-telegram-bot" # Bot name (container/image name)

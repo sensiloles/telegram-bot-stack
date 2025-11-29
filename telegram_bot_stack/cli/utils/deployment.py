@@ -5,11 +5,14 @@ Deployment configuration and template rendering utilities.
 import os
 import sys
 from pathlib import Path
-from typing import Any, Dict
+from typing import TYPE_CHECKING, Any, Dict
 
 import yaml  # type: ignore[import-untyped]
 from jinja2 import Environment, FileSystemLoader, TemplateNotFound
 from rich.console import Console
+
+if TYPE_CHECKING:
+    from telegram_bot_stack.cli.utils.vps import VPSConnection
 
 console = Console()
 
@@ -52,6 +55,26 @@ def escape_env_value(value: str) -> str:
 
     # Wrap in double quotes
     return f'"{escaped}"'
+
+
+def create_vps_connection_from_config(config: "DeploymentConfig") -> "VPSConnection":
+    """Create VPSConnection from deployment config.
+
+    Args:
+        config: DeploymentConfig instance
+
+    Returns:
+        VPSConnection instance configured from deploy.yaml
+    """
+    from telegram_bot_stack.cli.utils.vps import VPSConnection
+
+    return VPSConnection(
+        host=config.get("vps.host"),
+        user=config.get("vps.user", "root"),
+        ssh_key=config.get("vps.ssh_key"),
+        port=config.get("vps.port", 22),
+        auth_method=config.get("vps.auth_method", "auto"),
+    )
 
 
 class DeploymentConfig:
