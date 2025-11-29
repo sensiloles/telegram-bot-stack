@@ -14,5 +14,6 @@
   ".github/workflows/integration-tests.yml": "f9db63c480a9a943bd3f7056bf77a5db10089ab770078f12dae2e72847f0d6aa",
   ".github/workflows/unit-tests.yml": "0651ef5d1b2e24e5d78252af675d099bb1e95e2d89e1780b2d1f0a0e4020eead",
   ".github/workflows/lint.yml": "3cc08209fee4e56198e537ee1eead0f4447589f6fdbc909cde35ffcf72f26a66",
-  ".github/workflows/type-check.yml": "619e17220fb3bd305d6b0ab2c84ce2f2adbbef8f2d59d8b6d84509a6d73c3208"
+  ".github/workflows/type-check.yml": "619e17220fb3bd305d6b0ab2c84ce2f2adbbef8f2d59d8b6d84509a6d73c3208",
+  "telegram_bot_stack/decorators.py": "c8931dcd90a3e6e82c53f826c426fade39d9fcab2d14786fe34dccd4ef6173bd"
 }

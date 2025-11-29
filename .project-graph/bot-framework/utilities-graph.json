@@ -1,7 +1,7 @@
 {
   "metadata": {
     "version": "3.0.0",
-    "generated_at": "2025-11-27",
+    "generated_at": "2025-11-29",
     "graph_id": "bot_framework_utilities",
     "graph_name": "Bot Framework - Utilities",
     "graph_type": "sub_graph",
@@ -22,7 +22,7 @@
       "category": "implementation",
       "path": "telegram_bot_stack/decorators.py",
       "description": "Rate limiting and utility decorators for telegram bot handlers.",
-      "lines_of_code": 185,
+      "lines_of_code": 187,
       "complexity_score": 1,
       "exports": [
         "rate_limit",
