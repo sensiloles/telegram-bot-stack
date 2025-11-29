@@ -1,7 +1,7 @@
 # Project Status - telegram-bot-stack
 
 **Version:** v1.32.0 → v2.0.0 MVP
-**Updated:** 2025-11-29 (completed #131 Windows SSH key generation)
+**Updated:** 2025-11-29 (completed #132 Makefile alternatives for Windows)
 **Status:** 🏗️ Week 10 - Windows Developer Support + Pre-release Testing
 
 ---
@@ -482,10 +482,11 @@ Supporting Infrastructure (v2.0.1):
    → Cross-platform key generation (ed25519, rsa) ✅
    → Fixed file permissions on Windows (icacls) ✅
 
-2. #132 Makefile alternatives (4-5h) ← HIGH
-   → Create tasks.py for Windows developers
-   → Document both approaches (make vs python tasks.py)
-   → No regression for Unix users
+2. ✅ #132 Makefile alternatives (4-5h) ← DONE
+   → Created scripts/tasks.py for Windows developers ✅
+   → Documented both approaches (make vs python tasks.py) ✅
+   → No regression for Unix users ✅
+   → 14 comprehensive tests added ✅
 
 3. #133 Windows documentation (3-4h) ← HIGH
    → Create docs/windows-setup.md
@@ -622,7 +623,7 @@ Supporting Infrastructure (v2.0.1):
 **Cross-Platform Support (NEW for v2.0.0):**
 
 - [x] Windows SSH key generation (#131) ✅ DONE
-- [ ] Makefile alternatives for Windows (#132) ⏳ HIGH
+- [x] Makefile alternatives for Windows (#132) ✅ DONE
 - [ ] Windows documentation (#133) ⏳ HIGH
 - [ ] Works on Windows 10/11 (PowerShell, cmd, Git Bash)
 - [ ] Works on macOS (Intel + Apple Silicon)
@@ -834,8 +835,8 @@ Supporting Infrastructure (v2.0.1):
 ---
 
 **Status:** 🏗️ Week 10 - Windows cross-platform support in progress
-**Progress:** 13/15 critical tasks done ✅ | 2 Windows support tasks + E2E testing remaining
-**Current Focus:** #132, #133 - Windows developer support (Makefile alternatives + docs)
+**Progress:** 14/15 critical tasks done ✅ | 1 Windows support task + E2E testing remaining
+**Current Focus:** #133 - Windows documentation (setup guide + examples)
 **Next Gate:** #120 Pre-release E2E testing (Week 11)
 **Target Release:** v2.0.0 MVP (#121) - Week 12
 
