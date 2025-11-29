@@ -2,6 +2,24 @@
 
 <!-- version list -->
 
+## v1.30.0 (2025-11-29)
+
+### Bug Fixes
+
+- **tests**: Update mocks after VPSConnection refactoring
+  ([`6b4b8b8`](https://github.com/sensiloles/telegram-bot-stack/commit/6b4b8b8f0c7bc33552d1e4789162902d37c519ba))
+
+### Documentation
+
+- **status**: Mark #118 SSH key authentication as DONE
+  ([`ea41178`](https://github.com/sensiloles/telegram-bot-stack/commit/ea4117820f7c40ff8be1ee0bd30387c74da268d8))
+
+### Features
+
+- **deploy**: Support SSH key-based authentication alongside password
+  ([`4a45701`](https://github.com/sensiloles/telegram-bot-stack/commit/4a4570175dc7419769444ce5efdd83247c6a6df7))
+
+
 ## v1.29.0 (2025-11-29)
 
 ### Features
