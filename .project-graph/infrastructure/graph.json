@@ -297,13 +297,14 @@
       "type": "script",
       "path": ".github/workflows/scripts/merge_pr.py",
       "description": "Merge a PR with appropriate strategy and auto-cleanup.",
-      "lines_of_code": 373,
+      "lines_of_code": 469,
       "exports": [
         "get_current_branch",
         "find_pr_by_branch",
         "git_checkout_and_pull",
         "delete_local_branch",
         "delete_remote_branch",
+        "check_ci_status",
         "merge_pr",
         "main"
       ],
@@ -314,6 +315,7 @@
         "git_checkout_and_pull",
         "delete_local_branch",
         "delete_remote_branch",
+        "check_ci_status",
         "merge_pr",
         "main"
       ]
