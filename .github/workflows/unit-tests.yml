@@ -17,9 +17,10 @@ on:
   workflow_dispatch: # Allow manual trigger
 
 # Cancel previous runs when new commits are pushed to the same PR
+# But never cancel runs on main branch (push events)
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   unit-tests:
