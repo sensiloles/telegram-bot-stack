@@ -396,3 +396,100 @@ class TestGetRecentErrors:
         errors = get_recent_errors(mock_conn, "test-bot", lines=50)
 
         assert errors == ""
+
+
+class TestDockerComposeInstallation:
+    """Tests for Docker Compose installation.
+
+    Verifies that Docker Compose is properly installed both as plugin and standalone binary.
+    """
+
+    def test_docker_compose_plugin_installed(self):
+        """Verify docker-compose-plugin is installed with Docker on Ubuntu/Debian."""
+        vps = VPSConnection(host="test.com", user="root")
+
+        with patch.object(vps, "run_command") as mock_run:
+            with patch.object(vps, "connect") as mock_connect:
+                mock_conn = MagicMock()
+                mock_conn.run = MagicMock(
+                    return_value=MagicMock(ok=True, stdout="ubuntu")
+                )
+                mock_connect.return_value = mock_conn
+                mock_run.return_value = True
+
+                # Install Docker
+                vps.install_docker()
+
+                # Check that docker-compose-plugin is installed
+                install_calls = [str(call[0][0]) for call in mock_run.call_args_list]
+                docker_install_cmd = next(
+                    (
+                        cmd
+                        for cmd in install_calls
+                        if "apt-get install" in cmd and "docker-ce" in cmd
+                    ),
+                    None,
+                )
+
+                assert docker_install_cmd is not None
+                assert "docker-compose-plugin" in docker_install_cmd
+
+    def test_standalone_docker_compose_installed(self):
+        """Verify standalone docker-compose binary is installed as fallback."""
+        vps = VPSConnection(host="test.com", user="root")
+
+        with patch.object(vps, "run_command") as mock_run:
+            with patch.object(vps, "connect") as mock_connect:
+                mock_conn = MagicMock()
+                mock_conn.run = MagicMock(
+                    return_value=MagicMock(ok=True, stdout="ubuntu")
+                )
+                mock_connect.return_value = mock_conn
+                mock_run.return_value = True
+
+                vps.install_docker()
+
+                # Check that standalone docker-compose is downloaded
+                install_calls = [str(call[0][0]) for call in mock_run.call_args_list]
+                compose_download_cmd = next(
+                    (
+                        cmd
+                        for cmd in install_calls
+                        if "docker-compose" in cmd and "curl" in cmd
+                    ),
+                    None,
+                )
+
+                assert compose_download_cmd is not None
+                assert "v2.32.4" in compose_download_cmd  # Specific version
+                assert "-SL" in compose_download_cmd  # Reliable curl flags
+
+    def test_docker_compose_version_pinned(self):
+        """Verify Docker Compose version is pinned, not using 'latest'."""
+        vps = VPSConnection(host="test.com", user="root")
+
+        with patch.object(vps, "run_command") as mock_run:
+            with patch.object(vps, "connect") as mock_connect:
+                mock_conn = MagicMock()
+                mock_conn.run = MagicMock(
+                    return_value=MagicMock(ok=True, stdout="ubuntu")
+                )
+                mock_connect.return_value = mock_conn
+                mock_run.return_value = True
+
+                vps.install_docker()
+
+                install_calls = [str(call[0][0]) for call in mock_run.call_args_list]
+                compose_download_cmd = next(
+                    (
+                        cmd
+                        for cmd in install_calls
+                        if "docker-compose" in cmd and "curl" in cmd
+                    ),
+                    None,
+                )
+
+                # Verify it's NOT using 'latest' (unreliable)
+                assert compose_download_cmd is not None
+                assert "/latest/" not in compose_download_cmd
+                assert "v2.32.4" in compose_download_cmd

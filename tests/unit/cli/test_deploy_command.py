@@ -750,3 +750,182 @@ class TestDeployHealth:
 
             assert result.exit_code == 0
             assert "Failed to connect to VPS" in result.output
+
+
+class TestDockerMakefileOverwrite:
+    """Tests for Docker Makefile generation in deployment."""
+
+    def test_docker_makefile_has_build_tag_target(self, tmp_path):
+        """Verify Docker Makefile has build-tag target required for deployment."""
+        from telegram_bot_stack.cli.utils.deployment import (
+            DeploymentConfig,
+            DockerTemplateRenderer,
+        )
+
+        config_file = tmp_path / "deploy.yaml"
+        config_file.write_text(
+            """
+vps:
+  host: test.com
+bot:
+  name: test-bot
+  python_version: "3.11"
+deployment:
+  method: docker
+resources:
+  memory_limit: 256M
+  cpu_limit: "0.5"
+  memory_reservation: 128M
+  cpu_reservation: "0.25"
+logging:
+  level: INFO
+  max_size: 5m
+  max_files: "5"
+environment:
+  timezone: UTC
+"""
+        )
+
+        deploy_config = DeploymentConfig(str(config_file))
+        renderer = DockerTemplateRenderer(deploy_config, has_secrets=False)
+
+        output_dir = tmp_path / "output"
+        output_dir.mkdir()
+        renderer.render_all(output_dir)
+
+        makefile = output_dir / "Makefile"
+        content = makefile.read_text()
+
+        # Required targets for deployment
+        required_targets = [
+            "build:",
+            "build-tag:",
+            "up:",
+            "down:",
+            "restart:",
+            "logs:",
+            "status:",
+            "clean:",
+        ]
+
+        for target in required_targets:
+            assert target in content, f"Missing required target: {target}"
+
+        # Verify it's Docker Makefile, not dev Makefile
+        assert "DOCKER_COMPOSE" in content or "docker-compose" in content
+        assert (
+            "Build Docker image and tag with version" in content
+            or "build-tag" in content
+        )
+
+
+class TestDeployUpdateCommand:
+    """Tests for deploy update command fixes."""
+
+    def test_update_regenerates_docker_templates(
+        self, runner, tmp_path, temp_deploy_config
+    ):
+        """Verify deploy update regenerates Docker templates (Makefile, Dockerfile, docker-compose.yml)."""
+        os.chdir(tmp_path)
+
+        # Create a dummy bot.py
+        (tmp_path / "bot.py").write_text("# bot code")
+
+        with (
+            patch(
+                "telegram_bot_stack.cli.commands.deploy.operations.VPSConnection"
+            ) as mock_vps,
+            patch(
+                "telegram_bot_stack.cli.commands.deploy.operations.DockerTemplateRenderer"
+            ) as mock_renderer,
+            patch("telegram_bot_stack.cli.commands.deploy.operations.create_env_file"),
+            patch("telegram_bot_stack.cli.commands.deploy.operations.SecretsManager"),
+            patch("telegram_bot_stack.cli.commands.deploy.operations.VersionTracker"),
+            patch("telegram_bot_stack.cli.commands.deploy.operations.BackupManager"),
+        ):
+            mock_instance = MagicMock()
+            mock_instance.test_connection.return_value = True
+            mock_instance.validate_vps_requirements.return_value = True
+            mock_instance.transfer_files.return_value = True
+            mock_instance.run_command.return_value = True
+            mock_instance.write_file.return_value = True
+            mock_vps.return_value = mock_instance
+
+            # Mock the renderer to track if it's called
+            mock_renderer_instance = MagicMock()
+            mock_renderer.return_value = mock_renderer_instance
+
+            result = runner.invoke(
+                deploy, ["update", "--config", str(temp_deploy_config)]
+            )
+
+            # Verify Docker templates are regenerated during update
+            mock_renderer_instance.render_all.assert_called_once()
+
+    def test_update_creates_env_file(self, runner, tmp_path, temp_deploy_config):
+        """Verify deploy update creates .env file on VPS."""
+        os.chdir(tmp_path)
+
+        # Create a dummy bot.py
+        (tmp_path / "bot.py").write_text("# bot code")
+
+        with (
+            patch(
+                "telegram_bot_stack.cli.commands.deploy.operations.VPSConnection"
+            ) as mock_vps,
+            patch(
+                "telegram_bot_stack.cli.commands.deploy.operations.DockerTemplateRenderer"
+            ),
+            patch(
+                "telegram_bot_stack.cli.commands.deploy.operations.create_env_file"
+            ) as mock_create_env,
+            patch("telegram_bot_stack.cli.commands.deploy.operations.SecretsManager"),
+            patch("telegram_bot_stack.cli.commands.deploy.operations.VersionTracker"),
+            patch("telegram_bot_stack.cli.commands.deploy.operations.BackupManager"),
+        ):
+            mock_instance = MagicMock()
+            mock_instance.test_connection.return_value = True
+            mock_instance.validate_vps_requirements.return_value = True
+            mock_instance.transfer_files.return_value = True
+            mock_instance.run_command.return_value = True
+            mock_instance.write_file.return_value = True
+            mock_vps.return_value = mock_instance
+
+            result = runner.invoke(
+                deploy, ["update", "--config", str(temp_deploy_config)]
+            )
+
+            # Verify .env file is created during update
+            mock_create_env.assert_called()
+
+    def test_update_excludes_docker_files(self):
+        """Verify that Docker files are in exclusion list for deploy update."""
+        from pathlib import Path
+
+        # Read operations.py source file
+        operations_file = (
+            Path(__file__).parent.parent.parent.parent
+            / "telegram_bot_stack"
+            / "cli"
+            / "commands"
+            / "deploy"
+            / "operations.py"
+        )
+        source = operations_file.read_text()
+
+        # Find the update function section
+        # Verify Docker files are excluded in the update function
+        # We look for the exclusion list in update command
+        assert (
+            source.count('"Dockerfile",  # Exclude - generated by template') >= 2
+        )  # Should be in both up and update
+        assert (
+            source.count('"docker-compose.yml",  # Exclude - generated by template')
+            >= 2
+        )
+        assert source.count('"Makefile",  # Exclude - generated by template') >= 2
+
+        # Verify config files are excluded
+        assert '".env",  # Will be generated separately' in source
+        assert '".secrets.env",  # Exclude - encrypted version exists on VPS' in source
+        assert '"deploy.yaml",  # Already exists on VPS' in source

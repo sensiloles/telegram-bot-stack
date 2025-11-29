@@ -181,19 +181,20 @@ class VPSConnection:
                 'echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null',
                 # Install Docker
                 "DEBIAN_FRONTEND=noninteractive apt-get update",
-                "DEBIAN_FRONTEND=noninteractive apt-get install -y docker-ce docker-ce-cli containerd.io",
-                # Install Docker Compose
-                "curl -L 'https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)' -o /usr/local/bin/docker-compose",
+                "DEBIAN_FRONTEND=noninteractive apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin",
+                # Install standalone Docker Compose (fallback for older systems)
+                "curl -SL https://github.com/docker/compose/releases/download/v2.32.4/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose",
                 "chmod +x /usr/local/bin/docker-compose",
             ]
         elif os_id in ["centos", "rhel", "fedora"]:
             commands = [
                 "yum install -y yum-utils",
                 "yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo",
-                "yum install -y docker-ce docker-ce-cli containerd.io",
+                "yum install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin",
                 "systemctl start docker",
                 "systemctl enable docker",
-                "curl -L 'https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)' -o /usr/local/bin/docker-compose",
+                # Install standalone Docker Compose (fallback)
+                "curl -SL https://github.com/docker/compose/releases/download/v2.32.4/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose",
                 "chmod +x /usr/local/bin/docker-compose",
             ]
         else:

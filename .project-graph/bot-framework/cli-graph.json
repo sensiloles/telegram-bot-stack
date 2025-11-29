@@ -1,7 +1,7 @@
 {
   "metadata": {
     "version": "3.0.0",
-    "generated_at": "2025-11-28",
+    "generated_at": "2025-11-29",
     "graph_id": "bot_framework_cli",
     "graph_name": "Bot Framework - CLI",
     "graph_type": "sub_graph",
@@ -12,7 +12,7 @@
     "scope": "CLI tool for bot project management and development",
     "root_package": "telegram_bot_stack.cli",
     "node_count": 30,
-    "edge_count": 37
+    "edge_count": 39
   },
   "nodes": [
     {
@@ -254,7 +254,7 @@
       "category": "implementation",
       "path": "telegram_bot_stack/cli/utils/vps.py",
       "description": "VPS operations utilities for deployment.",
-      "lines_of_code": 602,
+      "lines_of_code": 724,
       "complexity_score": 1,
       "exports": [
         "VPSConnection",
@@ -524,7 +524,7 @@
       "category": "implementation",
       "path": "telegram_bot_stack/cli/commands/init.py",
       "description": "Initialize a new bot project with full dev environment.",
-      "lines_of_code": 812,
+      "lines_of_code": 823,
       "complexity_score": 1,
       "exports": [
         "init"
@@ -616,7 +616,7 @@
       "category": "implementation",
       "path": "telegram_bot_stack/cli/commands/deploy/operations.py",
       "description": "Deployment operations (up, update, down).",
-      "lines_of_code": 825,
+      "lines_of_code": 868,
       "complexity_score": 1,
       "exports": [
         "up",
@@ -1076,6 +1076,20 @@
       "target": "telegram_bot_stack.cli",
       "type": "imports",
       "description": "Imports from telegram_bot_stack.cli"
+    },
+    {
+      "id": "edge_42",
+      "source": "telegram_bot_stack.cli.commands.init",
+      "target": "telegram_bot_stack.cli.utils.dependencies",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.utils.dependencies"
+    },
+    {
+      "id": "edge_43",
+      "source": "telegram_bot_stack.cli.commands.init",
+      "target": "telegram_bot_stack.cli.utils.git",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.utils.git"
     }
   ]
 }

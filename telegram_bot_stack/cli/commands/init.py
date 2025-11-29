@@ -764,8 +764,19 @@ MIT
 
     (project_path / "README.md").write_text(readme)
 
+    # Create requirements.txt for Docker deployment
+    requirements_content = """# Production dependencies
+telegram-bot-stack>=1.0.0
+
+# Optional: Uncomment for specific storage backends
+# redis>=4.5.0  # For Redis storage
+# psycopg2-binary>=2.9.0  # For PostgreSQL storage
+"""
+    (project_path / "requirements.txt").write_text(requirements_content)
+
     click.secho(
-        "  ✅ Created project files (bot.py, README.md, .env.example)", fg="green"
+        "  ✅ Created project files (bot.py, README.md, .env.example, requirements.txt)",
+        fg="green",
     )
 
 

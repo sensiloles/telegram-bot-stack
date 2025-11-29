@@ -319,3 +319,52 @@ def test_init_with_package_manager_pdm(tmp_path):
             assert result.exit_code == 0
             project_path = Path("test-bot")
             assert project_path.exists()
+
+
+def test_init_creates_requirements_txt(tmp_path):
+    """Test that init creates requirements.txt for Docker deployment."""
+    runner = CliRunner()
+
+    with runner.isolated_filesystem(temp_dir=tmp_path):
+        result = runner.invoke(
+            cli,
+            ["init", "test-bot", "--no-install-deps", "--no-git"],
+        )
+
+        assert result.exit_code == 0
+
+        # Verify requirements.txt was created
+        requirements_file = Path("test-bot") / "requirements.txt"
+        assert requirements_file.exists()
+
+        # Verify content
+        content = requirements_file.read_text()
+        assert "telegram-bot-stack>=1.0.0" in content
+        assert "Production dependencies" in content
+
+
+def test_requirements_txt_content_valid(tmp_path):
+    """Verify requirements.txt has valid pip package format."""
+    from telegram_bot_stack.cli.commands.init import _create_project_structure
+
+    project_path = tmp_path / "test-bot"
+    project_path.mkdir()
+
+    _create_project_structure(project_path, "Test Bot")
+
+    requirements_file = project_path / "requirements.txt"
+    assert requirements_file.exists()
+
+    content = requirements_file.read_text()
+
+    # Verify format
+    lines = [line.strip() for line in content.split("\n") if line.strip()]
+    package_lines = [line for line in lines if not line.startswith("#")]
+
+    # Should have at least one package
+    assert len(package_lines) >= 1
+
+    # Main package should have version constraint
+    main_package = package_lines[0]
+    assert "telegram-bot-stack" in main_package
+    assert ">=" in main_package
