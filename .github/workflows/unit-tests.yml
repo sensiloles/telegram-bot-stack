@@ -36,11 +36,23 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           cache: "pip"
+          cache-dependency-path: |
+            pyproject.toml
+            requirements*.txt
 
       - name: Configure Git
         run: |
           git config --global user.email "ci@github.com"
           git config --global user.name "GitHub CI"
+
+      - name: Cache pytest
+        uses: actions/cache@v4
+        with:
+          path: .pytest_cache
+          key: pytest-cache-${{ matrix.python-version }}-${{ hashFiles('tests/**/*.py') }}
+          restore-keys: |
+            pytest-cache-${{ matrix.python-version }}-
+            pytest-cache-
 
       - name: Install dependencies
         id: install_deps

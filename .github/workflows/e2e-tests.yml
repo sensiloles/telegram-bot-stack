@@ -30,6 +30,18 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           cache: "pip"
+          cache-dependency-path: |
+            pyproject.toml
+            requirements*.txt
+
+      - name: Cache pytest
+        uses: actions/cache@v4
+        with:
+          path: .pytest_cache
+          key: pytest-cache-e2e-${{ matrix.python-version }}-${{ hashFiles('tests/e2e/**/*.py') }}
+          restore-keys: |
+            pytest-cache-e2e-${{ matrix.python-version }}-
+            pytest-cache-e2e-
 
       - name: Install system dependencies
         run: |
