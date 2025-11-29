@@ -2,6 +2,19 @@
 
 <!-- version list -->
 
+## v1.26.0 (2025-11-29)
+
+### Features
+
+- **ci**: Refactor CI/CD into modular workflows
+  ([`82a449f`](https://github.com/sensiloles/telegram-bot-stack/commit/82a449fe350e091e94399b89c9e904e91ba08244))
+
+### Testing
+
+- **integration**: Add VPS deployment integration tests infrastructure
+  ([`3d2c12c`](https://github.com/sensiloles/telegram-bot-stack/commit/3d2c12cd4bcf1abff650fe8f0bdc54dfd1da86d0))
+
+
 ## v1.25.3 (2025-11-27)
 
 ### Bug Fixes
