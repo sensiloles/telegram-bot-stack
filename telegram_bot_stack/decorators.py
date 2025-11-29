@@ -54,6 +54,8 @@ def rate_limit(
         - Admins bypass rate limits automatically
         - Old timestamps are cleaned up automatically
         - If storage fails, allows the call (fail-open for availability)
+        - Use 'user' scope for per-user quotas (recommended for most commands)
+        - Use 'global' scope for bot-wide resource protection
     """
 
     def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
