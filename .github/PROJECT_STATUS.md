@@ -103,33 +103,38 @@ Found and fixed **12 critical deployment bugs** during E2E testing:
 
 **CRITICAL Issues (must fix before v2.0.0):**
 
-| #       | Issue                         | Part of Deploy | Status  | Time  | Blocks |
-| ------- | ----------------------------- | -------------- | ------- | ----- | ------ |
-| **#76** | Rollback mechanism            | ✅ YES         | ✅ DONE | 3-4h  | -      |
-| **#77** | Health checks + auto-recovery | ✅ YES         | ✅ DONE | 4-5h  | #78    |
-| **#79** | Secrets management            | ✅ YES         | ✅ DONE | 5-6h  | -      |
-| **#81** | Backup/restore                | ✅ YES         | ✅ DONE | 5-6h  | -      |
-| **#84** | Troubleshooting guide         | ✅ YES (docs)  | ✅ DONE | 3-4h  | -      |
-| **#85** | Integration tests             | ✅ YES (tests) | ✅ DONE | 8-10h | -      |
-| **#88** | Doctor command                | 🔧 CLI tool    | ⏳ TODO | 6-8h  | -      |
-| **NEW** | **Deployment bug fixes**      | ✅ YES         | ✅ DONE | 12h   | -      |
+| #        | Issue                         | Part of Deploy | Status  | Time   | Blocks |
+| -------- | ----------------------------- | -------------- | ------- | ------ | ------ |
+| **#76**  | Rollback mechanism            | ✅ YES         | ✅ DONE | 3-4h   | -      |
+| **#77**  | Health checks + auto-recovery | ✅ YES         | ✅ DONE | 4-5h   | #78    |
+| **#79**  | Secrets management            | ✅ YES         | ✅ DONE | 5-6h   | -      |
+| **#81**  | Backup/restore                | ✅ YES         | ✅ DONE | 5-6h   | -      |
+| **#84**  | Troubleshooting guide         | ✅ YES (docs)  | ✅ DONE | 3-4h   | -      |
+| **#85**  | Integration tests             | ✅ YES (tests) | ✅ DONE | 8-10h  | -      |
+| **#88**  | Doctor command                | 🔧 CLI tool    | ⏳ TODO | 6-8h   | -      |
+| **#119** | Already running detection     | ✅ YES         | ⏳ TODO | 8-10h  | -      |
+| **#120** | Pre-release E2E testing       | ✅ QA          | ⏳ TODO | 16-24h | #121   |
+| **#121** | v2.0.0 Release                | 🎯 Milestone   | ⏳ TODO | 24-32h | All    |
+| **NEW**  | **Deployment bug fixes**      | ✅ YES         | ✅ DONE | 12h    | -      |
 
-**Total Critical Path:** ~44-53 hours (6-7 days) - **7/8 critical issues completed!**
+**Total Critical Path:** ~87-117 hours (11-15 days) - **7/11 critical issues completed!**
 
-**IMPORTANT Issues (do after critical):**
+**IMPORTANT Issues (do after critical or for v2.0.1):**
 
-| #       | Issue                   | Part of Deploy   | Status  | Time   | Depends  |
-| ------- | ----------------------- | ---------------- | ------- | ------ | -------- |
-| **#78** | Zero-downtime deploy    | ✅ YES           | ⏳ TODO | 6-8h   | #77      |
-| **#80** | Deployment verification | ✅ YES           | ⏳ TODO | 4-5h   | -        |
-| **#82** | Monitoring + alerting   | ✅ YES           | ⏳ TODO | 8-10h  | #77      |
-| **#83** | Multi-environment       | ✅ YES           | ⏳ TODO | 4-5h   | -        |
-| **#86** | Upgrade command         | 🔧 CLI tool      | ⏳ TODO | 5-6h   | -        |
-| **#87** | Redis storage           | 🔧 Scaling       | ⏳ TODO | 6-8h   | -        |
-| **#89** | Production example      | 📖 Demo          | ⏳ TODO | 12-16h | multiple |
-| **#90** | Structured logging      | 🔧 Observability | ⏳ TODO | 5-6h   | -        |
+| #        | Issue                   | Part of Deploy   | Status  | Time   | Depends  |
+| -------- | ----------------------- | ---------------- | ------- | ------ | -------- |
+| **#117** | Multi-bot on one VPS    | ✅ YES           | ⏳ TODO | 6-8h   | #27, #28 |
+| **#118** | SSH key authentication  | ✅ YES           | ⏳ TODO | 5-7h   | #79      |
+| **#78**  | Zero-downtime deploy    | ✅ YES           | ⏳ TODO | 6-8h   | #77      |
+| **#80**  | Deployment verification | ✅ YES           | ⏳ TODO | 4-5h   | -        |
+| **#82**  | Monitoring + alerting   | ✅ YES           | ⏳ TODO | 8-10h  | #77      |
+| **#83**  | Multi-environment       | ✅ YES           | ⏳ TODO | 4-5h   | -        |
+| **#86**  | Upgrade command         | 🔧 CLI tool      | ⏳ TODO | 5-6h   | -        |
+| **#87**  | Redis storage           | 🔧 Scaling       | ⏳ TODO | 6-8h   | -        |
+| **#89**  | Production example      | 📖 Demo          | ⏳ TODO | 12-16h | multiple |
+| **#90**  | Structured logging      | 🔧 Observability | ⏳ TODO | 5-6h   | -        |
 
-**Total Important Path:** ~50-64 hours (7-9 days)
+**Total Important Path:** ~61-79 hours (8-10 days)
 
 **Result:** Production-ready deployment system
 
@@ -141,17 +146,20 @@ Found and fixed **12 critical deployment bugs** during E2E testing:
 
 **Deployment Core (must complete for v2.0.0):**
 
-| #   | Issue                  | Category | Status            | Depends | Blocks   |
-| --- | ---------------------- | -------- | ----------------- | ------- | -------- |
-| #27 | VPS Deploy CLI         | Deploy   | ✅ DONE (v1.19.0) | #40     | #76-#85  |
-| #28 | Docker Templates       | Deploy   | ✅ DONE (v1.21.0) | #27     | #76-#85  |
-| #76 | **Rollback mechanism** | Deploy   | ✅ DONE           | #27     | -        |
-| #77 | **Health checks**      | Deploy   | ✅ DONE           | #27     | #78, #80 |
-| #79 | **Secrets management** | Deploy   | ✅ DONE           | #27     | -        |
-| #81 | **Backup/restore**     | Deploy   | ✅ DONE           | #27     | -        |
-| #84 | **Troubleshooting**    | Docs     | ✅ DONE           | #27     | -        |
-| #85 | **Deploy tests**       | Tests    | ✅ DONE           | #27     | -        |
-| #88 | **Doctor command**     | CLI      | ⏳ TODO           | -       | -        |
+| #    | Issue                      | Category | Status            | Depends | Blocks   |
+| ---- | -------------------------- | -------- | ----------------- | ------- | -------- |
+| #27  | VPS Deploy CLI             | Deploy   | ✅ DONE (v1.19.0) | #40     | #76-#85  |
+| #28  | Docker Templates           | Deploy   | ✅ DONE (v1.21.0) | #27     | #76-#85  |
+| #76  | **Rollback mechanism**     | Deploy   | ✅ DONE           | #27     | -        |
+| #77  | **Health checks**          | Deploy   | ✅ DONE           | #27     | #78, #80 |
+| #79  | **Secrets management**     | Deploy   | ✅ DONE           | #27     | #118     |
+| #81  | **Backup/restore**         | Deploy   | ✅ DONE           | #27     | -        |
+| #84  | **Troubleshooting**        | Docs     | ✅ DONE           | #27     | -        |
+| #85  | **Deploy tests**           | Tests    | ✅ DONE           | #27     | -        |
+| #88  | **Doctor command**         | CLI      | ⏳ TODO           | -       | -        |
+| #119 | **Already running detect** | Deploy   | ⏳ TODO           | #27     | -        |
+| #120 | **Pre-release E2E tests**  | QA       | ⏳ TODO           | All     | #121     |
+| #121 | **v2.0.0 Release**         | Release  | ⏳ TODO           | All     | -        |
 
 **Other Critical:**
 
@@ -160,20 +168,22 @@ Found and fixed **12 critical deployment bugs** during E2E testing:
 | #40 | Full Dev Setup | ✅ DONE (v1.17.0) | Killer Feature #1 |
 | #60 | Agent Optimize | 🏗️ In Progress    | Ongoing           |
 
-**Total Critical: 1 TODO + 9 DONE = 10 issues**
+**Total Critical: 4 TODO + 10 DONE = 14 issues**
 
 ---
 
-### 🟠 HIGH - Production Features (v2.0.1)
+### 🟠 HIGH - Production Features (v2.0.0 or v2.0.1)
 
-**Deployment Advanced:**
+**Deployment Advanced (recommended for v2.0.0):**
 
-| #   | Issue                   | Category | Depends | Notes               |
-| --- | ----------------------- | -------- | ------- | ------------------- |
-| #78 | Zero-downtime deploy    | Deploy   | #77     | Blue-green strategy |
-| #80 | Deployment verification | Deploy   | #77     | Smoke tests         |
-| #82 | Monitoring + alerting   | Deploy   | #77     | Observability       |
-| #83 | Multi-environment       | Deploy   | #27     | Dev/staging/prod    |
+| #    | Issue                   | Category | Depends  | Notes                    |
+| ---- | ----------------------- | -------- | -------- | ------------------------ |
+| #117 | Multi-bot on one VPS    | Deploy   | #27, #28 | Multiple deployments     |
+| #118 | SSH key authentication  | Deploy   | #79      | Security best practice   |
+| #78  | Zero-downtime deploy    | Deploy   | #77      | Blue-green strategy      |
+| #80  | Deployment verification | Deploy   | #77      | Smoke tests              |
+| #82  | Monitoring + alerting   | Deploy   | #77      | Observability            |
+| #83  | Multi-environment       | Deploy   | #27      | Dev/staging/prod support |
 
 **Infrastructure:**
 
@@ -197,7 +207,7 @@ Found and fixed **12 critical deployment bugs** during E2E testing:
 | #43 | Security hardening | Post-MVP          |
 | #44 | Multi-instance     | Needs #87 (Redis) |
 
-**Total High: 11 issues**
+**Total High: 13 issues**
 
 ---
 
@@ -252,17 +262,18 @@ Found and fixed **12 critical deployment bugs** during E2E testing:
 ✅ Week 1-3:   #40  Full Dev Environment (DONE v1.17.0)
 ✅ Week 4-6:   #27 + #28  Basic VPS Deployment (DONE v1.19.0, v1.21.0)
 🏗️ Week 7-8:   #76-#85, #88  Production Hardening (IN PROGRESS)
-⏳ Week 9:     #78, #80, #82, #83  Advanced Features
-⏳ Week 10:    #29, #89  Documentation + Examples
+⏳ Week 9:     #117-#119  Critical deployment scenarios
+⏳ Week 10:    #78, #80, #82, #83  Advanced features (optional)
+⏳ Week 11:    #120  Pre-release E2E testing (GATE)
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-✅ v2.0.0 MVP LAUNCH (Week 10)
+✅ v2.0.0 MVP LAUNCH (#121) - Week 12
 "From idea to production in 10 minutes" 🚀
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-   Week 11-14: #86, #87, #90  Scaling + Observability
+   Week 13-16: #29, #86, #87, #89, #90  Polish + Scaling
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-✅ v2.0.1 PRODUCTION-HARDENED (Week 14)
+✅ v2.0.1 PRODUCTION-HARDENED (Week 16)
 ```
 
 ### Dependency Graph
@@ -274,20 +285,29 @@ Killer Feature #2: VPS Deployment
 │
 ├── Critical Hardening (parallel work):
 │   ├── ✅ #76 Rollback ← #27 (DONE)
-│   ├── ✅ #77 Health checks ← #27 → blocks #78, #80 (DONE)
-│   ├── ✅ #79 Secrets ← #27 (DONE)
+│   ├── ✅ #77 Health checks ← #27 → blocks #78, #80, #82 (DONE)
+│   ├── ✅ #79 Secrets ← #27 → blocks #118 (DONE)
 │   ├── ✅ #81 Backup ← #27 (DONE)
 │   ├── ✅ #84 Troubleshooting ← #27 (DONE)
-│   ├── #85 Deploy tests ← #27
-│   └── #88 Doctor (independent)
+│   ├── ✅ #85 Deploy tests ← #27 (DONE)
+│   ├── #88 Doctor (independent)
+│   └── #119 Already running ← #27 (critical DX)
 │
-└── Advanced Features (sequential):
-    ├── #78 Zero-downtime ← #77
-    ├── #80 Verification ← #77
-    ├── #82 Monitoring ← #77
-    └── #83 Multi-env ← #27
+├── Important Deployment Features (parallel):
+│   ├── #117 Multi-bot VPS ← #27, #28 (production ready)
+│   └── #118 SSH key auth ← #79 (security)
+│
+├── Advanced Features (optional for v2.0.0):
+│   ├── #78 Zero-downtime ← #77
+│   ├── #80 Verification ← #77
+│   ├── #82 Monitoring ← #77
+│   └── #83 Multi-env ← #27
+│
+└── Release Path:
+    ├── #120 E2E Testing ← ALL features (GATE)
+    └── #121 v2.0.0 Release ← #120 (MILESTONE)
 
-Supporting Infrastructure (parallel):
+Supporting Infrastructure (v2.0.1):
 ├── #86 Upgrade command (independent)
 ├── #87 Redis storage (independent)
 ├── #89 Production example ← #76, #77, #81
@@ -298,85 +318,156 @@ Supporting Infrastructure (parallel):
 
 ## Next Actions
 
-### ⚡ IMMEDIATE (Week 7-8): Production Hardening
+### ⚡ IMMEDIATE (Week 7-9): Production Hardening
 
-**Phase 1: Critical Security & Safety (3-4 days)**
+**Phase 1: Critical Security & Safety (COMPLETED ✅)**
 
 ```bash
-# Work order for maximum safety:
-
-1. ✅ #79 Secrets management (5-6h) ← DONE (security)
+1. ✅ #79 Secrets management (5-6h) ← DONE
    → Secure token storage implemented
 
-2. ✅ #81 Backup/restore (5-6h) ← DONE (data safety)
+2. ✅ #81 Backup/restore (5-6h) ← DONE
    → Data protection implemented with auto-backup
 
-3. ✅ #76 Rollback mechanism (3-4h) ← DONE (recovery)
-   → Safety net for deployments - version tracking + rollback commands
+3. ✅ #76 Rollback mechanism (3-4h) ← DONE
+   → Safety net for deployments
 
-4. ✅ #77 Health checks (4-5h) ← DONE (reliability)
-   → Auto-recovery for production - health monitoring + auto-restart
+4. ✅ #77 Health checks (4-5h) ← DONE
+   → Auto-recovery for production
+
+5. ✅ #84 Troubleshooting guide (3-4h) ← DONE
+   → Comprehensive error resolution
+
+6. ✅ #85 Integration tests (8-10h) ← DONE
+   → Deployment reliability verified
 ```
 
-**Phase 2: Testing & Documentation (2-3 days)**
+**Phase 2: Critical Deployment Scenarios (Week 8-9)**
 
 ```bash
-5. #85 Integration tests (8-10h)
-   → Ensure deployment reliability
+7. #119 Already running detection (8-10h) ← HIGH PRIORITY
+   → Prevent double deployments, handle restart scenarios
+   → Critical for user experience
 
-6. #84 Troubleshooting guide (3-4h)
-   → Support users when things break
+8. #117 Multi-bot on one VPS (6-8h)
+   → Production-grade: deploy multiple bots safely
+   → Port conflict detection, resource isolation
 
-7. #88 Doctor command (6-8h)
-   → Auto-diagnose common issues
+9. #118 SSH key authentication (5-7h)
+   → Security best practice for production
+   → Support keys + password methods
+
+10. #88 Doctor command (6-8h)
+    → Auto-diagnose all issues
+    → Validates all critical scenarios
 ```
 
-**Total: 35-43 hours (~1 week)**
+**Phase 3: Pre-Release Quality Gate (Week 10-11)**
 
-### 🎯 Week 7-8 Goals
+```bash
+11. #120 Pre-release E2E testing (16-24h) ← MANDATORY GATE
+    → Test ALL features end-to-end
+    → Real VPS, all templates, all platforms
+    → Cannot skip - this is the quality gate
+```
 
-**✅ Completed:**
+**Total: 87-117 hours (~2-3 weeks)**
+
+### 🎯 Week 7-8 Goals (COMPLETED ✅)
+
+**✅ All Phase 1 Complete:**
 
 - Security (#79 Secrets) ✅
 - Data Safety (#81 Backup) ✅
 - Recovery (#76 Rollback) ✅
 - Reliability (#77 Health checks) ✅
 - Documentation (#84 Troubleshooting) ✅
+- Testing (#85 Integration tests) ✅
 
-**⏳ Remaining:**
+**Milestone:** Production-safe deployment foundation ✅
 
-- Tooling (#88 Doctor command)
+### 🚀 Week 8-9: Critical Deployment Scenarios
 
-**Milestone:** Production-safe deployment (6/7 critical features done) ✅
-
-### 🚀 Week 9: Advanced Features
+**MUST complete for v2.0.0:**
 
 ```bash
-# After critical hardening is done:
+1. #119 Already running detection (8-10h) ← CRITICAL DX
+   → Prevent double deploy, handle conflicts
+   → Most common user error scenario
 
-1. #78 Zero-downtime (6-8h) ← depends on #77
+2. #117 Multi-bot on one VPS (6-8h) ← PRODUCTION READY
+   → Real-world deployment pattern
+   → Resource isolation + conflict detection
+
+3. #118 SSH key authentication (5-7h) ← SECURITY
+   → Industry standard auth method
+   → Production best practice
+
+4. #88 Doctor command (6-8h) ← DIAGNOSTICS
+   → Auto-detect all issues
+   → Validates #119, #117, #118
+```
+
+**Total: 25-33 hours (~1 week)**
+
+**Milestone:** All critical deployment scenarios handled ✅
+
+### 📋 Week 10-11: Pre-Release Quality Gate
+
+**MANDATORY before release:**
+
+```bash
+1. #120 Pre-release E2E testing (16-24h)
+   → Test EVERYTHING end-to-end
+   → Real VPS, all templates, all scenarios
+   → Find and fix remaining bugs
+   → THIS IS THE QUALITY GATE
+
+2. Documentation polish
+   → Update any outdated docs
+   → Verify all examples work
+   → Add troubleshooting for new issues
+```
+
+**Total: 16-24 hours (3 days focused testing)**
+
+**Milestone:** Ready for v2.0.0 release 🎉
+
+### 🎯 Week 12: v2.0.0 Launch
+
+```bash
+1. #121 v2.0.0 Release (24-32h)
+   → Final preparation
+   → CHANGELOG.md
+   → Release notes
+   → PyPI publish
+   → Announcement
+```
+
+**Milestone:** v2.0.0 MVP LAUNCHED 🚀
+
+### 📈 Week 13-16: v2.0.1 Enhancement (Optional)
+
+**Nice-to-have features (not blocking v2.0.0):**
+
+```bash
+# Advanced deployment:
+1. #78 Zero-downtime (6-8h)
 2. #80 Verification (4-5h)
-3. #82 Monitoring (8-10h) ← depends on #77
+3. #82 Monitoring (8-10h)
 4. #83 Multi-environment (4-5h)
 
-# Parallel work:
+# Infrastructure:
 5. #86 Upgrade command (5-6h)
 6. #87 Redis storage (6-8h)
 7. #90 Structured logging (5-6h)
+
+# Documentation:
+8. #29 Extended deploy docs
+9. #89 Production example
 ```
 
-**Milestone:** Professional deployment system ✅
-
-### 📖 Week 10: Polish & Examples
-
-```bash
-1. #29 Extended deploy docs
-2. #89 Production example bot (task manager)
-3. Final testing and bug fixes
-4. Release notes and marketing prep
-```
-
-**Milestone:** v2.0.0 MVP READY FOR LAUNCH 🎉
+**Milestone:** v2.0.1 Production-Hardened ✅
 
 ---
 
@@ -405,19 +496,30 @@ Supporting Infrastructure (parallel):
 - ⏳ Production-grade error handling (#77, #84)
 - ⏳ Comprehensive documentation (#84)
 
-**Production Readiness Checklist:**
+**Production Readiness Checklist (v2.0.0):**
 
-- [x] Basic deployment works
-- [x] Deployment guide exists
+**Core Features (MUST have):**
+
+- [x] Basic deployment works ✅
+- [x] Deployment guide exists ✅
 - [x] Rollback mechanism (#76) ✅
 - [x] Health checks (#77) ✅
 - [x] Secrets management (#79) ✅
 - [x] Backup/restore (#81) ✅
 - [x] Troubleshooting guide (#84) ✅
 - [x] Integration tests (#85) ✅
-- [ ] Doctor command (#88)
+- [ ] Already running detection (#119) ⏳ CRITICAL
+- [ ] Multi-bot support (#117) ⏳
+- [ ] SSH key auth (#118) ⏳
+- [ ] Doctor command (#88) ⏳
+- [ ] E2E testing complete (#120) ⏳ GATE
+
+**Enhanced Features (NICE to have for v2.0.0, else v2.0.1):**
+
 - [ ] Zero-downtime updates (#78)
+- [ ] Deployment verification (#80)
 - [ ] Monitoring (#82)
+- [ ] Multi-environment (#83)
 
 **Marketing Messages:**
 
@@ -482,27 +584,42 @@ Supporting Infrastructure (parallel):
 
 ### Key Issues (Killer Feature #2)
 
-**Deployed:**
+**Completed:**
 
-- #27: VPS Deploy CLI ✅ DONE (v1.19.0)
-- #28: Docker Templates ✅ DONE (v1.21.0)
+- #27: VPS Deploy CLI ✅ (v1.19.0)
+- #28: Docker Templates ✅ (v1.21.0)
+- #76: Rollback mechanism ✅
+- #77: Health checks + auto-recovery ✅
+- #79: Secrets management ✅
+- #81: Backup/restore ✅
+- #84: Troubleshooting guide ✅
+- #85: Integration tests ✅
 
-**In Progress (Hardening):**
+**In Progress (Week 8-9 - Critical Scenarios):**
 
-- ✅ #76: Rollback mechanism DONE
-- ✅ #77: Health checks + auto-recovery DONE
-- ✅ #79: Secrets management DONE
-- ✅ #81: Backup/restore DONE
-- ✅ #84: Troubleshooting guide DONE
-- #85: Integration tests ⏳
+- #119: Already running detection ⏳ CRITICAL
+- #117: Multi-bot on one VPS ⏳
+- #118: SSH key authentication ⏳
 - #88: Doctor command ⏳
 
-**Planned (Advanced):**
+**Quality Gate (Week 10-11):**
+
+- #120: Pre-release E2E testing ⏳ MANDATORY
+
+**Release (Week 12):**
+
+- #121: v2.0.0 stable release ⏳
+
+**Planned for v2.0.1 (Advanced):**
 
 - #78: Zero-downtime deploy
 - #80: Deployment verification
 - #82: Monitoring + alerting
 - #83: Multi-environment
+- #86: Upgrade command
+- #87: Redis storage
+- #89: Production example
+- #90: Structured logging
 
 **Other:**
 
@@ -547,26 +664,28 @@ Supporting Infrastructure (parallel):
 
 ### Open Issues by Priority
 
-- 🔴 **CRITICAL:** 7 issues (deployment hardening) - 2 completed!
-- 🟠 **HIGH:** 11 issues (advanced features)
+- 🔴 **CRITICAL:** 14 issues - 10 completed, 4 remaining (including release)
+- 🟠 **HIGH:** 13 issues (deployment + advanced features)
 - 🟡 **MEDIUM:** 6 issues (future enhancements)
 - 🟢 **LOW:** 9 issues (long-term vision)
 
-**Total:** 35 open issues
+**Total:** 42 open issues (5 new issues added for v2.0.0 preparation)
 
 ### Milestones
 
 - ✅ Week 0-3: v1.17.0 - CLI + Dev Environment (DONE)
 - ✅ Week 4-6: v1.19.0-v1.21.0 - Basic Deployment (DONE)
-- 🏗️ Week 7-8: Critical Hardening (IN PROGRESS)
-- ⏳ Week 9: Advanced Features
-- ⏳ Week 10: v2.0.0 MVP Launch 🚀
-- ⏳ Week 11-14: v2.0.1 Production-Hardened
+- ✅ Week 7-8: Phase 1 Critical Hardening (DONE - 6 issues)
+- 🏗️ Week 8-9: Phase 2 Critical Scenarios (IN PROGRESS - 4 issues)
+- ⏳ Week 10-11: Pre-Release Testing (#120 - Quality Gate)
+- ⏳ Week 12: v2.0.0 MVP Launch (#121) 🚀
+- ⏳ Week 13-16: v2.0.1 Production-Hardened
 
 ---
 
-**Status:** 🏗️ Killer Feature #2 deployed, now hardening for production
-**Progress:** 6/7 critical hardening tasks completed (#76 Rollback, #77 Health, #79 Secrets, #81 Backup, #84 Troubleshooting, #85 Integration Tests) ✅
-**Current Focus:** Tooling (#88 Doctor command)
-**Next Milestone:** v2.0.0 MVP (Week 10)
-**Next Review:** After completing critical hardening (Week 8)
+**Status:** 🏗️ Phase 1 hardening complete, moving to Phase 2 critical scenarios
+**Progress:** 10/14 critical tasks completed ✅ | 4 remaining before E2E testing
+**Current Focus:** Critical deployment scenarios (#119 Already Running, #117 Multi-bot, #118 SSH keys, #88 Doctor)
+**Next Milestone:** Pre-release E2E testing (#120) - Week 10-11
+**Final Milestone:** v2.0.0 MVP Launch (#121) - Week 12
+**Updated:** 2025-11-29
