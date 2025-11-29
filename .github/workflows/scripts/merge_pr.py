@@ -135,11 +135,86 @@ def delete_remote_branch(repo, branch: str) -> bool:
         return False
 
 
+def check_ci_status(repo, pr) -> tuple[bool, str]:
+    """Check CI status before merging.
+
+    Args:
+        repo: Repository object
+        pr: Pull request object
+
+    Returns:
+        Tuple of (can_merge, message)
+    """
+    print("\n🔍 Checking CI status...")
+
+    try:
+        commit = repo.get_commit(pr.head.sha)
+        check_runs = list(commit.get_check_runs())
+
+        if not check_runs:
+            print("⚠️  Warning: No CI checks found")
+            return (True, "No CI checks configured")
+
+        passing = failing = running = 0
+        failed_checks = []
+        running_checks = []
+
+        # GitGuardian can be ignored (sometimes glitches)
+        IGNORED_CHECKS = ["GitGuardian Security Checks", "GitGuardian"]
+
+        for check in check_runs:
+            # Skip ignored checks
+            if any(ignored in check.name for ignored in IGNORED_CHECKS):
+                continue
+
+            if check.conclusion == "success":
+                passing += 1
+            elif check.conclusion == "failure":
+                failing += 1
+                failed_checks.append(check.name)
+            elif check.conclusion in ["cancelled", "skipped"]:
+                # Skipped/cancelled checks are OK
+                pass
+            else:
+                # Still running or pending
+                running += 1
+                running_checks.append(check.name)
+
+        print(f"   ✅ Passed: {passing}")
+        print(f"   ❌ Failed: {failing}")
+        print(f"   ⏳ Running: {running}")
+
+        # Block merge if any checks are failing
+        if failing > 0:
+            message = f"Cannot merge: {failing} CI check(s) failed\n"
+            message += "Failed checks:\n"
+            for check in failed_checks:
+                message += f"  - {check}\n"
+            return (False, message)
+
+        # Block merge if any checks are still running
+        if running > 0:
+            message = f"Cannot merge: {running} CI check(s) still running\n"
+            message += "Running checks:\n"
+            for check in running_checks:
+                message += f"  - {check}\n"
+            message += "\nPlease wait for all checks to complete before merging."
+            return (False, message)
+
+        return (True, f"All {passing} CI checks passed ✅")
+
+    except Exception as e:
+        print(f"⚠️  Warning: Could not check CI status: {e}")
+        # Don't block merge on CI check failure (GitHub API issues, etc.)
+        return (True, "CI check skipped due to error")
+
+
 def merge_pr(
     pr_number: int,
     pr_type: str = "release",
     will_release: bool = True,
     merge_method: str = None,
+    skip_ci_check: bool = False,
 ) -> bool:
     """
     Merge a PR with appropriate strategy.
@@ -149,6 +224,7 @@ def merge_pr(
         pr_type: 'release' or 'non-release'
         will_release: Will this PR trigger a release
         merge_method: Force specific merge method ('merge', 'squash', 'rebase')
+        skip_ci_check: Skip CI status check (use with caution!)
 
     Returns:
         True if merged successfully
@@ -165,6 +241,20 @@ def merge_pr(
     print(f"Head: {pr.head.ref}")
     print(f"PR Type: {pr_type}")
     print(f"Will Release: {'✅ YES' if will_release else '❌ NO'}")
+
+    # CRITICAL: Check CI status before merging
+    if not skip_ci_check:
+        can_merge, ci_message = check_ci_status(repo, pr)
+        if not can_merge:
+            print("\n❌ CI Check Failed:")
+            print(ci_message)
+            print("\n💡 Tip: Wait for all CI checks to complete and pass")
+            print(f"   Monitor at: {pr.html_url}/checks")
+            return False
+        else:
+            print(f"✅ {ci_message}")
+    else:
+        print("\n⚠️  WARNING: Skipping CI check (--skip-ci-check flag used)")
 
     # Determine merge method
     if merge_method is None:
@@ -279,6 +369,11 @@ Examples:
         action="store_true",
         help="Dry run (don't actually merge)",
     )
+    parser.add_argument(
+        "--skip-ci-check",
+        action="store_true",
+        help="Skip CI status check before merge (use with caution!)",
+    )
     args = parser.parse_args()
 
     try:
@@ -330,6 +425,7 @@ Examples:
             pr_type=args.type,
             will_release=args.release,
             merge_method=args.method,
+            skip_ci_check=args.skip_ci_check,
         )
 
         if not success:
