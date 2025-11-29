@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.29.0 (2025-11-29)
+
+### Features
+
+- **cli**: Add doctor command for project health diagnostics
+  ([`57966c1`](https://github.com/sensiloles/telegram-bot-stack/commit/57966c177f8f9514027ff986886cf8cc591ea6e3))
+
+
 ## v1.28.0 (2025-11-29)
 
 ### Documentation
