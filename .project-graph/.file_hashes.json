@@ -6,5 +6,8 @@
   ".github/PROJECT_STATUS.md": "feb868acd0c74a64eb25a0115123600170ace4ebd0600303646feec976b695bd",
   "docs/deployment_guide.md": "da92b50587283ac14dd238b4b387d8a7a626b6a3a5da27225ec67c35fbccbaa4",
   "telegram_bot_stack/cli/utils/vps.py": "3a0f001284801fb4c6d4821f07a2b2755bea242515e1ea664702afdd2ff6f709",
-  ".github/workflows/scripts/merge_pr.py": "e739354c5138a28b9d965046e589d02ab4a25ea518476861001526a93e3dfb9a"
+  ".github/workflows/scripts/merge_pr.py": "e739354c5138a28b9d965046e589d02ab4a25ea518476861001526a93e3dfb9a",
+  "CONTRIBUTING.md": "7897b044abdcf79d1bc5c6d15c994156587d9425f8b393120fdc8d6dd1f4a402",
+  "README.md": "c94681852257aafe4f54a7c2bf988c9cf4dd7c84b5a322fec45a186784c27267",
+  "scripts/tasks.py": "b7e34252cdcff547334c7fffd57bb55c9bbb63d80661e37264a46e2a76cfb806"
 }

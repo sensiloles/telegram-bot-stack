@@ -312,11 +312,42 @@ pip install -e ".[dev,github-actions]"
 - **[Deployment Guide](docs/deployment_guide.md)** - Production deployment instructions
 - **[Migration Guide](docs/migration_guide.md)** - Upgrading between versions
 
+## Platform Support
+
+The framework is fully cross-platform:
+
+- **Linux** - Full support ✅
+- **macOS** - Full support (Intel + Apple Silicon) ✅
+- **Windows** - Full support (PowerShell, cmd, Git Bash) ✅
+
+### Development on Windows
+
+Windows developers can use the cross-platform task runner instead of Make:
+
+```powershell
+# Instead of: make test
+python scripts/tasks.py test
+
+# Instead of: make lint
+python scripts/tasks.py lint
+
+# Instead of: make format
+python scripts/tasks.py format
+
+# Instead of: make dev
+python scripts/tasks.py dev
+
+# Show all available commands
+python scripts/tasks.py help
+```
+
+All development commands work identically across Windows, macOS, and Linux.
+
 ## Contributing
 
 Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for:
 
-- Development setup and workflow
+- Development setup and workflow (Windows/Unix)
 - Code style and conventions
 - Testing requirements
 - Pull request process
