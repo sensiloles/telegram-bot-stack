@@ -119,23 +119,23 @@ class TestDeployUp:
         (tmp_path / "bot.py").write_text("# Bot file")
         (tmp_path / "requirements.txt").write_text("python-telegram-bot>=22.3")
 
+        # Mock VPS instance
+        mock_vps_instance = MagicMock()
+        mock_vps_instance.test_connection.return_value = True
+        mock_vps_instance.check_docker_installed.return_value = True
+        mock_vps_instance.run_command.return_value = True
+        mock_vps_instance.transfer_files.return_value = True
+        mock_vps_instance.write_file.return_value = True
+
         with (
             patch(
-                "telegram_bot_stack.cli.commands.deploy.operations.VPSConnection"
-            ) as mock_vps,
+                "telegram_bot_stack.cli.commands.deploy.operations.create_vps_connection_from_config",
+                return_value=mock_vps_instance,
+            ),
             patch(
                 "telegram_bot_stack.cli.commands.deploy.operations.SecretsManager"
             ) as mock_secrets,
         ):
-            # Mock VPS operations
-            mock_instance = MagicMock()
-            mock_instance.test_connection.return_value = True
-            mock_instance.check_docker_installed.return_value = True
-            mock_instance.run_command.return_value = True
-            mock_instance.transfer_files.return_value = True
-            mock_instance.write_file.return_value = True
-            mock_vps.return_value = mock_instance
-
             # Mock SecretsManager
             mock_secrets_instance = MagicMock()
             mock_secrets_instance.list_secrets.return_value = {}
@@ -169,7 +169,7 @@ class TestDeployStatus:
         shutil.copy(temp_deploy_config, tmp_path / "deploy.yaml")
 
         with patch(
-            "telegram_bot_stack.cli.commands.deploy.monitoring.VPSConnection"
+            "telegram_bot_stack.cli.commands.deploy.monitoring.create_vps_connection_from_config"
         ) as mock_vps:
             mock_instance = MagicMock()
             mock_instance.run_command.return_value = True
@@ -204,7 +204,7 @@ class TestDeployLogs:
         shutil.copy(temp_deploy_config, tmp_path / "deploy.yaml")
 
         with patch(
-            "telegram_bot_stack.cli.commands.deploy.monitoring.VPSConnection"
+            "telegram_bot_stack.cli.commands.deploy.monitoring.create_vps_connection_from_config"
         ) as mock_vps:
             mock_instance = MagicMock()
             mock_instance.run_command.return_value = True
@@ -238,7 +238,7 @@ class TestDeployDown:
         shutil.copy(temp_deploy_config, tmp_path / "deploy.yaml")
 
         with patch(
-            "telegram_bot_stack.cli.commands.deploy.operations.VPSConnection"
+            "telegram_bot_stack.cli.commands.deploy.operations.create_vps_connection_from_config"
         ) as mock_vps:
             mock_instance = MagicMock()
             mock_instance.run_command.return_value = True
@@ -259,7 +259,7 @@ class TestDeployDown:
         shutil.copy(temp_deploy_config, tmp_path / "deploy.yaml")
 
         with patch(
-            "telegram_bot_stack.cli.commands.deploy.operations.VPSConnection"
+            "telegram_bot_stack.cli.commands.deploy.operations.create_vps_connection_from_config"
         ) as mock_vps:
             mock_instance = MagicMock()
             mock_instance.run_command.return_value = True
@@ -296,7 +296,7 @@ class TestDeployUpdate:
         (tmp_path / "bot.py").write_text("# Updated bot file")
 
         with patch(
-            "telegram_bot_stack.cli.commands.deploy.operations.VPSConnection"
+            "telegram_bot_stack.cli.commands.deploy.operations.create_vps_connection_from_config"
         ) as mock_vps:
             mock_instance = MagicMock()
             mock_instance.transfer_files.return_value = True
@@ -332,7 +332,7 @@ class TestDeployRollback:
 
         with (
             patch(
-                "telegram_bot_stack.cli.commands.deploy.operations.VPSConnection"
+                "telegram_bot_stack.cli.commands.deploy.operations.create_vps_connection_from_config"
             ) as mock_vps,
             patch(
                 "telegram_bot_stack.cli.commands.deploy.operations.VersionTracker"
@@ -378,7 +378,7 @@ class TestDeployRollback:
 
         with (
             patch(
-                "telegram_bot_stack.cli.commands.deploy.operations.VPSConnection"
+                "telegram_bot_stack.cli.commands.deploy.operations.create_vps_connection_from_config"
             ) as mock_vps,
             patch(
                 "telegram_bot_stack.cli.commands.deploy.operations.VersionTracker"
@@ -408,7 +408,7 @@ class TestDeployRollback:
 
         with (
             patch(
-                "telegram_bot_stack.cli.commands.deploy.operations.VPSConnection"
+                "telegram_bot_stack.cli.commands.deploy.operations.create_vps_connection_from_config"
             ) as mock_vps,
             patch(
                 "telegram_bot_stack.cli.commands.deploy.operations.VersionTracker"
@@ -467,7 +467,7 @@ class TestDeployHistory:
 
         with (
             patch(
-                "telegram_bot_stack.cli.commands.deploy.operations.VPSConnection"
+                "telegram_bot_stack.cli.commands.deploy.operations.create_vps_connection_from_config"
             ) as mock_vps,
             patch(
                 "telegram_bot_stack.cli.commands.deploy.operations.VersionTracker"
@@ -497,7 +497,7 @@ class TestDeployHistory:
 
         with (
             patch(
-                "telegram_bot_stack.cli.commands.deploy.operations.VPSConnection"
+                "telegram_bot_stack.cli.commands.deploy.operations.create_vps_connection_from_config"
             ) as mock_vps,
             patch(
                 "telegram_bot_stack.cli.commands.deploy.operations.VersionTracker"
@@ -550,7 +550,7 @@ class TestDeployHistory:
 
         with (
             patch(
-                "telegram_bot_stack.cli.commands.deploy.operations.VPSConnection"
+                "telegram_bot_stack.cli.commands.deploy.operations.create_vps_connection_from_config"
             ) as mock_vps,
             patch(
                 "telegram_bot_stack.cli.commands.deploy.operations.VersionTracker"
@@ -603,7 +603,7 @@ class TestDeployHealth:
 
         with (
             patch(
-                "telegram_bot_stack.cli.commands.deploy.monitoring.VPSConnection"
+                "telegram_bot_stack.cli.commands.deploy.monitoring.create_vps_connection_from_config"
             ) as mock_vps,
             patch(
                 "telegram_bot_stack.cli.commands.deploy.monitoring.get_container_health"
@@ -636,7 +636,7 @@ class TestDeployHealth:
 
         with (
             patch(
-                "telegram_bot_stack.cli.commands.deploy.monitoring.VPSConnection"
+                "telegram_bot_stack.cli.commands.deploy.monitoring.create_vps_connection_from_config"
             ) as mock_vps,
             patch(
                 "telegram_bot_stack.cli.commands.deploy.monitoring.get_container_health"
@@ -668,7 +668,7 @@ class TestDeployHealth:
 
         with (
             patch(
-                "telegram_bot_stack.cli.commands.deploy.monitoring.VPSConnection"
+                "telegram_bot_stack.cli.commands.deploy.monitoring.create_vps_connection_from_config"
             ) as mock_vps,
             patch(
                 "telegram_bot_stack.cli.commands.deploy.monitoring.get_container_health"
@@ -700,7 +700,7 @@ class TestDeployHealth:
 
         with (
             patch(
-                "telegram_bot_stack.cli.commands.deploy.monitoring.VPSConnection"
+                "telegram_bot_stack.cli.commands.deploy.monitoring.create_vps_connection_from_config"
             ) as mock_vps,
             patch(
                 "telegram_bot_stack.cli.commands.deploy.monitoring.get_container_health"
@@ -738,7 +738,7 @@ class TestDeployHealth:
         os.chdir(tmp_path)
 
         with patch(
-            "telegram_bot_stack.cli.commands.deploy.monitoring.VPSConnection"
+            "telegram_bot_stack.cli.commands.deploy.monitoring.create_vps_connection_from_config"
         ) as mock_vps:
             mock_instance = MagicMock()
             mock_instance.test_connection.return_value = False
@@ -833,7 +833,7 @@ class TestDeployUpdateCommand:
 
         with (
             patch(
-                "telegram_bot_stack.cli.commands.deploy.operations.VPSConnection"
+                "telegram_bot_stack.cli.commands.deploy.operations.create_vps_connection_from_config"
             ) as mock_vps,
             patch(
                 "telegram_bot_stack.cli.commands.deploy.operations.DockerTemplateRenderer"
@@ -871,7 +871,7 @@ class TestDeployUpdateCommand:
 
         with (
             patch(
-                "telegram_bot_stack.cli.commands.deploy.operations.VPSConnection"
+                "telegram_bot_stack.cli.commands.deploy.operations.create_vps_connection_from_config"
             ) as mock_vps,
             patch(
                 "telegram_bot_stack.cli.commands.deploy.operations.DockerTemplateRenderer"
