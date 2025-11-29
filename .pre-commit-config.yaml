@@ -5,13 +5,16 @@ repos:
     rev: 3e8a8703264a2f4a69428a0aa4dcb512790b2c8c # frozen: v6.0.0
     hooks:
       - id: trailing-whitespace
+        exclude: "^telegram_bot_stack/cli/templates/" # Template files (Jinja2)
       - id: check-yaml
+        exclude: "^telegram_bot_stack/cli/templates/" # YAML templates with Jinja2 syntax
       - id: check-json
         exclude: '^\.vscode/(settings\.json|settings\.recommended\.json)$' # JSONC with comments
       - id: pretty-format-json
         args: ["--autofix", "--indent=2", "--no-sort-keys"]
         exclude: '^\.vscode/(settings\.json|settings\.recommended\.json)$' # JSONC with comments
       - id: end-of-file-fixer
+        exclude: "^telegram_bot_stack/cli/templates/" # Template files (Jinja2)
       - id: check-added-large-files
 
   - repo: https://github.com/astral-sh/ruff-pre-commit

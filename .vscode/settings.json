@@ -7,6 +7,12 @@
     "**/.ruff_cache": true,
     "**/*.egg-info": true
   },
+  "files.associations": {
+    "**/telegram_bot_stack/cli/templates/**/*.template": "jinja",
+    "**/telegram_bot_stack/cli/templates/**/*.example": "plaintext",
+    "**/telegram_bot_stack/cli/templates/**/Dockerfile": "dockerfile",
+    "**/telegram_bot_stack/cli/templates/**/Makefile": "makefile"
+  },
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
     "source.organizeImports.ruff": "explicit",
@@ -40,6 +46,14 @@
   "[markdown]": {
     "editor.formatOnSave": true,
     "editor.wordWrap": "on"
+  },
+  "[jinja]": {
+    "editor.formatOnSave": false,
+    "files.insertFinalNewline": false,
+    "files.trimTrailingWhitespace": false
+  },
+  "[plaintext]": {
+    "editor.formatOnSave": false
   },
   "ruff.nativeServer": "on",
   "ruff.enable": true,
