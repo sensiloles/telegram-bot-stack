@@ -131,7 +131,11 @@ The following files should exist:
 ├── semantic_release.toml   # ✅ Semantic release config
 ├── workflows/
 │   ├── release.yml         # ✅ Automatic release workflow
-│   └── tests.yml           # ✅ CI tests
+│   ├── unit-tests.yml      # ✅ Unit tests (run on PRs)
+│   ├── integration-tests.yml # ✅ Integration tests (run on PRs)
+│   ├── e2e-tests.yml       # ✅ E2E tests (run on PRs)
+│   ├── lint.yml            # ✅ Code linting - ruff (run on PRs)
+│   └── type-check.yml      # ✅ Type checking - mypy (run on PRs)
 ├── GIT_WORKFLOW.md         # ✅ Workflow documentation
 ├── BRANCH_PROTECTION.md    # ✅ Protection setup guide
 └── pull_request_template.md # ✅ PR template

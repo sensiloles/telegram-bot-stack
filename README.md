@@ -3,7 +3,7 @@
 [![PyPI version](https://img.shields.io/pypi/v/telegram-bot-stack?color=blue)](https://pypi.org/project/telegram-bot-stack/)
 [![Python](https://img.shields.io/pypi/pyversions/telegram-bot-stack)](https://pypi.org/project/telegram-bot-stack/)
 [![License](https://img.shields.io/github/license/sensiloles/telegram-bot-stack)](https://github.com/sensiloles/telegram-bot-stack/blob/main/LICENSE)
-[![Tests](https://img.shields.io/github/actions/workflow/status/sensiloles/telegram-bot-stack/tests.yml?branch=main&label=tests)](https://github.com/sensiloles/telegram-bot-stack/actions/workflows/tests.yml)
+[![Tests](https://img.shields.io/github/actions/workflow/status/sensiloles/telegram-bot-stack/unit-tests.yml?branch=main&label=tests)](https://github.com/sensiloles/telegram-bot-stack/actions/workflows/unit-tests.yml)
 [![Coverage](https://img.shields.io/badge/coverage-84%25-brightgreen)](https://github.com/sensiloles/telegram-bot-stack)
 [![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
 

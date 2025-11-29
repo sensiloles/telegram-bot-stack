@@ -1,6 +1,8 @@
 name: Release
 
 # Automatic release on merge to main
+# Waits for ALL tests (unit, integration, e2e) before releasing
+
 on:
   push:
     branches:
@@ -13,16 +15,33 @@ permissions:
   packages: write
 
 jobs:
-  # First: Run all tests
-  test:
-    name: Run Tests Before Release
-    uses: ./.github/workflows/tests.yml
+  # First: Run ALL tests in parallel
+  unit-tests:
+    name: Unit Tests
+    uses: ./.github/workflows/unit-tests.yml
 
-  # Then: Release only if tests pass
+  integration-tests:
+    name: Integration Tests
+    uses: ./.github/workflows/integration-tests.yml
+
+  e2e-tests:
+    name: E2E Tests
+    uses: ./.github/workflows/e2e-tests.yml
+
+  lint:
+    name: Lint
+    uses: ./.github/workflows/lint.yml
+
+  type-check:
+    name: Type Check
+    uses: ./.github/workflows/type-check.yml
+
+  # Then: Release only if ALL required tests pass
   release:
     name: Semantic Release
     runs-on: ubuntu-latest
-    needs: [test]
+    needs: [unit-tests, integration-tests, e2e-tests, lint]
+    # Note: type-check is not required (it's allowed to fail)
 
     # Don't run on docs-only changes
     if: "!contains(github.event.head_commit.message, '[skip ci]')"
@@ -39,6 +58,7 @@ jobs:
         with:
           python-version: "3.12"
           cache: "pip"
+          cache-dependency-path: "pyproject.toml"
 
       - name: Install dependencies
         run: |
@@ -80,6 +100,23 @@ jobs:
         run: |
           echo "## 📊 Release Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Show test results
+          echo "### Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| 🧪 Unit Tests | ${{ needs.unit-tests.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| ⚡ Integration Tests | ${{ needs.integration-tests.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🎯 E2E Tests | ${{ needs.e2e-tests.result == 'success' && '✅ Passed' || '⚠️ Warning' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🎨 Lint | ${{ needs.lint.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🔍 Type Check | ${{ needs.type-check.result == 'success' && '✅ Passed' || '⚠️ Warning' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Show release status
+          echo "### Release Status" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
           if [ "${{ steps.check_release.outputs.release_needed }}" == "true" ]; then
             # Get latest tag
             LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "none")

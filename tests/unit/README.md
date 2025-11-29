@@ -327,8 +327,8 @@ open htmlcov/index.html
 
 Unit tests run automatically in GitHub Actions:
 
-- **Workflow**: `.github/workflows/tests.yml`
-- **Trigger**: Every push, PR
+- **Workflow**: `.github/workflows/unit-tests.yml`
+- **Trigger**: Every pull request
 - **Matrix**: Python 3.9, 3.10, 3.11, 3.12
 - **Timeout**: 10 minutes
 - **Required**: Must pass for PR merge

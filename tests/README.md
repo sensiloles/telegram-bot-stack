@@ -174,9 +174,9 @@ pytest tests/unit/ -n auto
 
 ### CI/CD
 
-Tests run automatically in GitHub Actions:
+Tests run automatically in GitHub Actions on every pull request:
 
-**Unit Tests** (`.github/workflows/tests.yml`):
+**Unit Tests** (`.github/workflows/unit-tests.yml`):
 
 - ✅ Required for PR merge
 - 🚀 Fast (2-3 minutes)
@@ -185,19 +185,22 @@ Tests run automatically in GitHub Actions:
 
 **Integration Tests** (`.github/workflows/integration-tests.yml`):
 
-**Fast Integration:**
-
 - ✅ Required for PR merge
 - ⚡ Fast (1-2 minutes)
 - 🚫 No Docker required
-- 🐍 Python 3.11, 3.12
+- 🐍 Python 3.9, 3.10, 3.11, 3.12
 
-**E2E Tests:**
+**E2E Tests** (`.github/workflows/e2e-tests.yml`):
 
 - ⚠️ Non-blocking (won't prevent merge)
 - 🐳 Requires Docker + Mock VPS
 - 🐍 Python 3.12 only
 - ⏱️ Timeout: 45 minutes
+
+**Code Quality:**
+
+- **Lint** (`.github/workflows/lint.yml`): Ruff linter + formatter
+- **Type Check** (`.github/workflows/type-check.yml`): mypy (non-blocking)
 
 ## Coverage
 
