@@ -112,12 +112,12 @@ Found and fixed **12 critical deployment bugs** during E2E testing:
 | **#84**  | Troubleshooting guide         | ✅ YES (docs)  | ✅ DONE | 3-4h   | -      |
 | **#85**  | Integration tests             | ✅ YES (tests) | ✅ DONE | 8-10h  | -      |
 | **#88**  | Doctor command                | 🔧 CLI tool    | ⏳ TODO | 6-8h   | -      |
-| **#119** | Already running detection     | ✅ YES         | ⏳ TODO | 8-10h  | -      |
+| **#119** | Already running detection     | ✅ YES         | ✅ DONE | 8-10h  | -      |
 | **#120** | Pre-release E2E testing       | ✅ QA          | ⏳ TODO | 16-24h | #121   |
 | **#121** | v2.0.0 Release                | 🎯 Milestone   | ⏳ TODO | 24-32h | All    |
 | **NEW**  | **Deployment bug fixes**      | ✅ YES         | ✅ DONE | 12h    | -      |
 
-**Total Critical Path:** ~87-117 hours (11-15 days) - **7/11 critical issues completed!**
+**Total Critical Path:** ~79-107 hours (10-13 days) - **8/11 critical issues completed!**
 
 **IMPORTANT Issues (do after critical or for v2.0.1):**
 
@@ -157,7 +157,7 @@ Found and fixed **12 critical deployment bugs** during E2E testing:
 | #84  | **Troubleshooting**        | Docs     | ✅ DONE           | #27     | -        |
 | #85  | **Deploy tests**           | Tests    | ✅ DONE           | #27     | -        |
 | #88  | **Doctor command**         | CLI      | ⏳ TODO           | -       | -        |
-| #119 | **Already running detect** | Deploy   | ⏳ TODO           | #27     | -        |
+| #119 | **Already running detect** | Deploy   | ✅ DONE           | #27     | -        |
 | #120 | **Pre-release E2E tests**  | QA       | ⏳ TODO           | All     | #121     |
 | #121 | **v2.0.0 Release**         | Release  | ⏳ TODO           | All     | -        |
 
@@ -168,7 +168,7 @@ Found and fixed **12 critical deployment bugs** during E2E testing:
 | #40 | Full Dev Setup | ✅ DONE (v1.17.0) | Killer Feature #1 |
 | #60 | Agent Optimize | 🏗️ In Progress    | Ongoing           |
 
-**Total Critical: 4 TODO + 10 DONE = 14 issues**
+**Total Critical: 3 TODO + 11 DONE = 14 issues**
 
 ---
 
@@ -540,7 +540,7 @@ Supporting Infrastructure (v2.0.1):
 - [x] Backup/restore (#81) ✅
 - [x] Troubleshooting guide (#84) ✅
 - [x] Integration tests (#85) ✅
-- [ ] Already running detection (#119) ⏳ CRITICAL
+- [x] Already running detection (#119) ✅ DONE
 - [ ] Multi-bot support (#117) ⏳
 - [ ] SSH key auth (#118) ⏳
 - [ ] Doctor command (#88) ⏳
@@ -629,7 +629,7 @@ Supporting Infrastructure (v2.0.1):
 
 **In Progress (Week 8-9 - Critical Scenarios):**
 
-- #119: Already running detection ⏳ CRITICAL
+- #119: Already running detection ✅ DONE
 - #117: Multi-bot on one VPS ⏳
 - #118: SSH key authentication ⏳
 - #88: Doctor command ⏳
@@ -726,9 +726,9 @@ Supporting Infrastructure (v2.0.1):
 
 ---
 
-**Status:** 🏗️ Phase 1 hardening complete, moving to Phase 2 critical scenarios
-**Progress:** 10/14 critical tasks done ✅ | 4 remaining before E2E testing
-**Current Focus:** #119 Already Running, #117 Multi-bot, #118 SSH keys, #88 Doctor
+**Status:** 🏗️ Phase 2 critical scenarios in progress
+**Progress:** 11/14 critical tasks done ✅ | 3 remaining before E2E testing
+**Current Focus:** #117 Multi-bot, #118 SSH keys, #88 Doctor
 **Next Gate:** #120 Pre-release E2E testing (Week 10-11)
 **Target Release:** v2.0.0 MVP (#121) - Week 12
 

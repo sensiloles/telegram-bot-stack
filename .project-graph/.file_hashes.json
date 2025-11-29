@@ -1,7 +1,11 @@
 {
-  ".github/PROJECT_STATUS.md": "0ca585683471c02d18384183dcdf03850a31836e7ea0d02949707e1178fe9212",
-  "telegram_bot_stack/cli/commands/deploy/operations.py": "4c71173f141f15882f69467ec6e6050c30ce29fdb1d71388abe78ee4accb28ce",
+  ".github/PROJECT_STATUS.md": "913de7d260016265c4dbaaf204e28b9f883752b3437369519c5b2d2c30d9b12f",
+  "telegram_bot_stack/cli/commands/deploy/operations.py": "6df5a64675493262487a8e2bbebf5c8f62dbc074a0fcde3a249e35dcc70691ae",
   "telegram_bot_stack/cli/commands/init.py": "79eee2532d56b376ffe692775fc628db67cdae76acc76c6fc090decec1dd4509",
   "telegram_bot_stack/cli/utils/vps.py": "1d11e65402fc893867a071498fe9ad707d8c1a7ef6b6304c46e5145168ab5693",
-  "scripts/mcp_github_server.py": "3dc3c179d150e07ed98e2e20c71040148063563048e314abedcd4d4e03b64a95"
+  "scripts/mcp_github_server.py": "3dc3c179d150e07ed98e2e20c71040148063563048e314abedcd4d4e03b64a95",
+  "docs/deployment_guide.md": "c1eaf1b43841b74001826f5ebdc64e5094d1acd4d006bf378d007fd0f83f979c",
+  "telegram_bot_stack/cli/commands/dev.py": "cfff75e13119238d07a22222659b8ad5fa354e2eb03223fed8913213fadd715f",
+  "telegram_bot_stack/cli/utils/bot_lock.py": "86d4063ed798cad1ea48ffbdc69b24c4ea6d07a106f716537b2c869a7235cf7c",
+  "telegram_bot_stack/cli/utils/deployment_state.py": "fb12d7f6c701fb0edd7b72ea211e9391c31d31286139bff953943307cfd5ac84"
 }

@@ -41,8 +41,11 @@ class BotLockManager:
         except (OSError, ProcessLookupError):
             return False
 
-    def acquire_lock(self) -> bool:
+    def acquire_lock(self, force: bool = False) -> bool:
         """Try to acquire lock.
+
+        Args:
+            force: If True, forcefully acquire lock even if another instance is running
 
         Returns:
             True if lock acquired, False if another instance is running
@@ -58,23 +61,54 @@ class BotLockManager:
 
                 # Check if process is still running
                 if existing_pid and self.is_process_running(existing_pid):
-                    # Another instance is running
+                    if force:
+                        # Force mode: kill existing process and take over
+                        click.secho(
+                            f"\n⚠️  Forcing lock acquisition (killing PID: {existing_pid})",
+                            fg="yellow",
+                        )
+                        try:
+                            os.kill(existing_pid, 15)  # SIGTERM
+                            time.sleep(0.5)  # Give it time to cleanup
+                            # If still running, force kill
+                            if self.is_process_running(existing_pid):
+                                os.kill(existing_pid, 9)  # SIGKILL
+                            click.echo("   Process terminated")
+                        except (OSError, ProcessLookupError) as e:
+                            click.secho(
+                                f"   Warning: Could not kill process: {e}", fg="yellow"
+                            )
+                        # Remove lock file and continue to create new lock
+                        try:
+                            self.lock_file.unlink()
+                        except OSError:
+                            pass  # File may already be gone
+                        # Fall through to create new lock below
+                    else:
+                        # Another instance is running
+                        click.secho(
+                            f"\n❌ Error: Bot is already running (PID: {existing_pid})",
+                            fg="red",
+                        )
+                        click.echo(f"   Started at: {started_at}")
+                        click.echo(f"   Lock file: {self.lock_file}")
+                        click.echo("\n💡 Options:")
+                        click.echo(f"   1. Stop existing process: kill {existing_pid}")
+                        click.echo("   2. Use existing dev session in another terminal")
+                        click.echo(
+                            "   3. Force restart: telegram-bot-stack dev --force"
+                        )
+                        click.echo(
+                            "\n📝 Tip: Use 'ps aux | grep python' to see all Python processes\n"
+                        )
+                        return False
+                else:
+                    # Process is dead, clean up stale lock
                     click.secho(
-                        f"\n❌ Bot is already running (PID: {existing_pid})",
-                        fg="red",
+                        f"🧹 Cleaning up stale lock (dead process: {existing_pid})",
+                        fg="yellow",
                     )
-                    click.echo(f"   Started at: {started_at}")
-                    click.echo(
-                        f"\n💡 To stop it: kill {existing_pid} or use Ctrl+C in that terminal\n"
-                    )
-                    return False
-
-                # Process is dead, clean up stale lock
-                click.secho(
-                    f"🧹 Cleaning up stale lock (dead process: {existing_pid})",
-                    fg="yellow",
-                )
-                self.lock_file.unlink()
+                    self.lock_file.unlink()
 
             except (json.JSONDecodeError, KeyError, OSError) as e:
                 # Corrupted lock file, remove it

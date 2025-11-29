@@ -1527,6 +1527,283 @@ ssh-keygen -R your-vps-ip
 ssh root@your-vps-ip
 ```
 
+---
+
+## Bot Already Running/Deployed
+
+### 1.5. Bot Already Running Locally (Dev Mode)
+
+**Symptoms:**
+
+- Error: "Bot is already running (PID: ...)"
+- Cannot start dev mode
+- Port already in use
+
+**Diagnosis:**
+
+```bash
+# Check if process is running
+ps aux | grep python | grep bot.py
+
+# Check lock file
+ls -la .bot.lock
+cat .bot.lock
+```
+
+**Solutions:**
+
+**1.5.1 Stop Existing Process:**
+
+```bash
+# Find process ID from error message
+# Example: "Bot is already running (PID: 12345)"
+
+# Kill the process
+kill 12345
+
+# Or use force kill if it doesn't respond
+kill -9 12345
+
+# Try dev mode again
+telegram-bot-stack dev
+```
+
+**1.5.2 Use Force Mode:**
+
+```bash
+# Automatically kill existing process and start new one
+telegram-bot-stack dev --force
+
+# This will:
+# - Detect running process
+# - Terminate it (SIGTERM)
+# - Force kill if needed (SIGKILL)
+# - Start new instance
+```
+
+**1.5.3 Use Existing Dev Session:**
+
+```bash
+# If another terminal is running dev mode, just use that terminal
+# Don't start multiple dev instances - they'll conflict
+
+# Check which terminal has the running instance
+ps aux | grep "telegram-bot-stack dev"
+```
+
+**1.5.4 Clean Up Stale Lock:**
+
+```bash
+# If process is dead but lock exists, remove it manually
+rm .bot.lock
+
+# Then try again
+telegram-bot-stack dev
+```
+
+### 1.6. Bot Already Deployed on VPS
+
+**Symptoms:**
+
+- Warning: "Bot is already deployed and running"
+- Deploy up shows existing container
+- Asked for confirmation to redeploy
+
+**Diagnosis:**
+
+```bash
+# Check deployment status
+telegram-bot-stack deploy status
+
+# Check bot health
+telegram-bot-stack deploy health
+
+# View deployment history
+telegram-bot-stack deploy history
+```
+
+**Solutions:**
+
+**1.6.1 Update Existing Deployment:**
+
+```bash
+# If bot is running and you want to update code
+telegram-bot-stack deploy update
+
+# This will:
+# - Create automatic backup
+# - Transfer new code
+# - Rebuild container
+# - Restart with new code
+# - Keep data intact
+```
+
+**1.6.2 Force Redeploy:**
+
+```bash
+# Force complete redeployment (stops existing, deploys fresh)
+telegram-bot-stack deploy up --force
+
+# This will:
+# - Stop existing container
+# - Remove old container
+# - Deploy fresh
+# - ⚠️  Warning: Use update instead to preserve data
+```
+
+**1.6.3 Stop and Redeploy:**
+
+```bash
+# Manual approach: stop first, then deploy
+telegram-bot-stack deploy down
+telegram-bot-stack deploy up
+
+# Or with cleanup (removes container and image)
+telegram-bot-stack deploy down --cleanup
+telegram-bot-stack deploy up
+```
+
+**1.6.4 Check if Update is Needed:**
+
+```bash
+# View current deployment version
+telegram-bot-stack deploy status
+
+# Check deployment history
+telegram-bot-stack deploy history
+
+# If already running latest version, no action needed
+# Bot will show message: "Bot is already running (Container: my-bot (running, X hours uptime))"
+```
+
+### 1.7. Stale/Zombie Containers
+
+**Symptoms:**
+
+- Container exists but not running
+- "Found stale container" message
+- Old containers not cleaned up
+
+**Diagnosis:**
+
+```bash
+# Check all containers (including stopped)
+ssh root@your-vps-ip "docker ps -a"
+
+# Check for exited containers
+ssh root@your-vps-ip "docker ps -a --filter status=exited"
+
+# Check container status
+telegram-bot-stack deploy status
+```
+
+**Solutions:**
+
+**1.7.1 Automatic Cleanup:**
+
+```bash
+# Deploy commands automatically clean up stale containers
+telegram-bot-stack deploy up
+
+# You'll see:
+# "⚠️  Found stale container 'my-bot' (exited 3 hours ago)"
+# "Auto-cleaning stale container... ✅ Done"
+```
+
+**1.7.2 Manual Cleanup:**
+
+```bash
+# Remove stopped containers manually
+ssh root@your-vps-ip "docker rm bot-name"
+
+# Remove all stopped containers
+ssh root@your-vps-ip "docker container prune -f"
+
+# Clean up everything (containers, images, volumes)
+ssh root@your-vps-ip "docker system prune -a -f"
+```
+
+**1.7.3 Restart Stuck Container:**
+
+```bash
+# If container exists but isn't responding
+ssh root@your-vps-ip "docker restart bot-name"
+
+# Or stop and start
+ssh root@your-vps-ip "docker stop bot-name && docker start bot-name"
+```
+
+### 1.8. Multiple Bot Instances Conflict
+
+**Symptoms:**
+
+- Bot running both locally and on VPS
+- Webhook errors ("conflict: terminated by other getUpdates request")
+- Messages processed twice
+- Unexpected behavior
+
+**Diagnosis:**
+
+```bash
+# Check local dev mode
+ps aux | grep "telegram-bot-stack dev"
+
+# Check VPS deployment
+telegram-bot-stack deploy status
+
+# Check Telegram bot status via curl
+curl "https://api.telegram.org/bot<YOUR_TOKEN>/getMe"
+```
+
+**Solutions:**
+
+**1.8.1 Stop Local Instance:**
+
+```bash
+# Find and kill local dev process
+ps aux | grep bot.py
+kill <PID>
+
+# Or use force mode to auto-stop
+# (Not recommended - better to stop manually)
+```
+
+**1.8.2 Stop VPS Instance:**
+
+```bash
+# If testing locally, stop VPS deployment
+telegram-bot-stack deploy down
+
+# Later resume VPS deployment
+telegram-bot-stack deploy up
+```
+
+**1.8.3 Best Practice - Use One Environment:**
+
+```bash
+# For development:
+telegram-bot-stack deploy down  # Stop VPS
+telegram-bot-stack dev          # Run locally
+
+# For production:
+# (Stop local dev with Ctrl+C)
+telegram-bot-stack deploy up    # Run on VPS
+```
+
+**1.8.4 Use Different Tokens:**
+
+```bash
+# Development: Use test bot token
+export BOT_TOKEN="test-bot-token"
+telegram-bot-stack dev
+
+# Production: Use production bot token
+telegram-bot-stack deploy secrets set BOT_TOKEN "prod-bot-token"
+telegram-bot-stack deploy up
+```
+
+---
+
 ### 2. SSH Key Not Authorized
 
 **Symptoms:**

@@ -11,8 +11,8 @@
     "description": "CLI tool for bot project management and development",
     "scope": "CLI tool for bot project management and development",
     "root_package": "telegram_bot_stack.cli",
-    "node_count": 30,
-    "edge_count": 39
+    "node_count": 31,
+    "edge_count": 40
   },
   "nodes": [
     {
@@ -362,7 +362,7 @@
       "category": "implementation",
       "path": "telegram_bot_stack/cli/utils/bot_lock.py",
       "description": "Bot instance lock file management for dev mode.",
-      "lines_of_code": 142,
+      "lines_of_code": 176,
       "complexity_score": 1,
       "exports": [
         "BotLockManager",
@@ -495,7 +495,7 @@
       "category": "implementation",
       "path": "telegram_bot_stack/cli/commands/dev.py",
       "description": "Run bot in development mode with auto-reload.",
-      "lines_of_code": 298,
+      "lines_of_code": 303,
       "complexity_score": 1,
       "exports": [
         "BotReloadHandler",
@@ -616,7 +616,7 @@
       "category": "implementation",
       "path": "telegram_bot_stack/cli/commands/deploy/operations.py",
       "description": "Deployment operations (up, update, down).",
-      "lines_of_code": 868,
+      "lines_of_code": 877,
       "complexity_score": 1,
       "exports": [
         "up",
@@ -811,6 +811,41 @@
         "get_previous_version",
         "mark_version_status",
         "cleanup_old_images"
+      ],
+      "dependencies": [],
+      "dependents": [],
+      "criticality": "medium"
+    },
+    {
+      "id": "telegram_bot_stack.cli.utils.deployment_state",
+      "name": "deployment_state",
+      "type": "module",
+      "category": "implementation",
+      "path": "telegram_bot_stack/cli/utils/deployment_state.py",
+      "description": "Module deployment_state",
+      "lines_of_code": 352,
+      "complexity_score": 1,
+      "exports": [
+        "ContainerState",
+        "ServiceState",
+        "DeploymentStateDetector",
+        "get_docker_state",
+        "get_systemd_state",
+        "detect_stale_containers",
+        "cleanup_stale_containers",
+        "check_before_deploy"
+      ],
+      "classes": [
+        "ContainerState",
+        "ServiceState",
+        "DeploymentStateDetector"
+      ],
+      "functions": [
+        "get_docker_state",
+        "get_systemd_state",
+        "detect_stale_containers",
+        "cleanup_stale_containers",
+        "check_before_deploy"
       ],
       "dependencies": [],
       "dependents": [],
@@ -1090,6 +1125,13 @@
       "target": "telegram_bot_stack.cli.utils.git",
       "type": "imports",
       "description": "Imports from telegram_bot_stack.cli.utils.git"
+    },
+    {
+      "id": "edge_44",
+      "source": "telegram_bot_stack.cli.commands.deploy.operations",
+      "target": "telegram_bot_stack.cli.utils",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.utils"
     }
   ]
 }
