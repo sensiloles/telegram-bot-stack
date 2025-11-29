@@ -187,11 +187,7 @@ class TestPortManager:
 class TestMultiBotListCommand:
     """Test multi-bot listing command."""
 
-    @patch(
-        "telegram_bot_stack.cli.commands.deploy.deploy.create_vps_connection_from_config"
-    )
-    @patch("telegram_bot_stack.cli.commands.deploy.deploy.DeploymentConfig")
-    def test_list_all_bots_docker(self, mock_config_class, mock_vps_factory):
+    def test_list_all_bots_docker(self):
         """Test listing all bots on VPS (Docker)."""
         from telegram_bot_stack.cli.commands.deploy.deploy import _list_all_bots_on_vps
 
@@ -200,7 +196,6 @@ class TestMultiBotListCommand:
         mock_config.get.side_effect = lambda key, default=None: {
             "deployment.method": "docker",
         }.get(key, default)
-        mock_config_class.return_value = mock_config
 
         # Mock VPS connection
         mock_vps = MagicMock()
