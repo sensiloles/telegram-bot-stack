@@ -1,8 +1,8 @@
 # Project Status - telegram-bot-stack
 
-**Version:** v1.25.0 → v2.0.0 MVP
-**Updated:** 2025-11-29 (after #127 SSH key generation completion)
-**Status:** 🏗️ Phase 2 - Hardening Killer Feature
+**Version:** v1.31.0 → v2.0.0 MVP
+**Updated:** 2025-11-29 (added Windows cross-platform support #130-#135)
+**Status:** 🏗️ Week 10 - Windows Developer Support + Pre-release Testing
 
 ---
 
@@ -187,6 +187,14 @@ Found and fixed **12 critical deployment bugs** during E2E testing:
 | #82  | Monitoring + alerting   | Deploy   | #77     | Observability             |
 | #83  | Multi-environment       | Deploy   | #27     | Dev/staging/prod support  |
 
+**Cross-Platform Support (v2.0.0 MVP):**
+
+| #    | Issue                      | Category | Depends | Notes                         |
+| ---- | -------------------------- | -------- | ------- | ----------------------------- |
+| #131 | Windows SSH key generation | Platform | -       | Fix SSH on Windows (CRITICAL) |
+| #132 | Makefile alternatives      | DX       | -       | Windows task runner (HIGH)    |
+| #133 | Windows documentation      | Docs     | -       | Windows setup guide (HIGH)    |
+
 **Infrastructure:**
 
 | #   | Issue              | Category | Depends | Notes                     |
@@ -202,7 +210,7 @@ Found and fixed **12 critical deployment bugs** during E2E testing:
 | #29 | Deploy Docs        | Docs     | #27, #28 | Extended guide   |
 | #89 | Production example | Examples | multiple | Task manager bot |
 
-**Total High: 11 issues**
+**Total High: 14 issues (3 new for Windows support)**
 
 ---
 
@@ -278,19 +286,22 @@ Found and fixed **12 critical deployment bugs** during E2E testing:
 ```
 ✅ Week 1-3:   #40  Full Dev Environment (DONE v1.17.0)
 ✅ Week 4-6:   #27 + #28  Basic VPS Deployment (DONE v1.19.0, v1.21.0)
-🏗️ Week 7-8:   #76-#85, #88  Production Hardening (IN PROGRESS)
-⏳ Week 9:     #117, #127  Critical deployment scenarios (multi-bot + SSH keys)
-⏳ Week 10:    #78, #80, #82, #83  Advanced features (optional)
+✅ Week 7-8:   #76-#85, #88  Production Hardening (DONE ✅)
+✅ Week 9:     #117, #118, #119, #127  Critical scenarios (DONE ✅)
+🏗️ Week 10:    #131, #132, #133  Windows support (IN PROGRESS)
 ⏳ Week 11:    #120  Pre-release E2E testing (GATE)
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ✅ v2.0.0 MVP LAUNCH (#121) - Week 12
 "From idea to production in 10 minutes" 🚀
+Cross-platform: Windows, Linux, macOS ✅
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-   Week 13-16: #29, #86, #87, #89, #90  Polish + Scaling
+   Week 13-16: #130, #134, #135 + #29, #86, #87, #89, #90
+               Windows CI + Polish + Scaling
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ✅ v2.0.1 PRODUCTION-HARDENED (Week 16)
+Full cross-platform support + Advanced features
 
    Week 17-20: v2.1.0 - Quality & DX improvements
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -301,14 +312,15 @@ Found and fixed **12 critical deployment bugs** during E2E testing:
 
 ### Milestones Overview
 
-| Milestone                                 | Due Date   | Issues | Progress | Status     |
-| ----------------------------------------- | ---------- | ------ | -------- | ---------- |
-| **v2.0.0 MVP**                            | 2025-12-20 | 7      | 0/7 (0%) | 🏗️ Active  |
-| **v2.0.1 Production-Hardened**            | 2026-01-17 | 8      | 0/8 (0%) | ⏳ Planned |
-| **v2.1.0 - Medium Priority Enhancements** | 2026-02-07 | 6      | 0/6 (0%) | ⏳ Planned |
-| **v3.0+ - Long-term Vision**              | TBD        | 18     | 0/18     | 💡 Backlog |
+| Milestone                                 | Due Date   | Issues | Progress  | Status     |
+| ----------------------------------------- | ---------- | ------ | --------- | ---------- |
+| **v2.0.0 MVP**                            | 2025-12-20 | 10     | 0/10 (0%) | 🏗️ Active  |
+| **v2.0.1 Production-Hardened**            | 2026-01-17 | 11     | 0/11 (0%) | ⏳ Planned |
+| **v2.1.0 - Medium Priority Enhancements** | 2026-02-07 | 6      | 0/6 (0%)  | ⏳ Planned |
+| **v3.0+ - Long-term Vision**              | TBD        | 18     | 0/18      | 💡 Backlog |
 
-**Total Open Issues:** 39 (all assigned to milestones ✅)
+**Total Open Issues:** 45 (all assigned to milestones ✅)
+**New this update:** +6 issues for Windows cross-platform support
 
 ### Dependency Graph
 
@@ -317,19 +329,24 @@ Killer Feature #2: VPS Deployment
 ├── ✅ #27 VPS Deploy CLI (v1.19.0)
 ├── ✅ #28 Docker Templates (v1.21.0)
 │
-├── Critical Hardening (parallel work):
-│   ├── ✅ #76 Rollback ← #27 (DONE)
-│   ├── ✅ #77 Health checks ← #27 → blocks #78, #80, #82 (DONE)
-│   ├── ✅ #79 Secrets ← #27 → blocks #118 (DONE)
-│   ├── ✅ #81 Backup ← #27 (DONE)
-│   ├── ✅ #84 Troubleshooting ← #27 (DONE)
-│   ├── ✅ #85 Deploy tests ← #27 (DONE)
-│   ├── #88 Doctor (independent)
-│   └── #119 Already running ← #27 (critical DX)
+├── Critical Hardening (all DONE ✅):
+│   ├── ✅ #76 Rollback ← #27
+│   ├── ✅ #77 Health checks ← #27 → blocks #78, #80, #82
+│   ├── ✅ #79 Secrets ← #27 → blocks #118
+│   ├── ✅ #81 Backup ← #27
+│   ├── ✅ #84 Troubleshooting ← #27
+│   ├── ✅ #85 Deploy tests ← #27
+│   ├── ✅ #88 Doctor (independent)
+│   ├── ✅ #119 Already running ← #27
+│   ├── ✅ #117 Multi-bot VPS ← #27, #28
+│   ├── ✅ #118 SSH key auth ← #79
+│   └── ✅ #127 SSH key generation ← #118
 │
-├── Important Deployment Features (parallel):
-│   ├── ✅ #117 Multi-bot VPS ← #27, #28 (DONE - production ready)
-│   └── ✅ #118 SSH key auth ← #79 (DONE - security)
+├── 🏗️ Cross-Platform Support (v2.0.0 - IN PROGRESS):
+│   ├── #130 Windows support (parent/tracking)
+│   ├── #131 Windows SSH generation ← #127 (CRITICAL)
+│   ├── #132 Makefile alternatives (HIGH)
+│   └── #133 Windows docs (HIGH)
 │
 ├── Advanced Features (optional for v2.0.0):
 │   ├── #78 Zero-downtime ← #77
@@ -338,14 +355,19 @@ Killer Feature #2: VPS Deployment
 │   └── #83 Multi-env ← #27
 │
 └── Release Path:
-    ├── #120 E2E Testing ← ALL features (GATE)
+    ├── #120 E2E Testing ← ALL features + Windows (GATE)
     └── #121 v2.0.0 Release ← #120 (MILESTONE)
 
 Supporting Infrastructure (v2.0.1):
-├── #86 Upgrade command (independent)
-├── #87 Redis storage (independent)
-├── #89 Production example ← #76, #77, #81
-└── #90 Structured logging (independent)
+├── Windows Testing & CI:
+│   ├── #134 Windows CI ← #131 (cross-platform testing)
+│   └── #135 Cross-platform tests ← #131 (integration tests)
+│
+└── Other Enhancements:
+    ├── #86 Upgrade command (independent)
+    ├── #87 Redis storage (independent)
+    ├── #89 Production example ← #76, #77, #81
+    └── #90 Structured logging (independent)
 ```
 
 ---
@@ -420,33 +442,62 @@ Supporting Infrastructure (v2.0.1):
 
 **Milestone:** Production-safe deployment foundation ✅
 
-### 🚀 Week 8-9: Critical Deployment Scenarios
+### ✅ Week 8-9: Critical Deployment Scenarios (COMPLETED)
 
-**MUST complete for v2.0.0:**
+**All items completed:**
 
 ```bash
 1. ✅ #119 Already running detection (8-10h) ← DONE
    → Prevent double deploy, handle conflicts
    → Most common user error scenario
 
-2. #117 Multi-bot on one VPS (6-8h) ← PRODUCTION READY
+2. ✅ #117 Multi-bot on one VPS (6-8h) ← DONE
    → Real-world deployment pattern
    → Resource isolation + conflict detection
 
-3. ✅ #118 SSH key authentication (5-7h) ← DONE (SECURITY)
+3. ✅ #118 SSH key authentication (5-7h) ← DONE
    → Industry standard auth method ✅
    → Production best practice ✅
 
 4. ✅ #88 Doctor command (6-8h) ← DONE
    → Auto-detect all issues
-   → Validates #119, #117, ✅ #118
-```
+   → Validates #119, #117, #118
 
-**Total: 11-15 hours (~2-3 days remaining)**
+5. ✅ #127 SSH key generation (3-4h) ← DONE
+   → Automatic SSH key setup
+   → Seamless deployment experience
+```
 
 **Milestone:** All critical deployment scenarios handled ✅
 
-### 📋 Week 10-11: Pre-Release Quality Gate
+---
+
+### 🏗️ Week 10: Windows Cross-Platform Support (IN PROGRESS)
+
+**MUST complete for v2.0.0:**
+
+```bash
+1. #131 Windows SSH key generation (3-4h) ← CRITICAL
+   → Replace ssh-keygen with cryptography library
+   → Cross-platform key generation
+   → Fix file permissions on Windows
+
+2. #132 Makefile alternatives (4-5h) ← HIGH
+   → Create tasks.py for Windows developers
+   → Document both approaches (make vs python tasks.py)
+   → No regression for Unix users
+
+3. #133 Windows documentation (3-4h) ← HIGH
+   → Create docs/windows-setup.md
+   → Update README, installation, quickstart
+   → PowerShell/cmd examples
+```
+
+**Total: 10-13 hours (~2 days)**
+
+**Milestone:** Cross-platform developer experience ready ✅
+
+### 📋 Week 11: Pre-Release Quality Gate
 
 **MANDATORY before release:**
 
@@ -454,13 +505,15 @@ Supporting Infrastructure (v2.0.1):
 1. #120 Pre-release E2E testing (16-24h)
    → Test EVERYTHING end-to-end
    → Real VPS, all templates, all scenarios
+   → Test on Windows, Linux, macOS
    → Find and fix remaining bugs
    → THIS IS THE QUALITY GATE
 
 2. Documentation polish
    → Update any outdated docs
-   → Verify all examples work
+   → Verify all examples work (all platforms)
    → Add troubleshooting for new issues
+   → Windows examples throughout
 ```
 
 **Total: 16-24 hours (3 days focused testing)**
@@ -480,26 +533,39 @@ Supporting Infrastructure (v2.0.1):
 
 **Milestone:** v2.0.0 MVP LAUNCHED 🚀
 
-### 📈 Week 13-16: v2.0.1 Enhancement (Optional)
+### 📈 Week 13-16: v2.0.1 Enhancement
 
-**Nice-to-have features (not blocking v2.0.0):**
+**Production hardening features:**
 
 ```bash
+# Windows CI & Testing (PRIORITY):
+1. #134 Windows CI runners (4-5h)
+   → Add windows-latest to GitHub Actions
+   → Fix Windows-specific test failures
+   → Automated cross-platform testing
+
+2. #135 Cross-platform integration tests (6-8h)
+   → Platform-specific test markers
+   → Windows, macOS, Linux integration tests
+   → Coverage ≥80% on all platforms
+
 # Advanced deployment:
-1. #78 Zero-downtime (6-8h)
-2. #80 Verification (4-5h)
-3. #82 Monitoring (8-10h)
-4. #83 Multi-environment (4-5h)
+3. #78 Zero-downtime (6-8h)
+4. #80 Verification (4-5h)
+5. #82 Monitoring (8-10h)
+6. #83 Multi-environment (4-5h)
 
 # Infrastructure:
-5. #86 Upgrade command (5-6h)
-6. #87 Redis storage (6-8h)
-7. #90 Structured logging (5-6h)
+7. #86 Upgrade command (5-6h)
+8. #87 Redis storage (6-8h)
+9. #90 Structured logging (5-6h)
 
 # Documentation:
-8. #29 Extended deploy docs
-9. #89 Production example
+10. #29 Extended deploy docs
+11. #89 Production example
 ```
+
+**Total: 48-62 hours (~8-10 days)**
 
 **Milestone:** v2.0.1 Production-Hardened ✅
 
@@ -524,11 +590,15 @@ Supporting Infrastructure (v2.0.1):
 **Technical Requirements:**
 
 - ✅ Zero manual configuration
-- ✅ Cross-platform (Linux, macOS, Windows)
+- 🏗️ Cross-platform (Linux, macOS, Windows) - **IN PROGRESS (#131-#133)**
+  - ✅ Core framework works on all platforms
+  - ⏳ SSH key generation needs Windows fix (#131)
+  - ⏳ Development workflow needs Windows support (#132)
+  - ⏳ Documentation needs Windows examples (#133)
 - ✅ Test coverage ≥80% (current: 84%)
-- ⏳ Deployment test coverage ≥80% (#85)
-- ⏳ Production-grade error handling (#77, #84)
-- ⏳ Comprehensive documentation (#84)
+- ✅ Deployment test coverage ≥80% (#85) DONE
+- ✅ Production-grade error handling (#77, #84) DONE
+- ✅ Comprehensive documentation (#84) DONE
 
 **Production Readiness Checklist (v2.0.0):**
 
@@ -546,7 +616,17 @@ Supporting Infrastructure (v2.0.1):
 - [x] Doctor command (#88) ✅
 - [x] Multi-bot support (#117) ✅
 - [x] SSH key auth (#118) ✅
+- [ ] **Windows support (#131, #132, #133)** ⏳ IN PROGRESS
 - [ ] E2E testing complete (#120) ⏳ GATE
+
+**Cross-Platform Support (NEW for v2.0.0):**
+
+- [ ] Windows SSH key generation (#131) ⏳ CRITICAL
+- [ ] Makefile alternatives for Windows (#132) ⏳ HIGH
+- [ ] Windows documentation (#133) ⏳ HIGH
+- [ ] Works on Windows 10/11 (PowerShell, cmd, Git Bash)
+- [ ] Works on macOS (Intel + Apple Silicon)
+- [ ] Works on Linux (Ubuntu, Debian, CentOS)
 
 **Enhanced Features (NICE to have for v2.0.0, else v2.0.1):**
 
@@ -554,6 +634,8 @@ Supporting Infrastructure (v2.0.1):
 - [ ] Deployment verification (#80)
 - [ ] Monitoring (#82)
 - [ ] Multi-environment (#83)
+- [ ] Windows CI runners (#134) - v2.0.1
+- [ ] Cross-platform integration tests (#135) - v2.0.1
 
 **Marketing Messages:**
 
@@ -561,6 +643,8 @@ Supporting Infrastructure (v2.0.1):
 - 🔒 "Production-safe from day one"
 - 🚀 "Best-in-class developer experience"
 - ⚡ "Deploy with confidence"
+- 🖥️ **NEW:** "Works on Windows, macOS, and Linux" (v2.0.0)
+- 🌍 **NEW:** "True cross-platform development" (v2.0.0)
 
 ---
 
@@ -628,15 +712,19 @@ Supporting Infrastructure (v2.0.1):
 - #81: Backup/restore ✅
 - #84: Troubleshooting guide ✅
 - #85: Integration tests ✅
+- #119: Already running detection ✅
+- #88: Doctor command ✅
+- #117: Multi-bot on one VPS ✅
+- #118: SSH key authentication ✅
+- #127: SSH key generation ✅
 
-**In Progress (Week 8-9 - Critical Scenarios):**
+**In Progress (Week 10 - Windows Support):**
 
-- #119: Already running detection ✅ DONE
-- #88: Doctor command ✅ DONE
-- #117: Multi-bot on one VPS ✅ DONE
-- #118: SSH key authentication ✅ DONE
+- #131: Windows SSH key generation ⏳ CRITICAL
+- #132: Makefile alternatives for Windows ⏳ HIGH
+- #133: Windows documentation ⏳ HIGH
 
-**Quality Gate (Week 10-11):**
+**Quality Gate (Week 11):**
 
 - #120: Pre-release E2E testing ⏳ MANDATORY
 
@@ -644,12 +732,23 @@ Supporting Infrastructure (v2.0.1):
 
 - #121: v2.0.0 stable release ⏳
 
-**Planned for v2.0.1 (Advanced):**
+**Planned for v2.0.1 (Production-Hardened):**
+
+**Windows Testing & CI:**
+
+- #130: Windows developer support (parent/tracking)
+- #134: Windows CI runners
+- #135: Cross-platform integration tests
+
+**Advanced Deployment:**
 
 - #78: Zero-downtime deploy
 - #80: Deployment verification
 - #82: Monitoring + alerting
 - #83: Multi-environment
+
+**Infrastructure:**
+
 - #86: Upgrade command
 - #87: Redis storage
 - #89: Production example
@@ -698,16 +797,22 @@ Supporting Infrastructure (v2.0.1):
 
 ### Open Issues by Priority
 
-- 🔴 **CRITICAL:** 15 issues (10 done ✅, 5 remaining for v2.0.0)
-- 🟠 **HIGH:** 11 issues (deployment + advanced features)
+- 🔴 **CRITICAL:** 15 issues (13 done ✅, 2 remaining for v2.0.0: #120, #121)
+- 🟠 **HIGH:** 17 issues (deployment + Windows support + advanced features)
+  - **NEW:** 6 Windows support issues (#130-#135)
 - 🟡 **MEDIUM:** 6 issues (quality improvements - v2.1.0)
 - 🟢 **LOW:** 18 issues (long-term vision - v3.0+)
 
-**Open Issues:** 40 (all properly assigned to milestones)
-**Closed Issues:** 82
-**Total Issues:** 122
+**Open Issues:** 45 (+6 Windows support issues)
+**Closed Issues:** 83
+**Total Issues:** 128
 
 **Closed as duplicates:** 3 issues (#41 → #87, #42 → #82+#90, #49 → #89)
+
+**Latest additions (2025-11-29):**
+
+- #130-#135: Windows cross-platform support (6 issues)
+- Target: v2.0.0 MVP (critical DX) + v2.0.1 (testing/CI)
 
 ### Milestones
 
@@ -728,21 +833,28 @@ Supporting Infrastructure (v2.0.1):
 
 ---
 
-**Status:** 🏗️ Phase 2 critical scenarios in progress
-**Progress:** 12/15 critical tasks done ✅ | 3 remaining before E2E testing
-**Current Focus:** #120 Pre-release E2E testing (final gate before release)
-**Next Gate:** #120 Pre-release E2E testing (Week 10-11)
+**Status:** 🏗️ Week 10 - Windows cross-platform support in progress
+**Progress:** 12/15 critical tasks done ✅ | 3 Windows support tasks + E2E testing remaining
+**Current Focus:** #131, #132, #133 - Windows developer support
+**Next Gate:** #120 Pre-release E2E testing (Week 11)
 **Target Release:** v2.0.0 MVP (#121) - Week 12
 
 **Milestones:**
 
-- 🎯 v2.0.0 MVP: 8 issues (due: Dec 20, 2025)
-- 📦 v2.0.1 Production: 8 issues (due: Jan 17, 2026)
+- 🎯 v2.0.0 MVP: 10 issues (due: Dec 20, 2025) - **+3 Windows support**
+- 📦 v2.0.1 Production: 11 issues (due: Jan 17, 2026) - **+3 Windows CI/testing**
 - 🔧 v2.1.0 Enhancements: 6 issues (due: Feb 7, 2026)
 - 💡 v3.0+ Vision: 18 issues (backlog)
 
-**Organization:** ✅ All 40 open issues assigned to milestones
+**Organization:** ✅ All 45 open issues assigned to milestones
 **Duplicates Closed:** 3 issues (#41→#87, #42→#82+#90, #49→#89)
-**Total Issues:** 122 (40 open, 82 closed)
+**Total Issues:** 128 (45 open, 83 closed)
 
-**Updated:** 2025-11-29
+**Latest Update:** 2025-11-29 - Added Windows cross-platform support (#130-#135)
+
+**New this session:**
+
+- Created 6 issues for Windows developer support
+- Added to v2.0.0 MVP: SSH generation, Makefile alternatives, Windows docs
+- Added to v2.0.1: Windows CI, cross-platform integration tests
+- Updated roadmap to reflect cross-platform focus
