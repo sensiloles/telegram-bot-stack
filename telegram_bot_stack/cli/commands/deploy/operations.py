@@ -14,6 +14,7 @@ from telegram_bot_stack.cli.utils.deployment import (
     SystemdTemplateRenderer,
     create_env_file,
 )
+from telegram_bot_stack.cli.utils.deployment_state import DeploymentStateDetector
 from telegram_bot_stack.cli.utils.secrets import SecretsManager
 from telegram_bot_stack.cli.utils.version_tracking import VersionTracker
 from telegram_bot_stack.cli.utils.vps import VPSConnection
@@ -24,7 +25,10 @@ console = Console()
 @click.command()
 @click.option("--config", default="deploy.yaml", help="Deployment config file")
 @click.option("--verbose", "-v", is_flag=True, help="Verbose output")
-def up(config: str, verbose: bool) -> None:
+@click.option(
+    "--force", is_flag=True, help="Force deployment even if bot is already running"
+)
+def up(config: str, verbose: bool, force: bool) -> None:
     """Deploy bot to VPS."""
     console.print("🚀 [bold cyan]Deploying bot to VPS...[/bold cyan]\n")
 
@@ -60,6 +64,15 @@ def up(config: str, verbose: bool) -> None:
         deployment_method = deploy_config.get("deployment.method", "docker")
         console.print(f"[cyan]📋 Deployment method: {deployment_method}[/cyan]\n")
 
+        # Prepare deployment directory
+        bot_name = deploy_config.get("bot.name")
+        remote_dir = f"/opt/{bot_name}"
+
+        # Check if bot is already deployed/running
+        state_detector = DeploymentStateDetector(vps, bot_name, remote_dir)
+        if not state_detector.check_before_deploy(deployment_method, force=force):
+            return
+
         # Get minimum Python version from config or use default
         min_python_version = deploy_config.get("bot.python_version", "3.9")
         if isinstance(min_python_version, str) and min_python_version.startswith("3."):
@@ -70,10 +83,6 @@ def up(config: str, verbose: bool) -> None:
         if not vps.validate_vps_requirements(deployment_method, min_python_version):
             console.print("[red]❌ VPS validation failed[/red]")
             return
-
-        # Prepare deployment directory
-        bot_name = deploy_config.get("bot.name")
-        remote_dir = f"/opt/{bot_name}"
 
         console.print(f"[cyan]📦 Preparing deployment directory: {remote_dir}[/cyan]")
         vps.run_command(f"mkdir -p {remote_dir}")

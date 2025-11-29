@@ -27,7 +27,12 @@ from telegram_bot_stack.cli.utils.venv import find_venv, get_venv_python
     default="bot.py",
     help="Bot file to run (default: bot.py)",
 )
-def dev(reload: bool, bot_file: str) -> None:
+@click.option(
+    "--force",
+    is_flag=True,
+    help="Force start even if another instance is running",
+)
+def dev(reload: bool, bot_file: str, force: bool) -> None:
     """Run bot in development mode with auto-reload.
 
     Features:
@@ -50,7 +55,7 @@ def dev(reload: bool, bot_file: str) -> None:
 
     # Check for bot lock (prevent multiple instances)
     lock_manager = BotLockManager(Path.cwd())
-    if not lock_manager.acquire_lock():
+    if not lock_manager.acquire_lock(force=force):
         sys.exit(1)
 
     # Find and use venv if available
