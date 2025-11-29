@@ -6,5 +6,10 @@
   ".github/PROJECT_STATUS.md": "492315a2b5506f8ed006bc02e9441f3550738f76a7464c983a34f91bf610c083",
   "docs/deployment_guide.md": "da92b50587283ac14dd238b4b387d8a7a626b6a3a5da27225ec67c35fbccbaa4",
   "telegram_bot_stack/cli/utils/vps.py": "3a0f001284801fb4c6d4821f07a2b2755bea242515e1ea664702afdd2ff6f709",
-  ".github/workflows/scripts/merge_pr.py": "e739354c5138a28b9d965046e589d02ab4a25ea518476861001526a93e3dfb9a"
+  ".github/workflows/scripts/merge_pr.py": "e739354c5138a28b9d965046e589d02ab4a25ea518476861001526a93e3dfb9a",
+  ".github/workflows/e2e-tests.yml": "bf9fc8d01df3481dc1318b416c7e9a0d79525bcee75c6be3b4d20d1a6aba534a",
+  ".github/workflows/integration-tests.yml": "0e82dfa030ca72d60528f6e6ef78f618b0da9c3f661fd6532765f92f8828e978",
+  ".github/workflows/unit-tests.yml": "797458ef1bddddba40b697d02964f8bab35e2ec45f5843a3c63c914256cc2610",
+  ".github/workflows/lint.yml": "83f8ab7b18add93e60aa504963b9eb69894d0d5d6faca2d63e50fd871e6eef6a",
+  ".github/workflows/type-check.yml": "3fcab6018014785585581b440f984d2efe3fd122705204148fe9700cea3b8392"
 }
