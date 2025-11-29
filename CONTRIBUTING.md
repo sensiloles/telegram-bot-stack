@@ -2,6 +2,8 @@
 
 Thank you for your interest in contributing! This document provides guidelines and setup instructions.
 
+> **Windows Developers:** For comprehensive Windows development setup, see the [Windows Setup Guide](docs/windows-setup.md).
+
 ## Quick Start
 
 ### 1. Fork and Clone

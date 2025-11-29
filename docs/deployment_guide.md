@@ -680,6 +680,8 @@ If you prefer manual setup or automated setup fails:
 
 #### 1. Generate SSH Key
 
+**Linux / macOS:**
+
 ```bash
 # Modern Ed25519 (recommended - fast, secure, small)
 ssh-keygen -t ed25519 -C "your-email@example.com"
@@ -687,6 +689,25 @@ ssh-keygen -t ed25519 -C "your-email@example.com"
 # Or RSA (compatible with older systems)
 ssh-keygen -t rsa -b 4096 -C "your-email@example.com"
 ```
+
+**Windows (PowerShell):**
+
+```powershell
+# Create .ssh directory if needed
+New-Item -Path $env:USERPROFILE\.ssh -ItemType Directory -Force
+
+# Generate Ed25519 key (recommended)
+ssh-keygen -t ed25519 -f $env:USERPROFILE\.ssh\id_ed25519 -C "your-email@example.com"
+
+# Or RSA key (if server doesn't support ed25519)
+ssh-keygen -t rsa -b 4096 -f $env:USERPROFILE\.ssh\id_rsa -C "your-email@example.com"
+
+# Fix key permissions (PowerShell as Administrator)
+icacls $env:USERPROFILE\.ssh\id_ed25519 /inheritance:r
+icacls $env:USERPROFILE\.ssh\id_ed25519 /grant:r "$($env:USERNAME):(R)"
+```
+
+> **Windows Users:** For complete SSH setup guide including OpenSSH installation, see the [Windows Setup Guide](windows-setup.md#ssh-setup-on-windows).
 
 **Key Features:**
 
@@ -696,19 +717,34 @@ ssh-keygen -t rsa -b 4096 -C "your-email@example.com"
 
 #### 2. Add SSH Key to VPS
 
-**Method 1: Using ssh-copy-id (easiest)**
+**Method 1: Using ssh-copy-id (Linux/macOS)**
 
 ```bash
 ssh-copy-id -i ~/.ssh/id_ed25519.pub root@your-vps-ip
 ```
 
-**Method 2: Manual (if ssh-copy-id unavailable)**
+**Method 2: Manual Copy (Linux/macOS)**
 
 ```bash
 cat ~/.ssh/id_ed25519.pub | ssh root@your-vps-ip "mkdir -p ~/.ssh && chmod 700 ~/.ssh && cat >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys"
 ```
 
-**Method 3: Through VPS Control Panel**
+**Method 3: Windows (PowerShell)**
+
+```powershell
+# Display public key
+Get-Content $env:USERPROFILE\.ssh\id_ed25519.pub
+
+# Copy to clipboard
+Get-Content $env:USERPROFILE\.ssh\id_ed25519.pub | Set-Clipboard
+
+# Then manually add to VPS:
+# 1. SSH to VPS with password: ssh root@your-vps-ip
+# 2. Paste key: echo "paste-key-here" >> ~/.ssh/authorized_keys
+# 3. Fix permissions: chmod 600 ~/.ssh/authorized_keys
+```
+
+**Method 4: Through VPS Control Panel (Recommended for Windows)**
 
 Many VPS providers allow adding SSH keys through their web interface:
 
@@ -716,6 +752,8 @@ Many VPS providers allow adding SSH keys through their web interface:
 - **AWS EC2:** Key Pairs section
 - **Hetzner:** Security → SSH Keys
 - **Linode:** Profile → SSH Keys
+
+This method works great for Windows users - just paste your public key from clipboard!
 
 #### 3. Verify SSH Connection
 

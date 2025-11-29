@@ -2,9 +2,19 @@
 
 Get started with telegram-bot-stack in less than 5 minutes!
 
+> **Windows Users:** This guide includes Windows-specific commands. For comprehensive Windows setup, see the [Windows Setup Guide](windows-setup.md).
+
 ## Installation
 
+**Linux / macOS:**
+
 ```bash
+pip install telegram-bot-stack
+```
+
+**Windows (PowerShell):**
+
+```powershell
 pip install telegram-bot-stack
 ```
 
@@ -13,6 +23,8 @@ pip install telegram-bot-stack
 The fastest way to create a new bot with complete development environment:
 
 ### Step 1: Initialize Project
+
+**All platforms:**
 
 ```bash
 telegram-bot-stack init my-awesome-bot
@@ -29,17 +41,42 @@ This creates a complete bot project with:
 
 ### Step 2: Configure Bot Token
 
+Get your token from [@BotFather](https://t.me/BotFather), then:
+
+**Linux / macOS:**
+
 ```bash
 cd my-awesome-bot
 echo "BOT_TOKEN=your_token_here" > .env
 ```
 
-Get your token from [@BotFather](https://t.me/BotFather)
+**Windows (PowerShell):**
+
+```powershell
+cd my-awesome-bot
+"BOT_TOKEN=your_token_here" | Out-File -FilePath .env -Encoding utf8
+```
 
 ### Step 3: Run Your Bot
 
+**Linux / macOS:**
+
 ```bash
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+source venv/bin/activate
+python bot.py
+```
+
+**Windows (PowerShell):**
+
+```powershell
+.\venv\Scripts\Activate.ps1
+python bot.py
+```
+
+**Windows (Command Prompt):**
+
+```cmd
+venv\Scripts\activate.bat
 python bot.py
 ```
 
