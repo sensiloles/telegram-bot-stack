@@ -2,6 +2,19 @@
 
 <!-- version list -->
 
+## v1.33.0 (2025-11-29)
+
+### Bug Fixes
+
+- **automation**: Add mandatory CI checks before PR merge
+  ([`689b870`](https://github.com/sensiloles/telegram-bot-stack/commit/689b870c876da140b43fe7e6d73d1b8651acce3f))
+
+### Features
+
+- **deploy**: Add cross-platform SSH key generation using cryptography
+  ([`f39bab4`](https://github.com/sensiloles/telegram-bot-stack/commit/f39bab4621dfa89c3d0e16bc075032ab0f6b858d))
+
+
 ## v1.32.0 (2025-11-29)
 
 ### Documentation
