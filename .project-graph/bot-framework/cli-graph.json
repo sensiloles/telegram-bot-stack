@@ -113,13 +113,14 @@
       "category": "implementation",
       "path": "telegram_bot_stack/cli/utils/deployment.py",
       "description": "Deployment configuration and template rendering utilities.",
-      "lines_of_code": 484,
+      "lines_of_code": 507,
       "complexity_score": 1,
       "exports": [
         "DeploymentConfig",
         "DockerTemplateRenderer",
         "SystemdTemplateRenderer",
         "escape_env_value",
+        "create_vps_connection_from_config",
         "create_env_file",
         "load",
         "save",
@@ -141,6 +142,7 @@
       ],
       "functions": [
         "escape_env_value",
+        "create_vps_connection_from_config",
         "create_env_file",
         "load",
         "save",
@@ -254,10 +256,12 @@
       "category": "implementation",
       "path": "telegram_bot_stack/cli/utils/vps.py",
       "description": "VPS operations utilities for deployment.",
-      "lines_of_code": 724,
+      "lines_of_code": 908,
       "complexity_score": 1,
       "exports": [
         "VPSConnection",
+        "find_ssh_keys",
+        "check_ssh_agent",
         "get_docker_compose_command",
         "check_docker_compose_installed",
         "get_container_health",
@@ -279,6 +283,8 @@
         "VPSConnection"
       ],
       "functions": [
+        "find_ssh_keys",
+        "check_ssh_agent",
         "get_docker_compose_command",
         "check_docker_compose_installed",
         "get_container_health",
@@ -544,7 +550,7 @@
       "category": "implementation",
       "path": "telegram_bot_stack/cli/commands/deploy/deploy.py",
       "description": "Core deployment commands (init, backup, restore).",
-      "lines_of_code": 334,
+      "lines_of_code": 376,
       "complexity_score": 1,
       "exports": [
         "deploy",
@@ -576,7 +582,7 @@
       "category": "implementation",
       "path": "telegram_bot_stack/cli/commands/deploy/monitoring.py",
       "description": "Monitoring commands for deployment (status, logs).",
-      "lines_of_code": 246,
+      "lines_of_code": 233,
       "complexity_score": 1,
       "exports": [
         "status",
@@ -616,7 +622,7 @@
       "category": "implementation",
       "path": "telegram_bot_stack/cli/commands/deploy/operations.py",
       "description": "Deployment operations (up, update, down).",
-      "lines_of_code": 877,
+      "lines_of_code": 852,
       "complexity_score": 1,
       "exports": [
         "up",
@@ -1103,13 +1109,6 @@
       "description": "Imports from telegram_bot_stack.cli.utils.secrets"
     },
     {
-      "id": "edge_29",
-      "source": "telegram_bot_stack.cli.commands.deploy.operations",
-      "target": "telegram_bot_stack.cli.utils.vps",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.cli.utils.vps"
-    },
-    {
       "id": "edge_30",
       "source": "telegram_bot_stack.cli.commands.deploy.secrets",
       "target": "telegram_bot_stack.cli.utils.deployment",
@@ -1180,13 +1179,6 @@
       "description": "Imports from telegram_bot_stack.cli.utils.git"
     },
     {
-      "id": "edge_44",
-      "source": "telegram_bot_stack.cli.commands.deploy.operations",
-      "target": "telegram_bot_stack.cli.utils",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.cli.utils"
-    },
-    {
       "id": "edge_45",
       "source": "telegram_bot_stack.cli.commands",
       "target": "telegram_bot_stack.cli.commands.validate",
@@ -1255,6 +1247,20 @@
       "target": "telegram_bot_stack.cli.commands.init",
       "type": "imports",
       "description": "Imports from telegram_bot_stack.cli.commands.init"
+    },
+    {
+      "id": "edge_55",
+      "source": "telegram_bot_stack.cli.commands.deploy.operations",
+      "target": "telegram_bot_stack.cli.utils.deployment_state",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.utils.deployment_state"
+    },
+    {
+      "id": "edge_56",
+      "source": "telegram_bot_stack.cli.utils.deployment",
+      "target": "telegram_bot_stack.cli.utils.vps",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.utils.vps"
     }
   ]
 }

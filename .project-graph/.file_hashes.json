@@ -3,5 +3,12 @@
   "telegram_bot_stack/cli/main.py": "c9158cdc0f482001a3ce7c66d176bb4798e462f2d757a891b8e36ff8e511d95f",
   "telegram_bot_stack/cli/utils/health_checks.py": "d55f519a809ed4c6742e25afadd7108ea84439f3afe51e36dcd1d2ef2c669e3b",
   ".github/PROJECT_STATUS.md": "f0e6db1dcbae505180a08d902dc0e29a9df3a6f426f18eda07d026b1823e8faa",
-  "telegram_bot_stack/cli/commands/__init__.py": "6979cb3a9f090b32325cf97bb2a36a3aa97daff73f2850aa63c34cb6709a8f45"
+  "telegram_bot_stack/cli/commands/__init__.py": "6979cb3a9f090b32325cf97bb2a36a3aa97daff73f2850aa63c34cb6709a8f45",
+  "docs/deployment_guide.md": "20a95832515e154597ae29cfa0755274f7c8ea877bb2b6cf888be152bd6a7450",
+  "telegram_bot_stack/cli/commands/deploy/deploy.py": "04505e41eed84c4a8ec33b6f98e8ce638e031bd316aa248ede2ed97353a25534",
+  "telegram_bot_stack/cli/commands/deploy/monitoring.py": "69b7292d168b097598c8993bb949fccf2777849ce84c0f7f9667ba906956b78a",
+  "telegram_bot_stack/cli/commands/deploy/operations.py": "7e53417f22861c2e20ee9c891a667f7fd0b004df391810ff2fbf8bf49b763757",
+  "telegram_bot_stack/cli/commands/deploy/secrets.py": "df32fa9c045ac998e4514372423e0fe2829b0487c4ed294954e1fff133c234d9",
+  "telegram_bot_stack/cli/utils/deployment.py": "5caa66e5677fe8ad9c7e501e4b9c3b892af3a071286a976a0732ce4269708af8",
+  "telegram_bot_stack/cli/utils/vps.py": "0acde16e8107858d24ab3e2c157de0f9d3f5464c0ba72ae6fa52cd55c9c667fb"
 }

@@ -5,9 +5,11 @@ from pathlib import Path
 import click
 from rich.console import Console
 
-from telegram_bot_stack.cli.utils.deployment import DeploymentConfig
+from telegram_bot_stack.cli.utils.deployment import (
+    DeploymentConfig,
+    create_vps_connection_from_config,
+)
 from telegram_bot_stack.cli.utils.secrets import SecretsManager
-from telegram_bot_stack.cli.utils.vps import VPSConnection
 
 console = Console()
 
@@ -52,12 +54,7 @@ def set_secret(config: str, key: str, value: str) -> None:
         return
 
     # Connect to VPS
-    vps = VPSConnection(
-        host=deploy_config.get("vps.host"),
-        user=deploy_config.get("vps.user"),
-        ssh_key=deploy_config.get("vps.ssh_key"),
-        port=deploy_config.get("vps.port", 22),
-    )
+    vps = create_vps_connection_from_config(deploy_config)
 
     try:
         if not vps.test_connection():
@@ -102,12 +99,7 @@ def get_secret(config: str, key: str) -> None:
         return
 
     # Connect to VPS
-    vps = VPSConnection(
-        host=deploy_config.get("vps.host"),
-        user=deploy_config.get("vps.user"),
-        ssh_key=deploy_config.get("vps.ssh_key"),
-        port=deploy_config.get("vps.port", 22),
-    )
+    vps = create_vps_connection_from_config(deploy_config)
 
     try:
         bot_name = deploy_config.get("bot.name")
@@ -151,12 +143,7 @@ def list_secrets(config: str) -> None:
         return
 
     # Connect to VPS
-    vps = VPSConnection(
-        host=deploy_config.get("vps.host"),
-        user=deploy_config.get("vps.user"),
-        ssh_key=deploy_config.get("vps.ssh_key"),
-        port=deploy_config.get("vps.port", 22),
-    )
+    vps = create_vps_connection_from_config(deploy_config)
 
     try:
         bot_name = deploy_config.get("bot.name")
@@ -203,12 +190,7 @@ def remove_secret(config: str, key: str) -> None:
         return
 
     # Connect to VPS
-    vps = VPSConnection(
-        host=deploy_config.get("vps.host"),
-        user=deploy_config.get("vps.user"),
-        ssh_key=deploy_config.get("vps.ssh_key"),
-        port=deploy_config.get("vps.port", 22),
-    )
+    vps = create_vps_connection_from_config(deploy_config)
 
     try:
         bot_name = deploy_config.get("bot.name")
