@@ -12,7 +12,7 @@
     "scope": "CLI tool for bot project management and development",
     "root_package": "telegram_bot_stack.cli",
     "node_count": 32,
-    "edge_count": 50
+    "edge_count": 51
   },
   "nodes": [
     {
@@ -550,7 +550,7 @@
       "category": "implementation",
       "path": "telegram_bot_stack/cli/commands/deploy/deploy.py",
       "description": "Core deployment commands (init, backup, restore).",
-      "lines_of_code": 376,
+      "lines_of_code": 649,
       "complexity_score": 1,
       "exports": [
         "deploy",
@@ -559,7 +559,8 @@
         "create_backup",
         "list_backups",
         "download",
-        "restore"
+        "restore",
+        "list_bots"
       ],
       "classes": [],
       "functions": [
@@ -569,7 +570,8 @@
         "create_backup",
         "list_backups",
         "download",
-        "restore"
+        "restore",
+        "list_bots"
       ],
       "dependencies": [],
       "dependents": [],
@@ -622,7 +624,7 @@
       "category": "implementation",
       "path": "telegram_bot_stack/cli/commands/deploy/operations.py",
       "description": "Deployment operations (up, update, down).",
-      "lines_of_code": 852,
+      "lines_of_code": 894,
       "complexity_score": 1,
       "exports": [
         "up",
@@ -1261,6 +1263,13 @@
       "target": "telegram_bot_stack.cli.utils.vps",
       "type": "imports",
       "description": "Imports from telegram_bot_stack.cli.utils.vps"
+    },
+    {
+      "id": "edge_57",
+      "source": "telegram_bot_stack.cli.commands.deploy.operations",
+      "target": "telegram_bot_stack.cli.utils",
+      "type": "imports",
+      "description": "Imports from telegram_bot_stack.cli.utils"
     }
   ]
 }

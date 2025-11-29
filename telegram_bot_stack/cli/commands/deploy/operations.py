@@ -16,6 +16,7 @@ from telegram_bot_stack.cli.utils.deployment import (
     create_vps_connection_from_config,
 )
 from telegram_bot_stack.cli.utils.deployment_state import DeploymentStateDetector
+from telegram_bot_stack.cli.utils.port_manager import detect_port_conflicts
 from telegram_bot_stack.cli.utils.secrets import SecretsManager
 from telegram_bot_stack.cli.utils.version_tracking import VersionTracker
 
@@ -67,6 +68,9 @@ def up(config: str, verbose: bool, force: bool) -> None:
         state_detector = DeploymentStateDetector(vps, bot_name, remote_dir)
         if not state_detector.check_before_deploy(deployment_method, force=force):
             return
+
+        # Check for port conflicts (only for webhook or custom port configurations)
+        _check_port_conflicts(vps, deploy_config, bot_name)
 
         # Get minimum Python version from config or use default
         min_python_version = deploy_config.get("bot.python_version", "3.9")
@@ -220,6 +224,44 @@ def up(config: str, verbose: bool, force: bool) -> None:
     finally:
         # Always close VPS connection
         vps.close()
+
+
+def _check_port_conflicts(
+    vps: Any, deploy_config: DeploymentConfig, bot_name: str
+) -> None:
+    """Check for port conflicts with other bots on VPS.
+
+    Args:
+        vps: VPSConnection instance
+        deploy_config: Deployment configuration
+        bot_name: Current bot name
+    """
+    # Get ports from config if specified
+    ports = deploy_config.get("ports", [])
+    if not ports:
+        # No ports configured - skip check (typical for polling mode)
+        return
+
+    # Convert to list if single port
+    if isinstance(ports, int):
+        ports = [ports]
+
+    conn = vps.connect()
+    conflicts = detect_port_conflicts(conn, ports, exclude_bot=bot_name)
+
+    if conflicts:
+        console.print(
+            f"[yellow]⚠️  Warning: Port conflicts detected: {', '.join(map(str, conflicts))}[/yellow]"
+        )
+        console.print(
+            "[yellow]These ports are already in use by other services.[/yellow]"
+        )
+        console.print(
+            "\n[dim]Tip: Configure different ports in deploy.yaml under 'ports' section[/dim]"
+        )
+        console.print(
+            "[dim]     or remove 'ports' section if using polling mode (no webhook)[/dim]\n"
+        )
 
 
 def _deploy_docker(

@@ -8,14 +8,16 @@ user: "root"             # SSH user (default: root)
 ssh_key: "~/.ssh/id_rsa" # Path to SSH private key (auto-detected if empty)
 port: 22                 # SSH port (default: 22)
 auth_method: "auto"      # Authentication method: auto, key, password, agent
-                        # auto: try keys/agent, then password (recommended)
-                        # key: use SSH private key only
-                        # password: use password authentication
-                        # agent: use SSH agent
+# auto: try keys/agent, then password (recommended)
+# key: use SSH private key only
+# password: use password authentication
+# agent: use SSH agent
 
 bot:
 # Bot configuration
 name: "my-telegram-bot" # Bot name (used for container/image names)
+# IMPORTANT: Must be unique on VPS if deploying multiple bots
+# This name is used for: container name, Docker image, network, directory
 token_env: "BOT_TOKEN"  # Environment variable name for bot token
 entry_point: "bot.py"   # Main bot file (default: bot.py)
 python_version: "3.11"  # Python version (3.9, 3.10, 3.11, 3.12)

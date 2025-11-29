@@ -374,3 +374,276 @@ def restore(config: str, backup_filename: str, yes: bool) -> None:
 
     finally:
         vps.close()
+
+
+@deploy.command("list")
+@click.option("--config", default="deploy.yaml", help="Deployment config file")
+@click.option(
+    "--remote", is_flag=True, help="List all bots on remote VPS (not just current bot)"
+)
+def list_bots(config: str, remote: bool) -> None:
+    """List deployed bots.
+
+    Examples:
+        # List current bot status
+        telegram-bot-stack deploy list
+
+        # List all bots on VPS
+        telegram-bot-stack deploy list --remote
+    """
+
+    # Load configuration
+    if not Path(config).exists():
+        console.print(f"[red]❌ Configuration file not found: {config}[/red]")
+        console.print("\n[yellow]Run 'telegram-bot-stack deploy init' first[/yellow]")
+        return
+
+    deploy_config = DeploymentConfig(config)
+
+    if not deploy_config.validate():
+        console.print("[red]❌ Invalid configuration[/red]")
+        return
+
+    # Connect to VPS
+    vps = create_vps_connection_from_config(deploy_config)
+
+    try:
+        if not vps.test_connection():
+            console.print("[red]❌ Failed to connect to VPS[/red]")
+            return
+
+        if remote:
+            # List all bots on VPS (discover by scanning /opt/ directory)
+            _list_all_bots_on_vps(vps, deploy_config)
+        else:
+            # List only current bot
+            bot_name = deploy_config.get("bot.name")
+            _list_current_bot(vps, deploy_config, bot_name)
+
+    finally:
+        vps.close()
+
+
+def _list_current_bot(
+    vps: VPSConnection, deploy_config: DeploymentConfig, bot_name: str
+) -> None:
+    """List information about the current bot."""
+    from telegram_bot_stack.cli.utils.vps import (
+        get_container_health,
+    )
+
+    remote_dir = f"/opt/{bot_name}"
+
+    console.print(f"🤖 [bold cyan]Bot: {bot_name}[/bold cyan]\n")
+
+    # Check if bot directory exists
+    dir_exists = vps.run_command(f"test -d {remote_dir}", hide=True)
+    if not dir_exists:
+        console.print("[yellow]⚠️  Bot not deployed on VPS[/yellow]")
+        console.print(f"[dim]   Directory {remote_dir} does not exist[/dim]")
+        return
+
+    deployment_method = deploy_config.get("deployment.method", "docker")
+
+    if deployment_method == "docker":
+        # Get container health
+        conn = vps.connect()
+        health_info = get_container_health(conn, bot_name)
+
+        # Display status
+        table = Table(show_header=True, header_style="bold cyan")
+        table.add_column("Property", style="cyan")
+        table.add_column("Value")
+
+        table.add_row("Name", bot_name)
+        table.add_row("Directory", remote_dir)
+        table.add_row("Status", _format_container_status(health_info["status"]))
+
+        if health_info["status"] == "running":
+            table.add_row("Health", health_info.get("health", "N/A"))
+            table.add_row("Uptime", health_info.get("uptime", "N/A"))
+            table.add_row("Restarts", str(health_info.get("restart_count", 0)))
+        elif health_info["status"] == "stopped":
+            table.add_row("Exit Code", str(health_info.get("exit_code", "N/A")))
+
+        console.print(table)
+
+    elif deployment_method == "systemd":
+        # Check systemd service status
+        conn = vps.connect()
+        result = conn.run(
+            f"systemctl is-active {bot_name}",
+            hide=True,
+            warn=True,
+            pty=False,
+            in_stream=False,
+        )
+        status = result.stdout.strip() if result and result.stdout else "unknown"
+
+        table = Table(show_header=True, header_style="bold cyan")
+        table.add_column("Property", style="cyan")
+        table.add_column("Value")
+
+        table.add_row("Name", bot_name)
+        table.add_row("Directory", remote_dir)
+        table.add_row("Status", _format_systemd_status(status))
+
+        console.print(table)
+
+
+def _list_all_bots_on_vps(vps: VPSConnection, deploy_config: DeploymentConfig) -> None:
+    """List all deployed bots on the VPS."""
+    from telegram_bot_stack.cli.utils.vps import get_container_health
+
+    console.print("🤖 [bold cyan]All Deployed Bots on VPS[/bold cyan]\n")
+
+    deployment_method = deploy_config.get("deployment.method", "docker")
+    conn = vps.connect()
+
+    if deployment_method == "docker":
+        # Find all bot directories in /opt/
+        result = conn.run(
+            "find /opt -maxdepth 1 -type d -name '*' | grep -v '^/opt$' || true",
+            hide=True,
+            warn=True,
+            pty=False,
+            in_stream=False,
+        )
+
+        if not result or not result.stdout.strip():
+            console.print("[yellow]No bots found on VPS[/yellow]")
+            return
+
+        bot_dirs = [d.strip() for d in result.stdout.strip().split("\n") if d.strip()]
+
+        # Filter directories that have docker-compose.yml (actual bot deployments)
+        bots = []
+        for bot_dir in bot_dirs:
+            compose_check = conn.run(
+                f"test -f {bot_dir}/docker-compose.yml",
+                hide=True,
+                warn=True,
+                pty=False,
+                in_stream=False,
+            )
+            if compose_check and compose_check.ok:
+                bot_name = bot_dir.split("/")[-1]
+                bots.append((bot_name, bot_dir))
+
+        if not bots:
+            console.print("[yellow]No bots found on VPS[/yellow]")
+            console.print(
+                "[dim]   (Bots should be deployed to /opt/<bot-name>/ with docker-compose.yml)[/dim]"
+            )
+            return
+
+        # Display table of all bots
+        table = Table(show_header=True, header_style="bold cyan")
+        table.add_column("Bot Name", style="cyan")
+        table.add_column("Directory")
+        table.add_column("Status")
+        table.add_column("Health")
+        table.add_column("Uptime")
+
+        for bot_name, bot_dir in sorted(bots):
+            health_info = get_container_health(conn, bot_name)
+
+            status = _format_container_status(health_info["status"])
+            health = (
+                health_info.get("health", "N/A")
+                if health_info["status"] == "running"
+                else "-"
+            )
+            uptime = (
+                health_info.get("uptime", "N/A")
+                if health_info["status"] == "running"
+                else "-"
+            )
+
+            table.add_row(bot_name, bot_dir, status, health, uptime)
+
+        console.print(table)
+        console.print(f"\n[dim]Found {len(bots)} bot(s)[/dim]")
+
+    elif deployment_method == "systemd":
+        # List all systemd services matching pattern
+        result = conn.run(
+            "systemctl list-units --all --type=service --no-pager | grep -E '\\.service' | awk '{print $1}' || true",
+            hide=True,
+            warn=True,
+            pty=False,
+            in_stream=False,
+        )
+
+        if not result or not result.stdout.strip():
+            console.print("[yellow]No bot services found[/yellow]")
+            return
+
+        # Filter services that are likely bots (have corresponding /opt/ directory)
+        services = result.stdout.strip().split("\n")
+        bots = []
+
+        for service in services:
+            service_name = service.replace(".service", "").strip()
+            bot_dir = f"/opt/{service_name}"
+            dir_check = conn.run(
+                f"test -d {bot_dir}",
+                hide=True,
+                warn=True,
+                pty=False,
+                in_stream=False,
+            )
+            if dir_check and dir_check.ok:
+                bots.append((service_name, bot_dir))
+
+        if not bots:
+            console.print("[yellow]No bots found on VPS[/yellow]")
+            return
+
+        # Display table
+        table = Table(show_header=True, header_style="bold cyan")
+        table.add_column("Bot Name", style="cyan")
+        table.add_column("Directory")
+        table.add_column("Status")
+
+        for bot_name, bot_dir in sorted(bots):
+            status_result = conn.run(
+                f"systemctl is-active {bot_name}",
+                hide=True,
+                warn=True,
+                pty=False,
+                in_stream=False,
+            )
+            status = (
+                status_result.stdout.strip()
+                if status_result and status_result.stdout
+                else "unknown"
+            )
+            status_formatted = _format_systemd_status(status)
+
+            table.add_row(bot_name, bot_dir, status_formatted)
+
+        console.print(table)
+        console.print(f"\n[dim]Found {len(bots)} bot(s)[/dim]")
+
+
+def _format_container_status(status: str) -> str:
+    """Format container status with color."""
+    status_colors = {
+        "running": "[green]🟢 Running[/green]",
+        "stopped": "[red]🔴 Stopped[/red]",
+        "not_found": "[yellow]⚪ Not deployed[/yellow]",
+        "error": "[red]❌ Error[/red]",
+    }
+    return status_colors.get(status, f"[dim]{status}[/dim]")
+
+
+def _format_systemd_status(status: str) -> str:
+    """Format systemd status with color."""
+    status_colors = {
+        "active": "[green]🟢 Active[/green]",
+        "inactive": "[yellow]⚪ Inactive[/yellow]",
+        "failed": "[red]❌ Failed[/red]",
+        "unknown": "[dim]❓ Unknown[/dim]",
+    }
+    return status_colors.get(status, f"[dim]{status}[/dim]")

@@ -800,53 +800,191 @@ CMD ["python", "bot.py"]
 
 ### Multiple Bots on Same VPS
 
-Deploy multiple bots to the same VPS efficiently:
+Deploy multiple bots to the same VPS efficiently. Each bot runs in complete isolation with its own resources, container, and network.
+
+**Features:**
+
+- Automatic namespace isolation (containers, networks, directories)
+- Port conflict detection and prevention
+- Independent resource management
+- Unified bot listing across all deployed bots
+- Separate management for each bot
 
 **Step 1: Create separate configs for each bot**
 
-```bash
-# Bot 1
-cd bot1/
-telegram-bot-stack deploy init --bot-name bot1
-# Creates deploy.yaml
+Each bot needs its own project directory with unique `bot.name`:
 
-# Bot 2
-cd bot2/
-telegram-bot-stack deploy init --bot-name bot2
-# Creates deploy.yaml
+```bash
+# Bot 1 (e.g., customer support bot)
+cd ~/bots/support-bot/
+telegram-bot-stack deploy init --bot-name support-bot
+# Creates deploy.yaml with bot.name: "support-bot"
+
+# Bot 2 (e.g., notification bot)
+cd ~/bots/notifications-bot/
+telegram-bot-stack deploy init --bot-name notifications-bot
+# Creates deploy.yaml with bot.name: "notifications-bot"
 ```
 
-**Step 2: Deploy each bot**
+**IMPORTANT:** The `bot.name` must be unique on the VPS. It's used for:
+
+- Container name: `support-bot`
+- Docker image: `support-bot:latest`
+- Remote directory: `/opt/support-bot/`
+- Docker network: `support-bot-network`
+
+**Step 2: Configure secrets for each bot**
+
+```bash
+# Bot 1 secrets
+cd ~/bots/support-bot/
+telegram-bot-stack deploy secrets set BOT_TOKEN "bot1-token-from-botfather"
+telegram-bot-stack deploy secrets set DATABASE_URL "postgres://..."
+
+# Bot 2 secrets
+cd ~/bots/notifications-bot/
+telegram-bot-stack deploy secrets set BOT_TOKEN "bot2-token-from-botfather"
+telegram-bot-stack deploy secrets set API_KEY "external-api-key"
+```
+
+**Step 3: Deploy each bot**
 
 ```bash
 # Deploy bot1
-cd bot1/
-export BOT_TOKEN="bot1-token"
+cd ~/bots/support-bot/
 telegram-bot-stack deploy up
 
 # Deploy bot2
-cd bot2/
-export BOT_TOKEN="bot2-token"
+cd ~/bots/notifications-bot/
 telegram-bot-stack deploy up
 ```
 
-**Step 3: Manage bots independently**
+**Step 4: List all deployed bots on VPS**
+
+NEW: View all bots running on your VPS at once:
 
 ```bash
-# Check status of bot1
-cd bot1/
-telegram-bot-stack deploy status
-
-# Update bot2
-cd bot2/
-telegram-bot-stack deploy update
-
-# View logs of bot1
-cd bot1/
-telegram-bot-stack deploy logs
+# From any bot directory (needs valid deploy.yaml)
+cd ~/bots/support-bot/
+telegram-bot-stack deploy list --remote
 ```
 
-**Resource allocation:** Each bot runs in its own container with separate resource limits. Ensure your VPS has enough resources (RAM, CPU) for all bots.
+Output:
+
+```
+🤖 All Deployed Bots on VPS
+
+Bot Name            Directory                Status          Health      Uptime
+support-bot         /opt/support-bot         🟢 Running      healthy     5h 23m
+notifications-bot   /opt/notifications-bot   🟢 Running      healthy     2h 15m
+analytics-bot       /opt/analytics-bot       🔴 Stopped      -           -
+
+Found 3 bot(s)
+```
+
+**Step 5: Manage bots independently**
+
+Each bot is managed from its own directory:
+
+```bash
+# Check status of specific bot
+cd ~/bots/support-bot/
+telegram-bot-stack deploy status
+
+# Update specific bot
+cd ~/bots/notifications-bot/
+telegram-bot-stack deploy update
+
+# View logs of specific bot
+cd ~/bots/support-bot/
+telegram-bot-stack deploy logs --tail 100
+
+# Restart specific bot
+cd ~/bots/analytics-bot/
+telegram-bot-stack deploy down
+telegram-bot-stack deploy up
+```
+
+**Port Management (for webhook mode):**
+
+If your bots use webhooks and expose ports, the framework automatically checks for conflicts:
+
+```yaml
+# In deploy.yaml (optional, only for webhook mode)
+bot:
+  name: "support-bot"
+
+# If using webhooks, specify ports (most bots use polling and don't need this)
+ports:
+  - 8080 # Webhook listener port
+```
+
+The deployment will warn you if ports are already in use:
+
+```
+⚠️  Warning: Port conflicts detected: 8080
+These ports are already in use by other services.
+
+Tip: Configure different ports in deploy.yaml under 'ports' section
+     or remove 'ports' section if using polling mode (no webhook)
+```
+
+**Resource Management:**
+
+Each bot has independent resource limits in `deploy.yaml`:
+
+```yaml
+resources:
+  memory_limit: "256M" # Maximum memory
+  memory_reservation: "128M" # Reserved memory
+  cpu_limit: "0.5" # Maximum CPU cores
+  cpu_reservation: "0.25" # Reserved CPU cores
+```
+
+**Best Practices:**
+
+1. **Unique Naming:** Always use descriptive, unique `bot.name` values
+2. **Resource Planning:** Calculate total resources needed:
+   - Example: 3 bots × 256M RAM = 768M minimum
+   - Recommendation: VPS with at least 2GB RAM for 3-5 bots
+3. **Monitoring:** Use `deploy list --remote` regularly to check all bots
+4. **Backups:** Each bot has independent backups in `/opt/{bot-name}/backups/`
+5. **Updates:** Update bots independently to minimize risk
+6. **Logs:** Keep logs separate per bot for easier troubleshooting
+
+**Troubleshooting Multi-Bot Deployments:**
+
+1. **Name Conflicts:**
+
+   ```
+   Error: Container name 'mybot' is already in use
+   ```
+
+   Solution: Use unique `bot.name` in each `deploy.yaml`
+
+2. **Port Conflicts (webhook mode):**
+
+   ```
+   Warning: Port conflicts detected: 8080
+   ```
+
+   Solution: Assign different ports in `deploy.yaml` or use polling mode
+
+3. **Resource Exhaustion:**
+
+   ```
+   Error: Cannot allocate memory
+   ```
+
+   Solution: Check total resources: `deploy list --remote` and reduce limits or upgrade VPS
+
+4. **Check All Bots:**
+
+   ```bash
+   telegram-bot-stack deploy list --remote
+   ```
+
+   Shows status of all bots, identifies stopped or unhealthy ones
 
 ### Version Management and Rollback Strategies
 

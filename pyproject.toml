@@ -126,6 +126,7 @@ exclude = [
 "dist/",
 ".git/",
 "__pycache__/",
+"telegram_bot_stack/cli/templates/", # Template files (YAML, Dockerfiles, etc.) should not be formatted
 ]
 
 [tool.ruff.lint]

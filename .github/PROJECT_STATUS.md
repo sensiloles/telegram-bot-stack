@@ -1,7 +1,7 @@
 # Project Status - telegram-bot-stack
 
 **Version:** v1.25.0 → v2.0.0 MVP
-**Updated:** 2025-11-29 (after #118 SSH key authentication completion)
+**Updated:** 2025-11-29 (after #117 Multi-bot deployment completion)
 **Status:** 🏗️ Phase 2 - Hardening Killer Feature
 
 ---
@@ -113,17 +113,18 @@ Found and fixed **12 critical deployment bugs** during E2E testing:
 | **#85**  | Integration tests             | ✅ YES (tests) | ✅ DONE | 8-10h  | -      |
 | **#88**  | Doctor command                | 🔧 CLI tool    | ✅ DONE | 6-8h   | -      |
 | **#119** | Already running detection     | ✅ YES         | ✅ DONE | 8-10h  | -      |
+| **#127** | SSH key generation & delivery | ✅ YES         | ⏳ TODO | 3-4h   | #118   |
 | **#120** | Pre-release E2E testing       | ✅ QA          | ⏳ TODO | 16-24h | #121   |
 | **#121** | v2.0.0 Release                | 🎯 Milestone   | ⏳ TODO | 24-32h | All    |
 | **NEW**  | **Deployment bug fixes**      | ✅ YES         | ✅ DONE | 12h    | -      |
 
-**Total Critical Path:** ~79-107 hours (10-13 days) - **9/11 critical issues completed!**
+**Total Critical Path:** ~82-111 hours (10-14 days) - **9/12 critical issues completed!**
 
 **IMPORTANT Issues (do after critical or for v2.0.1):**
 
 | #        | Issue                   | Part of Deploy   | Status  | Time   | Depends  |
 | -------- | ----------------------- | ---------------- | ------- | ------ | -------- |
-| **#117** | Multi-bot on one VPS    | ✅ YES           | ⏳ TODO | 6-8h   | #27, #28 |
+| **#117** | Multi-bot on one VPS    | ✅ YES           | ✅ DONE | 6-8h   | #27, #28 |
 | **#118** | SSH key authentication  | ✅ YES           | ✅ DONE | 5-7h   | #79      |
 | **#78**  | Zero-downtime deploy    | ✅ YES           | ⏳ TODO | 6-8h   | #77      |
 | **#80**  | Deployment verification | ✅ YES           | ⏳ TODO | 4-5h   | -        |
@@ -158,6 +159,7 @@ Found and fixed **12 critical deployment bugs** during E2E testing:
 | #85  | **Deploy tests**           | Tests    | ✅ DONE           | #27     | -        |
 | #88  | **Doctor command**         | CLI      | ✅ DONE           | -       | -        |
 | #119 | **Already running detect** | Deploy   | ✅ DONE           | #27     | -        |
+| #127 | **SSH key generation**     | Deploy   | ⏳ TODO           | #118    | -        |
 | #120 | **Pre-release E2E tests**  | QA       | ⏳ TODO           | All     | #121     |
 | #121 | **v2.0.0 Release**         | Release  | ⏳ TODO           | All     | -        |
 
@@ -168,7 +170,7 @@ Found and fixed **12 critical deployment bugs** during E2E testing:
 | #40 | Full Dev Setup | ✅ DONE (v1.17.0) | Killer Feature #1 |
 | #60 | Agent Optimize | 🏗️ In Progress    | Ongoing           |
 
-**Total Critical: 2 TODO + 12 DONE = 14 issues**
+**Total Critical: 3 TODO + 12 DONE = 15 issues**
 
 ---
 
@@ -176,14 +178,14 @@ Found and fixed **12 critical deployment bugs** during E2E testing:
 
 **Deployment Advanced (recommended for v2.0.0):**
 
-| #    | Issue                   | Category | Depends  | Notes                    |
-| ---- | ----------------------- | -------- | -------- | ------------------------ |
-| #117 | Multi-bot on one VPS    | Deploy   | #27, #28 | Multiple deployments     |
-| #118 | SSH key authentication  | Deploy   | ✅ DONE  | Security best practice ✅ |
-| #78  | Zero-downtime deploy    | Deploy   | #77      | Blue-green strategy      |
-| #80  | Deployment verification | Deploy   | #77      | Smoke tests              |
-| #82  | Monitoring + alerting   | Deploy   | #77      | Observability            |
-| #83  | Multi-environment       | Deploy   | #27      | Dev/staging/prod support |
+| #    | Issue                   | Category | Depends | Notes                     |
+| ---- | ----------------------- | -------- | ------- | ------------------------- |
+| #117 | Multi-bot on one VPS    | Deploy   | ✅ DONE | Multiple deployments ✅   |
+| #118 | SSH key authentication  | Deploy   | ✅ DONE | Security best practice ✅ |
+| #78  | Zero-downtime deploy    | Deploy   | #77     | Blue-green strategy       |
+| #80  | Deployment verification | Deploy   | #77     | Smoke tests               |
+| #82  | Monitoring + alerting   | Deploy   | #77     | Observability             |
+| #83  | Multi-environment       | Deploy   | #27     | Dev/staging/prod support  |
 
 **Infrastructure:**
 
@@ -277,7 +279,7 @@ Found and fixed **12 critical deployment bugs** during E2E testing:
 ✅ Week 1-3:   #40  Full Dev Environment (DONE v1.17.0)
 ✅ Week 4-6:   #27 + #28  Basic VPS Deployment (DONE v1.19.0, v1.21.0)
 🏗️ Week 7-8:   #76-#85, #88  Production Hardening (IN PROGRESS)
-⏳ Week 9:     #117-#119  Critical deployment scenarios
+⏳ Week 9:     #117, #127  Critical deployment scenarios (multi-bot + SSH keys)
 ⏳ Week 10:    #78, #80, #82, #83  Advanced features (optional)
 ⏳ Week 11:    #120  Pre-release E2E testing (GATE)
 
@@ -326,7 +328,7 @@ Killer Feature #2: VPS Deployment
 │   └── #119 Already running ← #27 (critical DX)
 │
 ├── Important Deployment Features (parallel):
-│   ├── #117 Multi-bot VPS ← #27, #28 (production ready)
+│   ├── ✅ #117 Multi-bot VPS ← #27, #28 (DONE - production ready)
 │   └── ✅ #118 SSH key auth ← #79 (DONE - security)
 │
 ├── Advanced Features (optional for v2.0.0):
@@ -542,7 +544,7 @@ Supporting Infrastructure (v2.0.1):
 - [x] Integration tests (#85) ✅
 - [x] Already running detection (#119) ✅
 - [x] Doctor command (#88) ✅
-- [ ] Multi-bot support (#117) ⏳
+- [x] Multi-bot support (#117) ✅
 - [x] SSH key auth (#118) ✅
 - [ ] E2E testing complete (#120) ⏳ GATE
 
@@ -631,7 +633,7 @@ Supporting Infrastructure (v2.0.1):
 
 - #119: Already running detection ✅ DONE
 - #88: Doctor command ✅ DONE
-- #117: Multi-bot on one VPS ⏳
+- #117: Multi-bot on one VPS ✅ DONE
 - #118: SSH key authentication ✅ DONE
 
 **Quality Gate (Week 10-11):**
@@ -696,14 +698,14 @@ Supporting Infrastructure (v2.0.1):
 
 ### Open Issues by Priority
 
-- 🔴 **CRITICAL:** 14 issues (10 done ✅, 4 remaining for v2.0.0)
+- 🔴 **CRITICAL:** 15 issues (10 done ✅, 5 remaining for v2.0.0)
 - 🟠 **HIGH:** 11 issues (deployment + advanced features)
 - 🟡 **MEDIUM:** 6 issues (quality improvements - v2.1.0)
 - 🟢 **LOW:** 18 issues (long-term vision - v3.0+)
 
-**Open Issues:** 39 (all properly assigned to milestones)
+**Open Issues:** 40 (all properly assigned to milestones)
 **Closed Issues:** 82
-**Total Issues:** 121
+**Total Issues:** 122
 
 **Closed as duplicates:** 3 issues (#41 → #87, #42 → #82+#90, #49 → #89)
 
@@ -727,20 +729,20 @@ Supporting Infrastructure (v2.0.1):
 ---
 
 **Status:** 🏗️ Phase 2 critical scenarios in progress
-**Progress:** 13/14 critical tasks done ✅ | 1 remaining before E2E testing
-**Current Focus:** #117 Multi-bot (final critical task)
+**Progress:** 11/15 critical tasks done ✅ | 4 remaining before E2E testing
+**Current Focus:** #127 SSH key generation (critical task remaining)
 **Next Gate:** #120 Pre-release E2E testing (Week 10-11)
 **Target Release:** v2.0.0 MVP (#121) - Week 12
 
 **Milestones:**
 
-- 🎯 v2.0.0 MVP: 7 issues (due: Dec 20, 2025)
+- 🎯 v2.0.0 MVP: 8 issues (due: Dec 20, 2025)
 - 📦 v2.0.1 Production: 8 issues (due: Jan 17, 2026)
 - 🔧 v2.1.0 Enhancements: 6 issues (due: Feb 7, 2026)
 - 💡 v3.0+ Vision: 18 issues (backlog)
 
-**Organization:** ✅ All 39 open issues assigned to milestones
+**Organization:** ✅ All 40 open issues assigned to milestones
 **Duplicates Closed:** 3 issues (#41→#87, #42→#82+#90, #49→#89)
-**Total Issues:** 121 (39 open, 82 closed)
+**Total Issues:** 122 (40 open, 82 closed)
 
 **Updated:** 2025-11-29
