@@ -2,6 +2,15 @@
 
 <!-- version list -->
 
+## v1.31.0 (2025-11-29)
+
+### Features
+
+- **deploy**: Add multi-bot deployment support
+  ([#117](https://github.com/sensiloles/telegram-bot-stack/pull/117),
+  [`9532409`](https://github.com/sensiloles/telegram-bot-stack/commit/95324096aef235aaad7b26eb043c7d1c4856962f))
+
+
 ## v1.30.0 (2025-11-29)
 
 ### Bug Fixes
