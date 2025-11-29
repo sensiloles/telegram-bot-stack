@@ -1,7 +1,7 @@
 # Project Status - telegram-bot-stack
 
 **Version:** v1.25.0 → v2.0.0 MVP
-**Updated:** 2025-11-29 (after #88 Doctor command completion)
+**Updated:** 2025-11-29 (after #118 SSH key authentication completion)
 **Status:** 🏗️ Phase 2 - Hardening Killer Feature
 
 ---
@@ -124,7 +124,7 @@ Found and fixed **12 critical deployment bugs** during E2E testing:
 | #        | Issue                   | Part of Deploy   | Status  | Time   | Depends  |
 | -------- | ----------------------- | ---------------- | ------- | ------ | -------- |
 | **#117** | Multi-bot on one VPS    | ✅ YES           | ⏳ TODO | 6-8h   | #27, #28 |
-| **#118** | SSH key authentication  | ✅ YES           | ⏳ TODO | 5-7h   | #79      |
+| **#118** | SSH key authentication  | ✅ YES           | ✅ DONE | 5-7h   | #79      |
 | **#78**  | Zero-downtime deploy    | ✅ YES           | ⏳ TODO | 6-8h   | #77      |
 | **#80**  | Deployment verification | ✅ YES           | ⏳ TODO | 4-5h   | -        |
 | **#82**  | Monitoring + alerting   | ✅ YES           | ⏳ TODO | 8-10h  | #77      |
@@ -179,7 +179,7 @@ Found and fixed **12 critical deployment bugs** during E2E testing:
 | #    | Issue                   | Category | Depends  | Notes                    |
 | ---- | ----------------------- | -------- | -------- | ------------------------ |
 | #117 | Multi-bot on one VPS    | Deploy   | #27, #28 | Multiple deployments     |
-| #118 | SSH key authentication  | Deploy   | #79      | Security best practice   |
+| #118 | SSH key authentication  | Deploy   | ✅ DONE  | Security best practice ✅ |
 | #78  | Zero-downtime deploy    | Deploy   | #77      | Blue-green strategy      |
 | #80  | Deployment verification | Deploy   | #77      | Smoke tests              |
 | #82  | Monitoring + alerting   | Deploy   | #77      | Observability            |
@@ -327,7 +327,7 @@ Killer Feature #2: VPS Deployment
 │
 ├── Important Deployment Features (parallel):
 │   ├── #117 Multi-bot VPS ← #27, #28 (production ready)
-│   └── #118 SSH key auth ← #79 (security)
+│   └── ✅ #118 SSH key auth ← #79 (DONE - security)
 │
 ├── Advanced Features (optional for v2.0.0):
 │   ├── #78 Zero-downtime ← #77
@@ -385,8 +385,8 @@ Supporting Infrastructure (v2.0.1):
    → Production-grade: deploy multiple bots safely
    → Port conflict detection, resource isolation
 
-9. #118 SSH key authentication (5-7h)
-   → Security best practice for production
+9. ✅ #118 SSH key authentication (5-7h) ← DONE
+   → Security best practice for production ✅
    → Support keys + password methods
 
 10. ✅ #88 Doctor command (6-8h) ← DONE
@@ -431,13 +431,13 @@ Supporting Infrastructure (v2.0.1):
    → Real-world deployment pattern
    → Resource isolation + conflict detection
 
-3. #118 SSH key authentication (5-7h) ← SECURITY
-   → Industry standard auth method
-   → Production best practice
+3. ✅ #118 SSH key authentication (5-7h) ← DONE (SECURITY)
+   → Industry standard auth method ✅
+   → Production best practice ✅
 
 4. ✅ #88 Doctor command (6-8h) ← DONE
    → Auto-detect all issues
-   → Validates #119, #117, #118
+   → Validates #119, #117, ✅ #118
 ```
 
 **Total: 11-15 hours (~2-3 days remaining)**
@@ -543,7 +543,7 @@ Supporting Infrastructure (v2.0.1):
 - [x] Already running detection (#119) ✅
 - [x] Doctor command (#88) ✅
 - [ ] Multi-bot support (#117) ⏳
-- [ ] SSH key auth (#118) ⏳
+- [x] SSH key auth (#118) ✅
 - [ ] E2E testing complete (#120) ⏳ GATE
 
 **Enhanced Features (NICE to have for v2.0.0, else v2.0.1):**
@@ -632,7 +632,7 @@ Supporting Infrastructure (v2.0.1):
 - #119: Already running detection ✅ DONE
 - #88: Doctor command ✅ DONE
 - #117: Multi-bot on one VPS ⏳
-- #118: SSH key authentication ⏳
+- #118: SSH key authentication ✅ DONE
 
 **Quality Gate (Week 10-11):**
 
@@ -727,8 +727,8 @@ Supporting Infrastructure (v2.0.1):
 ---
 
 **Status:** 🏗️ Phase 2 critical scenarios in progress
-**Progress:** 12/14 critical tasks done ✅ | 2 remaining before E2E testing
-**Current Focus:** #117 Multi-bot, #118 SSH keys
+**Progress:** 13/14 critical tasks done ✅ | 1 remaining before E2E testing
+**Current Focus:** #117 Multi-bot (final critical task)
 **Next Gate:** #120 Pre-release E2E testing (Week 10-11)
 **Target Release:** v2.0.0 MVP (#121) - Week 12
 
