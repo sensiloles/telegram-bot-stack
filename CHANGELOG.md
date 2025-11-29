@@ -2,6 +2,19 @@
 
 <!-- version list -->
 
+## v1.32.0 (2025-11-29)
+
+### Documentation
+
+- **status**: Add Windows cross-platform support to roadmap (#130-#135)
+  ([`4e1955b`](https://github.com/sensiloles/telegram-bot-stack/commit/4e1955b09ad2698155a80f394860011907bbc9a7))
+
+### Features
+
+- **deploy**: Implement SSH key generation and delivery to VPS
+  ([`fbadcc9`](https://github.com/sensiloles/telegram-bot-stack/commit/fbadcc9c0b62261c1008a944283e45816d558587))
+
+
 ## v1.31.0 (2025-11-29)
 
 ### Features
