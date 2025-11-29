@@ -2,6 +2,19 @@
 
 <!-- version list -->
 
+## v1.27.0 (2025-11-29)
+
+### Documentation
+
+- **roadmap**: Add 5 new issues for v2.0.0 preparation
+  ([`110cc29`](https://github.com/sensiloles/telegram-bot-stack/commit/110cc29019bcbc0288fcfb027efcc9a3387c5528))
+
+### Features
+
+- **mcp**: Add milestone management tools to GitHub MCP server
+  ([`5c6bc16`](https://github.com/sensiloles/telegram-bot-stack/commit/5c6bc1615557710b137c6460a7304090defc59cd))
+
+
 ## v1.26.1 (2025-11-29)
 
 ### Bug Fixes
