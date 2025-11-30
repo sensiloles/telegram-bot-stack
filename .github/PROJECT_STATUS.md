@@ -1,8 +1,8 @@
 # Project Status - telegram-bot-stack
 
 **Version:** v1.34.2 → v2.0.0 MVP
-**Updated:** 2025-11-30 (All 3 CRITICAL BLOCKERS FIXED ✅)
-**Status:** ✅ READY FOR v2.0.0 RELEASE - All blockers resolved
+**Updated:** 2025-11-30 (Licensing research complete ✅)
+**Status:** ✅ READY FOR v2.0.0 RELEASE - All blockers resolved, licensing decision pending
 
 ---
 
@@ -162,6 +162,7 @@ Found and fixed **12 critical deployment bugs** during E2E testing:
 | #127 | **SSH key generation**     | Deploy   | ✅ DONE           | #118    | -        |
 | #120 | **Pre-release E2E tests**  | QA       | ⏳ TODO           | All     | #121     |
 | #121 | **v2.0.0 Release**         | Release  | ⏳ TODO           | All     | -        |
+| #122 | **Licensing research**     | Docs     | ✅ DONE           | -       | #121     |
 
 **Other Critical:**
 
@@ -170,7 +171,7 @@ Found and fixed **12 critical deployment bugs** during E2E testing:
 | #40 | Full Dev Setup | ✅ DONE (v1.17.0) | Killer Feature #1 |
 | #60 | Agent Optimize | 🏗️ In Progress    | Ongoing           |
 
-**Total Critical: 3 TODO + 12 DONE = 15 issues**
+**Total Critical: 2 TODO + 13 DONE = 15 issues**
 
 ---
 
@@ -194,6 +195,12 @@ Found and fixed **12 critical deployment bugs** during E2E testing:
 | #131 | Windows SSH key generation | Platform | ✅ DONE | Fix SSH on Windows (DONE ✅)  |
 | #132 | Makefile alternatives      | DX       | ✅ DONE | Windows task runner (DONE ✅) |
 | #133 | Windows documentation      | Docs     | ✅ DONE | Windows setup guide (DONE ✅) |
+
+**Strategic Planning (v2.0.0 MVP):**
+
+| #    | Issue              | Category | Status  | Notes                                    |
+| ---- | ------------------ | -------- | ------- | ---------------------------------------- |
+| #122 | Licensing research | Legal    | ✅ DONE | BSL 1.1 recommended, decision pending ✅ |
 
 **Infrastructure:**
 
@@ -314,13 +321,13 @@ Full cross-platform support + Advanced features
 
 | Milestone                                 | Due Date   | Issues | Progress  | Status     |
 | ----------------------------------------- | ---------- | ------ | --------- | ---------- |
-| **v2.0.0 MVP**                            | 2025-12-20 | 10     | 0/10 (0%) | 🏗️ Active  |
+| **v2.0.0 MVP**                            | 2025-12-20 | 11     | 1/11 (9%) | 🏗️ Active  |
 | **v2.0.1 Production-Hardened**            | 2026-01-17 | 11     | 0/11 (0%) | ⏳ Planned |
 | **v2.1.0 - Medium Priority Enhancements** | 2026-02-07 | 6      | 0/6 (0%)  | ⏳ Planned |
 | **v3.0+ - Long-term Vision**              | TBD        | 18     | 0/18      | 💡 Backlog |
 
 **Total Open Issues:** 45 (all assigned to milestones ✅)
-**New this update:** +6 issues for Windows cross-platform support
+**Latest:** Licensing research complete (#122) - BSL 1.1 recommended ✅
 
 ### Dependency Graph
 
@@ -619,8 +626,10 @@ Supporting Infrastructure (v2.0.1):
 - [x] Doctor command (#88) ✅
 - [x] Multi-bot support (#117) ✅
 - [x] SSH key auth (#118) ✅
-- [ ] **Windows support (#131, #132, #133)** ⏳ IN PROGRESS
+- [x] **Windows support (#131, #132, #133)** ✅ DONE
+- [x] **Licensing research (#122)** ✅ DONE
 - [ ] E2E testing complete (#120) ⏳ GATE
+- [ ] **Licensing decision & implementation (#122)** ⏳ PENDING
 
 **Cross-Platform Support (NEW for v2.0.0):**
 
@@ -846,7 +855,7 @@ Supporting Infrastructure (v2.0.1):
 
 **Milestones:**
 
-- 🎯 v2.0.0 MVP: 10 issues (due: Dec 20, 2025) - **+3 Windows support**
+- 🎯 v2.0.0 MVP: 11 issues (due: Dec 20, 2025) - **+3 Windows support, +1 Licensing**
 - 📦 v2.0.1 Production: 11 issues (due: Jan 17, 2026) - **+3 Windows CI/testing**
 - 🔧 v2.1.0 Enhancements: 6 issues (due: Feb 7, 2026)
 - 💡 v3.0+ Vision: 18 issues (backlog)
@@ -855,9 +864,22 @@ Supporting Infrastructure (v2.0.1):
 **Duplicates Closed:** 3 issues (#41→#87, #42→#82+#90, #49→#89)
 **Total Issues:** 128 (45 open, 83 closed)
 
-**Latest Update:** 2025-11-30 - Manual testing completed, 3 CRITICAL BLOCKERS found
+**Latest Update:** 2025-11-30 - Licensing research complete (#122)
 
-**Manual Testing Results (#120) + Bug Fixes:**
+**Licensing Research (#122):**
+
+- ✅ **Research complete** - 6 license options analyzed (11,000+ words)
+- ✅ **Recommendation:** Business Source License 1.1
+  - Change Date: 2029-01-01 (4 years)
+  - Change License: Apache 2.0
+  - Allows: Personal, educational, small business use
+  - Protects: Commercial exploitation during growth phase
+- ✅ **Documentation:** LICENSING_RESEARCH.md created
+- ✅ **Issue updated:** Detailed comment with findings
+- ⏳ **Decision pending:** BSL 1.1 vs Apache 2.0
+- ⏳ **Implementation:** 2-3 weeks after decision
+
+**Previous Testing Results (#120) + Bug Fixes:**
 
 - ✅ Project creation works (init, dev commands)
 - ✅ SSH key authentication works
@@ -866,6 +888,6 @@ Supporting Infrastructure (v2.0.1):
 - ✅ **#157 FIXED** - deploy up succeeds on real VPS
 - ⚠️ **#154** - validate doesn't load .env (medium priority, not blocking)
 
-**Verdict:** ✅ ALL BLOCKERS RESOLVED - Ready for v2.0.0 release!
+**Verdict:** ✅ ALL BLOCKERS RESOLVED - Licensing decision is final step before v2.0.0!
 
-**Testing:** Verified on real VPS - full deployment works end-to-end ✅
+**Status:** Ready for v2.0.0 release after licensing decision + implementation ✅

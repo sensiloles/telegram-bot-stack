@@ -373,11 +373,15 @@ def main():
     # Determine storage backend
     storage_backend = os.getenv("STORAGE_BACKEND", "sqlite")
     database_url = os.getenv("DATABASE_URL", "sqlite:///poll_bot.db")
-    if not os.path.isabs(database_url) and "://" not in database_url:
-        # Relative path - make it relative to bot directory
-        db_path = os.path.join(
-            os.path.dirname(__file__), database_url.replace("sqlite:///", "")
-        )
+
+    # Handle SQLite database paths - ensure they're created in data/ directory
+    if database_url.startswith("sqlite:///"):
+        db_path = database_url.replace("sqlite:///", "")
+        # If path is relative, make it relative to bot's data directory
+        if not os.path.isabs(db_path):
+            data_dir = os.path.join(os.path.dirname(__file__), "data")
+            os.makedirs(data_dir, exist_ok=True)
+            db_path = os.path.join(data_dir, db_path)
         database_url = f"sqlite:///{db_path}"
 
     logger.info(f"Using storage backend: {storage_backend}")

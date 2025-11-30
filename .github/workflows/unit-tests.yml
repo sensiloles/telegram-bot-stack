@@ -4,6 +4,15 @@ name: Unit Tests
 # Run locally: pytest --ignore=tests/integration --ignore=tests/e2e
 
 on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+      - ".github/PROJECT_STATUS.md"
+      - "LICENSE"
+      - ".gitignore"
+      - ".cursorrules"
   pull_request:
     branches: [main, develop]
     paths-ignore:

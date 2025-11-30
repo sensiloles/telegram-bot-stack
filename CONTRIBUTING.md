@@ -441,6 +441,53 @@ python3 .github/workflows/scripts/check_setup.py
 - Focus on the code, not the person
 - Help others learn and grow
 
+## Licensing
+
+### License Overview
+
+telegram-bot-stack is licensed under the **Business Source License 1.1 (BSL 1.1)**.
+
+**Key points for contributors:**
+
+1. **Your contributions will be licensed under BSL 1.1**
+
+   - All code you contribute will be subject to the same license
+   - No Contributor License Agreement (CLA) required
+   - You retain copyright to your contributions
+
+2. **License conversion:**
+
+   - On **January 1, 2029**, the code will automatically convert to **Apache License 2.0**
+   - This means your contributions will eventually become fully open-source
+   - The conversion is automatic and applies to all code in the repository
+
+3. **What you can do:**
+
+   - Use telegram-bot-stack for personal, educational, and small business projects (up to 10 bots)
+   - Contribute code, documentation, examples
+   - Fork and modify for your own use (within license terms)
+   - Use in open-source projects
+
+4. **What's restricted:**
+   - Providing telegram-bot-stack as a hosted/managed service to third parties (without commercial license)
+   - Competing directly with telegram-bot-stack commercial offerings
+   - Commercial use beyond the limits specified in the license
+
+**Full license text:** See [LICENSE](../LICENSE) file in the repository root.
+
+**Questions about licensing?** Open an issue or contact the maintainers.
+
+### Why BSL 1.1?
+
+BSL 1.1 allows us to:
+
+- Build a strong community through open contributions
+- Protect the project during its growth phase (4 years)
+- Ensure eventual full open-source status (converts to Apache 2.0)
+- Enable sustainable development and future monetization
+
+This license is used by respected projects like MariaDB, CockroachDB, and Sentry.
+
 ## Recognition
 
 Contributors are recognized in:

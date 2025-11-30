@@ -2,6 +2,19 @@
 
 <!-- version list -->
 
+## [Unreleased]
+
+### Changed
+
+- **BREAKING**: License changed from MIT to Business Source License 1.1 (BSL 1.1)
+  - Effective date: December 2025 (v2.0.0 release)
+  - Conversion to Apache License 2.0: January 1, 2029
+  - See [LICENSE](LICENSE) file for full details
+  - Personal, educational, and small business use (up to 10 bots) remain free
+  - Commercial use beyond specified limits requires a license
+  - Rationale: Protect framework development during growth phase while ensuring eventual full open-source status
+  - All contributions will be licensed under BSL 1.1 and automatically convert to Apache 2.0 in 2029
+
 ## v1.34.3 (2025-11-30)
 
 ### Bug Fixes
@@ -26,7 +39,6 @@
 
 - Update PROJECT_STATUS.md - all blockers fixed, ready for v2.0.0
   ([`5c455d8`](https://github.com/sensiloles/telegram-bot-stack/commit/5c455d896ecaca2eeb9c93060874cf9775b67664))
-
 
 ## v1.34.2 (2025-11-30)
 

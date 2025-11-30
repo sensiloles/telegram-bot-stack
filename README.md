@@ -4,7 +4,7 @@
 [![Python](https://img.shields.io/pypi/pyversions/telegram-bot-stack)](https://pypi.org/project/telegram-bot-stack/)
 [![License](https://img.shields.io/github/license/sensiloles/telegram-bot-stack)](https://github.com/sensiloles/telegram-bot-stack/blob/main/LICENSE)
 [![Tests](https://img.shields.io/github/actions/workflow/status/sensiloles/telegram-bot-stack/unit-tests.yml?branch=main&label=tests)](https://github.com/sensiloles/telegram-bot-stack/actions/workflows/unit-tests.yml)
-[![Coverage](https://img.shields.io/badge/coverage-84%25-brightgreen)](https://github.com/sensiloles/telegram-bot-stack)
+[![Coverage](https://codecov.io/gh/sensiloles/telegram-bot-stack/branch/main/graph/badge.svg)](https://codecov.io/gh/sensiloles/telegram-bot-stack)
 [![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
 
 A reusable Python framework for building production-ready Telegram bots with minimal code. Build bots 70% faster with built-in user management, admin system, storage abstraction, and comprehensive testing infrastructure.
@@ -394,7 +394,25 @@ See [CHANGELOG.md](CHANGELOG.md) for version history and release notes.
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) file for details.
+**Business Source License 1.1 (BSL 1.1)**
+
+telegram-bot-stack is licensed under the Business Source License 1.1. This license:
+
+- ✅ **Allows free use** for personal, educational, and small business projects (up to 10 bots)
+- ✅ **Allows contributions** - all code you contribute will be licensed under BSL 1.1
+- ✅ **Converts to Apache 2.0** on January 1, 2029 (automatic conversion to full open-source)
+- ⚠️ **Restricts** commercial use beyond the specified limits (see LICENSE file for details)
+
+**Key points:**
+
+- Personal and educational use is always free
+- Small businesses can use up to 10 bots without restrictions
+- Open-source projects can use telegram-bot-stack freely
+- Commercial use beyond limits requires a license (contact maintainers)
+
+**Full license text:** See [LICENSE](LICENSE) file for complete terms.
+
+**Why BSL 1.1?** This license protects the project during its growth phase while ensuring it becomes fully open-source in 2029. Used by respected projects like MariaDB, CockroachDB, and Sentry.
 
 ## Links
 
