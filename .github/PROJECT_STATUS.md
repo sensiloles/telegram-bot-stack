@@ -1,8 +1,8 @@
 # Project Status - telegram-bot-stack
 
 **Version:** v1.34.2 → v2.0.0 MVP
-**Updated:** 2025-11-30 (E2E Testing Phase 1 Complete ✅)
-**Status:** ✅ READY FOR v2.0.0 RELEASE - CLI tested, all blockers resolved
+**Updated:** 2025-11-30 (E2E Testing Phase 2 Complete - 2 BLOCKERS FOUND ❌)
+**Status:** ⚠️ NOT READY - 2 critical deployment bugs block release (#163, #164)
 
 ---
 
@@ -114,7 +114,9 @@ Found and fixed **12 critical deployment bugs** during E2E testing:
 | **#88**  | Doctor command                | 🔧 CLI tool    | ✅ DONE    | 6-8h   | -      |
 | **#119** | Already running detection     | ✅ YES         | ✅ DONE    | 8-10h  | -      |
 | **#127** | SSH key generation & delivery | ✅ YES         | ✅ DONE    | 3-4h   | #118   |
-| **#120** | Pre-release E2E testing       | ✅ QA          | 🏗️ PHASE 1 | 16-24h | #121   |
+| **#120** | Pre-release E2E testing       | ✅ QA          | ✅ DONE    | 16-24h | #121   |
+| **#163** | deploy up deletes secrets     | ✅ YES         | ⏳ TODO    | 3-4h   | #121   |
+| **#164** | deploy update KeyError        | ✅ YES         | ⏳ TODO    | 2-3h   | #121   |
 | **#121** | v2.0.0 Release                | 🎯 Milestone   | ⏳ TODO    | 24-32h | All    |
 | **NEW**  | **Deployment bug fixes**      | ✅ YES         | ✅ DONE    | 12h    | -      |
 
@@ -160,7 +162,9 @@ Found and fixed **12 critical deployment bugs** during E2E testing:
 | #88  | **Doctor command**         | CLI      | ✅ DONE           | -       | -        |
 | #119 | **Already running detect** | Deploy   | ✅ DONE           | #27     | -        |
 | #127 | **SSH key generation**     | Deploy   | ✅ DONE           | #118    | -        |
-| #120 | **Pre-release E2E tests**  | QA       | 🏗️ PHASE 1 DONE   | All     | #121     |
+| #120 | **Pre-release E2E tests**  | QA       | ✅ DONE           | All     | #121     |
+| #163 | **Deploy secrets deletion** | Deploy   | ⏳ TODO           | #27     | #121     |
+| #164 | **Deploy update KeyError**  | Deploy   | ⏳ TODO           | #27     | #121     |
 | #121 | **v2.0.0 Release**         | Release  | ⏳ TODO           | All     | -        |
 | #122 | **Licensing research**     | Docs     | ✅ DONE           | -       | #121     |
 
@@ -845,14 +849,14 @@ Supporting Infrastructure (v2.0.1):
 
 ---
 
-**Status:** ✅ ALL BLOCKERS FIXED - Ready for v2.0.0 release
-**Progress:** E2E Testing Phase 1 Complete (#120) + All 3 blockers fixed (#155, #156, #157)
-**Latest:** CLI commands tested, deployment tested, all critical issues resolved
-**Fixes:** #155 (.gitignore ✅), #156 (password auth ✅), #157 (deploy ✅)
-**Testing:** Phase 1 (CLI Dev) ✅ DONE | Phase 2 (Deployment) 🏗️ 15% DONE
-**Current Focus:** Prepare v2.0.0 release (#121)
-**Next Step:** Release v2.0.0 → Continue deployment testing in v2.0.1
-**Target Release:** v2.0.0 MVP (#121) - READY NOW 🚀
+**Status:** ⚠️ DEPLOYMENT BUGS FOUND - 2 new blockers discovered during E2E testing
+**Progress:** E2E Testing Phase 2 Complete (#120) + 2 CRITICAL deployment bugs found
+**Latest:** Full deployment tested on real VPS, secrets deletion bug discovered
+**Bugs:** #163 (secrets deleted ❌), #164 (update fails ❌) - BLOCK v2.0.0
+**Testing:** Phase 1 (CLI Dev) ✅ 90% | Phase 2 (Deployment) ✅ 88% DONE
+**Current Focus:** FIX deployment bugs (#163, #164) before v2.0.0
+**Next Step:** Fix #163 (CRITICAL) → Fix #164 (HIGH) → Release v2.0.0
+**Target Release:** v2.0.0 MVP - BLOCKED by #163, #164 ⚠️
 
 **Milestones:**
 
@@ -880,33 +884,40 @@ Supporting Infrastructure (v2.0.1):
 - ⏳ **Decision pending:** BSL 1.1 vs Apache 2.0
 - ⏳ **Implementation:** 2-3 weeks after decision
 
-**E2E Testing Results (#120) - Phase 1 Complete:**
+**E2E Testing Results (#120) - Phase 1 & 2 Complete:**
 
 **✅ CLI Development Commands (90% tested):**
-
 - ✅ `init` - Perfect, creates complete project structure
 - ✅ `new` - Works (all templates) but #143 (missing files)
 - ⚠️ `validate` - Works but #154 (doesn't load .env)
 - ⚠️ `doctor` - Works but #154 (doesn't load .env)
 - ⏳ `dev` / `dev --reload` - Not yet tested
 
-**✅ CLI Deployment Commands (15% tested):**
+**✅ CLI Deployment Commands (88% tested on real VPS):**
+- ✅ `deploy init` - Works (password & SSH key)
+- ✅ `deploy secrets set/get/list` - Works perfectly
+- ⚠️ `deploy up` - Builds & deploys BUT deletes secrets (#163 BLOCKER)
+- ⚠️ `deploy update` - Builds BUT fails to restart (#164 HIGH)
+- ✅ `deploy status` - Works perfectly
+- ✅ `deploy logs` - Works perfectly
+- ✅ `deploy backup create/list` - Works perfectly
+- ✅ `deploy down` - Works perfectly
+- ⏳ `deploy rollback` - Not fully tested
 
-- ✅ `deploy init` - Works perfectly (password & SSH key)
-- ⏳ All other deploy commands - Need manual testing with real VPS
+**❌ NEW CRITICAL BLOCKERS FOUND:**
+- ❌ **#163 NEW** - deploy up deletes secrets (P0 BLOCKER) ⚠️
+- ❌ **#164 NEW** - deploy update KeyError (P1 HIGH) ⚠️
 
-**✅ All Critical Blockers Fixed:**
-
-- ✅ **#155 FIXED** - .gitignore created automatically (SECURITY) ✅
-- ✅ **#156 FIXED** - Password auth works (getpass prompt) ✅
-- ✅ **#157 FIXED** - deploy up succeeds on real VPS ✅
+**✅ Previous Blockers Fixed:**
+- ✅ **#155 FIXED** - .gitignore created automatically ✅
+- ✅ **#156 FIXED** - Password auth works ✅
+- ✅ **#157 FIXED** - deploy up succeeds ✅
 
 **⚠️ Non-Blocking Issues (v2.0.1):**
-
-- ⚠️ **#154** - validate doesn't load .env (medium priority)
+- ⚠️ **#154** - validate doesn't load .env (medium)
 - ⚠️ **#143** - new command missing files (workaround: use init)
 - ⚠️ **#142** - incorrect version display (cosmetic)
 
-**Verdict:** ✅ ALL BLOCKERS RESOLVED - READY FOR v2.0.0 RELEASE! 🚀
+**Verdict:** ❌ NOT READY - 2 deployment bugs block v2.0.0 release (#163, #164) ⚠️
 
 **Status:** Ready for v2.0.0 release after licensing decision + implementation ✅
