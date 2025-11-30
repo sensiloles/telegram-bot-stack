@@ -16,6 +16,9 @@ def test_new_basic_template(tmp_path, monkeypatch):
     assert (tmp_path / "test-bot").exists()
     assert (tmp_path / "test-bot" / "bot.py").exists()
     assert (tmp_path / "test-bot" / "README.md").exists()
+    assert (
+        tmp_path / "test-bot" / ".gitignore"
+    ).exists(), ".gitignore should be created"
 
 
 def test_new_counter_template(tmp_path, monkeypatch):
@@ -29,6 +32,9 @@ def test_new_counter_template(tmp_path, monkeypatch):
     assert (tmp_path / "counter-bot").exists()
     assert (tmp_path / "counter-bot" / "bot.py").exists()
     assert (tmp_path / "counter-bot" / "README.md").exists()
+    assert (
+        tmp_path / "counter-bot" / ".gitignore"
+    ).exists(), ".gitignore should be created"
 
     # Check counter-specific content
     bot_content = (tmp_path / "counter-bot" / "bot.py").read_text()
@@ -46,6 +52,9 @@ def test_new_menu_template(tmp_path, monkeypatch):
     assert result.exit_code == 0
     assert (tmp_path / "menu-bot").exists()
     assert (tmp_path / "menu-bot" / "bot.py").exists()
+    assert (
+        tmp_path / "menu-bot" / ".gitignore"
+    ).exists(), ".gitignore should be created"
 
     # Check menu-specific content
     bot_content = (tmp_path / "menu-bot" / "bot.py").read_text()
@@ -63,6 +72,9 @@ def test_new_advanced_template(tmp_path, monkeypatch):
     assert result.exit_code == 0
     assert (tmp_path / "advanced-bot").exists()
     assert (tmp_path / "advanced-bot" / "bot.py").exists()
+    assert (
+        tmp_path / "advanced-bot" / ".gitignore"
+    ).exists(), ".gitignore should be created"
 
     # Check advanced-specific content
     bot_content = (tmp_path / "advanced-bot" / "bot.py").read_text()

@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
     image: {{ bot_name }}:latest
     container_name: {{ bot_name }}
-    restart: always
+    restart: on-failure:5
 
     # Production resource limits for stability
     deploy:

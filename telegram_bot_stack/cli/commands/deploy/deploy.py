@@ -34,6 +34,7 @@ def deploy() -> None:
 @click.option("--host", help="VPS hostname or IP address")
 @click.option("--user", default="root", help="SSH user (default: root)")
 @click.option("--ssh-key", help="Path to SSH private key")
+@click.option("--password", help="SSH password (for password authentication)")
 @click.option("--port", default=22, help="SSH port (default: 22)")
 @click.option("--bot-name", help="Bot name (for container/image names)")
 @click.option("--bot-token-env", default="BOT_TOKEN", help="Bot token env var name")
@@ -47,6 +48,7 @@ def init(
     host: str,
     user: str,
     ssh_key: str,
+    password: str,
     port: int,
     bot_name: str,
     bot_token_env: str,
@@ -141,6 +143,14 @@ def init(
     if not ssh_key and auth_method == "key":
         ssh_key = Prompt.ask("SSH Key Path")
 
+    # Handle password authentication
+    if auth_method == "password" and not password:
+        # Import getpass for secure password input
+        import getpass
+
+        console.print("\n[yellow]Password authentication selected[/yellow]")
+        password = getpass.getpass("VPS Password: ")
+
     if not bot_name:
         # Try to detect bot name from current directory
         default_name = Path.cwd().name
@@ -152,6 +162,7 @@ def init(
         host=host,
         user=user,
         ssh_key=ssh_key if ssh_key else None,
+        password=password if password else None,
         port=port,
         auth_method=auth_method,
     )
