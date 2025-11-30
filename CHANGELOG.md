@@ -15,6 +15,30 @@
   - Rationale: Protect framework development during growth phase while ensuring eventual full open-source status
   - All contributions will be licensed under BSL 1.1 and automatically convert to Apache 2.0 in 2029
 
+## v1.34.3 (2025-11-30)
+
+### Bug Fixes
+
+- **cli**: Add .gitignore creation in init command
+  ([#155](https://github.com/sensiloles/telegram-bot-stack/pull/155),
+  [`69420d8`](https://github.com/sensiloles/telegram-bot-stack/commit/69420d815c4be3f276e85edfb0ecbc109058f69d))
+
+- **deploy**: Add password prompt for password authentication
+  ([#156](https://github.com/sensiloles/telegram-bot-stack/pull/156),
+  [`b793032`](https://github.com/sensiloles/telegram-bot-stack/commit/b79303241867cfb8f1e7c802fa1a84adcad775cd))
+
+- **deploy**: Create .secrets.env file during deployment
+  ([#157](https://github.com/sensiloles/telegram-bot-stack/pull/157),
+  [`128701b`](https://github.com/sensiloles/telegram-bot-stack/commit/128701b20fae7dfd5a18bca44fb29dcbd50a3c1f))
+
+- **docs**: Correct secrets command name in documentation
+  ([#148](https://github.com/sensiloles/telegram-bot-stack/pull/148),
+  [`b969295`](https://github.com/sensiloles/telegram-bot-stack/commit/b969295c11960e78302175a0f886d95adab19b61))
+
+### Documentation
+
+- Update PROJECT_STATUS.md - all blockers fixed, ready for v2.0.0
+  ([`5c455d8`](https://github.com/sensiloles/telegram-bot-stack/commit/5c455d896ecaca2eeb9c93060874cf9775b67664))
 ## v1.34.2 (2025-11-30)
 
 ### Bug Fixes

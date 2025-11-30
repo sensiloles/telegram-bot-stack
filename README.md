@@ -4,7 +4,7 @@
 [![Python](https://img.shields.io/pypi/pyversions/telegram-bot-stack)](https://pypi.org/project/telegram-bot-stack/)
 [![License](https://img.shields.io/github/license/sensiloles/telegram-bot-stack)](https://github.com/sensiloles/telegram-bot-stack/blob/main/LICENSE)
 [![Tests](https://img.shields.io/github/actions/workflow/status/sensiloles/telegram-bot-stack/unit-tests.yml?branch=main&label=tests)](https://github.com/sensiloles/telegram-bot-stack/actions/workflows/unit-tests.yml)
-[![Coverage](https://img.shields.io/badge/coverage-84%25-brightgreen)](https://github.com/sensiloles/telegram-bot-stack)
+[![Coverage](https://codecov.io/gh/sensiloles/telegram-bot-stack/branch/main/graph/badge.svg)](https://codecov.io/gh/sensiloles/telegram-bot-stack)
 [![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
 
 A reusable Python framework for building production-ready Telegram bots with minimal code. Build bots 70% faster with built-in user management, admin system, storage abstraction, and comprehensive testing infrastructure.
@@ -404,6 +404,7 @@ telegram-bot-stack is licensed under the Business Source License 1.1. This licen
 - ⚠️ **Restricts** commercial use beyond the specified limits (see LICENSE file for details)
 
 **Key points:**
+
 - Personal and educational use is always free
 - Small businesses can use up to 10 bots without restrictions
 - Open-source projects can use telegram-bot-stack freely
