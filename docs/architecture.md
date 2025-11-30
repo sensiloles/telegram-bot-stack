@@ -491,7 +491,6 @@ bot = MyBot(storage)
 
 ## 📚 References
 
-- **Master Plan:** `archive/PACKAGE_CONVERSION_PLAN_RU.md` (archived)
 - **Project Status:** `.github/PROJECT_STATUS.md`
 - **Testing Guide:** `README.md` (Testing section)
 - **API Documentation:** [API Reference](api_reference.md)

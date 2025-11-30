@@ -44,7 +44,7 @@ Create a `.env` file:
 BOT_TOKEN=your_bot_token_here
 ADMIN_ID=your_telegram_user_id
 STORAGE_BACKEND=sqlite
-DATABASE_URL=sqlite:///poll_bot.db
+DATABASE_URL=sqlite:///poll_bot.db  # Will be created in data/ directory
 ```
 
 ### Using PostgreSQL (Production)
@@ -226,7 +226,7 @@ The beauty of telegram-bot-stack is that you can switch backends without changin
 # Development with JSON
 storage = create_storage("json", base_dir="data")
 
-# Production with SQLite
+# Production with SQLite (database will be created in data/ directory)
 storage = create_storage("sqlite", database_url="sqlite:///poll_bot.db")
 
 # Production with PostgreSQL
@@ -241,7 +241,7 @@ bot = PollBot(token=token, storage=storage, admin_ids=admin_ids)
 If you started with JSON and want to migrate to SQL:
 
 ```bash
-# Migrate data from JSON to SQLite
+# Migrate data from JSON to SQLite (database will be created in data/ directory)
 python scripts/migrate_json_to_sql.py \
     --json-dir data \
     --database-url sqlite:///poll_bot.db
