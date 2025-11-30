@@ -56,11 +56,6 @@ Create `.cursor/mcp.json`:
       "command": "python3",
       "args": ["/absolute/path/to/scripts/mcp_github_server.py"],
       "description": "GitHub workflow management (issues, PRs, CI)"
-    },
-    "project-graph": {
-      "command": "python3",
-      "args": ["/absolute/path/to/scripts/mcp_project_graph.py"],
-      "description": "Project graph navigation"
     }
   }
 }
@@ -79,13 +74,6 @@ Create `.cursor/mcp.json`:
         "/Users/sensiloles/Documents/work/telegram-bot-stack/scripts/mcp_github_server.py"
       ],
       "description": "GitHub workflow management (issues, PRs, CI)"
-    },
-    "project-graph": {
-      "command": "python3",
-      "args": [
-        "/Users/sensiloles/Documents/work/telegram-bot-stack/scripts/mcp_project_graph.py"
-      ],
-      "description": "Project graph navigation"
     }
   }
 }
@@ -102,11 +90,6 @@ Add to `.vscode/settings.json`:
       "command": "python3",
       "args": ["${workspaceFolder}/scripts/mcp_github_server.py"],
       "description": "GitHub workflow management (issues, PRs, CI)"
-    },
-    "project-graph": {
-      "command": "python3",
-      "args": ["${workspaceFolder}/scripts/mcp_project_graph.py"],
-      "description": "Project graph navigation"
     }
   }
 }

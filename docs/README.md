@@ -119,4 +119,4 @@ When updating documentation:
 
 ---
 
-**Last Updated:** Based on documentation graph structure
+**Last Updated:** November 2025

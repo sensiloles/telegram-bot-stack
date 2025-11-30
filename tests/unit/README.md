@@ -304,8 +304,8 @@ def test_add_user_with_various_ids(user_id, expected):
 ## Coverage Goals
 
 - **Target**: ≥80% line coverage for `telegram_bot_stack/`
-- **Current**: ~70%
-- **Required**: ≥50% (CI requirement)
+- **Current**: ~80%
+- **Required**: ≥75% (CI requirement)
 
 ### Check Coverage
 

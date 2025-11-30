@@ -580,7 +580,11 @@ class TestDeployHistory:
             result = runner.invoke(deploy, ["history", "--limit", "3"])
 
             assert result.exit_code == 0
-            assert "Showing 3 of 5 versions" in result.output
+            # Check for the message with ANSI escape codes stripped
+            import re
+
+            output_plain = re.sub(r"\x1b\[[0-9;]*m", "", result.output)
+            assert "Showing 3 of 5 versions" in output_plain
 
 
 class TestDeployHealth:

@@ -206,9 +206,9 @@ Tests run automatically in GitHub Actions on every pull request:
 
 ### Current Status
 
-- **Total**: ~70%
+- **Total**: ~80%
 - **Target**: ≥80%
-- **Required**: ≥50% (CI)
+- **Required**: ≥75% (CI)
 
 ### Generate Reports
 
@@ -307,7 +307,7 @@ python_functions = ["test_*"]
 addopts = [
     "-ra",
     "--strict-markers",
-    "--cov-fail-under=50",
+    "--cov-fail-under=75",
 ]
 markers = [
     "slow: marks tests as slow",

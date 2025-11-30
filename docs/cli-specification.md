@@ -327,9 +327,9 @@ project/
 
 **Dependencies:**
 
-- ✅ Core: `python-telegram-bot`, `APScheduler`, `python-dotenv`
-- ✅ Dev: `ruff`, `mypy`, `pytest`, `pre-commit`, `commitizen`
-- ⚠️ VPS: `paramiko` for SSH connections
+- ✅ Core: `python-telegram-bot`, `python-dotenv`, `click`, `jinja2`, `rich`
+- ✅ Dev: `ruff`, `mypy`, `pytest`, `pre-commit`, `tox`
+- ⚠️ VPS: `paramiko`, `fabric` for SSH/deployment
 
 **Quick Start:**
 
@@ -431,7 +431,7 @@ jobs:
 - ✅ Launch in polling mode.
 - ✅ `/start` command with greeting and user registration.
 - ✅ Event logging; error handling with log notifications.
-- ✅ Daily notification scheduling (via `APScheduler`).
+- ✅ Daily notification scheduling (via `python-telegram-bot[job-queue]`).
 - ✅ Administrator system and user management.
 - ✅ Progress tracking and prize fund calculation.
 

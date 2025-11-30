@@ -1,5 +1,5 @@
 .PHONY: help test test-fast test-unit test-integration test-deploy test-e2e test-all \
-        coverage coverage-html coverage-unit build-mock-vps lint format clean install dev
+        coverage coverage-html coverage-unit build-mock-vps lint format clean install dev venv
 
 help:
 	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -24,29 +24,32 @@ help:
 	@echo "  make build-mock-vps    - Build Mock VPS Docker image (required for E2E tests)"
 	@echo ""
 	@echo "🔧 Development Commands:"
+	@echo "  make venv              - Create virtual environment (Python 3.9+)"
 	@echo "  make lint              - Run linters (ruff, mypy)"
 	@echo "  make format            - Auto-format code with ruff"
-	@echo "  make clean             - Clean build artifacts and cache"
-	@echo "  make install           - Install package in dev mode"
+	@echo "  make clean             - Clean build artifacts, cache, venv, and .env"
+	@echo "  make install           - Install package in dev mode (creates venv if missing)"
 	@echo "  make dev               - Setup complete development environment"
 	@echo ""
 	@echo "💡 Quick Start:"
-	@echo "  make dev               # First time setup"
+	@echo "  make dev               # First time setup (auto-creates venv)"
 	@echo "  make test-fast         # Quick validation during development"
 	@echo "  make test              # Full validation before commit"
+	@echo ""
+	@echo "⚠️  After 'make clean', run 'make dev' to recreate environment"
 	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
 # Run all tests (unit + integration, skip E2E by default)
 test:
 	@echo "🧪 Running all tests (unit + integration)..."
 	@echo "   E2E tests skipped (use 'make test-e2e' to run)"
-	pytest --no-cov -q
+	./venv/bin/pytest --no-cov -q
 
 # Fast tests for development (unit + basic integration, no E2E)
 test-fast:
 	@echo "⚡ Running fast tests (unit + basic integration)..."
 	@echo "   Excluding: E2E deployment tests (use 'make test-e2e' for those)"
-	pytest tests/unit/ tests/integration/bot/ \
+	./venv/bin/pytest tests/unit/ tests/integration/bot/ \
 		tests/integration/deployment/test_config.py \
 		tests/integration/deployment/test_docker.py \
 		tests/integration/deployment/test_cli.py \
@@ -56,12 +59,12 @@ test-fast:
 # Unit tests only (fastest)
 test-unit:
 	@echo "🔬 Running unit tests..."
-	pytest tests/unit/ -v --no-cov
+	./venv/bin/pytest tests/unit/ -v --no-cov
 
 # Basic integration tests (no Mock VPS needed)
 test-integration:
 	@echo "🔗 Running basic integration tests..."
-	pytest tests/integration/bot/ \
+	./venv/bin/pytest tests/integration/bot/ \
 		tests/integration/deployment/test_config.py \
 		tests/integration/deployment/test_docker.py \
 		tests/integration/deployment/test_cli.py \
@@ -71,33 +74,33 @@ test-integration:
 test-deploy:
 	@echo "🚀 Running deployment E2E tests..."
 	@echo "⚠️  Requires Mock VPS image (run 'make build-mock-vps' first)"
-	pytest tests/e2e/deployment/ -v --no-cov --run-e2e
+	./venv/bin/pytest tests/e2e/deployment/ -v --no-cov --run-e2e
 
 # Full E2E tests (slow, requires Mock VPS + Docker-in-Docker)
 test-e2e:
 	@echo "🎯 Running full E2E tests (this may take 5-30 minutes)..."
 	@echo "⚠️  Requires Mock VPS image with Docker-in-Docker support"
-	pytest tests/e2e/ -v --no-cov --run-e2e
+	./venv/bin/pytest tests/e2e/ -v --no-cov --run-e2e
 
 test-all-versions:
-	tox -p
+	./venv/bin/tox -p
 
 test-py39:
-	tox -e py39
+	./venv/bin/tox -e py39
 
 test-py310:
-	tox -e py310
+	./venv/bin/tox -e py310
 
 test-py311:
-	tox -e py311
+	./venv/bin/tox -e py311
 
 test-py312:
-	tox -e py312
+	./venv/bin/tox -e py312
 
 # Coverage reports
 coverage:
 	@echo "📊 Running tests with coverage..."
-	pytest --cov=telegram_bot_stack --cov-report=html --cov-report=term-missing:skip-covered
+	./venv/bin/pytest --cov=telegram_bot_stack --cov-report=html --cov-report=term-missing:skip-covered
 	@echo ""
 	@echo "✅ Coverage report generated!"
 	@echo "   HTML: htmlcov/index.html"
@@ -105,12 +108,12 @@ coverage:
 
 coverage-html:
 	@echo "📊 Generating HTML coverage report..."
-	pytest --cov=telegram_bot_stack --cov-report=html --no-cov-on-fail -q
+	./venv/bin/pytest --cov=telegram_bot_stack --cov-report=html --no-cov-on-fail -q
 	@echo "✅ Coverage report: htmlcov/index.html"
 
 coverage-unit:
 	@echo "📊 Running unit tests with coverage (fast)..."
-	pytest tests/unit/ --cov=telegram_bot_stack --cov-report=term-missing:skip-covered
+	./venv/bin/pytest tests/unit/ --cov=telegram_bot_stack --cov-report=term-missing:skip-covered
 
 # Build Mock VPS Docker image for E2E tests
 build-mock-vps:
@@ -123,16 +126,16 @@ build-mock-vps:
 # Linting and formatting
 lint:
 	@echo "🔍 Running linters..."
-	ruff check .
+	./venv/bin/ruff check .
 	@echo ""
 	@echo "🔍 Running type checker..."
-	mypy telegram_bot_stack/
+	./venv/bin/mypy telegram_bot_stack/
 	@echo "✅ Linting complete!"
 
 format:
 	@echo "✨ Formatting code..."
-	ruff format .
-	ruff check --fix .
+	./venv/bin/ruff format .
+	./venv/bin/ruff check --fix .
 	@echo "✅ Code formatted!"
 
 clean:
@@ -144,16 +147,39 @@ clean:
 	find . -maxdepth 1 -type f -name "*.db" -delete
 	find . -maxdepth 1 -type f -name "*.sqlite" -delete
 	find . -maxdepth 1 -type f -name "*.sqlite3" -delete
+	@echo "🧹 Cleaning virtual environment and config..."
+	rm -rf venv/
+	rm -f .env
 	@echo "✅ Cleanup complete!"
 
-install:
+# Create virtual environment
+venv:
+	@if [ -d "venv" ]; then \
+		echo "✅ Virtual environment already exists"; \
+	else \
+		echo "🔧 Creating virtual environment..."; \
+		python3 -m venv venv; \
+		echo "⬆️  Upgrading pip..."; \
+		./venv/bin/pip install --upgrade pip setuptools wheel; \
+		echo "✅ Virtual environment created!"; \
+		echo ""; \
+		echo "💡 To activate:"; \
+		echo "   source venv/bin/activate"; \
+	fi
+
+install: venv
 	@echo "📦 Installing package in development mode..."
-	pip install -e ".[dev]"
+	@echo "   Installing with all dependencies (dev + database support)"
+	@if [ -d "venv" ]; then \
+		./venv/bin/pip install -e ".[dev]"; \
+	else \
+		pip install -e ".[dev]"; \
+	fi
 	@echo "✅ Package installed!"
 
 dev: install
 	@echo "🔧 Setting up development environment..."
-	pre-commit install
+	./venv/bin/pre-commit install
 	@echo ""
 	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 	@echo "✅ Development environment ready!"

@@ -68,33 +68,32 @@ if command -v git >/dev/null 2>&1; then
     fi
 fi
 
-# Detect absolute path to MCP servers
+# Detect absolute path to MCP server
 MCP_GITHUB_ABSOLUTE="$PROJECT_ROOT/$MCP_SERVER_RELATIVE_PATH"
-MCP_GRAPH_RELATIVE="scripts/mcp_project_graph.py"
-MCP_GRAPH_ABSOLUTE="$PROJECT_ROOT/$MCP_GRAPH_RELATIVE"
+
+# Detect Python executable (prefer venv)
+PYTHON_EXECUTABLE="python3"
+if [ -f "$PROJECT_ROOT/venv/bin/python" ]; then
+    PYTHON_EXECUTABLE="$PROJECT_ROOT/venv/bin/python"
+elif [ -f "$PROJECT_ROOT/venv/bin/python3" ]; then
+    PYTHON_EXECUTABLE="$PROJECT_ROOT/venv/bin/python3"
+fi
 
 # Detect repository (for .env file suggestion)
 if [ -n "$GITHUB_REPO" ]; then
     echo "📦 Detected repository: $GITHUB_REPO"
 fi
 
-# Create unified configuration (both servers, no env variables)
+# Create configuration (no env variables)
 cat > "$CURSOR_CONFIG" << EOF
 {
   "mcpServers": {
     "github-workflow": {
-      "command": "python3",
+      "command": "$PYTHON_EXECUTABLE",
       "args": [
         "$MCP_GITHUB_ABSOLUTE"
       ],
       "description": "GitHub workflow management (issues, PRs, CI)"
-    },
-    "project-graph": {
-      "command": "python3",
-      "args": [
-        "$MCP_GRAPH_ABSOLUTE"
-      ],
-      "description": "Project graph navigation"
     }
   }
 }
@@ -114,8 +113,7 @@ fi
 echo "   2. Restart Cursor"
 echo "   3. Test by asking: 'List all open GitHub issues'"
 echo ""
-echo "💡 MCP servers configured:"
+echo "💡 MCP server configured:"
 echo "   • github-workflow: GitHub issues, PRs, CI"
-echo "   • project-graph: Project navigation"
 echo ""
 echo "🔒 Security: GITHUB_TOKEN and GITHUB_REPO read from .env file"
