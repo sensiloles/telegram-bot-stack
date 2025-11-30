@@ -2,6 +2,40 @@
 
 <!-- version list -->
 
+## v1.34.5 (2025-11-30)
+
+### Bug Fixes
+
+- **deploy**: Prevent secrets deletion and fix update restart (#163, #164)
+  ([`efc65c4`](https://github.com/sensiloles/telegram-bot-stack/commit/efc65c4e0283b3f498ef7dbff9c4e18cc2fd599a))
+
+### Chores
+
+- **license**: Improve license file format for better recognition
+  ([`6335f30`](https://github.com/sensiloles/telegram-bot-stack/commit/6335f3036af9364431085243b7f44c2c6f448325))
+
+### Documentation
+
+- **readme**: Add Windows development command reference (fixes CI)
+  ([`39c0935`](https://github.com/sensiloles/telegram-bot-stack/commit/39c09352d1e5adb1b171a4b148c0c93d0b518b67))
+
+- **readme**: Improve features section with CLI and deployment focus
+  ([`6358f96`](https://github.com/sensiloles/telegram-bot-stack/commit/6358f966325fdcc4692319fb2a1aa1a7d3c579db))
+
+- **readme**: Replace GitHub license badge with custom BSL 1.1 badge
+  ([`3703d7f`](https://github.com/sensiloles/telegram-bot-stack/commit/3703d7f501c8d3d346c4bd5fbdacd2e1775a5e37))
+
+- **status**: Update PROJECT_STATUS.md - #163, #164 fixed, ready for v2.0.0
+  ([`9320a04`](https://github.com/sensiloles/telegram-bot-stack/commit/9320a044fb6fecab717483c428e83f5781d6d5d4))
+
+- **status**: Update PROJECT_STATUS.md with E2E testing Phase 1 results
+  ([#120](https://github.com/sensiloles/telegram-bot-stack/pull/120),
+  [`16821fa`](https://github.com/sensiloles/telegram-bot-stack/commit/16821fa870314ce9db01ee2e717738a1d616ce84))
+
+- **status**: Update with Phase 2 E2E testing results - 2 critical bugs found (#163, #164)
+  ([`904c925`](https://github.com/sensiloles/telegram-bot-stack/commit/904c925d0ba5172e472561c75594dda30340e0e1))
+
+
 ## v1.34.4 (2025-11-30)
 
 ### Bug Fixes
