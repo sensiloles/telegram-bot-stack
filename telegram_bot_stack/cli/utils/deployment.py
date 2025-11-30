@@ -66,14 +66,32 @@ def create_vps_connection_from_config(config: "DeploymentConfig") -> "VPSConnect
     Returns:
         VPSConnection instance configured from deploy.yaml
     """
+    import getpass
+
+    import click
+
     from telegram_bot_stack.cli.utils.vps import VPSConnection
+
+    auth_method = config.get("vps.auth_method", "auto")
+    password = None
+
+    # Prompt for password if using password authentication
+    if auth_method == "password":
+        try:
+            password = getpass.getpass(
+                f"🔑 Enter SSH password for {config.get('vps.user')}@{config.get('vps.host')}: "
+            )
+        except (KeyboardInterrupt, EOFError):
+            click.echo("\n❌ Password input cancelled")
+            raise SystemExit(1)
 
     return VPSConnection(
         host=config.get("vps.host"),
         user=config.get("vps.user", "root"),
         ssh_key=config.get("vps.ssh_key"),
         port=config.get("vps.port", 22),
-        auth_method=config.get("vps.auth_method", "auto"),
+        password=password,
+        auth_method=auth_method,
     )
 
 
