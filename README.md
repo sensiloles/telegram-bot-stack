@@ -460,7 +460,14 @@ The framework includes comprehensive test coverage (84%) with unit tests, integr
 - **macOS** - Full support (Intel + Apple Silicon) ✅
 - **Windows** - Full support (PowerShell, cmd, Git Bash) ✅
 
-See [Windows Setup Guide](docs/windows-setup.md) for Windows-specific instructions.
+**Windows users:** Use `make.bat` or `python scripts/tasks.py` for all development commands:
+
+```bash
+make.bat test              # Run tests (Windows cmd/PowerShell)
+python scripts/tasks.py test  # Alternative syntax
+```
+
+See [Windows Setup Guide](docs/windows-setup.md) for complete Windows-specific instructions.
 
 ### Contributing
 
