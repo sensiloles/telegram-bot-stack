@@ -49,9 +49,12 @@ restart:
 	@echo "✅ Bot restarted!"
 
 logs:
-	@TAIL=$${TAIL:-100}                           ; \
-	FOLLOW=$${FOLLOW:-f}                          ; \
-	$(DOCKER_COMPOSE) logs $$FOLLOW --tail=$$TAIL
+	@TAIL=$${TAIL:-100}                                 ; \
+	if [ -n "$$FOLLOW" ]                                 ; then \
+		$(DOCKER_COMPOSE) logs -f --tail=$$TAIL bot       ; \
+	else                                                   \
+		$(DOCKER_COMPOSE) logs --tail=$$TAIL bot          ; \
+	fi
 
 status:
 	@$(DOCKER_COMPOSE) ps

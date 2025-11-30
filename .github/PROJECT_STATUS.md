@@ -1,7 +1,7 @@
 # Project Status - telegram-bot-stack
 
 **Version:** v1.32.0 → v2.0.0 MVP
-**Updated:** 2025-11-29 (completed #133 Windows documentation - Week 10 COMPLETE ✅)
+**Updated:** 2025-11-30 (fixed #144, #145, #147 - Critical deployment bugs)
 **Status:** ✅ Week 10 Complete - Ready for Week 11 Pre-release Testing
 
 ---
@@ -836,8 +836,9 @@ Supporting Infrastructure (v2.0.1):
 
 ---
 
-**Status:** ✅ Week 10 Complete - All Windows support tasks done
-**Progress:** 15/15 critical tasks done ✅ | Ready for Week 11 E2E testing gate
+**Status:** ✅ Week 10 Complete + Critical Bugs Fixed
+**Progress:** 15/15 critical tasks done ✅ + 3 critical bugs fixed ✅
+**Latest:** Fixed #144 (.gitignore), #145 (password auth), #147 (restarts + logs)
 **Current Focus:** #120 - Pre-release E2E testing (MANDATORY GATE)
 **Next Step:** Comprehensive end-to-end testing on all platforms
 **Target Release:** v2.0.0 MVP (#121) - Week 12
@@ -853,11 +854,12 @@ Supporting Infrastructure (v2.0.1):
 **Duplicates Closed:** 3 issues (#41→#87, #42→#82+#90, #49→#89)
 **Total Issues:** 128 (45 open, 83 closed)
 
-**Latest Update:** 2025-11-29 - Added Windows cross-platform support (#130-#135)
+**Latest Update:** 2025-11-30 - Fixed critical deployment bugs (#144, #145, #147)
 
 **New this session:**
 
-- Created 6 issues for Windows developer support
-- Added to v2.0.0 MVP: SSH generation, Makefile alternatives, Windows docs
-- Added to v2.0.1: Windows CI, cross-platform integration tests
-- Updated roadmap to reflect cross-platform focus
+- ✅ Fixed #144: Added .gitignore to all templates (SECURITY)
+- ✅ Fixed #145: Added --password option to deploy init
+- ✅ Fixed #147: Fixed infinite restarts (restart: on-failure:5) + broken logs command
+- ✅ All 554 unit tests passing
+- Ready for Week 11 E2E testing
