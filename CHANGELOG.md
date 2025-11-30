@@ -2,6 +2,19 @@
 
 <!-- version list -->
 
+## v1.34.4 (2025-11-30)
+
+### Bug Fixes
+
+- **badges**: Make tests and coverage badges dynamic
+  ([`6f82ade`](https://github.com/sensiloles/telegram-bot-stack/commit/6f82adede6f46c81a06d940f4719190ff720bf15))
+
+### Documentation
+
+- **legal**: Complete licensing research for v2.0.0
+  ([`504b0f0`](https://github.com/sensiloles/telegram-bot-stack/commit/504b0f0be2c694de25e3f1505a5430c78583ec49))
+
+
 ## [Unreleased]
 
 ### Changed
