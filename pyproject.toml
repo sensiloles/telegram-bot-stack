@@ -68,6 +68,8 @@ dev = [
 "pre-commit>=3.8.0",
 "tox>=4.0.0",                     # Multi-version testing
 "testcontainers>=3.7.0",          # For integration tests with mock VPS
+"PyGithub>=2.1.1",                # Required for MCP GitHub server (scripts/mcp_github_server.py)
+"mcp>=1.0.0; python_version >= '3.10'",  # Required for MCP Project Graph server (scripts/mcp_project_graph.py); requires Python 3.10+
 ]
 
 # GitHub Actions automation
