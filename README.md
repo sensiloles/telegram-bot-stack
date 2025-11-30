@@ -394,7 +394,24 @@ See [CHANGELOG.md](CHANGELOG.md) for version history and release notes.
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) file for details.
+**Business Source License 1.1 (BSL 1.1)**
+
+telegram-bot-stack is licensed under the Business Source License 1.1. This license:
+
+- ✅ **Allows free use** for personal, educational, and small business projects (up to 10 bots)
+- ✅ **Allows contributions** - all code you contribute will be licensed under BSL 1.1
+- ✅ **Converts to Apache 2.0** on January 1, 2029 (automatic conversion to full open-source)
+- ⚠️ **Restricts** commercial use beyond the specified limits (see LICENSE file for details)
+
+**Key points:**
+- Personal and educational use is always free
+- Small businesses can use up to 10 bots without restrictions
+- Open-source projects can use telegram-bot-stack freely
+- Commercial use beyond limits requires a license (contact maintainers)
+
+**Full license text:** See [LICENSE](LICENSE) file for complete terms.
+
+**Why BSL 1.1?** This license protects the project during its growth phase while ensuring it becomes fully open-source in 2029. Used by respected projects like MariaDB, CockroachDB, and Sentry.
 
 ## Links
 
