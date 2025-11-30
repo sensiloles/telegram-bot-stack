@@ -70,7 +70,7 @@ class TestDockerComposeGeneration:
         assert "services" in compose_data
         assert "bot" in compose_data["services"]
         assert compose_data["services"]["bot"]["container_name"] == TEST_BOT_NAME
-        assert compose_data["services"]["bot"]["restart"] == "always"
+        assert compose_data["services"]["bot"]["restart"] == "on-failure:5"
 
     def test_compose_resource_limits(self, tmp_path: Path) -> None:
         """Test docker-compose includes resource limits."""
