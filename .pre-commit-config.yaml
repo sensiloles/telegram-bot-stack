@@ -44,12 +44,3 @@ repos:
       - id: commitizen
         name: "📝 Conventional Commits"
         stages: [commit-msg]
-
-  - repo: local
-    hooks:
-      - id: update-project-graphs
-        name: "📊 Update Project Graphs"
-        entry: ./venv/bin/python .project-graph/utils/pre_commit_hook.py
-        language: system
-        pass_filenames: true
-        files: \.(py|md|yml|yaml|toml|sh)$

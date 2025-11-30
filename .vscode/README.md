@@ -130,7 +130,6 @@ Project uses dynamic imports from external directories. These are configured via
 
 ```json
 "python.analysis.extraPaths": [
-  ".project-graph",
   ".github/workflows/scripts"
 ]
 ```
@@ -139,7 +138,6 @@ Project uses dynamic imports from external directories. These are configured via
 
 - Configures import resolution for scripts directory
 - Handles `mcp` package (Python 3.10+ only)
-- Resolves `utils.graph_utils` from `.project-graph`
 - Resolves `github_helper` from `.github/workflows/scripts`
 
 **No `# type: ignore` needed!** ✅

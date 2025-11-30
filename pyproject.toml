@@ -67,9 +67,8 @@ dev = [
 "pre-commit>=3.8.0",
 "tox>=4.0.0",                           # Multi-version testing
 "testcontainers>=3.7.0",                # For integration tests with mock VPS
-"PyGithub>=2.1.1",                      # Required for MCP GitHub server and CI automation
-"mcp>=1.0.0; python_version >= '3.10'", # Required for MCP Project Graph server (scripts/mcp_project_graph.py); requires Python 3.10+
-"sqlalchemy>=2.0,<3.0",                 # Required for SQL storage tests
+    "PyGithub>=2.1.1",                      # Required for MCP GitHub server and CI automation
+    "sqlalchemy>=2.0,<3.0",                 # Required for SQL storage tests
 "psycopg2-binary>=2.9",                 # Required for PostgreSQL storage tests
 ]
 
@@ -100,27 +99,25 @@ disallow_untyped_defs = true
 disallow_incomplete_defs = true
 ignore_missing_imports = true
 exclude = [
-"venv/",
-"build/",
-"dist/",
-".project-graph/",
-"examples/",
-"tests/",
-"scripts/",
-"telegram_bot_stack/cli/templates/"
+    "venv/",
+    "build/",
+    "dist/",
+    "examples/",
+    "tests/",
+    "scripts/",
+    "telegram_bot_stack/cli/templates/"
 ]
 
 [tool.ruff]
 line-length = 88
 target-version = "py39"
 exclude = [
-".project-graph/",
-"venv/",
-"build/",
-"dist/",
-".git/",
-"__pycache__/",
-"telegram_bot_stack/cli/templates/", # Template files (YAML, Dockerfiles, etc.) should not be formatted
+    "venv/",
+    "build/",
+    "dist/",
+    ".git/",
+    "__pycache__/",
+    "telegram_bot_stack/cli/templates/", # Template files (YAML, Dockerfiles, etc.) should not be formatted
 ]
 
 [tool.ruff.lint]
