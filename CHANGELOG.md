@@ -2,6 +2,24 @@
 
 <!-- version list -->
 
+## v1.34.2 (2025-11-30)
+
+### Bug Fixes
+
+- **cli**: Resolve critical deployment bugs (#144, #145, #147)
+  ([`96c03e5`](https://github.com/sensiloles/telegram-bot-stack/commit/96c03e59d6f44136268e324a50704df25c805eb3))
+
+### Chores
+
+- **deps**: Add PyGithub and mcp to dev dependencies
+  ([`9d1f5c6`](https://github.com/sensiloles/telegram-bot-stack/commit/9d1f5c60918142169b4d8466118fb40cfe685bb6))
+
+### Testing
+
+- **integration**: Fix docker-compose restart policy assertion
+  ([`63936bb`](https://github.com/sensiloles/telegram-bot-stack/commit/63936bbc6a409f85dace9656edda19c177854e63))
+
+
 ## v1.34.1 (2025-11-29)
 
 ### Bug Fixes
