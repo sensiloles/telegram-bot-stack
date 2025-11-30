@@ -39,7 +39,7 @@ from .storage import (
 )
 from .user_manager import UserManager
 
-__version__ = "0.1.0"
+__version__ = "1.34.5"
 __author__ = "telegram-bot-stack contributors"
 __license__ = "Business Source License 1.1"
 __all__ = [

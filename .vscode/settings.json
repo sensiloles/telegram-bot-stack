@@ -63,6 +63,12 @@
     "./venv/bin/ruff"
   ],
   "python.defaultInterpreterPath": "./venv/bin/python3",
+  "python.analysis.extraPaths": [
+    ".project-graph",
+    ".github/workflows/scripts"
+  ],
+  "python.analysis.useLibraryCodeForTypes": true,
+  "python.analysis.stubPath": "typings",
   "python.analysis.typeCheckingMode": "off",
   "python.analysis.diagnosticMode": "workspace",
   "python.analysis.diagnosticSeverityOverrides": {
@@ -97,5 +103,7 @@
   ],
   "mypy.reportingScope": "workspace",
   "mypy.enabled": true,
-  "mypy.showNotifications": "onError"
+  "mypy.showNotifications": "onError",
+  "mypy.runUsingActiveInterpreter": true,
+  "mypy.dmypyExecutable": "${workspaceFolder}/venv/bin/dmypy"
 }

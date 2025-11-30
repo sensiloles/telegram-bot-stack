@@ -25,7 +25,7 @@ import json
 import logging
 import sys
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Any, Dict, List, Tuple
 
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -48,7 +48,7 @@ def discover_json_files(json_dir: Path) -> List[Tuple[str, Path]]:
     Returns:
         List of tuples (key, filepath) where key is the storage key
     """
-    json_files = []
+    json_files: list[tuple[str, Path]] = []
 
     if not json_dir.exists():
         logger.error(f"Directory not found: {json_dir}")
@@ -62,7 +62,7 @@ def discover_json_files(json_dir: Path) -> List[Tuple[str, Path]]:
     return json_files
 
 
-def load_json_data(filepath: Path) -> Dict:
+def load_json_data(filepath: Path) -> Dict[Any, Any]:
     """Load data from JSON file.
 
     Args:
@@ -73,7 +73,7 @@ def load_json_data(filepath: Path) -> Dict:
     """
     try:
         with open(filepath, encoding="utf-8") as f:
-            return json.load(f)
+            return json.load(f)  # type: ignore[no-any-return]
     except Exception as e:
         logger.error(f"Error loading {filepath}: {e}")
         return {}
@@ -249,7 +249,7 @@ def verify_migration(
     return matching, mismatching
 
 
-def main():
+def main() -> None:
     """Main entry point for the migration tool."""
     parser = argparse.ArgumentParser(
         description="Migrate JSON storage to SQL storage",

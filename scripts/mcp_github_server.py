@@ -20,13 +20,16 @@ from pathlib import Path
 from typing import Any, Optional
 
 try:
+    import urllib.error
+    import urllib.request
+
     import requests
 except ImportError:
     # Fallback to urllib if requests not available
     import urllib.error
     import urllib.request
 
-    requests = None
+    requests = None  # type: ignore[assignment]
 
 # Setup paths
 project_root = Path(__file__).parent.parent
@@ -98,7 +101,7 @@ def detect_repo_from_git() -> Optional[str]:
 # Load environment variables before importing github_helper
 load_env_variables()
 
-from github_helper import (  # type: ignore[import-untyped]
+from github_helper import (
     format_issue_detail,
     format_issue_list,
     get_github_client,
@@ -108,15 +111,14 @@ from github_helper import (  # type: ignore[import-untyped]
 try:
     from github import GithubException
 except ImportError:
-
-    class GithubException(Exception):
-        pass
+    # Fallback if PyGithub not installed
+    GithubException = Exception  # type: ignore[misc,assignment]
 
 
 class MCPServer:
     """MCP Server implementation for GitHub issues and pull requests."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.repo: Optional[Any] = None
         self.repo_name: Optional[str] = None
         self._repo_cache: dict[str, Any] = {}  # Cache for multiple repos
@@ -169,7 +171,7 @@ class MCPServer:
             Dictionary with error analysis
         """
         lines = logs.split("\n")
-        errors = {
+        errors: dict[str, list[str]] = {
             "tracebacks": [],
             "assertion_errors": [],
             "import_errors": [],
@@ -398,11 +400,13 @@ class MCPServer:
                 except Exception as e:
                     error_code = None
                     if requests:
-                        if hasattr(e, "response") and e.response is not None:
-                            error_code = e.response.status_code
+                        if hasattr(e, "response") and hasattr(e, "response"):
+                            response_obj = getattr(e, "response", None)
+                            if response_obj is not None:
+                                error_code = getattr(response_obj, "status_code", None)
                     else:
                         if hasattr(e, "code"):
-                            error_code = e.code
+                            error_code = getattr(e, "code", None)
 
                     if error_code == 403:
                         result_lines.append(
@@ -1141,13 +1145,13 @@ class MCPServer:
                 if not head:
                     # Try to detect from git
                     try:
-                        result = subprocess.run(
+                        git_result = subprocess.run(
                             ["git", "branch", "--show-current"],
                             capture_output=True,
                             text=True,
                             check=True,
                         )
-                        head = result.stdout.strip()
+                        head = git_result.stdout.strip()
                     except subprocess.CalledProcessError:
                         return {
                             "content": [
@@ -1215,13 +1219,13 @@ class MCPServer:
                 if not pr_number:
                     # Try to detect from current branch
                     try:
-                        result = subprocess.run(
+                        git_result = subprocess.run(
                             ["git", "branch", "--show-current"],
                             capture_output=True,
                             text=True,
                             check=True,
                         )
-                        branch = result.stdout.strip()
+                        branch = git_result.stdout.strip()
                         owner = repo.full_name.split("/")[0]
                         pulls = list(
                             repo.get_pulls(state="open", head=f"{owner}:{branch}")
@@ -1719,7 +1723,7 @@ class MCPServer:
 
         return {"jsonrpc": "2.0", "id": request_id, "result": result}
 
-    async def run(self):
+    async def run(self) -> None:
         """Run the MCP server (stdio protocol)."""
         init_line = await asyncio.to_thread(sys.stdin.readline)
         if not init_line:
@@ -1741,6 +1745,7 @@ class MCPServer:
             return
 
         while True:
+            request: Optional[Any] = None
             try:
                 line = await asyncio.to_thread(sys.stdin.readline)
                 if not line:
@@ -1751,13 +1756,14 @@ class MCPServer:
                     continue
 
                 request = json.loads(line)
-                response = await self.handle_request(request)
-                if response is not None:
-                    print(json.dumps(response), flush=True)
+                if request is not None:
+                    response = await self.handle_request(request)
+                    if response is not None:
+                        print(json.dumps(response), flush=True)
             except json.JSONDecodeError:
                 continue
             except Exception as e:
-                request_id = request.get("id") if "request" in locals() else None
+                request_id = request.get("id") if request is not None else None
                 # Only send error response if request has an id (not a notification)
                 if request_id is not None:
                     print(
@@ -1775,7 +1781,7 @@ class MCPServer:
                     )
 
 
-def main():
+def main() -> None:
     """Main entry point."""
     server = MCPServer()
     try:

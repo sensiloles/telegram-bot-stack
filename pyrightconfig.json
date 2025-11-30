@@ -1,0 +1,38 @@
+{
+  "include": [
+    "telegram_bot_stack",
+    "tests",
+    "scripts"
+  ],
+  "exclude": [
+    "**/node_modules",
+    "**/__pycache__",
+    ".venv",
+    "venv",
+    ".tox",
+    "build",
+    "dist",
+    "*.egg-info",
+    ".project-graph",
+    ".github/workflows/scripts"
+  ],
+  "extraPaths": [
+    ".project-graph",
+    ".github/workflows/scripts"
+  ],
+  "reportMissingImports": "warning",
+  "reportMissingModuleSource": "none",
+  "pythonVersion": "3.9",
+  "pythonPlatform": "Darwin",
+  "executionEnvironments": [
+    {
+      "root": "scripts",
+      "pythonVersion": "3.9",
+      "extraPaths": [
+        ".project-graph",
+        ".github/workflows/scripts"
+      ],
+      "reportMissingImports": "none"
+    }
+  ]
+}

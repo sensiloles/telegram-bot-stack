@@ -7,6 +7,12 @@
     "**/.ruff_cache": true,
     "**/*.egg-info": true
   },
+  "files.associations": {
+    "**/telegram_bot_stack/cli/templates/**/*.template": "jinja",
+    "**/telegram_bot_stack/cli/templates/**/*.example": "plaintext",
+    "**/telegram_bot_stack/cli/templates/**/Dockerfile": "dockerfile",
+    "**/telegram_bot_stack/cli/templates/**/Makefile": "makefile"
+  },
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
     "source.organizeImports.ruff": "explicit",
@@ -41,6 +47,14 @@
     "editor.formatOnSave": true,
     "editor.wordWrap": "on"
   },
+  "[jinja]": {
+    "editor.formatOnSave": false,
+    "files.insertFinalNewline": false,
+    "files.trimTrailingWhitespace": false
+  },
+  "[plaintext]": {
+    "editor.formatOnSave": false
+  },
   "ruff.nativeServer": "on",
   "ruff.enable": true,
   "ruff.configurationPreference": "filesystemFirst",
@@ -49,6 +63,12 @@
     "./venv/bin/ruff"
   ],
   "python.defaultInterpreterPath": "./venv/bin/python3",
+  "python.analysis.extraPaths": [
+    ".project-graph",
+    ".github/workflows/scripts"
+  ],
+  "python.analysis.useLibraryCodeForTypes": true,
+  "python.analysis.stubPath": "typings",
   "python.analysis.typeCheckingMode": "off",
   "python.analysis.diagnosticMode": "workspace",
   "python.analysis.diagnosticSeverityOverrides": {
@@ -83,5 +103,7 @@
   ],
   "mypy.reportingScope": "workspace",
   "mypy.enabled": true,
-  "mypy.showNotifications": "onError"
+  "mypy.showNotifications": "onError",
+  "mypy.runUsingActiveInterpreter": true,
+  "mypy.dmypyExecutable": "${workspaceFolder}/venv/bin/dmypy"
 }

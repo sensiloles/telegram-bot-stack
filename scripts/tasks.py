@@ -162,13 +162,16 @@ def task_help() -> None:
     print()
 
     print_section("🔧", "Development Commands:")
+    print_info(
+        "python scripts/tasks.py venv              - Create virtual environment (Python 3.9+)"
+    )
     print_info("python scripts/tasks.py lint              - Run linters (ruff, mypy)")
     print_info("python scripts/tasks.py format            - Auto-format code with ruff")
     print_info(
-        "python scripts/tasks.py clean             - Clean build artifacts and cache"
+        "python scripts/tasks.py clean             - Clean build artifacts, cache, venv, and .env"
     )
     print_info(
-        "python scripts/tasks.py install           - Install package in dev mode"
+        "python scripts/tasks.py install           - Install package in dev mode (creates venv if missing)"
     )
     print_info(
         "python scripts/tasks.py dev               - Setup complete development environment"
@@ -176,13 +179,17 @@ def task_help() -> None:
     print()
 
     print_section("💡", "Quick Start:")
-    print_info("python scripts/tasks.py dev               # First time setup")
+    print_info(
+        "python scripts/tasks.py dev               # First time setup (auto-creates venv)"
+    )
     print_info(
         "python scripts/tasks.py test-fast         # Quick validation during development"
     )
     print_info(
         "python scripts/tasks.py test              # Full validation before commit"
     )
+    print()
+    print_info("⚠️  After 'clean', run 'dev' to recreate environment")
 
     print(f"{Colors.BOLD}{'━' * 70}{Colors.END}")
     print()
@@ -391,7 +398,7 @@ def task_format() -> None:
 
 
 def task_clean() -> None:
-    """Clean build artifacts and cache."""
+    """Clean build artifacts, cache, database files, venv, and .env."""
     print_section("🧹", "Cleaning build artifacts...")
 
     # Directories to remove
@@ -402,6 +409,7 @@ def task_clean() -> None:
         ".pytest_cache",
         ".mypy_cache",
         ".ruff_cache",
+        ".tox",
     ]
 
     for dir_name in dirs_to_remove:
@@ -433,13 +441,83 @@ def task_clean() -> None:
         print_info(f"Removing {egg_info}")
         shutil.rmtree(egg_info)
 
+    print_section("🧹", "Cleaning database files...")
+    # Remove database files in root directory only
+    for db_pattern in ["*.db", "*.sqlite", "*.sqlite3"]:
+        for db_file in Path(".").glob(db_pattern):
+            if db_file.is_file():
+                print_info(f"Removing {db_file}")
+                db_file.unlink()
+
+    print_section("🧹", "Cleaning virtual environment and config...")
+    # Remove venv directory
+    venv_path = Path("venv")
+    if venv_path.exists():
+        print_info("Removing venv/")
+        shutil.rmtree(venv_path)
+
+    # Remove .env file
+    env_file = Path(".env")
+    if env_file.exists():
+        print_info("Removing .env")
+        env_file.unlink()
+
     print_success("Cleanup complete!")
 
 
+def task_venv() -> None:
+    """Create virtual environment if it doesn't exist."""
+    venv_path = Path("venv")
+
+    if venv_path.exists():
+        print_success("Virtual environment already exists")
+        return
+
+    print_section("🔧", "Creating virtual environment...")
+
+    # Create venv
+    import venv as venv_module
+
+    venv_module.create(venv_path, with_pip=True)
+
+    # Upgrade pip, setuptools, and wheel
+    print_section("⬆️ ", "Upgrading pip...")
+    if platform.system() == "Windows":
+        pip_executable = venv_path / "Scripts" / "pip.exe"
+    else:
+        pip_executable = venv_path / "bin" / "pip"
+
+    run([str(pip_executable), "install", "--upgrade", "pip", "setuptools", "wheel"])
+
+    print_success("Virtual environment created!")
+    print()
+    print_section("💡", "To activate:")
+    if platform.system() == "Windows":
+        print_info("   .\\venv\\Scripts\\activate")
+    else:
+        print_info("   source venv/bin/activate")
+
+
 def task_install() -> subprocess.CompletedProcess:
-    """Install package in development mode."""
+    """Install package in development mode (creates venv if missing)."""
+    # Ensure venv exists
+    task_venv()
+
     print_section("📦", "Installing package in development mode...")
-    result = run([sys.executable, "-m", "pip", "install", "-e", ".[dev]"])
+
+    # Determine pip path
+    venv_path = Path("venv")
+    if platform.system() == "Windows":
+        pip_executable = venv_path / "Scripts" / "pip.exe"
+    else:
+        pip_executable = venv_path / "bin" / "pip"
+
+    # Use venv pip if available, otherwise system pip
+    if pip_executable.exists():
+        result = run([str(pip_executable), "install", "-e", ".[dev]"])
+    else:
+        result = run([sys.executable, "-m", "pip", "install", "-e", ".[dev]"])
+
     print_success("Package installed!")
     return result
 
@@ -453,7 +531,13 @@ def task_dev() -> None:
 
     # Install pre-commit hooks
     print()
-    run(["pre-commit", "install"])
+    venv_path = Path("venv")
+    if platform.system() == "Windows":
+        precommit_executable = venv_path / "Scripts" / "pre-commit.exe"
+    else:
+        precommit_executable = venv_path / "bin" / "pre-commit"
+
+    run([str(precommit_executable), "install"])
 
     print()
     print_header("✅ Development environment ready!")
@@ -500,6 +584,7 @@ TASKS = {
     "lint": task_lint,
     "format": task_format,
     "clean": task_clean,
+    "venv": task_venv,
     "install": task_install,
     "dev": task_dev,
 }

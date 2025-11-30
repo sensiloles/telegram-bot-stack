@@ -1,7 +1,7 @@
 {
   "metadata": {
     "version": "3.0.0",
-    "generated_at": "2025-11-29",
+    "generated_at": "2025-11-30",
     "graph_id": "infrastructure",
     "graph_name": "Infrastructure",
     "graph_type": "domain",
@@ -9,7 +9,7 @@
     "description": "CI/CD workflows, automation scripts, and tooling",
     "scope": "GitHub Actions, automation scripts, deployment",
     "node_count": 54,
-    "edge_count": 1
+    "edge_count": 0
   },
   "nodes": [
     {
@@ -751,7 +751,7 @@
       "type": "script",
       "path": "scripts/mcp_project_graph.py",
       "description": "MCP Server for Project Graph Navigation.",
-      "lines_of_code": 523,
+      "lines_of_code": 529,
       "exports": [
         "ProjectGraphMCPServer",
         "get_project_root",
@@ -779,10 +779,9 @@
       "type": "script",
       "path": "scripts/mcp_github_server.py",
       "description": "MCP Server for GitHub Issues and Pull Requests.",
-      "lines_of_code": 1788,
+      "lines_of_code": 1794,
       "exports": [
         "MCPServer",
-        "GithubException",
         "log_debug",
         "load_env_variables",
         "detect_repo_from_git",
@@ -792,8 +791,7 @@
         "list_tools"
       ],
       "classes": [
-        "MCPServer",
-        "GithubException"
+        "MCPServer"
       ],
       "functions": [
         "log_debug",
@@ -812,7 +810,7 @@
       "category": "implementation",
       "path": "scripts/tasks.py",
       "description": "Module tasks",
-      "lines_of_code": 549,
+      "lines_of_code": 634,
       "complexity_score": 1,
       "exports": [
         "Colors",
@@ -841,6 +839,7 @@
         "task_lint",
         "task_format",
         "task_clean",
+        "task_venv",
         "task_install",
         "task_dev",
         "main",
@@ -875,6 +874,7 @@
         "task_lint",
         "task_format",
         "task_clean",
+        "task_venv",
         "task_install",
         "task_dev",
         "main",
@@ -885,13 +885,5 @@
       "criticality": "medium"
     }
   ],
-  "edges": [
-    {
-      "id": "edge_1",
-      "source": "scripts.migrate_json_to_sql",
-      "target": "telegram_bot_stack.storage",
-      "type": "imports",
-      "description": "Imports from telegram_bot_stack.storage"
-    }
-  ]
+  "edges": []
 }

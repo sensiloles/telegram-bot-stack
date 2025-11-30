@@ -1,7 +1,7 @@
 {
   "metadata": {
     "version": "3.0.0",
-    "generated_at": "2025-11-27",
+    "generated_at": "2025-11-30",
     "graph_id": "bot_framework_core",
     "graph_name": "Bot Framework - Core",
     "graph_type": "sub_graph",
@@ -55,7 +55,7 @@
       "category": "implementation",
       "path": "telegram_bot_stack/__init__.py",
       "description": "telegram-bot-stack: Reusable framework for building Telegram bots.",
-      "lines_of_code": 59,
+      "lines_of_code": 60,
       "complexity_score": 1,
       "exports": [],
       "classes": [],

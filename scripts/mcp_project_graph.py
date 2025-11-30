@@ -44,7 +44,7 @@ Usage:
 import json
 import sys
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from mcp import types
 
@@ -73,16 +73,17 @@ def get_project_root() -> Path:
 class ProjectGraphMCPServer:
     """MCP Server for project graph navigation."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize server."""
         self.project_root = get_project_root()
         self.graph_root = self.project_root / ".project-graph"
-        self.router = None  # Lazy load
+        self.router: Optional[Dict[str, Any]] = None  # Lazy load
 
-    def _ensure_router(self):
+    def _ensure_router(self) -> None:
         """Ensure router is loaded."""
         if self.router is None:
             self.router = load_router()
+        assert self.router is not None  # For mypy
 
     def _get_agent_context(self) -> str:
         """Get minimal agent context for quick orientation.
@@ -138,7 +139,7 @@ class ProjectGraphMCPServer:
             "critical_rules": [
                 "Use Tool Priority: MCP > CLI Scripts > Manual Git",
                 "NEVER push to main - use feature branches",
-                "Test coverage >=80% for telegram_bot_stack/",
+                "Test coverage >=75% (CI minimum), target 80% for telegram_bot_stack/",
                 "Conventional commits: type(scope): description",
                 "Update docs BEFORE committing code",
             ],
@@ -158,7 +159,7 @@ class ProjectGraphMCPServer:
             "workflow_summary": {
                 "step_1": "Check branch (not main) & open issues",
                 "step_2": "Load relevant graph: fetch_mcp_resource('project-graph', 'graph://...')",
-                "step_3": "Implement changes + tests (>=80% coverage)",
+                "step_3": "Implement changes + tests (>=75% coverage required, 80% target)",
                 "step_4": "Commit with conventional format",
                 "step_5": "Create PR: mcp_github-workflow_create_pr(...)",
                 "step_6": "Merge: mcp_github-workflow_merge_pr(...)",
@@ -180,6 +181,7 @@ class ProjectGraphMCPServer:
             List of resource descriptors
         """
         self._ensure_router()
+        assert self.router is not None  # For mypy
 
         resources = [
             types.Resource(
@@ -271,6 +273,7 @@ class ProjectGraphMCPServer:
             # Parse query parameter
             if "?task=" in path:
                 task = path.split("?task=", 1)[1]
+                assert self.router is not None  # For mypy
                 recommendation = get_recommended_graph(self.router, task)
                 return json.dumps(
                     {
@@ -311,6 +314,7 @@ class ProjectGraphMCPServer:
         if name == "recommend_graph":
             task = arguments.get("task", "")
             self._ensure_router()
+            assert self.router is not None  # For mypy
             recommendation = get_recommended_graph(self.router, task)
             return json.dumps({"recommended_graph": recommendation})
 
@@ -475,7 +479,7 @@ class ProjectGraphMCPServer:
         ]
 
 
-def main():
+def main() -> None:
     """Run MCP server."""
     import asyncio
 
@@ -493,24 +497,26 @@ def main():
     app = Server("project-graph")
 
     @app.list_resources()
-    async def handle_list_resources():
+    async def handle_list_resources() -> List[types.Resource]:
         return server.list_resources()
 
     @app.read_resource()
-    async def handle_read_resource(uri: str):
+    async def handle_read_resource(uri: str) -> str:
         content = server.read_resource(uri)
         return content
 
     @app.list_tools()
-    async def handle_list_tools():
+    async def handle_list_tools() -> List[Dict[str, Any]]:
         return server.list_tools()
 
     @app.call_tool()
-    async def handle_call_tool(name: str, arguments: Dict[str, Any]):
+    async def handle_call_tool(
+        name: str, arguments: Dict[str, Any]
+    ) -> List[types.TextContent]:
         result = server.call_tool(name, arguments)
         return [types.TextContent(type="text", text=result)]
 
-    async def run():
+    async def run() -> None:
         async with stdio_server() as (read_stream, write_stream):
             await app.run(
                 read_stream, write_stream, app.create_initialization_options()
