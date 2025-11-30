@@ -115,8 +115,7 @@ exclude = [
 "examples/",
 "tests/",
 "scripts/",
-"telegram_bot_stack/cli/templates/",
-"archive/"
+"telegram_bot_stack/cli/templates/"
 ]
 
 [tool.ruff]

@@ -137,9 +137,13 @@ format:
 
 clean:
 	@echo "🧹 Cleaning build artifacts..."
-	rm -rf build/ dist/ *.egg-info htmlcov/ .coverage coverage.xml
+	rm -rf build/ dist/ *.egg-info htmlcov/ .coverage coverage.xml .tox/
 	find . -type d -name __pycache__ -exec rm -rf {} +
 	find . -type f -name "*.pyc" -delete
+	@echo "🧹 Cleaning database files..."
+	find . -maxdepth 1 -type f -name "*.db" -delete
+	find . -maxdepth 1 -type f -name "*.sqlite" -delete
+	find . -maxdepth 1 -type f -name "*.sqlite3" -delete
 	@echo "✅ Cleanup complete!"
 
 install:

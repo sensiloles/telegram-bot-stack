@@ -33,12 +33,6 @@ Technical reference documentation:
 - **[Architecture](architecture.md)** - System design and patterns
 - **[CLI Specification](cli-specification.md)** - Command-line tool specification
 
-### Archive
-
-Historical documentation:
-
-- **[Development Archive](../archive/development-archive.md)** - Archived development notes
-
 ## Documentation Structure
 
 ```
@@ -82,12 +76,6 @@ Technical documentation:
 - **API Reference** - Complete API documentation
 - **Architecture** - Design decisions and patterns
 - **CLI Specification** - Command-line tool reference
-
-### Archive (Low Priority)
-
-Historical and deprecated documentation:
-
-- **Development Archive** - Archived development notes
 
 ## Documentation Relationships
 
