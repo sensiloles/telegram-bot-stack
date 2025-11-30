@@ -42,7 +42,7 @@ Bot Token (from @BotFather): 1234567890:ABCdefGHIjklMNOpqrsTUVwxyz
 For secure production deployment, use secrets management:
 
 ```bash
-telegram-bot-stack deploy secrets set BOT_TOKEN "your-bot-token-here"
+telegram-bot-stack deploy secrets set-secret BOT_TOKEN "your-bot-token-here"
 ```
 
 Alternatively, you can use environment variables (less secure):
@@ -395,7 +395,7 @@ This automatically generates an encryption key and stores it in `deploy.yaml`.
 
 ```bash
 # Set bot token
-telegram-bot-stack deploy secrets set BOT_TOKEN "your-bot-token-here"
+telegram-bot-stack deploy secrets set-secret BOT_TOKEN "your-bot-token-here"
 
 # Set additional secrets
 telegram-bot-stack deploy secrets set DB_PASSWORD "secure-password"
@@ -1021,12 +1021,12 @@ telegram-bot-stack deploy init --bot-name notifications-bot
 ```bash
 # Bot 1 secrets
 cd ~/bots/support-bot/
-telegram-bot-stack deploy secrets set BOT_TOKEN "bot1-token-from-botfather"
+telegram-bot-stack deploy secrets set-secret BOT_TOKEN "bot1-token-from-botfather"
 telegram-bot-stack deploy secrets set DATABASE_URL "postgres://..."
 
 # Bot 2 secrets
 cd ~/bots/notifications-bot/
-telegram-bot-stack deploy secrets set BOT_TOKEN "bot2-token-from-botfather"
+telegram-bot-stack deploy secrets set-secret BOT_TOKEN "bot2-token-from-botfather"
 telegram-bot-stack deploy secrets set API_KEY "external-api-key"
 ```
 
@@ -2239,7 +2239,7 @@ export BOT_TOKEN="test-bot-token"
 telegram-bot-stack dev
 
 # Production: Use production bot token
-telegram-bot-stack deploy secrets set BOT_TOKEN "prod-bot-token"
+telegram-bot-stack deploy secrets set-secret BOT_TOKEN "prod-bot-token"
 telegram-bot-stack deploy up
 ```
 
@@ -2546,7 +2546,7 @@ print(bot.get_me())
 "
 
 # Update token on VPS
-telegram-bot-stack deploy secrets set BOT_TOKEN "your-correct-token"
+telegram-bot-stack deploy secrets set-secret BOT_TOKEN "your-correct-token"
 
 # Restart bot
 telegram-bot-stack deploy up
@@ -2679,7 +2679,7 @@ print(bot.get_me())
 "
 
 # Update token if wrong
-telegram-bot-stack deploy secrets set BOT_TOKEN "correct-token"
+telegram-bot-stack deploy secrets set-secret BOT_TOKEN "correct-token"
 telegram-bot-stack deploy up
 ```
 
@@ -3574,7 +3574,7 @@ telegram-bot-stack deploy secrets list
 
 ```bash
 # Set bot token
-telegram-bot-stack deploy secrets set BOT_TOKEN "your-token-here"
+telegram-bot-stack deploy secrets set-secret BOT_TOKEN "your-token-here"
 
 # Set other secrets
 telegram-bot-stack deploy secrets set DATABASE_URL "postgres://..."

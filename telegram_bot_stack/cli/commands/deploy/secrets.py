@@ -28,7 +28,7 @@ def set_secret(config: str, key: str, value: str) -> None:
     """Set a secret value on VPS.
 
     Example:
-        telegram-bot-stack deploy secrets set BOT_TOKEN "your-token-here"
+        telegram-bot-stack deploy secrets set-secret BOT_TOKEN "your-token-here"
     """
     console.print(f"🔐 [bold cyan]Setting secret: {key}[/bold cyan]\n")
 

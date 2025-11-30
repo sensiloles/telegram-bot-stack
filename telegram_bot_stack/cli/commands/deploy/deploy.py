@@ -229,7 +229,7 @@ def init(
     console.print("\n[bold]Next steps:[/bold]")
     console.print("1. Review deploy.yaml and adjust settings if needed")
     console.print(
-        "2. Set secrets on VPS: [cyan]telegram-bot-stack deploy secrets set BOT_TOKEN 'your-token'[/cyan]"
+        "2. Set secrets on VPS: [cyan]telegram-bot-stack deploy secrets set-secret BOT_TOKEN 'your-token'[/cyan]"
     )
     console.print("3. Run: [cyan]telegram-bot-stack deploy up[/cyan]")
     console.print("\n[dim]See deploy.yaml.example for all available options[/dim]")
