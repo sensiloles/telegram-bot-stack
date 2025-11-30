@@ -25,5 +25,6 @@
   "scripts/mcp_project_graph.py": "2a9db6b77fbc3d794827c03dd28489a53fd957995a9aff7db26f2a60576127e4",
   "scripts/migrate_json_to_sql.py": "798e914ded419f852cb0e533bc44d39ec75a3a4dccb8f273e4c790dbafdd1be6",
   "telegram_bot_stack/__init__.py": "b966b7687fbfd9818ff95f78a1d8c0d68489f512b7686ad31b1a19ac8c3b24df",
-  ".pre-commit-config.yaml": "bc3f4a4c2a1b2776f04ee0d00ac0228157facb3217edac1a1b670711e4a2bf46"
+  ".pre-commit-config.yaml": "bc3f4a4c2a1b2776f04ee0d00ac0228157facb3217edac1a1b670711e4a2bf46",
+  "scripts/setup_mcp.sh": "113b042c62e65e383b5e7a87e816c86a8fdb815d7271e2097401765a9b0df0f0"
 }

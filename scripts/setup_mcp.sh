@@ -73,6 +73,14 @@ MCP_GITHUB_ABSOLUTE="$PROJECT_ROOT/$MCP_SERVER_RELATIVE_PATH"
 MCP_GRAPH_RELATIVE="scripts/mcp_project_graph.py"
 MCP_GRAPH_ABSOLUTE="$PROJECT_ROOT/$MCP_GRAPH_RELATIVE"
 
+# Detect Python executable (prefer venv)
+PYTHON_EXECUTABLE="python3"
+if [ -f "$PROJECT_ROOT/venv/bin/python" ]; then
+    PYTHON_EXECUTABLE="$PROJECT_ROOT/venv/bin/python"
+elif [ -f "$PROJECT_ROOT/venv/bin/python3" ]; then
+    PYTHON_EXECUTABLE="$PROJECT_ROOT/venv/bin/python3"
+fi
+
 # Detect repository (for .env file suggestion)
 if [ -n "$GITHUB_REPO" ]; then
     echo "📦 Detected repository: $GITHUB_REPO"
@@ -83,14 +91,14 @@ cat > "$CURSOR_CONFIG" << EOF
 {
   "mcpServers": {
     "github-workflow": {
-      "command": "python3",
+      "command": "$PYTHON_EXECUTABLE",
       "args": [
         "$MCP_GITHUB_ABSOLUTE"
       ],
       "description": "GitHub workflow management (issues, PRs, CI)"
     },
     "project-graph": {
-      "command": "python3",
+      "command": "$PYTHON_EXECUTABLE",
       "args": [
         "$MCP_GRAPH_ABSOLUTE"
       ],

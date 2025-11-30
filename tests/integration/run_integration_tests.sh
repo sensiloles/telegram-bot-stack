@@ -23,9 +23,9 @@ echo "✓ Docker is running"
 echo ""
 
 # Check if Python dependencies are installed
-if ! python -c "import pytest" >/dev/null 2>&1; then
+if ! ./venv/bin/python -c "import pytest" >/dev/null 2>&1; then
     echo "❌ Error: pytest not installed"
-    echo "   Run: pip install -e '.[dev]'"
+    echo "   Run: make dev"
     exit 1
 fi
 
@@ -101,7 +101,7 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo ""
 
 # Run with coverage and parallel execution
-pytest "$TEST_PATH" \
+./venv/bin/pytest "$TEST_PATH" \
     -v \
     -n auto \
     --tb=short \
