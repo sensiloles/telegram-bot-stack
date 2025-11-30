@@ -39,7 +39,6 @@
 
 - Update PROJECT_STATUS.md - all blockers fixed, ready for v2.0.0
   ([`5c455d8`](https://github.com/sensiloles/telegram-bot-stack/commit/5c455d896ecaca2eeb9c93060874cf9775b67664))
-
 ## v1.34.2 (2025-11-30)
 
 ### Bug Fixes
