@@ -161,6 +161,11 @@ def up(config: str, verbose: bool, force: bool) -> None:
             env_file = temp_dir / ".env"
             create_env_file(deploy_config, env_file, secrets_manager, vps)
 
+            # Create empty .secrets.env (required by docker-compose.yml)
+            # Actual secrets are stored encrypted and decrypted in-memory
+            secrets_env_file = temp_dir / ".secrets.env"
+            secrets_env_file.write_text("# Secrets managed via encrypted storage\n")
+
             # Transfer to VPS
             if not vps.transfer_files(temp_dir, remote_dir):
                 console.print("[red]❌ Failed to transfer files[/red]")
@@ -594,6 +599,11 @@ def update(config: str, verbose: bool, backup: bool, no_backup: bool) -> None:
                     secrets_manager if "secrets_manager" in locals() else None,
                     vps,
                 )
+
+                # Create empty .secrets.env (required by docker-compose.yml)
+                # Actual secrets are stored encrypted and decrypted in-memory
+                secrets_env_file = temp_dir / ".secrets.env"
+                secrets_env_file.write_text("# Secrets managed via encrypted storage\n")
 
             # Transfer to VPS
             if not vps.transfer_files(temp_dir, remote_dir):
