@@ -11,7 +11,7 @@ requires-python = ">=3.9"
 authors = [
 {name = "telegram-bot-stack contributors", email = "telegram-bot-stack@users.noreply.github.com"}
 ]
-license = {text = "Business Source License 1.1"}
+license = {file = "LICENSE"}
 keywords = ["telegram", "bot", "framework", "python-telegram-bot", "chatbot"]
 classifiers = [
 "Development Status :: 3 - Alpha",
