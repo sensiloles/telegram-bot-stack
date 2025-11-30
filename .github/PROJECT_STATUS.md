@@ -1,8 +1,8 @@
 # Project Status - telegram-bot-stack
 
-**Version:** v1.32.0 → v2.0.0 MVP
-**Updated:** 2025-11-30 (fixed #144, #145, #147 - Critical deployment bugs)
-**Status:** ✅ Week 10 Complete - Ready for Week 11 Pre-release Testing
+**Version:** v1.34.2 → v2.0.0 MVP
+**Updated:** 2025-11-30 (Manual testing completed - 3 CRITICAL BLOCKERS found)
+**Status:** 🔴 BLOCKED - 3 critical bugs must be fixed before v2.0.0
 
 ---
 
@@ -191,7 +191,7 @@ Found and fixed **12 critical deployment bugs** during E2E testing:
 
 | #    | Issue                      | Category | Depends | Notes                         |
 | ---- | -------------------------- | -------- | ------- | ----------------------------- |
-| #131 | Windows SSH key generation | Platform | ✅ DONE | Fix SSH on Windows (DONE ✅)   |
+| #131 | Windows SSH key generation | Platform | ✅ DONE | Fix SSH on Windows (DONE ✅)  |
 | #132 | Makefile alternatives      | DX       | ✅ DONE | Windows task runner (DONE ✅) |
 | #133 | Windows documentation      | Docs     | ✅ DONE | Windows setup guide (DONE ✅) |
 
@@ -836,12 +836,13 @@ Supporting Infrastructure (v2.0.1):
 
 ---
 
-**Status:** ✅ Week 10 Complete + Critical Bugs Fixed
-**Progress:** 15/15 critical tasks done ✅ + 3 critical bugs fixed ✅
-**Latest:** Fixed #144 (.gitignore), #145 (password auth), #147 (restarts + logs)
-**Current Focus:** #120 - Pre-release E2E testing (MANDATORY GATE)
-**Next Step:** Comprehensive end-to-end testing on all platforms
-**Target Release:** v2.0.0 MVP (#121) - Week 12
+**Status:** 🔴 BLOCKED - Manual testing revealed 3 CRITICAL BLOCKERS
+**Progress:** Testing complete (#120) - Found 3 P0 bugs blocking v2.0.0
+**Latest:** Manual user journey testing completed on real VPS
+**Critical Blockers:** #155 (no .gitignore - SECURITY), #156 (password auth broken), #157 (deploy fails)
+**Current Focus:** Fix 3 blockers immediately (est. 4-6 hours)
+**Next Step:** Fix #155, #156, #157 → Re-test → Release v2.0.0
+**Target Release:** v2.0.0 MVP (#121) - DELAYED until blockers fixed
 
 **Milestones:**
 
@@ -854,12 +855,15 @@ Supporting Infrastructure (v2.0.1):
 **Duplicates Closed:** 3 issues (#41→#87, #42→#82+#90, #49→#89)
 **Total Issues:** 128 (45 open, 83 closed)
 
-**Latest Update:** 2025-11-30 - Fixed critical deployment bugs (#144, #145, #147)
+**Latest Update:** 2025-11-30 - Manual testing completed, 3 CRITICAL BLOCKERS found
 
-**New this session:**
+**Manual Testing Results (#120):**
 
-- ✅ Fixed #144: Added .gitignore to all templates (SECURITY)
-- ✅ Fixed #145: Added --password option to deploy init
-- ✅ Fixed #147: Fixed infinite restarts (restart: on-failure:5) + broken logs command
-- ✅ All 554 unit tests passing
-- Ready for Week 11 E2E testing
+- ✅ Project creation works (init, dev commands)
+- ✅ SSH key authentication works
+- ❌ **#155** - init doesn't create .gitignore (SECURITY BLOCKER)
+- ❌ **#156** - Password auth broken for all commands except init (BLOCKER)
+- ❌ **#157** - deploy up fails: .secrets.env not created (BLOCKER)
+- ⚠️ **#154** - validate doesn't load .env (medium priority)
+
+**Verdict:** Cannot release v2.0.0 until 3 blockers fixed (est. 4-6 hours)

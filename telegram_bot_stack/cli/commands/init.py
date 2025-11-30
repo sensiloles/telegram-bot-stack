@@ -815,8 +815,127 @@ telegram-bot-stack>={current_version}
 """
     (project_path / "requirements.txt").write_text(requirements_content)
 
+    # Create .gitignore (CRITICAL for security - prevent committing secrets)
+    gitignore_content = """# Telegram Bot - Environment & Secrets
+.env
+.env.local
+.env.*.local
+*.key
+*.pem
+.secrets.env
+
+# Telegram Bot - Data & Storage
+*.db
+*.sqlite
+*.sqlite3
+bot_data/
+data/
+logs/
+backups/
+
+# Deployment
+deploy_config.json
+deploy.yaml
+.deployment/
+
+# Telegram Bot - Dev Lock
+.bot.lock
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Testing
+.pytest_cache/
+.coverage
+.coverage.*
+coverage.xml
+coverage.json
+htmlcov/
+.tox/
+.nox/
+.hypothesis/
+
+# Linting & Type Checking
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.ruff_cache/
+.pytype/
+.pyre/
+
+# IDE - VS Code
+.vscode/tasks.json
+.vscode/c_cpp_properties.json
+.vscode/*.code-workspace
+.vscode/.ropeproject
+
+# IDE - PyCharm
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# IDE - Other
+*.swp
+*.swo
+*~
+.project
+.pydevproject
+.settings/
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# Project specific
+*.log
+*.log.*
+temp/
+tmp/
+"""
+    (project_path / ".gitignore").write_text(gitignore_content)
+
     click.secho(
-        "  ✅ Created project files (bot.py, README.md, .env.example, requirements.txt)",
+        "  ✅ Created project files (bot.py, README.md, .env.example, requirements.txt, .gitignore)",
         fg="green",
     )
 

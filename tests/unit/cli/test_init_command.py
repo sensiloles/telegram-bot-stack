@@ -201,7 +201,9 @@ def test_init_minimal(tmp_path):
         assert not (project_path / "tests").exists()
         assert not (project_path / ".vscode").exists()
         assert not (project_path / ".idea").exists()
-        assert not (project_path / ".gitignore").exists()
+
+        # .gitignore is ALWAYS created for security (prevent committing secrets)
+        assert (project_path / ".gitignore").exists()
 
 
 @pytest.mark.skipif(
